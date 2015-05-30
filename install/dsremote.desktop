@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Name=DSRemote
+GenericName=Oscilloscope
+Comment=Operate your Rigol oscilloscope from your Linux desktop.
+Icon=r
+Exec=dsremote
+Terminal=false
+Categories=Science;Application;
+MimeType=
+InitialPreference=9

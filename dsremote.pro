@@ -40,6 +40,30 @@ SOURCES += signalcurve.cpp
 
 RESOURCES = images.qrc
 
+target.path = /usr/bin
+target.files = dsremote
+INSTALLS += target
+
+icon_a.path = /usr/share/icons
+icon_a.files = images/r.png
+INSTALLS += icon_a
+
+icon_b.path += /usr/share/pixmaps
+icon_b.files = images/r.png
+INSTALLS += icon_b
+
+icon_c.path += /usr/share/icons/hicolor/48x48/apps
+icon_c.files = images/r.png
+INSTALLS += icon_c
+
+icon_d.path += /usr/share/icons/hicolor/48x48/mimetypes
+icon_d.files = images/r.png
+INSTALLS += icon_d
+
+desktop_link.path += /usr/share/applications
+desktop_link.files += install/dsremote.desktop
+INSTALLS += desktop_link
+
 
 
 
