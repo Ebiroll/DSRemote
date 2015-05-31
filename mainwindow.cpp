@@ -95,6 +95,7 @@ UI_Mainwindow::UI_Mainwindow()
   waveForm->setSignalColor4(QColor(0, 128, 255));
   waveForm->setRasterColor(Qt::darkGray);
   waveForm->setBorderSize(40);
+  waveForm->setDeviceParameters(&devparms);
 
   setCentralWidget(waveForm);
 

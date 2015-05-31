@@ -103,8 +103,6 @@ void SignalCurve::clear()
 {
   bufsize = 0;
 
-  devparms = NULL;
-
   update();
 }
 
@@ -244,8 +242,6 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     return;
   }
 
-  if(bufsize < 2)  return;
-
   offset = -127;
 
   v_sense = -((double)curve_h / 256.0);
@@ -291,6 +287,8 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   }
 
 /////////////////////////////////// draw the curve ///////////////////////////////////////////
+
+  if(bufsize < 2)  return;
 
   painter->setClipping(true);
   painter->setClipRegion(QRegion(0, 0, curve_w, curve_h), Qt::ReplaceClip);
@@ -423,13 +421,19 @@ void SignalCurve::drawCurve(struct device_settings *devp, struct tmcdev *dev, in
 }
 
 
+void SignalCurve::setDeviceParameters(struct device_settings *devp)
+{
+  devparms = devp;
+}
+
+
 void SignalCurve::drawTopLabels(QPainter *painter)
 {
   QPainterPath path;
 
   char str[128];
 
-  if((devparms == NULL) || (device == NULL))
+  if(devparms == NULL)
   {
     return;
   }
@@ -605,9 +609,8 @@ void SignalCurve::drawTopLabels(QPainter *painter)
   if(devparms->triggeredgeslope == 0)
   {
     painter->drawLine(705, 8, 710, 8);
-    painter->drawLine(705, 8, 705, 18);
-    painter->drawLine(700, 18, 705, 18);
-    painter->drawLine(701, 15, 709, 15);
+    painter->drawLine(705, 8, 705, 20);
+    painter->drawLine(700, 20, 705, 20);
     painter->drawLine(701, 15, 705, 11);
     painter->drawLine(709, 15, 705, 11);
   }
@@ -615,11 +618,10 @@ void SignalCurve::drawTopLabels(QPainter *painter)
   if(devparms->triggeredgeslope == 1)
   {
     painter->drawLine(700, 8, 705, 8);
-    painter->drawLine(705, 8, 705, 18);
-    painter->drawLine(705, 18, 710, 18);
-    painter->drawLine(701, 11, 709, 11);
-    painter->drawLine(701, 11, 705, 15);
-    painter->drawLine(709, 11, 705, 15);
+    painter->drawLine(705, 8, 705, 20);
+    painter->drawLine(705, 20, 710, 20);
+    painter->drawLine(701, 12, 705, 16);
+    painter->drawLine(709, 12, 705, 16);
   }
 
   if(devparms->triggeredgeslope == 2)
@@ -645,7 +647,7 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
   char str1[4],
        str2[128];
 
-  if((devparms == NULL) || (device == NULL))
+  if(devparms == NULL)
   {
     return;
   }
@@ -680,6 +682,33 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
       painter->drawRoundedRect(xpos + 25, ypos, 85, 20, 3, 3);
 
       painter->drawText(xpos + 25, ypos + 1, 85, 20, Qt::AlignCenter, str2);
+
+      if(devparms->chancoupling[chn] == 0)
+      {
+        painter->drawLine(xpos + 33, ypos + 6, xpos + 33, ypos + 10);
+
+        painter->drawLine(xpos + 28, ypos + 10, xpos + 38, ypos + 10);
+
+        painter->drawLine(xpos + 30, ypos + 12, xpos + 36, ypos + 12);
+
+        painter->drawLine(xpos + 32, ypos + 14, xpos + 34, ypos + 14);
+      }
+      else if(devparms->chancoupling[chn] == 1)
+        {
+          painter->drawLine(xpos + 28, ypos + 8, xpos + 38, ypos + 8);
+
+          painter->drawLine(xpos + 28, ypos + 12, xpos + 30, ypos + 12);
+
+          painter->drawLine(xpos + 32, ypos + 12, xpos + 34, ypos + 12);
+
+          painter->drawLine(xpos + 36, ypos + 12, xpos + 38, ypos + 12);
+        }
+        else if(devparms->chancoupling[chn] == 2)
+          {
+            painter->drawArc(xpos + 30, ypos + 8, 5, 5, 10 * 16, 160 * 16);
+
+            painter->drawArc(xpos + 35, ypos + 8, 5, 5, -10 * 16, -160 * 16);
+          }
     }
     else
     {
@@ -694,6 +723,33 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
       painter->drawText(xpos + 6, ypos + 15, str1);
 
       painter->drawText(xpos + 25, ypos + 1, 85, 20, Qt::AlignCenter, str2);
+
+      if(devparms->chancoupling[chn] == 0)
+      {
+        painter->drawLine(xpos + 33, ypos + 6, xpos + 33, ypos + 10);
+
+        painter->drawLine(xpos + 28, ypos + 10, xpos + 38, ypos + 10);
+
+        painter->drawLine(xpos + 30, ypos + 12, xpos + 36, ypos + 12);
+
+        painter->drawLine(xpos + 32, ypos + 14, xpos + 34, ypos + 14);
+      }
+      else if(devparms->chancoupling[chn] == 1)
+        {
+          painter->drawLine(xpos + 28, ypos + 8, xpos + 38, ypos + 8);
+
+          painter->drawLine(xpos + 28, ypos + 12, xpos + 30, ypos + 12);
+
+          painter->drawLine(xpos + 32, ypos + 12, xpos + 34, ypos + 12);
+
+          painter->drawLine(xpos + 36, ypos + 12, xpos + 38, ypos + 12);
+        }
+        else if(devparms->chancoupling[chn] == 2)
+          {
+            painter->drawArc(xpos + 30, ypos + 8, 5, 5, 10 * 16, 160 * 16);
+
+            painter->drawArc(xpos + 35, ypos + 8, 5, 5, -10 * 16, -160 * 16);
+          }
     }
   }
   else
@@ -709,6 +765,33 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
     painter->drawText(xpos + 6, ypos + 15, str1);
 
     painter->drawText(xpos + 25, ypos + 1, 85, 20, Qt::AlignCenter, str2);
+
+    if(devparms->chancoupling[chn] == 0)
+    {
+      painter->drawLine(xpos + 33, ypos + 6, xpos + 33, ypos + 10);
+
+      painter->drawLine(xpos + 28, ypos + 10, xpos + 38, ypos + 10);
+
+      painter->drawLine(xpos + 30, ypos + 12, xpos + 36, ypos + 12);
+
+      painter->drawLine(xpos + 32, ypos + 14, xpos + 34, ypos + 14);
+    }
+    else if(devparms->chancoupling[chn] == 1)
+      {
+        painter->drawLine(xpos + 28, ypos + 8, xpos + 38, ypos + 8);
+
+        painter->drawLine(xpos + 28, ypos + 12, xpos + 30, ypos + 12);
+
+        painter->drawLine(xpos + 32, ypos + 12, xpos + 34, ypos + 12);
+
+        painter->drawLine(xpos + 36, ypos + 12, xpos + 38, ypos + 12);
+      }
+      else if(devparms->chancoupling[chn] == 2)
+        {
+          painter->drawArc(xpos + 30, ypos + 8, 5, 5, 10 * 16, 160 * 16);
+
+          painter->drawArc(xpos + 35, ypos + 8, 5, 5, -10 * 16, -160 * 16);
+        }
   }
 }
 

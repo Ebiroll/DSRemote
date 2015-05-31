@@ -30,7 +30,7 @@
 #define DEMO_GLOBAL_H
 
 
-#define PROGRAM_NAME     "DS6000 Remote"
+#define PROGRAM_NAME     "DSRemote"
 #define PROGRAM_VERSION       "0.1"
 
 #define MAX_PATHLEN            4096

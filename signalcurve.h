@@ -81,6 +81,7 @@ public:
   void clear();
   void setUpdatesEnabled(bool);
   void setTrigLineVisible(void);
+  void setDeviceParameters(struct device_settings *);
 
   unsigned int scr_update_cntr;
 
