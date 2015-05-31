@@ -1,0 +1,10 @@
+--- usbtmc.c.orig	2015-05-31 09:24:30.990150343 +0200
++++ usbtmc.c	2015-05-31 09:26:55.369913094 +0200
+@@ -109,6 +109,7 @@ struct usbtmc_ID_rigol_quirk {
+ 
+ static const struct usbtmc_ID_rigol_quirk usbtmc_id_quirk[] = {
+ 	{ 0x1ab1, 0x0588 },
++	{ 0x1ab1, 0x04b0 },
+ 	{ 0, 0 }
+ };
+ 
