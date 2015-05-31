@@ -429,20 +429,30 @@ void SignalCurve::setDeviceParameters(struct device_settings *devp)
 
 void SignalCurve::drawTopLabels(QPainter *painter)
 {
-  QPainterPath path;
+  int i;
 
   char str[128];
+
+  QPainterPath path;
 
   if(devparms == NULL)
   {
     return;
   }
 
+  path.addRoundedRect(5, 5, 70, 20, 3, 3);
+
+  painter->fillPath(path, Qt::black);
+
+  painter->setPen(Qt::white);
+
+  painter->drawText(5, 5, 70, 20, Qt::AlignCenter, devparms->modelname);
+
 //////////////// triggerstatus ///////////////////////////////
 
   path = QPainterPath();
 
-  path.addRoundedRect(55, 5, 45, 20, 3, 3);
+  path.addRoundedRect(80, 5, 35, 20, 3, 3);
 
   if((devparms->triggerstatus == 1) || (devparms->triggerstatus == 3))
   {
@@ -478,18 +488,18 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   switch(devparms->triggerstatus)
   {
-    case 0 : painter->drawText(55, 5, 45, 20, Qt::AlignCenter, "T'D");
+    case 0 : painter->drawText(80, 5, 35, 20, Qt::AlignCenter, "T'D");
              break;
-    case 1 : painter->drawText(55, 5, 45, 20, Qt::AlignCenter, "WAIT");
+    case 1 : painter->drawText(80, 5, 35, 20, Qt::AlignCenter, "WAIT");
              break;
-    case 2 : painter->drawText(55, 5, 45, 20, Qt::AlignCenter, "RUN");
+    case 2 : painter->drawText(80, 5, 35, 20, Qt::AlignCenter, "RUN");
              break;
-    case 3 : painter->drawText(55, 5, 45, 20, Qt::AlignCenter, "AUTO");
+    case 3 : painter->drawText(80, 5, 35, 20, Qt::AlignCenter, "AUTO");
              break;
-    case 4 : painter->drawText(55, 5, 45, 20, Qt::AlignCenter, "FIN");
+    case 4 : painter->drawText(80, 5, 35, 20, Qt::AlignCenter, "FIN");
              break;
     case 5 : painter->setPen(Qt::red);
-             painter->drawText(55, 5, 45, 20, Qt::AlignCenter, "STOP");
+             painter->drawText(80, 5, 35, 20, Qt::AlignCenter, "STOP");
              break;
   }
 
@@ -497,19 +507,19 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   path = QPainterPath();
 
-  path.addRoundedRect(130, 5, 70, 20, 3, 3);
+  path.addRoundedRect(140, 5, 70, 20, 3, 3);
 
   painter->fillPath(path, Qt::black);
 
   painter->setPen(Qt::white);
 
-  painter->drawText(115, 20, "H");
+  painter->drawText(125, 20, "H");
 
   convert_to_metric_suffix(str, devparms->timebasescale);
 
   strcat(str, "s");
 
-  painter->drawText(130, 5, 70, 20, Qt::AlignCenter, str);
+  painter->drawText(140, 5, 70, 20, Qt::AlignCenter, str);
 
 //////////////// samplerate ///////////////////////////////
 
@@ -526,6 +536,37 @@ void SignalCurve::drawTopLabels(QPainter *painter)
   strcat(str, "pts");
 
   painter->drawText(200, 14, 85, 20, Qt::AlignCenter, str);
+
+//////////////// memory position ///////////////////////////////
+
+  path = QPainterPath();
+
+  path.addRoundedRect(285, 5, 240, 20, 3, 3);
+
+  painter->fillPath(path, Qt::black);
+
+  painter->setPen(Qt::gray);
+
+  painter->drawRect(288, 16, 233, 8);
+
+  painter->setPen(Qt::white);
+
+  painter->drawLine(289, 20, 291, 22);
+
+  for(i=0; i<19; i++)
+  {
+    painter->drawLine((i * 12) + 291, 22, (i * 12) + 293, 22);
+
+    painter->drawLine((i * 12) + 297, 18, (i * 12) + 299, 18);
+
+    painter->drawLine((i * 12) + 294, 21, (i * 12) + 296, 19);
+
+    painter->drawLine((i * 12) + 300, 19, (i * 12) + 302, 21);
+  }
+
+  painter->drawLine(519, 22, 520, 22);
+
+  drawSmallTriggerArrow(painter, 407, 16, QColor(255, 128, 0));
 
 //////////////// delay ///////////////////////////////
 
@@ -683,6 +724,11 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
 
       painter->drawText(xpos + 25, ypos + 1, 85, 20, Qt::AlignCenter, str2);
 
+      if(devparms->chanbwlimit[chn])
+      {
+        painter->drawText(xpos + 90, ypos + 1, 20, 20, Qt::AlignCenter, "B");
+      }
+
       if(devparms->chancoupling[chn] == 0)
       {
         painter->drawLine(xpos + 33, ypos + 6, xpos + 33, ypos + 10);
@@ -723,6 +769,11 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
       painter->drawText(xpos + 6, ypos + 15, str1);
 
       painter->drawText(xpos + 25, ypos + 1, 85, 20, Qt::AlignCenter, str2);
+
+      if(devparms->chanbwlimit[chn])
+      {
+        painter->drawText(xpos + 90, ypos + 1, 20, 20, Qt::AlignCenter, "B");
+      }
 
       if(devparms->chancoupling[chn] == 0)
       {
@@ -765,6 +816,11 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
     painter->drawText(xpos + 6, ypos + 15, str1);
 
     painter->drawText(xpos + 25, ypos + 1, 85, 20, Qt::AlignCenter, str2);
+
+    if(devparms->chanbwlimit[chn])
+    {
+      painter->drawText(xpos + 90, ypos + 1, 20, 20, Qt::AlignCenter, "B");
+    }
 
     if(devparms->chancoupling[chn] == 0)
     {
@@ -864,14 +920,34 @@ void SignalCurve::drawArrow(QPainter *painter, int xpos, int ypos, int rot, QCol
 }
 
 
+void SignalCurve::drawSmallTriggerArrow(QPainter *painter, int xpos, int ypos, QColor color)
+{
+  QPainterPath path;
+
+  path.moveTo(xpos + 5, ypos - 10);
+  path.lineTo(xpos + 5,  ypos - 5);
+  path.lineTo(xpos,     ypos);
+  path.lineTo(xpos - 4,  ypos - 5);
+  path.lineTo(xpos - 4, ypos - 10);
+  path.lineTo(xpos + 5, ypos - 10);
+  painter->fillPath(path, color);
+
+  painter->setPen(Qt::black);
+
+  painter->drawLine(xpos - 2, ypos - 8, xpos + 2, ypos - 8);
+
+  painter->drawLine(xpos, ypos - 8, xpos, ypos - 3);
+}
+
+
 void SignalCurve::drawTrigCenterArrow(QPainter *painter, int xpos, int ypos)
 {
   QPainterPath path;
 
-  path.moveTo(xpos + 6, ypos);
+  path.moveTo(xpos + 7, ypos);
   path.lineTo(xpos - 6, ypos);
   path.lineTo(xpos, ypos + 7);
-  path.lineTo(xpos + 6, ypos);
+  path.lineTo(xpos + 7, ypos);
   painter->fillPath(path, QColor(255, 128, 0));
 }
 
