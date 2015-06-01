@@ -1,0 +1,66 @@
+
+DSRemote 0.1
+------------
+
+When opening a connection, the program reads the settings from the device.
+It does not lock the device, so it's still possible to change settings on the device.
+This will cause a mismatch between the programs settings and the device settings.
+This can be solved by letting the program re-read the settings of the device.
+At this moment, the only way to do that is to disconnect and connect again.
+
+Number of screen updates is approx. 20 waveforms per second.
+
+Use the mousewheel to change the dials. In order to simulate a push on a dial,
+click on it with the right mouse button.
+
+In addition of using the dials to change the scale and offset of the traces and the trigger position,
+you can use the mouse to drag the yellow and orange arrows aside of the plot.
+
+
+
+What's implemented so far:
+--------------------------
+
+- horizontal timebase
+- horizontal offset
+- horizontal timebase delay on/off
+  (display is not yet implemented)
+- horizontal vernier
+
+
+- vertical sensitivity
+- vertical offset
+- vertical bandwith limit
+- vertical coupling (ac/dc/gnd)
+- vertical display channel on/off
+- vertical vernier
+
+
+- basic trigger settings like:
+- run/stop, single, auto
+- trigger holdoff
+- trigger source (chan1/4, ext, ext5, ac)
+- trigger edge (positive, negative, rising edge & falling edge)
+- trigger level
+- trigger level 50%
+- trigger force
+
+
+- display clear
+
+
+- save screenshot
+- save display data (raw waveform, the part that is visible on the screen)
+  saving deep memory is not yet implemented
+  fileformat for waveform data is EDF, these files can be read by lots
+  of viewers and analyzing software like EDFbrowser, Scilab, Octave, Matlab, Labview, etc.
+
+
+
+
+
+
+
+
+
+
