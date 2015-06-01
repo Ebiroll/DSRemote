@@ -58,6 +58,7 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include <QPoint>
+#include <QDial>
 
 #include <stdio.h>
 #include <stdlib.h>
