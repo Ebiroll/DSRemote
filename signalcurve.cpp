@@ -134,7 +134,7 @@ void SignalCurve::paintEvent(QPaintEvent *)
 
 void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 {
-  int i, chn;
+  int i, chn, tmp;
 
   double offset=0.0,
          h_step=0.0,
@@ -328,6 +328,8 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   painter->setClipping(false);
 
+/////////////////////////////////// draw the trigger arrows ///////////////////////////////////////////
+
   if(trig_level_arrow_moving)
   {
     drawArrow(painter, curve_w, trig_level_arrow_pos, 2, QColor(255, 128, 0), 'T');
@@ -393,6 +395,19 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
         drawArrow(painter, trig_pos_arrow_pos, 27, 1, QColor(255, 128, 0), 'T');
       }
   }
+
+  tmp = 407 - ((devparms->timebaseoffset / (devparms->timebasescale * 14.0)) * 233);
+
+  if(tmp < -116)
+  {
+    tmp = -116;
+  }
+  else if(tmp > 116)
+    {
+      tmp = 116;
+    }
+
+  drawSmallTriggerArrow(painter, tmp, 16, QColor(255, 128, 0));
 
 //   clk_end = clock();
 //
@@ -565,8 +580,6 @@ void SignalCurve::drawTopLabels(QPainter *painter)
   }
 
   painter->drawLine(519, 22, 520, 22);
-
-  drawSmallTriggerArrow(painter, 407, 16, QColor(255, 128, 0));
 
 //////////////// delay ///////////////////////////////
 
