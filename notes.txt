@@ -7,6 +7,12 @@ It does not lock the device, so it's still possible to change settings on the de
 This will cause a mismatch between the programs settings and the device settings.
 This can be solved by letting the program re-read the settings of the device.
 At this moment, the only way to do that is to disconnect and connect again.
+Some settings are checked regularly and will always be synchronized:
+- trigger status
+- trigger sweep
+- samplerate
+- memory depth
+
 
 Number of screen updates is approx. 20 waveforms per second.
 
@@ -15,7 +21,6 @@ click on it with the right mouse button.
 
 In addition of using the dials to change the scale and offset of the traces and the trigger position,
 you can use the mouse to drag the yellow and orange arrows aside of the plot.
-
 
 
 What's implemented so far:

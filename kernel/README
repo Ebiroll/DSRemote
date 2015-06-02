@@ -26,13 +26,12 @@ Compiling:
 
 Install: kernel-desktop-devel kernel-source
 
-In the following commands, replace the part "linux-3.16.7-21" with your actual kernel version.
+In the following commands, replace the part "3.16.7-21-desktop" with your actual kernel version.
 The easiest way to get this version is to use the command uname -r.
 
-cp /usr/src/linux-3.16.7-21/include/uapi/linux/usb/tmc.h .
+cp /lib/modules/3.16.7-21-desktop/source/include/uapi/linux/usb/tmc.h .
 
-cp /usr/src/linux-3.16.7-21/drivers/usb/class/usbtmc.c .
-
+cp /lib/modules/3.16.7-21-desktop/source/drivers/usb/class/usbtmc.c .
 
 
 Somewhere around line 110 of the file usbtmc.c you will find the following code:

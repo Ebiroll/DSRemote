@@ -74,13 +74,14 @@ UI_Mainwindow::UI_Mainwindow()
   devicemenu->setTitle("Device");
   devicemenu->addAction("Connect",         this, SLOT(open_connection()));
   devicemenu->addAction("Disconnect",      this, SLOT(close_connection()));
-  devicemenu->addAction("Select",          this, SLOT(select_device()));
   devicemenu->addAction("Exit",            this, SLOT(close()), QKeySequence::Quit);
   menubar->addMenu(devicemenu);
 
+  menubar->addAction("Settings", this, SLOT(open_settings_dialog()));
+
   helpmenu = new QMenu;
   helpmenu->setTitle("Help");
-  helpmenu->addAction("About",  this, SLOT(show_about_dialog()));
+  helpmenu->addAction("About", this, SLOT(show_about_dialog()));
   menubar->addMenu(helpmenu);
 
   statusLabel = new QLabel;
@@ -399,7 +400,7 @@ UI_Mainwindow::~UI_Mainwindow()
 }
 
 
-void UI_Mainwindow::select_device()
+void UI_Mainwindow::open_settings_dialog()
 {
   UI_select_device_window sel_device;
 }

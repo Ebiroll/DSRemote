@@ -28,7 +28,7 @@
 
 
 
-#include "select_device_dialog.h"
+#include "settings_dialog.h"
 
 
 
@@ -42,7 +42,7 @@ UI_select_device_window::UI_select_device_window(QDialog *parnt)
 
   setMinimumSize(QSize(400, 200));
   setMaximumSize(QSize(400, 200));
-  setWindowTitle("Device settings");
+  setWindowTitle("Settings");
   setModal(true);
 
   comboBox1 = new QComboBox(this);
