@@ -59,6 +59,7 @@
 #include <QMessageBox>
 #include <QPoint>
 #include <QDial>
+#include <QSettings>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,6 +76,7 @@
 #include "tled.h"
 #include "edflib.h"
 #include "signalcurve.h"
+#include "select_device_dialog.h"
 
 
 
@@ -202,6 +204,7 @@ private slots:
   void show_about_dialog();
   void open_connection();
   void close_connection();
+  void select_device();
   int get_device_settings();
   void save_waveform();
   void save_screenshot();

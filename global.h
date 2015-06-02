@@ -75,6 +75,9 @@ struct device_settings
 {
   int connected;
   char modelname[128];
+  char serialnr[128];
+  char softwvers[128];
+
   double samplerate;            // Samplefrequency
   int memdepth;                 // Number of waveform points that the oscilloscope can store in a single trigger sample
   int channel_cnt;              // Device has 2 or 4 channels

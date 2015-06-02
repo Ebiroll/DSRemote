@@ -25,6 +25,7 @@ HEADERS += tmc_dev.h
 HEADERS += tled.h
 HEADERS += edflib.h
 HEADERS += signalcurve.h
+HEADERS += select_device_dialog.h
 
 SOURCES += main.cpp
 SOURCES += mainwindow.cpp
@@ -37,6 +38,7 @@ SOURCES += tmc_dev.c
 SOURCES += tled.cpp
 SOURCES += edflib.c
 SOURCES += signalcurve.cpp
+SOURCES += select_device_dialog.cpp
 
 RESOURCES = images.qrc
 

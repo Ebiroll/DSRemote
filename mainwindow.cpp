@@ -55,6 +55,10 @@ UI_Mainwindow::UI_Mainwindow()
 
   setlocale(LC_NUMERIC, "C");
 
+  QCoreApplication::setOrganizationName("TvB");
+  QCoreApplication::setOrganizationDomain("teuniz.net");
+  QCoreApplication::setApplicationName(PROGRAM_NAME);
+
   memset(&devparms, 0, sizeof(struct device_settings));
 
   devparms.screenshot_buf = (char *)malloc(1024 * 1024 * 2);
@@ -70,8 +74,7 @@ UI_Mainwindow::UI_Mainwindow()
   devicemenu->setTitle("Device");
   devicemenu->addAction("Connect",         this, SLOT(open_connection()));
   devicemenu->addAction("Disconnect",      this, SLOT(close_connection()));
-//  devicemenu->addAction("Save waveform",   this, SLOT(save_waveform()));
-//  devicemenu->addAction("Save screenshot", this, SLOT(save_screenshot()));
+  devicemenu->addAction("Select",          this, SLOT(select_device()));
   devicemenu->addAction("Exit",            this, SLOT(close()), QKeySequence::Quit);
   menubar->addMenu(devicemenu);
 
@@ -396,18 +399,35 @@ UI_Mainwindow::~UI_Mainwindow()
 }
 
 
+void UI_Mainwindow::select_device()
+{
+  UI_select_device_window sel_device;
+}
+
+
 void UI_Mainwindow::open_connection()
 {
   int n;
 
   char str[1024],
-       dev_str[128] = {"/dev/usbtmc0"},
+       dev_str[128] = {""},
        resp_str[1024],
        *ptr;
+
+  QSettings settings;
 
   if(device != NULL)
   {
     return;
+  }
+
+  strcpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data());
+
+  if(!strcmp(dev_str, ""))
+  {
+    strcpy(dev_str, "/dev/usbtmc0");
+
+    settings.setValue("connection/device", dev_str);
   }
 
   device = tmcdev_open(dev_str);
@@ -472,6 +492,26 @@ void UI_Mainwindow::open_connection()
     str[1023] = 0;
     goto OUT_ERROR;
   }
+
+  ptr = strtok(NULL, ",");
+  if(ptr == NULL)
+  {
+    snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
+    str[1023] = 0;
+    goto OUT_ERROR;
+  }
+
+  strcpy(devparms.serialnr, ptr);
+
+  ptr = strtok(NULL, ",");
+  if(ptr == NULL)
+  {
+    snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
+    str[1023] = 0;
+    goto OUT_ERROR;
+  }
+
+  strcpy(devparms.softwvers, ptr);
 
   if(strncmp(devparms.modelname, "DS6", 3))
   {
@@ -553,6 +593,10 @@ void UI_Mainwindow::open_connection()
   connect(trigAdjustDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(trigAdjustDialClicked(QPoint)));
   connect(adjDial,        SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(adjustDialClicked(QPoint)));
 
+  sprintf(str, PROGRAM_NAME " " PROGRAM_VERSION "   %s   %s", devparms.serialnr, devparms.softwvers);
+
+  setWindowTitle(str);
+
   statusLabel->setText("Connected");
 
   devparms.connected = 1;
@@ -593,6 +637,8 @@ void UI_Mainwindow::close_connection()
   stat_timer->stop();
 
   adjdial_timer->stop();
+
+  setWindowTitle(PROGRAM_NAME " " PROGRAM_VERSION);
 
   disconnect(adjDial,         SIGNAL(valueChanged(int)), this, SLOT(adjDialChanged(int)));
   disconnect(trigAdjustDial,  SIGNAL(valueChanged(int)), this, SLOT(trigAdjustDialChanged(int)));
@@ -1879,7 +1925,6 @@ void UI_Mainwindow::get_device_model(const char *str)
     strcpy(devparms.modelname, str);
   }
 }
-
 
 
 
