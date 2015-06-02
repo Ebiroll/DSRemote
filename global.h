@@ -119,6 +119,8 @@ struct device_settings
   int triggerstatus;            // 0=td, 1=wait, 2=run, 3=auto, 4=fin, 5=stop
   int triggersweep;             // 0=auto, 1=normal, 2=single
 
+  int displaygrid;              // 0=none, 1=half, 2=full
+
   char *screenshot_buf;
   char *wavebuf[MAX_CHNS];
 

@@ -175,65 +175,77 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   painter->drawRect (0, 0, curve_w - 1, curve_h - 1);
 
-  painter->setPen(QPen(QBrush(RasterColor, Qt::SolidPattern), tracewidth, Qt::DotLine, Qt::SquareCap, Qt::BevelJoin));
-
-  step = curve_w / 14.0;
-
-  for(i=1; i<14; i++)
+  if(devparms->displaygrid)
   {
-    painter->drawLine(step * i, curve_h - 1, step * i, 0);
-  }
+    painter->setPen(QPen(QBrush(RasterColor, Qt::SolidPattern), tracewidth, Qt::DotLine, Qt::SquareCap, Qt::BevelJoin));
 
-  step = curve_h / 8.0;
-
-  for(i=1; i<8; i++)
-  {
-    painter->drawLine(0, step * i, curve_w - 1, step * i);
-  }
-
-  painter->setPen(RasterColor);
-
-  step = curve_w / 70.0;
-
-  for(i=1; i<70; i++)
-  {
-    step2 = step * i;
-
-    painter->drawLine(step2, curve_h / 2 + 2, step2, curve_h / 2 - 2);
-
-    if(i % 5)
+    if(devparms->displaygrid == 2)
     {
-      painter->drawLine(step2, curve_h - 1, step2, curve_h - 5);
+      step = curve_w / 14.0;
 
-      painter->drawLine(step2, 0, step2, 4);
+      for(i=1; i<14; i++)
+      {
+        painter->drawLine(step * i, curve_h - 1, step * i, 0);
+      }
+
+      step = curve_h / 8.0;
+
+      for(i=1; i<8; i++)
+      {
+        painter->drawLine(0, step * i, curve_w - 1, step * i);
+      }
     }
     else
     {
-      painter->drawLine(step2, curve_h - 1, step2, curve_h - 9);
+      painter->drawLine(curve_w / 2, curve_h - 1, curve_w / 2, 0);
 
-      painter->drawLine(step2, 0, step2, 8);
+      painter->drawLine(0, curve_h / 2, curve_w - 1, curve_h / 2);
     }
-  }
 
-  step = curve_h / 40.0;
+    painter->setPen(RasterColor);
 
-  for(i=1; i<40; i++)
-  {
-    step2 = step * i;
+    step = curve_w / 70.0;
 
-    painter->drawLine(curve_w / 2 + 2, step2, curve_w / 2  - 2, step2);
-
-    if(i % 5)
+    for(i=1; i<70; i++)
     {
-      painter->drawLine(curve_w - 1, step2, curve_w - 5, step2);
+      step2 = step * i;
 
-      painter->drawLine(0, step2, 4, step2);
+      painter->drawLine(step2, curve_h / 2 + 2, step2, curve_h / 2 - 2);
+
+      if(i % 5)
+      {
+        painter->drawLine(step2, curve_h - 1, step2, curve_h - 5);
+
+        painter->drawLine(step2, 0, step2, 4);
+      }
+      else
+      {
+        painter->drawLine(step2, curve_h - 1, step2, curve_h - 9);
+
+        painter->drawLine(step2, 0, step2, 8);
+      }
     }
-    else
-    {
-      painter->drawLine(curve_w - 1, step2, curve_w - 9, step2);
 
-      painter->drawLine(0, step2, 8, step2);
+    step = curve_h / 40.0;
+
+    for(i=1; i<40; i++)
+    {
+      step2 = step * i;
+
+      painter->drawLine(curve_w / 2 + 2, step2, curve_w / 2  - 2, step2);
+
+      if(i % 5)
+      {
+        painter->drawLine(curve_w - 1, step2, curve_w - 5, step2);
+
+        painter->drawLine(0, step2, 4, step2);
+      }
+      else
+      {
+        painter->drawLine(curve_w - 1, step2, curve_w - 9, step2);
+
+        painter->drawLine(0, step2, 8, step2);
+      }
     }
   }
 

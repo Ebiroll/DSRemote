@@ -68,13 +68,17 @@ UI_Mainwindow::UI_Mainwindow()
     devparms.wavebuf[i] = (char *)malloc(WAVFRM_MAX_BUFSZ);
   }
 
+  devparms.displaygrid = 2;
+
+  devparms.channel_cnt = 4;
+
   menubar = menuBar();
 
   devicemenu = new QMenu;
   devicemenu->setTitle("Device");
-  devicemenu->addAction("Connect",         this, SLOT(open_connection()));
-  devicemenu->addAction("Disconnect",      this, SLOT(close_connection()));
-  devicemenu->addAction("Exit",            this, SLOT(close()), QKeySequence::Quit);
+  devicemenu->addAction("Connect",    this, SLOT(open_connection()));
+  devicemenu->addAction("Disconnect", this, SLOT(close_connection()));
+  devicemenu->addAction("Exit",       this, SLOT(close()), QKeySequence::Quit);
   menubar->addMenu(devicemenu);
 
   menubar->addAction("Settings", this, SLOT(open_settings_dialog()));
@@ -1600,6 +1604,36 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.samplerate = atof(device->buf);
 
+  if(tmcdev_write(device, ":DISP:GRID?") != 11)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmcdev_read(device) < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "NONE"))
+  {
+    devparms.displaygrid = 0;
+  }
+  else if(!strcmp(device->buf, "HALF"))
+    {
+      devparms.displaygrid = 1;
+    }
+    else if(!strcmp(device->buf, "FULL"))
+      {
+        devparms.displaygrid = 2;
+      }
+      else
+      {
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+
   return 0;
 
 OUT_ERROR:
@@ -1763,6 +1797,10 @@ int UI_Mainwindow::get_metric_factor(double value)
 
 void UI_Mainwindow::get_device_model(const char *str)
 {
+  devparms.channel_cnt = 0;
+
+  devparms.bandwidth = 0;
+
   if(!strcmp(str, "DS6104"))
   {
     devparms.channel_cnt = 4;

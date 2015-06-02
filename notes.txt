@@ -39,6 +39,7 @@ What's implemented so far:
 - vertical coupling (ac/dc/gnd)
 - vertical display channel on/off
 - vertical vernier
+- vertical invert
 
 
 - basic trigger settings like:
@@ -52,6 +53,8 @@ What's implemented so far:
 
 
 - display clear
+- display grid
+- display grading
 
 
 - save screenshot

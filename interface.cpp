@@ -159,6 +159,121 @@ void UI_Mainwindow::saveButtonClicked()
 
 void UI_Mainwindow::dispButtonClicked()
 {
+  QMenu menu,
+        submenugrid,
+        submenugrading;
+
+  submenugrid.setTitle("Grid");
+  submenugrid.addAction("Full", this, SLOT(set_grid_full()));
+  submenugrid.addAction("Half", this, SLOT(set_grid_half()));
+  submenugrid.addAction("None", this, SLOT(set_grid_none()));
+  menu.addMenu(&submenugrid);
+
+  submenugrading.setTitle("Grading");
+  submenugrading.addAction("Minimum",  this, SLOT(set_grading_min()));
+  submenugrading.addAction("0.05",     this, SLOT(set_grading_005()));
+  submenugrading.addAction("0.1",      this, SLOT(set_grading_01()));
+  submenugrading.addAction("0.2",      this, SLOT(set_grading_02()));
+  submenugrading.addAction("0.5",      this, SLOT(set_grading_05()));
+  submenugrading.addAction("1",        this, SLOT(set_grading_1()));
+  submenugrading.addAction("2",        this, SLOT(set_grading_2()));
+  submenugrading.addAction("5",        this, SLOT(set_grading_5()));
+  submenugrading.addAction("10",       this, SLOT(set_grading_10()));
+  submenugrading.addAction("20",       this, SLOT(set_grading_20()));
+  submenugrading.addAction("Infinite", this, SLOT(set_grading_inf()));
+  menu.addMenu(&submenugrading);
+
+  menu.exec(dispButton->mapToGlobal(QPoint(0,0)));
+}
+
+
+void UI_Mainwindow::set_grid_full()
+{
+  devparms.displaygrid = 2;
+
+  tmcdev_write(device, ":DISP:GRID FULL");
+}
+
+
+void UI_Mainwindow::set_grid_half()
+{
+  devparms.displaygrid = 1;
+
+  tmcdev_write(device, ":DISP:GRID HALF");
+}
+
+
+void UI_Mainwindow::set_grid_none()
+{
+  devparms.displaygrid = 0;
+
+  tmcdev_write(device, ":DISP:GRID NONE");
+}
+
+
+void UI_Mainwindow::set_grading_min()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM MIN");
+}
+
+
+void UI_Mainwindow::set_grading_005()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM 0.05");
+}
+
+
+void UI_Mainwindow::set_grading_01()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM 0.1");
+}
+
+
+void UI_Mainwindow::set_grading_02()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM 0.2");
+}
+
+
+void UI_Mainwindow::set_grading_05()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM 0.5");
+}
+
+
+void UI_Mainwindow::set_grading_1()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM 1");
+}
+
+
+void UI_Mainwindow::set_grading_2()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM 2");
+}
+
+
+void UI_Mainwindow::set_grading_5()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM 5");
+}
+
+
+void UI_Mainwindow::set_grading_10()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM 10");
+}
+
+
+void UI_Mainwindow::set_grading_20()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM 20");
+}
+
+
+void UI_Mainwindow::set_grading_inf()
+{
+  tmcdev_write(device, ":DISP:GRAD:TIM INF");
 }
 
 
@@ -976,6 +1091,8 @@ void UI_Mainwindow::ch1ButtonClicked()
     else
     {
       devparms.activechannel = 0;
+
+      chan_menu(ch1Button->mapToGlobal(QPoint(0,0)));
     }
   }
   else
@@ -1018,6 +1135,8 @@ void UI_Mainwindow::ch2ButtonClicked()
     else
     {
       devparms.activechannel = 1;
+
+      chan_menu(ch2Button->mapToGlobal(QPoint(0,0)));
     }
   }
   else
@@ -1060,6 +1179,8 @@ void UI_Mainwindow::ch3ButtonClicked()
     else
     {
       devparms.activechannel = 2;
+
+      chan_menu(ch3Button->mapToGlobal(QPoint(0,0)));
     }
   }
   else
@@ -1102,6 +1223,8 @@ void UI_Mainwindow::ch4ButtonClicked()
     else
     {
       devparms.activechannel = 3;
+
+      chan_menu(ch4Button->mapToGlobal(QPoint(0,0)));
     }
   }
   else
@@ -1114,6 +1237,130 @@ void UI_Mainwindow::ch4ButtonClicked()
 
     devparms.activechannel = 3;
   }
+}
+
+
+void UI_Mainwindow::chan_menu(QPoint xy_pos)
+{
+  QMenu menu,
+        submenubwl,
+        submenucoupling,
+        submenuinvert;
+
+  submenucoupling.setTitle("Coupling");
+  submenucoupling.addAction("AC",  this, SLOT(chan_coupling_ac()));
+  submenucoupling.addAction("DC",  this, SLOT(chan_coupling_dc()));
+  submenucoupling.addAction("GND", this, SLOT(chan_coupling_gnd()));
+  menu.addMenu(&submenucoupling);
+
+  submenubwl.setTitle("BWL");
+  submenubwl.addAction("Off",    this, SLOT(chan_bwl_off()));
+  submenubwl.addAction("20MHz",  this, SLOT(chan_bwl_20()));
+  submenubwl.addAction("250MHz", this, SLOT(chan_bwl_250()));
+  menu.addMenu(&submenubwl);
+
+  submenuinvert.setTitle("Invert");
+  submenuinvert.addAction("On",  this, SLOT(chan_invert_on()));
+  submenuinvert.addAction("Off", this, SLOT(chan_invert_off()));
+  menu.addMenu(&submenuinvert);
+
+  menu.exec(xy_pos);
+}
+
+
+void UI_Mainwindow::chan_coupling_ac()
+{
+  char str[128];
+
+  devparms.chancoupling[devparms.activechannel] = 2;
+
+  sprintf(str, ":CHAN%i:COUP AC", '1' + devparms.activechannel);
+
+  tmcdev_write(device, str);
+}
+
+
+void UI_Mainwindow::chan_coupling_dc()
+{
+  char str[128];
+
+  devparms.chancoupling[devparms.activechannel] = 1;
+
+  sprintf(str, ":CHAN%i:COUP DC", '1' + devparms.activechannel);
+
+  tmcdev_write(device, str);
+}
+
+
+void UI_Mainwindow::chan_coupling_gnd()
+{
+  char str[128];
+
+  devparms.chancoupling[devparms.activechannel] = 0;
+
+  sprintf(str, ":CHAN%i:COUP GND", '1' + devparms.activechannel);
+
+  tmcdev_write(device, str);
+}
+
+
+void UI_Mainwindow::chan_bwl_off()
+{
+  char str[128];
+
+  devparms.chanbwlimit[devparms.activechannel] = 0;
+
+  sprintf(str, ":CHAN%i:BWL OFF", '1' + devparms.activechannel);
+
+  tmcdev_write(device, str);
+}
+
+
+void UI_Mainwindow::chan_bwl_20()
+{
+  char str[128];
+
+  devparms.chanbwlimit[devparms.activechannel] = 20;
+
+  sprintf(str, ":CHAN%i:BWL 20M", '1' + devparms.activechannel);
+
+  tmcdev_write(device, str);
+}
+
+
+void UI_Mainwindow::chan_bwl_250()
+{
+  char str[128];
+
+  devparms.chanbwlimit[devparms.activechannel] = 250;
+
+  sprintf(str, ":CHAN%i:BWL 250M", '1' + devparms.activechannel);
+
+  tmcdev_write(device, str);
+}
+
+
+void UI_Mainwindow::chan_invert_on()
+{
+  char str[128];
+
+  devparms.chaninvert[devparms.activechannel] = 1;
+
+  sprintf(str, ":CHAN%i:INV 1", '1' + devparms.activechannel);
+
+  tmcdev_write(device, str);
+}
+
+
+void UI_Mainwindow::chan_invert_off()
+{
+  char str[128];
+
+  devparms.chaninvert[devparms.activechannel] = 0;
+
+  sprintf(str, ":CHAN%i:INV 0", '1' + devparms.activechannel);
+
+  tmcdev_write(device, str);
 }
 
 

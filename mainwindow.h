@@ -266,6 +266,33 @@ private slots:
   void navDial_timer_handler();
   void navDialChanged(int);
 
+  void set_grid_full();
+  void set_grid_half();
+  void set_grid_none();
+
+  void set_grading_min();
+  void set_grading_005();
+  void set_grading_01();
+  void set_grading_02();
+  void set_grading_05();
+  void set_grading_1();
+  void set_grading_2();
+  void set_grading_5();
+  void set_grading_10();
+  void set_grading_20();
+  void set_grading_inf();
+
+  void chan_coupling_ac();
+  void chan_coupling_dc();
+  void chan_coupling_gnd();
+  void chan_bwl_off();
+  void chan_bwl_20();
+  void chan_bwl_250();
+  void chan_invert_on();
+  void chan_invert_off();
+
+  void chan_menu(QPoint);
+
 protected:
   void closeEvent(QCloseEvent *);
 
