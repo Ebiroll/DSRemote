@@ -215,28 +215,24 @@ UI_Mainwindow::UI_Mainwindow()
 
   ch1InputLabel = new QLabel(verticalGrpBox);
   ch1InputLabel->setGeometry(12, 15, 50, 18);
-//  ch1InputLabel->setText("AC 50 BW");
   ch1InputLabel->setStyleSheet("color: #C0C000; font: 7pt;");
   ch1Button = new QPushButton(verticalGrpBox);
   ch1Button->setGeometry(15, 30, 40, 18);
   ch1Button->setText("CH1");
   ch2InputLabel = new QLabel(verticalGrpBox);
   ch2InputLabel->setGeometry(12, 55, 50, 18);
-//  ch2InputLabel->setText("AC 50 BW");
   ch2InputLabel->setStyleSheet("color: #C0C000; font: 7pt;");
   ch2Button = new QPushButton(verticalGrpBox);
   ch2Button->setGeometry(15, 70, 40, 18);
   ch2Button->setText("CH2");
   ch3InputLabel = new QLabel(verticalGrpBox);
   ch3InputLabel->setGeometry(12, 95, 50, 18);
-//  ch3InputLabel->setText("AC 50 BW");
   ch3InputLabel->setStyleSheet("color: #C0C000; font: 7pt;");
   ch3Button = new QPushButton(verticalGrpBox);
   ch3Button->setGeometry(15, 110, 40, 18);
   ch3Button->setText("CH3");
   ch4InputLabel = new QLabel(verticalGrpBox);
   ch4InputLabel->setGeometry(12, 135, 50, 18);
-//  ch4InputLabel->setText("AC 50 BW");
   ch4InputLabel->setStyleSheet("color: #C0C000; font: 7pt;");
   ch4Button = new QPushButton(verticalGrpBox);
   ch4Button->setGeometry(15, 150, 40, 18);
@@ -554,6 +550,27 @@ void UI_Mainwindow::open_connection()
   }
 
   QApplication::restoreOverrideCursor();
+
+  if(devparms.channel_cnt < 4)
+  {
+    ch4Button->setEnabled(false);
+
+    ch4Button->setVisible(false);
+  }
+
+  if(devparms.channel_cnt < 3)
+  {
+    ch3Button->setEnabled(false);
+
+    ch3Button->setVisible(false);
+  }
+
+  if(devparms.channel_cnt < 2)
+  {
+    ch2Button->setEnabled(false);
+
+    ch2Button->setVisible(false);
+  }
 
   connect(adjDial,          SIGNAL(valueChanged(int)), this, SLOT(adjDialChanged(int)));
   connect(trigAdjustDial,   SIGNAL(valueChanged(int)), this, SLOT(trigAdjustDialChanged(int)));
@@ -1569,19 +1586,19 @@ int UI_Mainwindow::get_device_settings()
     }
   }
 
-//   if(tmcdev_write(device, ":ACQ:SRAT?") != 10)
-//   {
-//     line = __LINE__;
-//     goto OUT_ERROR;
-//   }
-//
-//   if(tmcdev_read(device) < 1)
-//   {
-//     line = __LINE__;
-//     goto OUT_ERROR;
-//   }
-//
-//   devparms.samplerate = atof(device->buf);
+  if(tmcdev_write(device, ":ACQ:SRAT?") != 10)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmcdev_read(device) < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  devparms.samplerate = atof(device->buf);
 
   return 0;
 

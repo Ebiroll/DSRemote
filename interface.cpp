@@ -1325,10 +1325,16 @@ void UI_Mainwindow::trigMenuButtonClicked()
 
   submenusource.setTitle("Source");
   submenusource.addAction("CH1", this, SLOT(trigger_source_ch1()));
-  submenusource.addAction("CH2", this, SLOT(trigger_source_ch2()));
-  if(devparms.channel_cnt == 4)
+  if(devparms.channel_cnt > 1)
+  {
+    submenusource.addAction("CH2", this, SLOT(trigger_source_ch2()));
+  }
+  if(devparms.channel_cnt > 2)
   {
     submenusource.addAction("CH3", this, SLOT(trigger_source_ch3()));
+  }
+  if(devparms.channel_cnt > 3)
+  {
     submenusource.addAction("CH4", this, SLOT(trigger_source_ch4()));
   }
   submenusource.addAction("EXT", this, SLOT(trigger_source_ext()));

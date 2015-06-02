@@ -20,7 +20,8 @@ How to compile:
 
  Now you can run the program by typing: dsremote
 
- Read also the readme_usbtcm_driver.txt file.
+ Read also the file readme_usbtcm_driver.txt
+ and the file notes.txt.
 
 
 

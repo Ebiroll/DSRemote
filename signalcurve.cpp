@@ -156,7 +156,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   painter->fillRect(0, curve_h - 30, curve_w, curve_h, QColor(32, 32, 32));
 
-  for(i=0; i<MAX_CHNS; i++)
+  for(i=0; i<devparms->channel_cnt; i++)
   {
     drawChanLabel(painter, 8 + (i * 125), curve_h - 25, i);
   }
@@ -252,7 +252,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   drawTrigCenterArrow(painter, curve_w / 2, 0);
 
-  for(chn=0; chn<MAX_CHNS; chn++)
+  for(chn=0; chn<devparms->channel_cnt; chn++)
   {
     if(!devparms->chandisplay[chn])
     {
@@ -295,7 +295,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   h_step = (double)curve_w / (double)bufsize;
 
-  for(chn=0; chn<MAX_CHNS; chn++)
+  for(chn=0; chn<devparms->channel_cnt; chn++)
   {
     if(!devparms->chandisplay[chn])
     {
@@ -1097,7 +1097,7 @@ void SignalCurve::mousePressEvent(QMouseEvent *press_event)
       }
       else
       {
-        for(chn=0; chn<MAX_CHNS; chn++)
+        for(chn=0; chn<devparms->channel_cnt; chn++)
         {
           if(!devparms->chandisplay[chn])
           {
@@ -1220,7 +1220,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
     }
     else
     {
-      for(chn=0; chn<MAX_CHNS; chn++)
+      for(chn=0; chn<devparms->channel_cnt; chn++)
       {
         if(!devparms->chandisplay[chn])
         {
@@ -1330,7 +1330,7 @@ void SignalCurve::mouseMoveEvent(QMouseEvent *move_event)
     }
     else
     {
-      for(chn=0; chn<MAX_CHNS; chn++)
+      for(chn=0; chn<devparms->channel_cnt; chn++)
       {
         if(!devparms->chandisplay[chn])
         {
