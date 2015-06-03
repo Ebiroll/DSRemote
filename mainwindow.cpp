@@ -72,6 +72,8 @@ UI_Mainwindow::UI_Mainwindow()
 
   devparms.channel_cnt = 4;
 
+  devparms.timebasescale = 1;
+
   menubar = menuBar();
 
   devicemenu = new QMenu;

@@ -154,6 +154,19 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   drawTopLabels(painter);
 
+  tmp = 407 - ((devparms->timebaseoffset / (devparms->timebasescale * 14.0)) * 233);
+
+  if(tmp < 291)
+  {
+    tmp = 291;
+  }
+  else if(tmp > 523)
+    {
+      tmp = 523;
+    }
+
+  drawSmallTriggerArrow(painter, tmp, 16, QColor(255, 128, 0));
+
   painter->fillRect(0, curve_h - 30, curve_w, curve_h, QColor(32, 32, 32));
 
   for(i=0; i<devparms->channel_cnt; i++)
@@ -201,6 +214,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
       painter->drawLine(0, curve_h / 2, curve_w - 1, curve_h / 2);
     }
+  }
 
     painter->setPen(RasterColor);
 
@@ -210,7 +224,10 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     {
       step2 = step * i;
 
-      painter->drawLine(step2, curve_h / 2 + 2, step2, curve_h / 2 - 2);
+      if(devparms->displaygrid)
+      {
+        painter->drawLine(step2, curve_h / 2 + 2, step2, curve_h / 2 - 2);
+      }
 
       if(i % 5)
       {
@@ -232,7 +249,10 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     {
       step2 = step * i;
 
-      painter->drawLine(curve_w / 2 + 2, step2, curve_w / 2  - 2, step2);
+      if(devparms->displaygrid)
+      {
+        painter->drawLine(curve_w / 2 + 2, step2, curve_w / 2  - 2, step2);
+      }
 
       if(i % 5)
       {
@@ -247,7 +267,6 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
         painter->drawLine(0, step2, 8, step2);
       }
     }
-  }
 
   if(devparms == NULL)
   {
@@ -407,19 +426,6 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
         drawArrow(painter, trig_pos_arrow_pos, 27, 1, QColor(255, 128, 0), 'T');
       }
   }
-
-  tmp = 407 - ((devparms->timebaseoffset / (devparms->timebasescale * 14.0)) * 233);
-
-  if(tmp < -116)
-  {
-    tmp = -116;
-  }
-  else if(tmp > 116)
-    {
-      tmp = 116;
-    }
-
-  drawSmallTriggerArrow(painter, tmp, 16, QColor(255, 128, 0));
 
 //   clk_end = clock();
 //
