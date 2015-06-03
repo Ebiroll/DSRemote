@@ -215,7 +215,7 @@ UI_Mainwindow::UI_Mainwindow()
   horPosDial->setContextMenuPolicy(Qt::CustomContextMenu);
 
   verticalGrpBox = new QGroupBox("Vertical", DPRwidget);
-  verticalGrpBox->setGeometry(5, 290, 140, 200);
+  verticalGrpBox->setGeometry(5, 290, 140, 255);
 
   ch1InputLabel = new QLabel(verticalGrpBox);
   ch1InputLabel->setGeometry(12, 15, 50, 18);
@@ -241,6 +241,9 @@ UI_Mainwindow::UI_Mainwindow()
   ch4Button = new QPushButton(verticalGrpBox);
   ch4Button->setGeometry(15, 150, 40, 18);
   ch4Button->setText("CH4");
+  chanMenuButton = new QPushButton(verticalGrpBox);
+  chanMenuButton->setGeometry(15, 190, 40, 18);
+  chanMenuButton->setText("Menu");
   vertOffsetLabel = new QLabel(verticalGrpBox);
   vertOffsetLabel->setGeometry(80, 30, 40, 18);
   vertOffsetLabel->setStyleSheet("font: 7pt;");
@@ -588,6 +591,7 @@ void UI_Mainwindow::open_connection()
   connect(ch2Button,        SIGNAL(clicked()),      this, SLOT(ch2ButtonClicked()));
   connect(ch3Button,        SIGNAL(clicked()),      this, SLOT(ch3ButtonClicked()));
   connect(ch4Button,        SIGNAL(clicked()),      this, SLOT(ch4ButtonClicked()));
+  connect(chanMenuButton,   SIGNAL(clicked()),      this, SLOT(chan_menu()));
   connect(waveForm,         SIGNAL(chan1Clicked()), this, SLOT(ch1ButtonClicked()));
   connect(waveForm,         SIGNAL(chan2Clicked()), this, SLOT(ch2ButtonClicked()));
   connect(waveForm,         SIGNAL(chan3Clicked()), this, SLOT(ch3ButtonClicked()));

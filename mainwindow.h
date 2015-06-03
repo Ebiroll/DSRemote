@@ -148,6 +148,7 @@ private:
               *ch2Button,
               *ch3Button,
               *ch4Button,
+              *chanMenuButton,
               *clearButton,
               *autoButton,
               *runButton,
@@ -291,7 +292,7 @@ private slots:
   void chan_invert_on();
   void chan_invert_off();
 
-  void chan_menu(QPoint);
+  void chan_menu();
 
 protected:
   void closeEvent(QCloseEvent *);

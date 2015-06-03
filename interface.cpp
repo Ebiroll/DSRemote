@@ -1091,8 +1091,6 @@ void UI_Mainwindow::ch1ButtonClicked()
     else
     {
       devparms.activechannel = 0;
-
-      chan_menu(ch1Button->mapToGlobal(QPoint(0,0)));
     }
   }
   else
@@ -1135,8 +1133,6 @@ void UI_Mainwindow::ch2ButtonClicked()
     else
     {
       devparms.activechannel = 1;
-
-      chan_menu(ch2Button->mapToGlobal(QPoint(0,0)));
     }
   }
   else
@@ -1179,8 +1175,6 @@ void UI_Mainwindow::ch3ButtonClicked()
     else
     {
       devparms.activechannel = 2;
-
-      chan_menu(ch3Button->mapToGlobal(QPoint(0,0)));
     }
   }
   else
@@ -1223,8 +1217,6 @@ void UI_Mainwindow::ch4ButtonClicked()
     else
     {
       devparms.activechannel = 3;
-
-      chan_menu(ch4Button->mapToGlobal(QPoint(0,0)));
     }
   }
   else
@@ -1240,12 +1232,17 @@ void UI_Mainwindow::ch4ButtonClicked()
 }
 
 
-void UI_Mainwindow::chan_menu(QPoint xy_pos)
+void UI_Mainwindow::chan_menu()
 {
   QMenu menu,
         submenubwl,
         submenucoupling,
         submenuinvert;
+
+  if((devparms.activechannel < 0) || (devparms.activechannel > MAX_CHNS))
+  {
+    return;
+  }
 
   submenucoupling.setTitle("Coupling");
   submenucoupling.addAction("AC",  this, SLOT(chan_coupling_ac()));
@@ -1264,7 +1261,7 @@ void UI_Mainwindow::chan_menu(QPoint xy_pos)
   submenuinvert.addAction("Off", this, SLOT(chan_invert_off()));
   menu.addMenu(&submenuinvert);
 
-  menu.exec(xy_pos);
+  menu.exec(chanMenuButton->mapToGlobal(QPoint(0,0)));
 }
 
 
@@ -1344,6 +1341,11 @@ void UI_Mainwindow::chan_invert_on()
 {
   char str[128];
 
+  if(!devparms.chaninvert[devparms.activechannel])
+  {
+    devparms.triggeredgelevel[devparms.activechannel] *= -1;
+  }
+
   devparms.chaninvert[devparms.activechannel] = 1;
 
   sprintf(str, ":CHAN%i:INV 1", devparms.activechannel + 1);
@@ -1355,6 +1357,11 @@ void UI_Mainwindow::chan_invert_on()
 void UI_Mainwindow::chan_invert_off()
 {
   char str[128];
+
+  if(devparms.chaninvert[devparms.activechannel])
+  {
+    devparms.triggeredgelevel[devparms.activechannel] *= -1;
+  }
 
   devparms.chaninvert[devparms.activechannel] = 0;
 
