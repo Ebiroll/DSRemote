@@ -548,7 +548,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(125, 20, "H");
 
-  convert_to_metric_suffix(str, devparms->timebasescale);
+  convert_to_metric_suffix(str, devparms->timebasescale, 1);
 
   strcat(str, "s");
 
@@ -558,13 +558,13 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->setPen(Qt::gray);
 
-  convert_to_metric_suffix(str, devparms->samplerate);
+  convert_to_metric_suffix(str, devparms->samplerate, 3);
 
   strcat(str, "Sa/s");
 
   painter->drawText(200, -1, 85, 20, Qt::AlignCenter, str);
 
-  convert_to_metric_suffix(str, devparms->memdepth);
+  convert_to_metric_suffix(str, devparms->memdepth, 1);
 
   strcat(str, "pts");
 
@@ -611,7 +611,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(555, 20, "D");
 
-  convert_to_metric_suffix(str, devparms->timebaseoffset);
+  convert_to_metric_suffix(str, devparms->timebaseoffset, 3);
 
   strcat(str, "s");
 
@@ -629,7 +629,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(670, 20, "T");
 
-  convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource]);
+  convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource], 2);
 
   strcat(str, "V");
 
@@ -727,7 +727,7 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
   str1[0] = '1' + chn;
   str1[1] = 0;
 
-  convert_to_metric_suffix(str2, devparms->chanscale[chn]);
+  convert_to_metric_suffix(str2, devparms->chanscale[chn], 2);
 
   strcat(str2, "V");
 
@@ -1148,7 +1148,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
     strcpy(str, "Horizontal position: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms->timebaseoffset);
+    convert_to_metric_suffix(str + strlen(str), devparms->timebaseoffset, 2);
 
     strcat(str, "s");
 
@@ -1189,7 +1189,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       sprintf(str, "Trigger level: ");
 
-      convert_to_metric_suffix(str + strlen(str), devparms->triggeredgelevel[devparms->triggeredgesource]);
+      convert_to_metric_suffix(str + strlen(str), devparms->triggeredgelevel[devparms->triggeredgesource], 2);
 
       strcat(str, "V");
 
@@ -1238,7 +1238,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
           sprintf(str, "Channel %i offset: ", chn + 1);
 
-          convert_to_metric_suffix(str + strlen(str), devparms->chanoffset[chn]);
+          convert_to_metric_suffix(str + strlen(str), devparms->chanoffset[chn], 2);
 
           strcat(str, "V");
 

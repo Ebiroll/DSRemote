@@ -195,6 +195,7 @@ private:
   int parse_preamble(char *, int, struct waveform_preamble *, int);
   int get_metric_factor(double);
   void get_device_model(const char *);
+  double get_stepsize_divide_by_1000(double);
 
 private slots:
 

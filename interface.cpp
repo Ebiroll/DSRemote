@@ -32,6 +32,8 @@ void UI_Mainwindow::navDialChanged(int npos)
 {
   char str[512];
 
+  double val;
+
   if(navDial->isSliderDown() == true)
   {
     navDial_timer->start(100);
@@ -43,33 +45,35 @@ void UI_Mainwindow::navDialChanged(int npos)
 
   if(navDialFunc == NAV_DIAL_FUNC_HOLDOFF)
   {
+    val = get_stepsize_divide_by_1000(devparms.triggerholdoff);
+
     if(npos > 93)
       {
-        devparms.triggerholdoff += 1e-1;
+        devparms.triggerholdoff += (val * 64);
       }
       else if(npos > 86)
         {
-          devparms.triggerholdoff += 1e-2;
+          devparms.triggerholdoff += (val * 32);
         }
         else if(npos > 79)
           {
-            devparms.triggerholdoff += 1e-3;
+            devparms.triggerholdoff += (val * 16);
           }
           else if(npos > 72)
             {
-              devparms.triggerholdoff += 1e-4;
+              devparms.triggerholdoff += (val * 8);
             }
             else if(npos > 65)
               {
-                devparms.triggerholdoff += 1e-5;
+                devparms.triggerholdoff += (val * 4);
               }
               else if(npos > 58)
                 {
-                  devparms.triggerholdoff += 1e-6;
+                  devparms.triggerholdoff += (val * 2);
                 }
                 else if(npos > 51)
                   {
-                    devparms.triggerholdoff += 1e-7;
+                    devparms.triggerholdoff += val;
                   }
                   else if(npos > 49)
                     {
@@ -77,31 +81,31 @@ void UI_Mainwindow::navDialChanged(int npos)
                     }
                     else if(npos > 42)
                       {
-                        devparms.triggerholdoff -= 1e-7;
+                        devparms.triggerholdoff -= val;
                       }
                       else if(npos > 35)
                         {
-                          devparms.triggerholdoff -= 1e-6;
+                          devparms.triggerholdoff -= (val * 2);
                         }
                         else if(npos > 28)
                           {
-                            devparms.triggerholdoff -= 1e-5;
+                            devparms.triggerholdoff -= (val * 4);
                           }
                           else if(npos > 21)
                             {
-                              devparms.triggerholdoff -= 1e-4;
+                              devparms.triggerholdoff -= (val * 8);
                             }
                             else if(npos > 14)
                               {
-                                devparms.triggerholdoff -= 1e-3;
+                                devparms.triggerholdoff -= (val * 16);
                               }
                               else if(npos > 7)
                                 {
-                                  devparms.triggerholdoff -= 1e-2;
+                                  devparms.triggerholdoff -= (val * 32);
                                 }
                                 else
                                 {
-                                  devparms.triggerholdoff -= 1e-1;
+                                  devparms.triggerholdoff -= (val * 64);
                                 }
 
 
@@ -117,7 +121,7 @@ void UI_Mainwindow::navDialChanged(int npos)
 
     strcpy(str, "Holdoff: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff);
+    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2);
 
     strcat(str, "s");
 
@@ -169,7 +173,7 @@ void UI_Mainwindow::dispButtonClicked()
   submenugrid.addAction("None", this, SLOT(set_grid_none()));
   menu.addMenu(&submenugrid);
 
-  submenugrading.setTitle("Grading");
+  submenugrading.setTitle("Persistence");
   submenugrading.addAction("Minimum",  this, SLOT(set_grading_min()));
   submenugrading.addAction("0.05",     this, SLOT(set_grading_005()));
   submenugrading.addAction("0.1",      this, SLOT(set_grading_01()));
@@ -191,6 +195,8 @@ void UI_Mainwindow::set_grid_full()
 {
   devparms.displaygrid = 2;
 
+  statusLabel->setText("Display grid: full");
+
   tmcdev_write(device, ":DISP:GRID FULL");
 }
 
@@ -198,6 +204,8 @@ void UI_Mainwindow::set_grid_full()
 void UI_Mainwindow::set_grid_half()
 {
   devparms.displaygrid = 1;
+
+  statusLabel->setText("Display grid: half");
 
   tmcdev_write(device, ":DISP:GRID HALF");
 }
@@ -207,73 +215,97 @@ void UI_Mainwindow::set_grid_none()
 {
   devparms.displaygrid = 0;
 
+  statusLabel->setText("Display grid: none");
+
   tmcdev_write(device, ":DISP:GRID NONE");
 }
 
 
 void UI_Mainwindow::set_grading_min()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM MIN");
+  statusLabel->setText("Display grading: Minimum");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME MIN");
 }
 
 
 void UI_Mainwindow::set_grading_005()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM 0.05");
+  statusLabel->setText("Display grading: 0.05 Sec.");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME 0.05");
 }
 
 
 void UI_Mainwindow::set_grading_01()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM 0.1");
+  statusLabel->setText("Display grading: 0.1 Sec.");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME 0.1");
 }
 
 
 void UI_Mainwindow::set_grading_02()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM 0.2");
+  statusLabel->setText("Display grading: 0.2 Sec.");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME 0.2");
 }
 
 
 void UI_Mainwindow::set_grading_05()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM 0.5");
+  statusLabel->setText("Display grading: 0.5 Sec.");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME 0.5");
 }
 
 
 void UI_Mainwindow::set_grading_1()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM 1");
+  statusLabel->setText("Display grading: 1 Sec.");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME 1");
 }
 
 
 void UI_Mainwindow::set_grading_2()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM 2");
+  statusLabel->setText("Display grading: 2 Sec.");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME 2");
 }
 
 
 void UI_Mainwindow::set_grading_5()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM 5");
+  statusLabel->setText("Display grading: 5 Sec.");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME 5");
 }
 
 
 void UI_Mainwindow::set_grading_10()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM 10");
+  statusLabel->setText("Display grading: 10 Sec.");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME 10");
 }
 
 
 void UI_Mainwindow::set_grading_20()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM 20");
+  statusLabel->setText("Display grading: 20 Sec.");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME 20");
 }
 
 
 void UI_Mainwindow::set_grading_inf()
 {
-  tmcdev_write(device, ":DISP:GRAD:TIM INF");
+  statusLabel->setText("Display grading: Infinite");
+
+  tmcdev_write(device, ":DISP:GRAD:TIME INF");
 }
 
 
@@ -349,7 +381,7 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
 
   if(adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF)
   {
-    if(dir)
+    if(!dir)
     {
       if(devparms.triggerholdoff >= 10)
       {
@@ -360,7 +392,7 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
         return;
       }
 
-      devparms.triggerholdoff += devparms.timebasescale / 10;
+      devparms.triggerholdoff += get_stepsize_divide_by_1000(devparms.triggerholdoff);
     }
     else
     {
@@ -373,12 +405,12 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
         return;
       }
 
-      devparms.triggerholdoff -= devparms.timebasescale / 10;
+      devparms.triggerholdoff -= get_stepsize_divide_by_1000(devparms.triggerholdoff);
     }
 
     strcpy(str, "Holdoff: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff);
+    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2);
 
     strcat(str, "s");
 
@@ -477,7 +509,7 @@ void UI_Mainwindow::trigAdjustDialChanged(int new_pos)
 
   strcpy(str, "Trigger level: ");
 
-  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[chn]);
+  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[chn], 2);
 
   strcat(str, "V");
 
@@ -593,7 +625,7 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
 
     strcpy(str, "Delayed timebase: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
 
     strcat(str, "s");
 
@@ -655,7 +687,7 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
 
     strcpy(str, "Timebase: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2);
 
     strcat(str, "s");
 
@@ -745,7 +777,7 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
 
     strcpy(str, "Horizontal delay position: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
 
     strcat(str, "s");
 
@@ -788,7 +820,7 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
 
     strcpy(str, "Horizontal position: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
 
     strcat(str, "s");
 
@@ -886,7 +918,7 @@ void UI_Mainwindow::vertOffsetDialChanged(int new_pos)
 
   sprintf(str, "Channel %i offset: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn]);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
 
   strcat(str, "V");
 
@@ -1010,7 +1042,7 @@ void UI_Mainwindow::vertScaleDialChanged(int new_pos)
 
   sprintf(str, "Channel %i scale: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn]);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
 
   strcat(str, "V");
 
@@ -1271,6 +1303,10 @@ void UI_Mainwindow::chan_coupling_ac()
 
   devparms.chancoupling[devparms.activechannel] = 2;
 
+  sprintf(str, "Channel %i coupling: AC", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
   sprintf(str, ":CHAN%i:COUP AC", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
@@ -1282,6 +1318,10 @@ void UI_Mainwindow::chan_coupling_dc()
   char str[128];
 
   devparms.chancoupling[devparms.activechannel] = 1;
+
+  sprintf(str, "Channel %i coupling: DC", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
 
   sprintf(str, ":CHAN%i:COUP DC", devparms.activechannel + 1);
 
@@ -1295,6 +1335,10 @@ void UI_Mainwindow::chan_coupling_gnd()
 
   devparms.chancoupling[devparms.activechannel] = 0;
 
+  sprintf(str, "Channel %i coupling: GND", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
   sprintf(str, ":CHAN%i:COUP GND", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
@@ -1306,6 +1350,10 @@ void UI_Mainwindow::chan_bwl_off()
   char str[128];
 
   devparms.chanbwlimit[devparms.activechannel] = 0;
+
+  sprintf(str, "Channel %i bandwidth limit: Off", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
 
   sprintf(str, ":CHAN%i:BWL OFF", devparms.activechannel + 1);
 
@@ -1319,6 +1367,10 @@ void UI_Mainwindow::chan_bwl_20()
 
   devparms.chanbwlimit[devparms.activechannel] = 20;
 
+  sprintf(str, "Channel %i bandwidth limit: 20MHz", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
   sprintf(str, ":CHAN%i:BWL 20M", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
@@ -1330,6 +1382,10 @@ void UI_Mainwindow::chan_bwl_250()
   char str[128];
 
   devparms.chanbwlimit[devparms.activechannel] = 250;
+
+  sprintf(str, "Channel %i bandwidth limit: 250MHz", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
 
   sprintf(str, ":CHAN%i:BWL 250M", devparms.activechannel + 1);
 
@@ -1348,6 +1404,10 @@ void UI_Mainwindow::chan_invert_on()
 
   devparms.chaninvert[devparms.activechannel] = 1;
 
+  sprintf(str, "Channel %i inverted: On", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
   sprintf(str, ":CHAN%i:INV 1", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
@@ -1364,6 +1424,10 @@ void UI_Mainwindow::chan_invert_off()
   }
 
   devparms.chaninvert[devparms.activechannel] = 0;
+
+  sprintf(str, "Channel %i inverted: Off", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
 
   sprintf(str, ":CHAN%i:INV 0", devparms.activechannel + 1);
 
@@ -1393,7 +1457,7 @@ void UI_Mainwindow::vertOffsetDialClicked(QPoint)
 
   sprintf(str, "Channel %i offset: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn]);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
 
   strcat(str, "V");
 
@@ -1495,7 +1559,7 @@ void UI_Mainwindow::horPosDialClicked(QPoint)
 
     strcpy(str, "Horizontal delay position: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
 
     strcat(str, "s");
 
@@ -1511,7 +1575,7 @@ void UI_Mainwindow::horPosDialClicked(QPoint)
 
     strcpy(str, "Horizontal position: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
 
     strcat(str, "s");
 
@@ -1771,7 +1835,7 @@ void UI_Mainwindow::trigAdjustDialClicked(QPoint)
 
   strcpy(str, "Trigger level: ");
 
-  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[devparms.triggeredgesource]);
+  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[devparms.triggeredgesource], 2);
 
   strcat(str, "V");
 

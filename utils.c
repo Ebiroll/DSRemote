@@ -1599,7 +1599,7 @@ void hextobin(char *dest, const char *str)
 }
 
 
-int convert_to_metric_suffix(char *buf, double value)
+int convert_to_metric_suffix(char *buf, double value, int decimals)
 {
   double ltmp;
 
@@ -1665,12 +1665,32 @@ int convert_to_metric_suffix(char *buf, double value)
 
   if(value >= 0)
   {
-    return sprintf(buf, "%.3f%c", ltmp, suffix);
+    switch(decimals)
+    {
+      case 0: return sprintf(buf, "%.0f%c", ltmp, suffix);
+              break;
+      case 1: return sprintf(buf, "%.1f%c", ltmp, suffix);
+              break;
+      case 2: return sprintf(buf, "%.2f%c", ltmp, suffix);
+              break;
+      default: return sprintf(buf, "%.3f%c", ltmp, suffix);
+              break;
+    }
   }
 
   if(value < 0)
   {
-    return sprintf(buf, "%.3f%c", ltmp * -1, suffix);
+    switch(decimals)
+    {
+      case 0: return sprintf(buf, "%.0f%c", ltmp * -1, suffix);
+              break;
+      case 1: return sprintf(buf, "%.1f%c", ltmp * -1, suffix);
+              break;
+      case 2: return sprintf(buf, "%.2f%c", ltmp * -1, suffix);
+              break;
+      default: return sprintf(buf, "%.3f%c", ltmp * -1, suffix);
+              break;
+    }
   }
 
   strcpy(buf, "0");
@@ -1779,7 +1799,6 @@ double round_down_step125(double val)
 
   return ltmp;
 }
-
 
 
 

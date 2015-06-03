@@ -330,6 +330,10 @@ UI_Mainwindow::UI_Mainwindow()
 
   device = NULL;
 
+  QSettings settings;
+
+  strcpy(recent_savedir, settings.value("path/savedir").toString().toLocal8Bit().data());
+
   adjDialFunc = ADJ_DIAL_FUNC_NONE;
   navDialFunc = NAV_DIAL_FUNC_NONE;
 
@@ -393,6 +397,10 @@ UI_Mainwindow::UI_Mainwindow()
 
 UI_Mainwindow::~UI_Mainwindow()
 {
+  QSettings settings;
+
+  settings.setValue("path/savedir", recent_savedir);
+
   delete appfont;
   delete monofont;
 
@@ -1798,6 +1806,28 @@ int UI_Mainwindow::get_metric_factor(double value)
                 }
 
   return suffix;
+}
+
+
+double UI_Mainwindow::get_stepsize_divide_by_1000(double val)
+{
+  int exp=0;
+
+  while(val < 1)
+  {
+    val *= 10;
+
+    exp--;
+  }
+
+  while(val >= 10)
+  {
+    val /= 10;
+
+    exp++;
+  }
+
+  return(exp10(exp - 2));
 }
 
 
