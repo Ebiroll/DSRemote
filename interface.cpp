@@ -1274,7 +1274,7 @@ void UI_Mainwindow::chan_coupling_ac()
 
   devparms.chancoupling[devparms.activechannel] = 2;
 
-  sprintf(str, ":CHAN%i:COUP AC", '1' + devparms.activechannel);
+  sprintf(str, ":CHAN%i:COUP AC", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
 }
@@ -1286,7 +1286,7 @@ void UI_Mainwindow::chan_coupling_dc()
 
   devparms.chancoupling[devparms.activechannel] = 1;
 
-  sprintf(str, ":CHAN%i:COUP DC", '1' + devparms.activechannel);
+  sprintf(str, ":CHAN%i:COUP DC", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
 }
@@ -1298,7 +1298,7 @@ void UI_Mainwindow::chan_coupling_gnd()
 
   devparms.chancoupling[devparms.activechannel] = 0;
 
-  sprintf(str, ":CHAN%i:COUP GND", '1' + devparms.activechannel);
+  sprintf(str, ":CHAN%i:COUP GND", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
 }
@@ -1310,7 +1310,7 @@ void UI_Mainwindow::chan_bwl_off()
 
   devparms.chanbwlimit[devparms.activechannel] = 0;
 
-  sprintf(str, ":CHAN%i:BWL OFF", '1' + devparms.activechannel);
+  sprintf(str, ":CHAN%i:BWL OFF", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
 }
@@ -1322,7 +1322,7 @@ void UI_Mainwindow::chan_bwl_20()
 
   devparms.chanbwlimit[devparms.activechannel] = 20;
 
-  sprintf(str, ":CHAN%i:BWL 20M", '1' + devparms.activechannel);
+  sprintf(str, ":CHAN%i:BWL 20M", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
 }
@@ -1334,7 +1334,7 @@ void UI_Mainwindow::chan_bwl_250()
 
   devparms.chanbwlimit[devparms.activechannel] = 250;
 
-  sprintf(str, ":CHAN%i:BWL 250M", '1' + devparms.activechannel);
+  sprintf(str, ":CHAN%i:BWL 250M", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
 }
@@ -1346,7 +1346,7 @@ void UI_Mainwindow::chan_invert_on()
 
   devparms.chaninvert[devparms.activechannel] = 1;
 
-  sprintf(str, ":CHAN%i:INV 1", '1' + devparms.activechannel);
+  sprintf(str, ":CHAN%i:INV 1", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
 }
@@ -1358,7 +1358,7 @@ void UI_Mainwindow::chan_invert_off()
 
   devparms.chaninvert[devparms.activechannel] = 0;
 
-  sprintf(str, ":CHAN%i:INV 0", '1' + devparms.activechannel);
+  sprintf(str, ":CHAN%i:INV 0", devparms.activechannel + 1);
 
   tmcdev_write(device, str);
 }
