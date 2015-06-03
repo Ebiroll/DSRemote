@@ -216,57 +216,57 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     }
   }
 
-    painter->setPen(RasterColor);
+  painter->setPen(RasterColor);
 
-    step = curve_w / 70.0;
+  step = curve_w / 70.0;
 
-    for(i=1; i<70; i++)
+  for(i=1; i<70; i++)
+  {
+    step2 = step * i;
+
+    if(devparms->displaygrid)
     {
-      step2 = step * i;
-
-      if(devparms->displaygrid)
-      {
-        painter->drawLine(step2, curve_h / 2 + 2, step2, curve_h / 2 - 2);
-      }
-
-      if(i % 5)
-      {
-        painter->drawLine(step2, curve_h - 1, step2, curve_h - 5);
-
-        painter->drawLine(step2, 0, step2, 4);
-      }
-      else
-      {
-        painter->drawLine(step2, curve_h - 1, step2, curve_h - 9);
-
-        painter->drawLine(step2, 0, step2, 8);
-      }
+      painter->drawLine(step2, curve_h / 2 + 2, step2, curve_h / 2 - 2);
     }
 
-    step = curve_h / 40.0;
-
-    for(i=1; i<40; i++)
+    if(i % 5)
     {
-      step2 = step * i;
+      painter->drawLine(step2, curve_h - 1, step2, curve_h - 5);
 
-      if(devparms->displaygrid)
-      {
-        painter->drawLine(curve_w / 2 + 2, step2, curve_w / 2  - 2, step2);
-      }
-
-      if(i % 5)
-      {
-        painter->drawLine(curve_w - 1, step2, curve_w - 5, step2);
-
-        painter->drawLine(0, step2, 4, step2);
-      }
-      else
-      {
-        painter->drawLine(curve_w - 1, step2, curve_w - 9, step2);
-
-        painter->drawLine(0, step2, 8, step2);
-      }
+      painter->drawLine(step2, 0, step2, 4);
     }
+    else
+    {
+      painter->drawLine(step2, curve_h - 1, step2, curve_h - 9);
+
+      painter->drawLine(step2, 0, step2, 8);
+    }
+  }
+
+  step = curve_h / 40.0;
+
+  for(i=1; i<40; i++)
+  {
+    step2 = step * i;
+
+    if(devparms->displaygrid)
+    {
+      painter->drawLine(curve_w / 2 + 2, step2, curve_w / 2  - 2, step2);
+    }
+
+    if(i % 5)
+    {
+      painter->drawLine(curve_w - 1, step2, curve_w - 5, step2);
+
+      painter->drawLine(0, step2, 4, step2);
+    }
+    else
+    {
+      painter->drawLine(curve_w - 1, step2, curve_w - 9, step2);
+
+      painter->drawLine(0, step2, 8, step2);
+    }
+  }
 
   if(devparms == NULL)
   {
@@ -425,6 +425,39 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
       {
         drawArrow(painter, trig_pos_arrow_pos, 27, 1, QColor(255, 128, 0), 'T');
       }
+  }
+
+  if(devparms->countersrc)
+  {
+    char str[128];
+
+    QPainterPath path;
+
+    path.addRoundedRect(600, 20, 122, 20, 3, 3);
+
+    painter->fillPath(path, Qt::black);
+
+    painter->setPen(Qt::darkGray);
+
+    painter->drawRoundedRect(600, 20, 122, 20, 3, 3);
+
+    path = QPainterPath();
+
+    path.addRoundedRect(604, 23, 14, 14, 3, 3);
+
+    painter->fillPath(path, SignalColor[devparms->countersrc - 1]);
+
+    painter->setPen(Qt::black);
+
+    painter->drawLine(607, 26, 615, 26);
+
+    painter->drawLine(611, 26, 611, 34);
+
+    painter->setPen(Qt::white);
+
+    sprintf(str, "%.3f Hz", devparms->counterfreq);
+
+    painter->drawText(622, 20, 100, 20, Qt::AlignCenter, str);
   }
 
 //   clk_end = clock();

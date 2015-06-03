@@ -216,6 +216,13 @@ UI_Mainwindow::UI_Mainwindow()
   horPosDial->setMinimum(0);
   horPosDial->setContextMenuPolicy(Qt::CustomContextMenu);
 
+  quickGrpBox = new QGroupBox("Quick", DPRwidget);
+  quickGrpBox->setGeometry(195, 190, 70, 90);
+
+  measureButton = new QPushButton(quickGrpBox);
+  measureButton->setGeometry(15, 30, 40, 18);
+  measureButton->setText("MEAS");
+
   verticalGrpBox = new QGroupBox("Vertical", DPRwidget);
   verticalGrpBox->setGeometry(5, 290, 140, 255);
 
@@ -621,6 +628,7 @@ void UI_Mainwindow::open_connection()
   connect(dispButton,       SIGNAL(clicked()),      this, SLOT(dispButtonClicked()));
   connect(utilButton,       SIGNAL(clicked()),      this, SLOT(utilButtonClicked()));
   connect(helpButton,       SIGNAL(clicked()),      this, SLOT(helpButtonClicked()));
+  connect(measureButton,    SIGNAL(clicked()),      this, SLOT(measureButtonClicked()));
 
   connect(horPosDial,     SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(horPosDialClicked(QPoint)));
   connect(vertOffsetDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(vertOffsetDialClicked(QPoint)));
@@ -707,6 +715,7 @@ void UI_Mainwindow::close_connection()
   disconnect(dispButton,       SIGNAL(clicked()),     this, SLOT(dispButtonClicked()));
   disconnect(utilButton,       SIGNAL(clicked()),     this, SLOT(utilButtonClicked()));
   disconnect(helpButton,       SIGNAL(clicked()),     this, SLOT(helpButtonClicked()));
+  disconnect(measureButton,    SIGNAL(clicked()),     this, SLOT(measureButtonClicked()));
 
   disconnect(horPosDial,     SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(horPosDialClicked(QPoint)));
   disconnect(vertOffsetDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(vertOffsetDialClicked(QPoint)));
@@ -1647,6 +1656,44 @@ int UI_Mainwindow::get_device_settings()
         line = __LINE__;
         goto OUT_ERROR;
       }
+
+  if(tmcdev_write(device, ":MEAS:COUN:SOUR?") != 16)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmcdev_read(device) < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "OFF"))
+  {
+    devparms.countersrc = 0;
+  }
+  else if(!strcmp(device->buf, "CHAN1"))
+    {
+      devparms.countersrc = 1;
+    }
+    else if(!strcmp(device->buf, "CHAN2"))
+      {
+        devparms.countersrc = 2;
+      }
+      else if(!strcmp(device->buf, "CHAN3"))
+        {
+          devparms.countersrc = 3;
+        }
+        else if(!strcmp(device->buf, "CHAN4"))
+          {
+            devparms.countersrc = 4;
+          }
+          else
+          {
+            line = __LINE__;
+            goto OUT_ERROR;
+          }
 
   return 0;
 

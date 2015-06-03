@@ -1609,6 +1609,73 @@ void UI_Mainwindow::horScaleDialClicked(QPoint)
 }
 
 
+void UI_Mainwindow::measureButtonClicked()
+{
+  QMenu menu,
+        submenucounter;
+
+  submenucounter.setTitle("Counter");
+  submenucounter.addAction("OFF", this, SLOT(counter_off()));
+  submenucounter.addAction("CH1", this, SLOT(counter_ch1()));
+  if(devparms.channel_cnt > 1)
+  {
+    submenucounter.addAction("CH2", this, SLOT(counter_ch2()));
+  }
+  if(devparms.channel_cnt > 2)
+  {
+    submenucounter.addAction("CH3", this, SLOT(counter_ch3()));
+  }
+  if(devparms.channel_cnt > 3)
+  {
+    submenucounter.addAction("CH4", this, SLOT(counter_ch4()));
+  }
+
+  menu.addMenu(&submenucounter);
+
+  menu.exec(measureButton->mapToGlobal(QPoint(0,0)));
+}
+
+
+void UI_Mainwindow::counter_off()
+{
+  devparms.countersrc = 0;
+
+  tmcdev_write(device, ":MEAS:COUN:SOUR OFF");
+}
+
+
+void UI_Mainwindow::counter_ch1()
+{
+  devparms.countersrc = 1;
+
+  tmcdev_write(device, ":MEAS:COUN:SOUR CHAN1");
+}
+
+
+void UI_Mainwindow::counter_ch2()
+{
+  devparms.countersrc = 2;
+
+  tmcdev_write(device, ":MEAS:COUN:SOUR CHAN2");
+}
+
+
+void UI_Mainwindow::counter_ch3()
+{
+  devparms.countersrc = 3;
+
+  tmcdev_write(device, ":MEAS:COUN:SOUR CHAN3");
+}
+
+
+void UI_Mainwindow::counter_ch4()
+{
+  devparms.countersrc = 4;
+
+  tmcdev_write(device, ":MEAS:COUN:SOUR CHAN4");
+}
+
+
 void UI_Mainwindow::trigModeButtonClicked()
 {
   devparms.triggersweep++;

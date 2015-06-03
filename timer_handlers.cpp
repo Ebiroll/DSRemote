@@ -219,6 +219,23 @@ void UI_Mainwindow::stat_timer_handler()
 
   devparms.memdepth = atoi(device->buf);
 
+  if(devparms.countersrc)
+  {
+    if(tmcdev_write(device, ":MEAS:COUN:VAL?") != 15)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmcdev_read(device) < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    devparms.counterfreq = atof(device->buf);
+  }
+
 //   if(old_stat != devparms.triggerstatus)
 //   {
 //     printf("Status change: %i\n", devparms.triggerstatus);

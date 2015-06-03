@@ -142,7 +142,8 @@ private:
   QGroupBox   *verticalGrpBox,
               *horizontalGrpBox,
               *triggerGrpBox,
-              *menuGrpBox;
+              *menuGrpBox,
+              *quickGrpBox;
 
   QPushButton *ch1Button,
               *ch2Button,
@@ -166,7 +167,8 @@ private:
               *helpButton,
               *playpauseButton,
               *stopButton,
-              *recordButton;
+              *recordButton,
+              *measureButton;
 
   QDial       *adjDial,
               *horScaleDial,
@@ -238,8 +240,15 @@ private slots:
   void dispButtonClicked();
   void utilButtonClicked();
   void helpButtonClicked();
+  void measureButtonClicked();
 
   void horizontal_delayed();
+
+  void counter_off();
+  void counter_ch1();
+  void counter_ch2();
+  void counter_ch3();
+  void counter_ch4();
 
   void trigger_source_ch1();
   void trigger_source_ch2();

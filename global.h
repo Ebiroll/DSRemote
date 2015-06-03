@@ -121,6 +121,9 @@ struct device_settings
 
   int displaygrid;              // 0=none, 1=half, 2=full
 
+  int countersrc;               // 0=off, 1=ch1, 2=ch2, 3=ch3, 4=ch4
+  double counterfreq;           // Value of frequency counter
+
   char *screenshot_buf;
   char *wavebuf[MAX_CHNS];
 
