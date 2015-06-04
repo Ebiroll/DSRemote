@@ -133,7 +133,8 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
        !strncmp(buf, ":WAV:SOUR CHAN", 14) ||
        !strncmp(buf, ":TRIG:SWE?", 10) ||
        !strncmp(buf, ":ACQ:SRAT?", 10) ||
-       !strncmp(buf, ":ACQ:MDEP?", 10)))
+       !strncmp(buf, ":ACQ:MDEP?", 10) ||
+       !strncmp(buf, ":MEAS:COUN:VAL?", 15)))
   {
     printf("tmc_dev write: %s", buf);
   }

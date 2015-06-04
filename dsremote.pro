@@ -29,6 +29,7 @@ HEADERS += settings_dialog.h
 
 SOURCES += main.cpp
 SOURCES += mainwindow.cpp
+SOURCES += mainwindow_constr.cpp
 SOURCES += timer_handlers.cpp
 SOURCES += save_data.cpp
 SOURCES += interface.cpp

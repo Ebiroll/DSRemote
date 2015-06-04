@@ -138,7 +138,7 @@ private:
 
   void drawWidget(QPainter *, int, int);
   void drawArrow(QPainter *, int, int, int, QColor, char);
-  void drawSmallTriggerArrow(QPainter *, int, int, QColor);
+  void drawSmallTriggerArrow(QPainter *, int, int, int, QColor);
   void drawTrigCenterArrow(QPainter *, int, int);
   void drawChanLabel(QPainter *, int, int, int);
   void drawTopLabels(QPainter *);

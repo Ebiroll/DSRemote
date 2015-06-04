@@ -1673,6 +1673,14 @@ int convert_to_metric_suffix(char *buf, double value, int decimals)
               break;
       case 2: return sprintf(buf, "%.2f%c", ltmp, suffix);
               break;
+      case 3: return sprintf(buf, "%.3f%c", ltmp, suffix);
+              break;
+      case 4: return sprintf(buf, "%.4f%c", ltmp, suffix);
+              break;
+      case 5: return sprintf(buf, "%.5f%c", ltmp, suffix);
+              break;
+      case 6: return sprintf(buf, "%.6f%c", ltmp, suffix);
+              break;
       default: return sprintf(buf, "%.3f%c", ltmp, suffix);
               break;
     }

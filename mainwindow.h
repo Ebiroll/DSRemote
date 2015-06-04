@@ -211,7 +211,8 @@ private slots:
   void close_connection();
   void open_settings_dialog();
   int get_device_settings();
-  void save_waveform();
+  void save_screen_waveform();
+  void save_memory_waveform();
   void save_screenshot();
 
   void adjDialChanged(int);

@@ -143,7 +143,227 @@ OUT_ERROR:
 }
 
 
-void UI_Mainwindow::save_waveform()
+void UI_Mainwindow::save_memory_waveform()
+{
+//   int i, j, k, ready, n=0, chns=0, hdl=-1, yoffset[MAX_CHNS], bytes_rcvd;
+//
+//   char str[128],
+//        opath[MAX_PATHLEN];
+//
+//   short *wavbuf[4];
+//
+//   double rec_len = 0;
+//
+// //  struct waveform_preamble wfp;
+//
+//   if(device == NULL)
+//   {
+//     return;
+//   }
+//
+//   wavbuf[0] = NULL;
+//   wavbuf[1] = NULL;
+//   wavbuf[2] = NULL;
+//   wavbuf[3] = NULL;
+//
+//   rec_len = devparms.memdepth / devparms.samplerate;
+//
+//   if(rec_len < 1e-6)
+//   {
+//     strcpy(str, "Can not save waveforms shorter than 1 uSec.");
+//     goto OUT_ERROR;
+//   }
+//
+//   for(i=0; i<MAX_CHNS; i++)
+//   {
+//     if(!devparms.chandisplay[i])  // Download data only when channel is switched on
+//     {
+//       continue;
+//     }
+//
+//     wavbuf[i] = (short *)malloc(devparms.memdepth * sizeof(short));
+//     if(wavbuf[i] == NULL)
+//     {
+//       strcpy(str, "Malloc error.");
+//       goto OUT_ERROR;
+//     }
+//
+//     chns++;
+//   }
+//
+//   if(!chns)
+//   {
+//     strcpy(str, "No active channels.");
+//     goto OUT_ERROR;
+//   }
+//
+//   scrn_timer->stop();
+//
+//   stat_timer->stop();
+//
+//   tmcdev_write(device, ":STOP");
+//
+//   tmcdev_write(device, ":WAV:POIN?");
+//
+//   n = tmcdev_read(device);
+//
+//   printf("n is: %i  points response is: ->%s<-\n", n, device->buf);
+//
+//   for(i=0; i<MAX_CHNS; i++)
+//   {
+//     if(!devparms.chandisplay[i])  // Download data only when channel is switched on
+//     {
+//       continue;
+//     }
+//
+//     sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
+//
+//     tmcdev_write(device, str);
+//
+//     tmcdev_write(device, ":WAV:FORM BYTE");
+//
+//     tmcdev_write(device, ":WAV:MODE RAW");
+//
+//   tmcdev_write(device, ":WAV:POIN?");
+//
+//   n = tmcdev_read(device);
+//
+//   printf("n is: %i  points response is: ->%s<-\n", n, device->buf);
+//
+//     tmcdev_write(device, ":WAV RES");
+//
+//     tmcdev_write(device, ":WAV BEG");
+//
+//     bytes_rcvd = 0;
+//
+//     ready = 0;
+//
+//     while(1)
+//     {
+//       tmcdev_write(device, ":WAV:STAT?");
+//
+//       n = tmcdev_read(device);
+//
+//       printf("n is: %i   response is: ->%s<-\n", n, device->buf);
+//
+//       if(n < 4)
+//       {
+//         strcpy(str, "Error, could not read waveform status.");
+//         goto OUT_ERROR;
+//       }
+//
+//       if(strncmp(device->buf, "READ", 4))
+//       {
+//         ready = 1;
+//       }
+//
+//       tmcdev_write(device, ":WAV:DATA?");
+//
+//       QApplication::setOverrideCursor(Qt::WaitCursor);
+//
+//       n = tmcdev_read(device);
+//
+//       QApplication::restoreOverrideCursor();
+//
+//       if(n < 0)
+//       {
+//         strcpy(str, "Can not read from device.\n"
+//                     "Have you already patched the usbtmc driver?");
+//         goto OUT_ERROR;
+//       }
+//
+//       printf("received %i bytes\n", n);
+//
+//       if(n > devparms.memdepth)
+//       {
+//         strcpy(str, "Datablock too big for buffer.");
+//         goto OUT_ERROR;
+//       }
+//
+//       if(ready)
+//       {
+//         tmcdev_write(device, ":WAV END");
+//
+//         break;
+//       }
+//     }
+//   }
+//
+//
+//   for(i=0; i<MAX_CHNS; i++)
+//   {
+//     free(wavbuf[i]);
+//   }
+//
+//   stat_timer->start(STAT_TIMER_IVAL);
+//
+//   scrn_timer->start(SCRN_TIMER_IVAL);
+//
+//   return;
+//
+// OUT_ERROR:
+//
+//   QMessageBox msgBox;
+//   msgBox.setIcon(QMessageBox::Critical);
+//   msgBox.setText(str);
+//   msgBox.exec();
+//
+//   if(hdl >= 0)
+//   {
+//     edfclose_file(hdl);
+//   }
+//
+//   for(i=0; i<MAX_CHNS; i++)
+//   {
+//     free(wavbuf[i]);
+//   }
+//
+//   stat_timer->start(STAT_TIMER_IVAL);
+//
+//   scrn_timer->start(SCRN_TIMER_IVAL);
+}
+
+
+//     tmcdev_write(device, ":WAV:PRE?");
+//
+//     n = tmcdev_read(device);
+//
+//     if(n < 0)
+//     {
+//       strcpy(str, "Can not read from device.");
+//       goto OUT_ERROR;
+//     }
+
+//     printf("waveform preamble: %s\n", device->buf);
+
+//     if(parse_preamble(device->buf, device->sz, &wfp, i))
+//     {
+//       strcpy(str, "Preamble parsing error.");
+//       goto OUT_ERROR;
+//     }
+
+//     printf("waveform preamble:\n"
+//            "format: %i\n"
+//            "type: %i\n"
+//            "points: %i\n"
+//            "count: %i\n"
+//            "xincrement: %e\n"
+//            "xorigin: %e\n"
+//            "xreference: %e\n"
+//            "yincrement: %e\n"
+//            "yorigin: %e\n"
+//            "yreference: %e\n",
+//            wfp.format, wfp.type, wfp.points, wfp.count,
+//            wfp.xincrement[i], wfp.xorigin[i], wfp.xreference[i],
+//            wfp.yincrement[i], wfp.yorigin[i], wfp.yreference[i]);
+
+//     rec_len = wfp.xincrement[i] * wfp.points;
+
+
+
+
+
+void UI_Mainwindow::save_screen_waveform()
 {
   int i, j, n=0, chns=0, hdl=-1, yoffset[MAX_CHNS];
 
@@ -153,8 +373,6 @@ void UI_Mainwindow::save_waveform()
   short *wavbuf[4];
 
   double rec_len = 0;
-
-//  struct waveform_preamble wfp;
 
   if(device == NULL)
   {
@@ -197,10 +415,6 @@ void UI_Mainwindow::save_waveform()
     goto OUT_ERROR;
   }
 
-//   tmcdev_write(device, ":ACQ:SRAT?");
-//
-//   devparms.samplerate = atof(device->buf);
-
   for(i=0; i<MAX_CHNS; i++)
   {
     if(!devparms.chandisplay[i])  // Download data only when channel is switched on
@@ -215,41 +429,6 @@ void UI_Mainwindow::save_waveform()
     tmcdev_write(device, ":WAV:FORM BYTE");
 
     tmcdev_write(device, ":WAV:MODE NORM");
-
-//     tmcdev_write(device, ":WAV:PRE?");
-//
-//     n = tmcdev_read(device);
-//
-//     if(n < 0)
-//     {
-//       strcpy(str, "Can not read from device.");
-//       goto OUT_ERROR;
-//     }
-
-//     printf("waveform preamble: %s\n", device->buf);
-
-//     if(parse_preamble(device->buf, device->sz, &wfp, i))
-//     {
-//       strcpy(str, "Preamble parsing error.");
-//       goto OUT_ERROR;
-//     }
-
-//     printf("waveform preamble:\n"
-//            "format: %i\n"
-//            "type: %i\n"
-//            "points: %i\n"
-//            "count: %i\n"
-//            "xincrement: %e\n"
-//            "xorigin: %e\n"
-//            "xreference: %e\n"
-//            "yincrement: %e\n"
-//            "yorigin: %e\n"
-//            "yreference: %e\n",
-//            wfp.format, wfp.type, wfp.points, wfp.count,
-//            wfp.xincrement[i], wfp.xorigin[i], wfp.xreference[i],
-//            wfp.yincrement[i], wfp.yorigin[i], wfp.yreference[i]);
-
-//     rec_len = wfp.xincrement[i] * wfp.points;
 
     tmcdev_write(device, ":WAV:DATA?");
 

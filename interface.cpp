@@ -30,9 +30,11 @@
 
 void UI_Mainwindow::navDialChanged(int npos)
 {
+  int mpr = 1;
+
   char str[512];
 
-  double val;
+  double val, lefttime, righttime, delayrange;
 
   if(navDial->isSliderDown() == true)
   {
@@ -43,71 +45,109 @@ void UI_Mainwindow::navDialChanged(int npos)
     navDial_timer->start(300);
   }
 
+  if(npos > 93)
+    {
+      mpr = 64;
+    }
+    else if(npos > 86)
+      {
+        mpr = 32;
+      }
+      else if(npos > 79)
+        {
+          mpr = 16;
+        }
+        else if(npos > 72)
+          {
+            mpr = 8;
+          }
+          else if(npos > 65)
+            {
+              mpr = 4;
+            }
+            else if(npos > 58)
+              {
+                mpr = 2;
+              }
+              else if(npos > 51)
+                {
+                  mpr = 1;
+                }
+                else if(npos > 49)
+                  {
+                    return;
+                  }
+                  else if(npos > 42)
+                    {
+                      mpr = -1;
+                    }
+                    else if(npos > 35)
+                      {
+                        mpr = -2;
+                      }
+                      else if(npos > 28)
+                        {
+                          mpr = -4;
+                        }
+                        else if(npos > 21)
+                          {
+                            mpr = -8;
+                          }
+                          else if(npos > 14)
+                            {
+                              mpr = -16;
+                            }
+                            else if(npos > 7)
+                              {
+                                mpr = -32;
+                              }
+                              else
+                              {
+                                mpr = -64;
+                              }
+
+  if(devparms.timebasedelayenable)
+  {
+    val = get_stepsize_divide_by_1000(devparms.timebasedelayoffset);
+
+    devparms.timebasedelayoffset += (val * mpr);
+
+    lefttime = (7 * devparms.timebasescale) - devparms.timebaseoffset;
+
+    righttime = (7 * devparms.timebasescale) + devparms.timebaseoffset;
+
+    delayrange = 7 * devparms.timebasedelayscale;
+
+    if(devparms.timebasedelayoffset < -(lefttime - delayrange))
+    {
+      devparms.timebasedelayoffset = -(lefttime - delayrange);
+    }
+
+    if(devparms.timebasedelayoffset > (righttime - delayrange))
+    {
+      devparms.timebasedelayoffset = (righttime - delayrange);
+    }
+
+    strcpy(str, "Delayed timebase position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+
+    tmcdev_write(device, str);
+
+    return;
+  }
+
   if(navDialFunc == NAV_DIAL_FUNC_HOLDOFF)
   {
     val = get_stepsize_divide_by_1000(devparms.triggerholdoff);
 
-    if(npos > 93)
-      {
-        devparms.triggerholdoff += (val * 64);
-      }
-      else if(npos > 86)
-        {
-          devparms.triggerholdoff += (val * 32);
-        }
-        else if(npos > 79)
-          {
-            devparms.triggerholdoff += (val * 16);
-          }
-          else if(npos > 72)
-            {
-              devparms.triggerholdoff += (val * 8);
-            }
-            else if(npos > 65)
-              {
-                devparms.triggerholdoff += (val * 4);
-              }
-              else if(npos > 58)
-                {
-                  devparms.triggerholdoff += (val * 2);
-                }
-                else if(npos > 51)
-                  {
-                    devparms.triggerholdoff += val;
-                  }
-                  else if(npos > 49)
-                    {
-                      return;
-                    }
-                    else if(npos > 42)
-                      {
-                        devparms.triggerholdoff -= val;
-                      }
-                      else if(npos > 35)
-                        {
-                          devparms.triggerholdoff -= (val * 2);
-                        }
-                        else if(npos > 28)
-                          {
-                            devparms.triggerholdoff -= (val * 4);
-                          }
-                          else if(npos > 21)
-                            {
-                              devparms.triggerholdoff -= (val * 8);
-                            }
-                            else if(npos > 14)
-                              {
-                                devparms.triggerholdoff -= (val * 16);
-                              }
-                              else if(npos > 7)
-                                {
-                                  devparms.triggerholdoff -= (val * 32);
-                                }
-                                else
-                                {
-                                  devparms.triggerholdoff -= (val * 64);
-                                }
-
+    devparms.triggerholdoff += (val * mpr);
 
     if(devparms.triggerholdoff < 1e-7)
     {
@@ -154,7 +194,8 @@ void UI_Mainwindow::saveButtonClicked()
 {
   QMenu menu;
 
-  menu.addAction("Save waveform",   this, SLOT(save_waveform()));
+  menu.addAction("Save screen waveform",   this, SLOT(save_screen_waveform()));
+//  menu.addAction("Save memory waveform",   this, SLOT(save_memory_waveform()));
   menu.addAction("Save screenshot", this, SLOT(save_screenshot()));
 
   menu.exec(saveButton->mapToGlobal(QPoint(0,0)));

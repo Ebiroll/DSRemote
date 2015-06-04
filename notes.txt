@@ -52,6 +52,9 @@ What's implemented so far:
 - trigger force
 
 
+- measure hardware frequency counter
+
+
 - display clear
 - display grid
 - display grading

@@ -134,7 +134,7 @@ void SignalCurve::paintEvent(QPaintEvent *)
 
 void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 {
-  int i, chn, tmp;
+  int i, chn, tmp, rot=1;
 
   double offset=0.0,
          h_step=0.0,
@@ -158,14 +158,25 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   if(tmp < 291)
   {
-    tmp = 291;
+    tmp = 286;
+
+    rot = 2;
   }
   else if(tmp > 523)
     {
-      tmp = 523;
+      tmp = 528;
+
+      rot = 0;
     }
 
-  drawSmallTriggerArrow(painter, tmp, 16, QColor(255, 128, 0));
+  if((rot == 0) || (rot == 2))
+  {
+    drawSmallTriggerArrow(painter, tmp, 11, rot, QColor(255, 128, 0));
+  }
+  else
+  {
+    drawSmallTriggerArrow(painter, tmp, 16, rot, QColor(255, 128, 0));
+  }
 
   painter->fillRect(0, curve_h - 30, curve_w, curve_h, QColor(32, 32, 32));
 
@@ -433,31 +444,40 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
     QPainterPath path;
 
-    path.addRoundedRect(600, 20, 122, 20, 3, 3);
+    path.addRoundedRect(600, 6, 122, 20, 3, 3);
 
     painter->fillPath(path, Qt::black);
 
     painter->setPen(Qt::darkGray);
 
-    painter->drawRoundedRect(600, 20, 122, 20, 3, 3);
+    painter->drawRoundedRect(600, 6, 122, 20, 3, 3);
 
     path = QPainterPath();
 
-    path.addRoundedRect(604, 23, 14, 14, 3, 3);
+    path.addRoundedRect(604, 9, 14, 14, 3, 3);
 
     painter->fillPath(path, SignalColor[devparms->countersrc - 1]);
 
     painter->setPen(Qt::black);
 
-    painter->drawLine(607, 26, 615, 26);
+    painter->drawLine(607, 12, 615, 12);
 
-    painter->drawLine(611, 26, 611, 34);
+    painter->drawLine(611, 12, 611, 20);
 
     painter->setPen(Qt::white);
 
-    sprintf(str, "%.3f Hz", devparms->counterfreq);
+    if((devparms->counterfreq < 15) || (devparms->counterfreq > 1.1e9))
+    {
+      strcpy(str, "< 15 Hz");
+    }
+    else
+    {
+      convert_to_metric_suffix(str, devparms->counterfreq, 4);
 
-    painter->drawText(622, 20, 100, 20, Qt::AlignCenter, str);
+      strcat(str, "Hz");
+    }
+
+    painter->drawText(622, 6, 100, 20, Qt::AlignCenter, str);
   }
 
 //   clk_end = clock();
@@ -644,7 +664,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(555, 20, "D");
 
-  convert_to_metric_suffix(str, devparms->timebaseoffset, 3);
+  convert_to_metric_suffix(str, devparms->timebaseoffset, 4);
 
   strcat(str, "s");
 
@@ -984,23 +1004,61 @@ void SignalCurve::drawArrow(QPainter *painter, int xpos, int ypos, int rot, QCol
 }
 
 
-void SignalCurve::drawSmallTriggerArrow(QPainter *painter, int xpos, int ypos, QColor color)
+void SignalCurve::drawSmallTriggerArrow(QPainter *painter, int xpos, int ypos, int rot, QColor color)
 {
   QPainterPath path;
 
-  path.moveTo(xpos + 5, ypos - 10);
-  path.lineTo(xpos + 5,  ypos - 5);
-  path.lineTo(xpos,     ypos);
-  path.lineTo(xpos - 4,  ypos - 5);
-  path.lineTo(xpos - 4, ypos - 10);
-  path.lineTo(xpos + 5, ypos - 10);
-  painter->fillPath(path, color);
+  if(rot == 0)
+  {
+    path.moveTo(xpos - 13, ypos - 5);
+    path.lineTo(xpos - 5,  ypos - 5);
+    path.lineTo(xpos,     ypos);
+    path.lineTo(xpos - 5,  ypos + 5);
+    path.lineTo(xpos - 13, ypos + 5);
+    path.lineTo(xpos - 13, ypos - 5);
 
-  painter->setPen(Qt::black);
+    painter->fillPath(path, color);
 
-  painter->drawLine(xpos - 2, ypos - 8, xpos + 2, ypos - 8);
+    painter->setPen(Qt::black);
 
-  painter->drawLine(xpos, ypos - 8, xpos, ypos - 3);
+    painter->drawLine(xpos - 10, ypos - 4, xpos - 6, ypos - 4);
+
+    painter->drawLine(xpos - 8, ypos - 4, xpos - 8, ypos + 4);
+  }
+  else if(rot == 1)
+    {
+      path.moveTo(xpos + 5, ypos - 10);
+      path.lineTo(xpos + 5,  ypos - 5);
+      path.lineTo(xpos,     ypos);
+      path.lineTo(xpos - 4,  ypos - 5);
+      path.lineTo(xpos - 4, ypos - 10);
+      path.lineTo(xpos + 5, ypos - 10);
+
+      painter->fillPath(path, color);
+
+      painter->setPen(Qt::black);
+
+      painter->drawLine(xpos - 2, ypos - 8, xpos + 2, ypos - 8);
+
+      painter->drawLine(xpos, ypos - 8, xpos, ypos - 3);
+    }
+    else if(rot == 2)
+      {
+        path.moveTo(xpos + 12, ypos - 5);
+        path.lineTo(xpos + 5,  ypos - 5);
+        path.lineTo(xpos,     ypos);
+        path.lineTo(xpos + 5,  ypos + 5);
+        path.lineTo(xpos + 12, ypos + 5);
+        path.lineTo(xpos + 12, ypos - 5);
+
+        painter->fillPath(path, color);
+
+        painter->setPen(Qt::black);
+
+        painter->drawLine(xpos + 9, ypos - 4, xpos + 5, ypos - 4);
+
+        painter->drawLine(xpos + 7, ypos - 4, xpos + 7, ypos + 4);
+      }
 }
 
 
