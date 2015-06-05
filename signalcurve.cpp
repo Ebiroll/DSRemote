@@ -360,6 +360,11 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
       {
         if(i < (bufsize - 1))
         {
+          if(devparms->displaytype)
+          {
+            painter->drawPoint(i * h_step, ((double)(devparms->wavebuf[chn][i]) + offset) * v_sense);
+          }
+          else
           {
             painter->drawLine(i * h_step, ((double)(devparms->wavebuf[chn][i]) + offset) * v_sense, (i + 1) * h_step, ((double)(devparms->wavebuf[chn][i + 1]) + offset) * v_sense);
           }
@@ -447,45 +452,25 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   if(devparms->countersrc)
   {
-    char str[128];
-
-    QPainterPath path;
-
-    path.addRoundedRect(600, 6, 122, 20, 3, 3);
-
-    painter->fillPath(path, Qt::black);
-
-    painter->setPen(Qt::darkGray);
-
-    painter->drawRoundedRect(600, 6, 122, 20, 3, 3);
-
-    path = QPainterPath();
-
-    path.addRoundedRect(604, 9, 14, 14, 3, 3);
-
-    painter->fillPath(path, SignalColor[devparms->countersrc - 1]);
-
-    painter->setPen(Qt::black);
-
-    painter->drawLine(607, 12, 615, 12);
-
-    painter->drawLine(611, 12, 611, 20);
-
-    painter->setPen(Qt::white);
-
-    if((devparms->counterfreq < 15) || (devparms->counterfreq > 1.1e9))
-    {
-      strcpy(str, "< 15 Hz");
-    }
-    else
-    {
-      convert_to_metric_suffix(str, devparms->counterfreq, 4);
-
-      strcat(str, "Hz");
-    }
-
-    painter->drawText(622, 6, 100, 20, Qt::AlignCenter, str);
+    paintCounterLabel(painter, curve_w - 150, 6);
   }
+
+  char str[128];
+
+  if(mainwindow->adjDialFunc == NAV_DIAL_FUNC_HOLDOFF)
+  {
+    convert_to_metric_suffix(str, devparms->triggerholdoff, 2);
+
+    strcat(str, "S");
+
+    paintLabel(painter, curve_w - 110, 5, 100, 20, str);
+  }
+  else if(mainwindow->adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
+    {
+      sprintf(str, "%i", devparms->acquireaverages);
+
+      paintLabel(painter, curve_w - 110, 5, 100, 20, str);
+    }
 
 //   clk_end = clock();
 //
@@ -1548,9 +1533,63 @@ void SignalCurve::trig_stat_timer_handler()
 }
 
 
+void SignalCurve::paintLabel(QPainter *painter, int xpos, int ypos, int xw, int yh, const char *str)
+{
+  QPainterPath path;
+
+  path.addRoundedRect(xpos, ypos, xw, yh, 3, 3);
+
+  painter->fillPath(path, Qt::black);
+
+  painter->setPen(Qt::white);
+
+  painter->drawRoundedRect(xpos, ypos, xw, yh, 3, 3);
+
+  painter->drawText(xpos, ypos, xw, yh, Qt::AlignCenter, str);
+}
 
 
+void SignalCurve::paintCounterLabel(QPainter *painter, int xpos, int ypos)
+{
+  char str[128];
 
+  QPainterPath path;
+
+  path.addRoundedRect(xpos, ypos, 122, 20, 3, 3);
+
+  painter->fillPath(path, Qt::black);
+
+  painter->setPen(Qt::darkGray);
+
+  painter->drawRoundedRect(xpos, ypos, 122, 20, 3, 3);
+
+  path = QPainterPath();
+
+  path.addRoundedRect(xpos + 4, ypos + 3, 14, 14, 3, 3);
+
+  painter->fillPath(path, SignalColor[devparms->countersrc - 1]);
+
+  painter->setPen(Qt::black);
+
+  painter->drawLine(xpos + 7, ypos + 6, xpos + 15, ypos + 6);
+
+  painter->drawLine(xpos + 11, ypos + 6, xpos + 11, ypos + 14);
+
+  painter->setPen(Qt::white);
+
+  if((devparms->counterfreq < 15) || (devparms->counterfreq > 1.1e9))
+  {
+    strcpy(str, "< 15 Hz");
+  }
+  else
+  {
+    convert_to_metric_suffix(str, devparms->counterfreq, 4);
+
+    strcat(str, "Hz");
+  }
+
+  painter->drawText(xpos + 22, ypos, 100, 20, Qt::AlignCenter, str);
+}
 
 
 

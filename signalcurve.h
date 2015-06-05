@@ -142,6 +142,8 @@ private:
   void drawTrigCenterArrow(QPainter *, int, int);
   void drawChanLabel(QPainter *, int, int, int);
   void drawTopLabels(QPainter *);
+  void paintLabel(QPainter *, int, int, int, int, const char *);
+  void paintCounterLabel(QPainter *, int, int);
 
   struct device_settings *devparms;
 

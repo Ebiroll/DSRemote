@@ -58,6 +58,12 @@ What's implemented so far:
 - display clear
 - display grid
 - display grading
+- display vectors
+- display dots
+
+
+- acquire normal
+- acquire average
 
 
 - save screenshot

@@ -106,6 +106,9 @@ public:
   QFont        *appfont,
                *monofont;
 
+  int adjDialFunc,
+      navDialFunc;
+
 private:
 
   QMenuBar     *menubar;
@@ -190,10 +193,6 @@ private:
        *trigModeSingLed;
 
   SignalCurve *waveForm;
-
-  int adjDialFunc,
-      adjDialCnt,
-      navDialFunc;
 
   int parse_preamble(char *, int, struct waveform_preamble *, int);
   int get_metric_factor(double);
@@ -281,6 +280,9 @@ private slots:
   void navDial_timer_handler();
   void navDialChanged(int);
 
+  void set_grid_type_vectors();
+  void set_grid_type_dots();
+
   void set_grid_full();
   void set_grid_half();
   void set_grid_none();
@@ -307,6 +309,9 @@ private slots:
   void chan_invert_off();
 
   void chan_menu();
+
+  void set_acq_normal();
+  void set_acq_average();
 
 protected:
   void closeEvent(QCloseEvent *);

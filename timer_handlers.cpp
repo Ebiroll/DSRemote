@@ -51,25 +51,15 @@ void UI_Mainwindow::navDial_timer_handler()
 
 void UI_Mainwindow::adjdial_timer_handler()
 {
-  if(adjDialCnt % 2)
-  {
-    adjDialLabel->setStyleSheet("background: #66FF99; font: 7pt;");
-  }
-  else
-  {
-    adjDialLabel->setStyleSheet(def_stylesh);
+  adjdial_timer->stop();
 
-    adjDialLabel->setStyleSheet("font: 7pt;");
-  }
+  adjDialLabel->setStyleSheet(def_stylesh);
 
-  if(++adjDialCnt > ADJ_DIAL_CNT_TIMEOUT)
-  {
-    adjdial_timer->stop();
+  adjDialLabel->setStyleSheet("font: 7pt;");
 
-    adjDialLabel->setStyleSheet(def_stylesh);
+  adjDialLabel->setText("");
 
-    adjDialLabel->setStyleSheet("font: 7pt;");
-  }
+  adjDialFunc = NAV_DIAL_FUNC_NONE;
 }
 
 
@@ -285,10 +275,6 @@ void UI_Mainwindow::scrn_timer_handler()
     return;
   }
 
-//   tmcdev_write(device, ":ACQ:SRAT?");
-//
-//   devparms.samplerate = atof(device->buf);
-//
   for(i=0; i<MAX_CHNS; i++)
   {
     if(!devparms.chandisplay[i])  // Download data only when channel is switched on
@@ -300,54 +286,9 @@ void UI_Mainwindow::scrn_timer_handler()
 
     tmcdev_write(device, str);
 
-//     tmcdev_write(device, ":WAV:YOR?");
-//
-//     n = tmcdev_read(device);
-//
-//     if(n < 0)
-//     {
-//       printf("Can not read from device.\n");
-//       return;
-//     }
-//
-//     devparms.preamble.yorigin[i] = atof(device->buf);
-
     tmcdev_write(device, ":WAV:FORM BYTE");
 
     tmcdev_write(device, ":WAV:MODE NORM");
-
-//     tmcdev_write(device, ":WAV:PRE?");
-//
-//     n = tmcdev_read(device);
-//
-//     if(n < 0)
-//     {
-//       strcpy(str, "Can not read from device.");
-//       goto OUT_ERROR;
-//     }
-//
-//     printf("waveform preamble: %s\n", device->buf);
-
-//     if(parse_preamble(device->buf, device->sz, &devparms.preamble, i))
-//     {
-//       strcpy(str, "Preamble parsing error.");
-//       goto OUT_ERROR;
-//     }
-
-//     printf("waveform preamble:\n"
-//            "format: %i\n"
-//            "type: %i\n"
-//            "points: %i\n"
-//            "count: %i\n"
-//            "xincrement: %e\n"
-//            "xorigin: %e\n"
-//            "xreference: %e\n"
-//            "yincrement: %e\n"
-//            "yorigin: %e\n"
-//            "yreference: %e\n",
-//            devparms.preamble.format, devparms.preamble.type, devparms.preamble.points, devparms.preamble.count,
-//            devparms.preamble.xincrement[i], devparms.preamble.xorigin[i], devparms.preamble.xreference[i],
-//            devparms.preamble.yincrement[i], devparms.preamble.yorigin[i], devparms.preamble.yreference[i]);
 
     tmcdev_write(device, ":WAV:DATA?");
 
@@ -369,8 +310,6 @@ void UI_Mainwindow::scrn_timer_handler()
     {
       return;
     }
-
-//    yref = devparms.preamble.yreference[i];
 
     for(j=0; j<n; j++)
     {

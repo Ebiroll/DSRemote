@@ -1309,6 +1309,80 @@ int UI_Mainwindow::get_device_settings()
             goto OUT_ERROR;
           }
 
+  if(tmcdev_write(device, ":DISP:TYPE?") != 11)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmcdev_read(device) < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "VECT"))
+  {
+    devparms.displaytype = 0;
+  }
+  else if(!strcmp(device->buf, "DOTS"))
+    {
+      devparms.displaytype = 1;
+    }
+    else
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+  if(tmcdev_write(device, ":ACQ:TYPE?") != 10)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmcdev_read(device) < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "NORM"))
+  {
+    devparms.acquiretype = 0;
+  }
+  else if(!strcmp(device->buf, "AVER"))
+    {
+      devparms.acquiretype = 1;
+    }
+    else if(!strcmp(device->buf, "PEAK"))
+      {
+        devparms.acquiretype = 2;
+      }
+      else if(!strcmp(device->buf, "HRESR"))
+        {
+          devparms.acquiretype = 3;
+        }
+        else
+        {
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+
+  if(tmcdev_write(device, ":ACQ:AVER?") != 10)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmcdev_read(device) < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  devparms.acquireaverages = atoi(device->buf);
+
   return 0;
 
 OUT_ERROR:

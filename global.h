@@ -41,7 +41,7 @@
 
 #define SCRN_TIMER_IVAL          50
 
-#define ADJDIAL_TIMER_IVAL      200
+#define ADJDIAL_TIMER_IVAL     3000
 
 #define SCRN_SHOT_BMP_SZ    1152054
 
@@ -49,7 +49,7 @@
 
 #define ADJ_DIAL_FUNC_NONE        0
 #define ADJ_DIAL_FUNC_HOLDOFF     1
-#define ADJ_DIAL_CNT_TIMEOUT     30
+#define ADJ_DIAL_FUNC_ACQ_AVG     2
 
 #define NAV_DIAL_FUNC_NONE        0
 #define NAV_DIAL_FUNC_HOLDOFF     1
@@ -120,6 +120,10 @@ struct device_settings
   int triggersweep;             // 0=auto, 1=normal, 2=single
 
   int displaygrid;              // 0=none, 1=half, 2=full
+  int displaytype;              // 0=vectors, 1=dots
+
+  int acquiretype;              // 0=normal, 1=average, 2=peak, 3=highres
+  int acquireaverages;          // 2, 4, 8, 16, 32, 64, etc. to 8192
 
   int countersrc;               // 0=off, 1=ch1, 2=ch2, 3=ch3, 4=ch4
   double counterfreq;           // Value of frequency counter
