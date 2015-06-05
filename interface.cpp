@@ -816,7 +816,7 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
       devparms.timebasedelayoffset -= (devparms.timebasedelayscale / 50);
     }
 
-    strcpy(str, "Horizontal delay position: ");
+    strcpy(str, "Delayed timebase position: ");
 
     convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
 
@@ -1636,7 +1636,7 @@ void UI_Mainwindow::horPosDialClicked(QPoint)
   {
     devparms.timebasedelayoffset = devparms.timebaseoffset;
 
-    strcpy(str, "Horizontal delay position: ");
+    strcpy(str, "Delayed timebase position: ");
 
     convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
 

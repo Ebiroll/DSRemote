@@ -1240,6 +1240,8 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
   char str[512];
 
+  double lefttime, righttime, delayrange;
+
   w = width() - (2 * bordersize);
   h = height() - (2 * bordersize);
 
@@ -1275,7 +1277,23 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       devparms->timebasedelayoffset = (devparms->timebasedelayscale / 50) * tmp;
 
-      strcpy(str, "Horizontal delay position: ");
+      lefttime = (7 * devparms->timebasescale) - devparms->timebaseoffset;
+
+      righttime = (7 * devparms->timebasescale) + devparms->timebaseoffset;
+
+      delayrange = 7 * devparms->timebasedelayscale;
+
+      if(devparms->timebasedelayoffset < -(lefttime - delayrange))
+      {
+        devparms->timebasedelayoffset = -(lefttime - delayrange);
+      }
+
+      if(devparms->timebasedelayoffset > (righttime - delayrange))
+      {
+        devparms->timebasedelayoffset = (righttime - delayrange);
+      }
+
+      strcpy(str, "Delayed timebase position: ");
 
       convert_to_metric_suffix(str + strlen(str), devparms->timebasedelayoffset, 2);
 
