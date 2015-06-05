@@ -418,7 +418,14 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   }
   else
   {
-    trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebaseoffset / (devparms->timebasescale * 14.0)) * curve_w);
+    if(devparms->timebasedelayenable)
+    {
+      trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebasedelayoffset / (devparms->timebasedelayscale * 14.0)) * curve_w);
+    }
+    else
+    {
+      trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebaseoffset / (devparms->timebasescale * 14.0)) * curve_w);
+    }
 
     if(trig_pos_arrow_pos < 0)
     {
@@ -515,9 +522,11 @@ void SignalCurve::setDeviceParameters(struct device_settings *devp)
 
 void SignalCurve::drawTopLabels(QPainter *painter)
 {
-  int i;
+  int i, x1;
 
   char str[128];
+
+  double dtmp1, dtmp2;
 
   QPainterPath path;
 
@@ -601,7 +610,14 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(125, 20, "H");
 
-  convert_to_metric_suffix(str, devparms->timebasescale, 1);
+  if(devparms->timebasedelayenable)
+  {
+    convert_to_metric_suffix(str, devparms->timebasedelayscale, 1);
+  }
+  else
+  {
+    convert_to_metric_suffix(str, devparms->timebasescale, 1);
+  }
 
   strcat(str, "s");
 
@@ -632,6 +648,19 @@ void SignalCurve::drawTopLabels(QPainter *painter)
   painter->fillPath(path, Qt::black);
 
   painter->setPen(Qt::gray);
+
+  if(devparms->timebasedelayenable)
+  {
+    dtmp1 = devparms->timebasedelayscale / devparms->timebasescale;
+
+    dtmp2 = (devparms->timebaseoffset - devparms->timebasedelayoffset) / (7 * devparms->timebasescale);
+
+    painter->fillRect(288, 16, (116 - (dtmp1 * 116)) - (dtmp2 * 116), 8, QColor(64, 160, 255));
+
+    x1 = (116 - (dtmp1 * 116)) + (dtmp2 * 116);
+
+    painter->fillRect(288 + 233 - x1, 16, x1, 8, QColor(64, 160, 255));
+  }
 
   painter->drawRect(288, 16, 233, 8);
 
@@ -664,7 +693,14 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(555, 20, "D");
 
-  convert_to_metric_suffix(str, devparms->timebaseoffset, 4);
+  if(devparms->timebasedelayenable)
+  {
+    convert_to_metric_suffix(str, devparms->timebasedelayoffset, 4);
+  }
+  else
+  {
+    convert_to_metric_suffix(str, devparms->timebaseoffset, 4);
+  }
 
   strcat(str, "s");
 
@@ -1231,23 +1267,46 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
 //    printf("w is %i   trig_pos_arrow_pos is %i\n", w, trig_pos_arrow_pos);
 
-    devparms->timebaseoffset = ((devparms->timebasescale * 14.0) / w) * ((w / 2) - trig_pos_arrow_pos);
+    if(devparms->timebasedelayenable)
+    {
+      devparms->timebasedelayoffset = ((devparms->timebasedelayscale * 14.0) / w) * ((w / 2) - trig_pos_arrow_pos);
 
-    tmp = devparms->timebaseoffset / (devparms->timebasescale / 50);
+      tmp = devparms->timebasedelayoffset / (devparms->timebasedelayscale / 50);
 
-    devparms->timebaseoffset = (devparms->timebasescale / 50) * tmp;
+      devparms->timebasedelayoffset = (devparms->timebasedelayscale / 50) * tmp;
 
-    strcpy(str, "Horizontal position: ");
+      strcpy(str, "Horizontal delay position: ");
 
-    convert_to_metric_suffix(str + strlen(str), devparms->timebaseoffset, 2);
+      convert_to_metric_suffix(str + strlen(str), devparms->timebasedelayoffset, 2);
 
-    strcat(str, "s");
+      strcat(str, "s");
 
-    mainwindow->statusLabel->setText(str);
+      mainwindow->statusLabel->setText(str);
 
-    sprintf(str, ":TIM:OFFS %e", devparms->timebaseoffset);
+      sprintf(str, ":TIM:DEL:OFFS %e", devparms->timebasedelayoffset);
 
-    tmcdev_write(device, str);
+      tmcdev_write(device, str);
+    }
+    else
+    {
+      devparms->timebaseoffset = ((devparms->timebasescale * 14.0) / w) * ((w / 2) - trig_pos_arrow_pos);
+
+      tmp = devparms->timebaseoffset / (devparms->timebasescale / 50);
+
+      devparms->timebaseoffset = (devparms->timebasescale / 50) * tmp;
+
+      strcpy(str, "Horizontal position: ");
+
+      convert_to_metric_suffix(str + strlen(str), devparms->timebaseoffset, 2);
+
+      strcat(str, "s");
+
+      mainwindow->statusLabel->setText(str);
+
+      sprintf(str, ":TIM:OFFS %e", devparms->timebaseoffset);
+
+      tmcdev_write(device, str);
+    }
   }
   else if(trig_level_arrow_moving)
     {

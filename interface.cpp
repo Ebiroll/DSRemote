@@ -1556,15 +1556,51 @@ void UI_Mainwindow::adjustDialClicked(QPoint)
 
 void UI_Mainwindow::horMenuButtonClicked()
 {
-  QMenu menu;
+  QMenu menu,
+        submenudelayed;
 
-  menu.addAction("Delayed", this, SLOT(horizontal_delayed()));
+  submenudelayed.setTitle("Delayed");
+  submenudelayed.addAction("On",  this, SLOT(horizontal_delayed_on()));
+  submenudelayed.addAction("Off", this, SLOT(horizontal_delayed_off()));
+  menu.addMenu(&submenudelayed);
 
   menu.exec(horMenuButton->mapToGlobal(QPoint(0,0)));
 }
 
 
-void UI_Mainwindow::horizontal_delayed()
+void UI_Mainwindow::horizontal_delayed_on()
+{
+  if(devparms.timebasedelayenable)
+  {
+    return;
+  }
+
+  devparms.timebasedelayenable = 1;
+
+  statusLabel->setText("Delayed timebase enabled");
+
+  tmcdev_write(device, ":TIM:DEL:ENAB 1");
+
+  devparms.timebasedelayoffset = devparms.timebaseoffset;
+}
+
+
+void UI_Mainwindow::horizontal_delayed_off()
+{
+  if(!devparms.timebasedelayenable)
+  {
+    return;
+  }
+
+  devparms.timebasedelayenable = 0;
+
+  statusLabel->setText("Delayed timebase disabled");
+
+  tmcdev_write(device, ":TIM:DEL:ENAB 0");
+}
+
+
+void UI_Mainwindow::horizontal_delayed_toggle()
 {
   if(devparms.timebasedelayenable)
   {
@@ -1581,6 +1617,8 @@ void UI_Mainwindow::horizontal_delayed()
     statusLabel->setText("Delayed timebase enabled");
 
     tmcdev_write(device, ":TIM:DEL:ENAB 1");
+
+    devparms.timebasedelayoffset = devparms.timebaseoffset;
   }
 }
 
@@ -1596,7 +1634,7 @@ void UI_Mainwindow::horPosDialClicked(QPoint)
 
   if(devparms.timebasedelayenable)
   {
-    devparms.timebasedelayoffset = 0;
+    devparms.timebasedelayoffset = devparms.timebaseoffset;
 
     strcpy(str, "Horizontal delay position: ");
 
@@ -1631,22 +1669,7 @@ void UI_Mainwindow::horPosDialClicked(QPoint)
 
 void UI_Mainwindow::horScaleDialClicked(QPoint)
 {
-  if(devparms.timebasedelayenable)
-  {
-    devparms.timebasedelayenable = 0;
-
-    statusLabel->setText("Delayed timebase disabled");
-
-    tmcdev_write(device, ":TIM:DEL:ENAB 0");
-  }
-  else
-  {
-    devparms.timebasedelayenable = 1;
-
-    statusLabel->setText("Delayed timebase enabled");
-
-    tmcdev_write(device, ":TIM:DEL:ENAB 1");
-  }
+  horizontal_delayed_toggle();
 }
 
 

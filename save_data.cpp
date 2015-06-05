@@ -203,12 +203,6 @@ void UI_Mainwindow::save_memory_waveform()
 //
 //   tmcdev_write(device, ":STOP");
 //
-//   tmcdev_write(device, ":WAV:POIN?");
-//
-//   n = tmcdev_read(device);
-//
-//   printf("n is: %i  points response is: ->%s<-\n", n, device->buf);
-//
 //   for(i=0; i<MAX_CHNS; i++)
 //   {
 //     if(!devparms.chandisplay[i])  // Download data only when channel is switched on
@@ -222,17 +216,53 @@ void UI_Mainwindow::save_memory_waveform()
 //
 //     tmcdev_write(device, ":WAV:FORM BYTE");
 //
+//     sleep(1);
+//
 //     tmcdev_write(device, ":WAV:MODE RAW");
 //
-//   tmcdev_write(device, ":WAV:POIN?");
+// tmcdev_write(device, ":WAV:POIN?");
 //
-//   n = tmcdev_read(device);
+// n = tmcdev_read(device);
 //
-//   printf("n is: %i  points response is: ->%s<-\n", n, device->buf);
+// printf("n is: %i  points response is: ->%s<-\n", n, device->buf);
+//
+// tmcdev_write(device, ":WAV:STAR?");
+//
+// n = tmcdev_read(device);
+//
+// printf("n is: %i  start position response is: ->%s<-\n", n, device->buf);
+//
+// tmcdev_write(device, ":WAV:STOP?");
+//
+// n = tmcdev_read(device);
+//
+// printf("n is: %i  stop position response is: ->%s<-\n", n, device->buf);
+//
+// tmcdev_write(device, ":WAV:FORM?");
+//
+// n = tmcdev_read(device);
+//
+// printf("n is: %i  wav format response is: ->%s<-\n", n, device->buf);
+//
+// tmcdev_write(device, ":WAV:MODE?");
+//
+// n = tmcdev_read(device);
+//
+// printf("n is: %i  wav mode response is: ->%s<-\n", n, device->buf);
+//
+//     sleep(1);
 //
 //     tmcdev_write(device, ":WAV RES");
 //
+//     sleep(1);
+//
 //     tmcdev_write(device, ":WAV BEG");
+//
+//     sleep(1);
+//
+//     tmcdev_write(device, ":SING");
+//
+//     sleep(1);
 //
 //     bytes_rcvd = 0;
 //
@@ -384,7 +414,14 @@ void UI_Mainwindow::save_screen_waveform()
   wavbuf[2] = NULL;
   wavbuf[3] = NULL;
 
-  rec_len = devparms.timebasescale * 14;
+  if(devparms.timebasedelayenable)
+  {
+    rec_len = devparms.timebasedelayscale * 14;
+  }
+  else
+  {
+    rec_len = devparms.timebasescale * 14;
+  }
 
   if(rec_len < 1e-6)
   {

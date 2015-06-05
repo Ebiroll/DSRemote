@@ -69,6 +69,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "global.h"
 #include "about_dialog.h"
@@ -243,7 +244,9 @@ private slots:
   void helpButtonClicked();
   void measureButtonClicked();
 
-  void horizontal_delayed();
+  void horizontal_delayed_toggle();
+  void horizontal_delayed_on();
+  void horizontal_delayed_off();
 
   void counter_off();
   void counter_ch1();
