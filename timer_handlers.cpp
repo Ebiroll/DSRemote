@@ -123,18 +123,6 @@ void UI_Mainwindow::stat_timer_handler()
             }
             else
             {
-              device->hdrbuf[32] = 0;
-              printf(" Status error hdrbuf: %s<-\n", device->hdrbuf);
-
-              device->buf[32] = 0;
-              printf(" Status error buf: %s<-\n", device->buf);
-
-              for(int i=0; i<32; i++)
-              {
-                printf("  %i:%02X", i, device->buf[i]);
-              }
-              printf("\n");
-
               line = __LINE__;
               goto OUT_ERROR;
             }
@@ -225,11 +213,6 @@ void UI_Mainwindow::stat_timer_handler()
 
     devparms.counterfreq = atof(device->buf);
   }
-
-//   if(old_stat != devparms.triggerstatus)
-//   {
-//     printf("Status change: %i\n", devparms.triggerstatus);
-//   }
 
   return;
 

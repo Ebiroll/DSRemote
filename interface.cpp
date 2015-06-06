@@ -1770,13 +1770,31 @@ void UI_Mainwindow::horizontal_delayed_toggle()
   }
   else
   {
+    stat_timer->stop();
+
+    scrn_timer->stop();
+
     devparms.timebasedelayenable = 1;
 
     statusLabel->setText("Delayed timebase enabled");
 
     tmcdev_write(device, ":TIM:DEL:ENAB 1");
 
-    devparms.timebasedelayoffset = devparms.timebaseoffset;
+    tmcdev_write(device, ":TIM:DEL:OFFS?");
+
+    tmcdev_read(device);
+
+    devparms.timebasedelayoffset = atof(device->buf);
+
+    tmcdev_write(device, ":TIM:DEL:SCAL?");
+
+    tmcdev_read(device);
+
+    devparms.timebasedelayscale = atof(device->buf);
+
+    stat_timer->start(devparms.status_timer_ival);
+
+    scrn_timer->start(devparms.screen_timer_ival);
   }
 }
 
