@@ -1801,11 +1801,6 @@ void UI_Mainwindow::horizontal_delayed_toggle()
 
 void UI_Mainwindow::horPosDialClicked(QPoint)
 {
-//   QMenu menu;
-//
-//   menu.addAction("Zero", this, SLOT(horizontal_position_zero()));
-//
-//   menu.exec(horPosDial->mapToGlobal(QPoint(0,0)));
   char str[512];
 
   if(devparms.timebasedelayenable)

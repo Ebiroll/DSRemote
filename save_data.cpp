@@ -130,21 +130,6 @@ void UI_Mainwindow::save_screenshot()
 
   get_directory_from_path(recent_savedir, opath, MAX_PATHLEN);
 
-//   FILE *f = fopen(opath, "wb");
-//   if(f == NULL)
-//   {
-//     QMessageBox msgBox;
-//     msgBox.setIcon(QMessageBox::Critical);
-//     msgBox.setText("Can not open file for writing");
-//     msgBox.exec();
-//
-//     return;
-//   }
-//
-//   fwrite((uchar *)devparms.screenshot_buf, SCRN_SHOT_BMP_SZ, 1, f);
-//
-//   fclose(f);
-
   if(screenXpm.save(QString::fromLocal8Bit(opath), "PNG", 50) == false)
   {
     strcpy(str, "Could not save file (unknown error)");
@@ -172,211 +157,267 @@ OUT_ERROR:
 
 void UI_Mainwindow::save_memory_waveform()
 {
-//   int i, j, k, ready, n=0, chns=0, hdl=-1, yoffset[MAX_CHNS], bytes_rcvd;
-//
-//   char str[128],
-//        opath[MAX_PATHLEN];
-//
-//   short *wavbuf[4];
-//
-//   double rec_len = 0;
-//
-// //  struct waveform_preamble wfp;
-//
-//   if(device == NULL)
-//   {
-//     return;
-//   }
-//
-//   wavbuf[0] = NULL;
-//   wavbuf[1] = NULL;
-//   wavbuf[2] = NULL;
-//   wavbuf[3] = NULL;
-//
-//   rec_len = devparms.memdepth / devparms.samplerate;
-//
-//   if(rec_len < 1e-6)
-//   {
-//     strcpy(str, "Can not save waveforms shorter than 1 uSec.");
-//     goto OUT_ERROR;
-//   }
-//
-//   for(i=0; i<MAX_CHNS; i++)
-//   {
-//     if(!devparms.chandisplay[i])  // Download data only when channel is switched on
-//     {
-//       continue;
-//     }
-//
-//     wavbuf[i] = (short *)malloc(devparms.memdepth * sizeof(short));
-//     if(wavbuf[i] == NULL)
-//     {
-//       strcpy(str, "Malloc error.");
-//       goto OUT_ERROR;
-//     }
-//
-//     chns++;
-//   }
-//
-//   if(!chns)
-//   {
-//     strcpy(str, "No active channels.");
-//     goto OUT_ERROR;
-//   }
-//
-//   scrn_timer->stop();
-//
-//   stat_timer->stop();
-//
-//   tmcdev_write(device, ":STOP");
-//
-//   for(i=0; i<MAX_CHNS; i++)
-//   {
-//     if(!devparms.chandisplay[i])  // Download data only when channel is switched on
-//     {
-//       continue;
-//     }
-//
-//     sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
-//
-//     tmcdev_write(device, str);
-//
-//     tmcdev_write(device, ":WAV:FORM BYTE");
-//
-//     sleep(1);
-//
-//     tmcdev_write(device, ":WAV:MODE RAW");
-//
-// tmcdev_write(device, ":WAV:POIN?");
-//
-// n = tmcdev_read(device);
-//
-// printf("n is: %i  points response is: ->%s<-\n", n, device->buf);
-//
-// tmcdev_write(device, ":WAV:STAR?");
-//
-// n = tmcdev_read(device);
-//
-// printf("n is: %i  start position response is: ->%s<-\n", n, device->buf);
-//
-// tmcdev_write(device, ":WAV:STOP?");
-//
-// n = tmcdev_read(device);
-//
-// printf("n is: %i  stop position response is: ->%s<-\n", n, device->buf);
-//
-// tmcdev_write(device, ":WAV:FORM?");
-//
-// n = tmcdev_read(device);
-//
-// printf("n is: %i  wav format response is: ->%s<-\n", n, device->buf);
-//
-// tmcdev_write(device, ":WAV:MODE?");
-//
-// n = tmcdev_read(device);
-//
-// printf("n is: %i  wav mode response is: ->%s<-\n", n, device->buf);
-//
-//     sleep(1);
-//
-//     tmcdev_write(device, ":WAV RES");
-//
-//     sleep(1);
-//
-//     tmcdev_write(device, ":WAV BEG");
-//
-//     sleep(1);
-//
-//     tmcdev_write(device, ":SING");
-//
-//     sleep(1);
-//
-//     bytes_rcvd = 0;
-//
-//     ready = 0;
-//
-//     while(1)
-//     {
-//       tmcdev_write(device, ":WAV:STAT?");
-//
-//       n = tmcdev_read(device);
-//
-//       printf("n is: %i   response is: ->%s<-\n", n, device->buf);
-//
-//       if(n < 4)
-//       {
-//         strcpy(str, "Error, could not read waveform status.");
-//         goto OUT_ERROR;
-//       }
-//
-//       if(strncmp(device->buf, "READ", 4))
-//       {
-//         ready = 1;
-//       }
-//
-//       tmcdev_write(device, ":WAV:DATA?");
-//
-//       QApplication::setOverrideCursor(Qt::WaitCursor);
-//
-//       n = tmcdev_read(device);
-//
-//       QApplication::restoreOverrideCursor();
-//
-//       if(n < 0)
-//       {
-//         strcpy(str, "Can not read from device.");
-//         goto OUT_ERROR;
-//       }
-//
-//       printf("received %i bytes\n", n);
-//
-//       if(n > devparms.memdepth)
-//       {
-//         strcpy(str, "Datablock too big for buffer.");
-//         goto OUT_ERROR;
-//       }
-//
-//       if(ready)
-//       {
-//         tmcdev_write(device, ":WAV END");
-//
-//         break;
-//       }
-//     }
-//   }
-//
-//
-//   for(i=0; i<MAX_CHNS; i++)
-//   {
-//     free(wavbuf[i]);
-//   }
-//
-//   stat_timer->start(STAT_TIMER_IVAL);
-//
-//   scrn_timer->start(SCRN_TIMER_IVAL);
-//
-//   return;
-//
-// OUT_ERROR:
-//
-//   QMessageBox msgBox;
-//   msgBox.setIcon(QMessageBox::Critical);
-//   msgBox.setText(str);
-//   msgBox.exec();
-//
-//   if(hdl >= 0)
-//   {
-//     edfclose_file(hdl);
-//   }
-//
-//   for(i=0; i<MAX_CHNS; i++)
-//   {
-//     free(wavbuf[i]);
-//   }
-//
-//   stat_timer->start(STAT_TIMER_IVAL);
-//
-//   scrn_timer->start(SCRN_TIMER_IVAL);
+  int i, j, k, n=0, chns=0, hdl=-1, yoffset[MAX_CHNS], bytes_rcvd, blocksz;
+
+  char str[128],
+       opath[MAX_PATHLEN];
+
+  short *wavbuf[4];
+
+  double rec_len = 0;
+
+  if(device == NULL)
+  {
+    return;
+  }
+
+  wavbuf[0] = NULL;
+  wavbuf[1] = NULL;
+  wavbuf[2] = NULL;
+  wavbuf[3] = NULL;
+
+  rec_len = devparms.memdepth / devparms.samplerate;
+
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+
+  qApp->processEvents();
+
+  if(rec_len < 1e-6)
+  {
+    strcpy(str, "Can not save waveforms shorter than 1 uSec.");
+    goto OUT_ERROR;
+  }
+
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    if(!devparms.chandisplay[i])  // Download data only when channel is switched on
+    {
+      continue;
+    }
+
+    wavbuf[i] = (short *)malloc(devparms.memdepth * sizeof(short));
+    if(wavbuf[i] == NULL)
+    {
+      strcpy(str, "Malloc error.");
+      goto OUT_ERROR;
+    }
+
+    chns++;
+  }
+
+  if(!chns)
+  {
+    strcpy(str, "No active channels.");
+    goto OUT_ERROR;
+  }
+
+  scrn_timer->stop();
+
+  stat_timer->stop();
+
+  tmcdev_write(device, ":STOP");
+
+  blocksz = 1000000;
+
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    if(!devparms.chandisplay[i])  // Download data only when channel is switched on
+    {
+      continue;
+    }
+
+    sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
+
+    tmcdev_write(device, str);
+
+    tmcdev_write(device, ":WAV:FORM BYTE");
+
+    tmcdev_write(device, ":WAV:MODE RAW");
+
+    bytes_rcvd = 0;
+
+    for(j=0; ; j++)
+    {
+      sprintf(str, ":WAV:STAR %i",  (j * blocksz) + 1);
+
+      tmcdev_write(device, str);
+
+      if(((j + 1) * blocksz) > devparms.memdepth)
+      {
+        sprintf(str, ":WAV:STOP %i", devparms.memdepth);
+      }
+      else
+      {
+        sprintf(str, ":WAV:STOP %i", (j + 1) * blocksz);
+      }
+
+      tmcdev_write(device, str);
+
+      tmcdev_write(device, ":WAV:DATA?");
+
+      n = tmcdev_read(device);
+
+      if(n < 0)
+      {
+        strcpy(str, "Can not read from device.");
+        goto OUT_ERROR;
+      }
+
+      printf("received %i bytes\n", n);
+
+      if(n > blocksz)
+      {
+        strcpy(str, "Datablock too big for buffer.");
+        goto OUT_ERROR;
+      }
+
+      if(n < 1)
+      {
+        break;
+      }
+
+      bytes_rcvd += n;
+
+      if(bytes_rcvd >= devparms.memdepth)
+      {
+        break;
+      }
+
+//      yoffset[i] = ((devparms.chanoffset[i] / devparms.chanscale[i]) * 25.0);
+
+      for(k=0; k<n; k++)
+      {
+        wavbuf[i][(j * blocksz) + k] = (int)(((unsigned char *)device->buf)[k]) - 127;
+
+//        wavbuf[i][k] -= yoffset[k];
+      }
+    }
+  }
+
+  tmcdev_write(device, ":WAV:MODE NORM");
+
+  tmcdev_write(device, ":WAV:STAR 1");
+
+  tmcdev_write(device, ":WAV:STOP 1200");
+
+  stat_timer->start(devparms.status_timer_ival);
+
+  scrn_timer->start(devparms.screen_timer_ival);
+
+  QApplication::restoreOverrideCursor();
+
+  opath[0] = 0;
+  if(recent_savedir[0]!=0)
+  {
+    strcpy(opath, recent_savedir);
+    strcat(opath, "/");
+  }
+  strcat(opath, "waveform.edf");
+
+  strcpy(opath, QFileDialog::getSaveFileName(this, "Save file", opath, "EDF files (*.edf *.EDF)").toLocal8Bit().data());
+
+  if(!strcmp(opath, ""))
+  {
+    goto OUT_NORMAL;
+  }
+
+  get_directory_from_path(recent_savedir, opath, MAX_PATHLEN);
+
+  hdl = edfopen_file_writeonly(opath, EDFLIB_FILETYPE_EDFPLUS, chns);
+  if(hdl < 0)
+  {
+    strcpy(str, "Can not create EDF file.");
+    goto OUT_ERROR;
+  }
+
+  if(edf_set_double_datarecord_duration(hdl, rec_len))
+  {
+    strcpy(str, "Can not set datarecord duration of EDF file.");
+    goto OUT_ERROR;
+  }
+
+  j = 0;
+
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    if(!devparms.chandisplay[i])
+    {
+      continue;
+    }
+
+    edf_set_samplefrequency(hdl, j, devparms.memdepth);
+    edf_set_digital_maximum(hdl, j, 32767);
+    edf_set_digital_minimum(hdl, j, -32768);
+    if(devparms.chanscale[i] > 2)
+    {
+      edf_set_physical_maximum(hdl, j, (devparms.chanscale[i] / 25) * 32767);
+      edf_set_physical_minimum(hdl, j, (devparms.chanscale[i] / 25) * 32767);
+      edf_set_physical_dimension(hdl, j, "V");
+    }
+    else
+    {
+      edf_set_physical_maximum(hdl, j, 1000 * (devparms.chanscale[i] / 25) * 32767);
+      edf_set_physical_minimum(hdl, j, 1000 * (devparms.chanscale[i] / 25) * -32768);
+      edf_set_physical_dimension(hdl, j, "mV");
+    }
+    sprintf(str, "CHAN%i", i + 1);
+    edf_set_label(hdl, j, str);
+
+    j++;
+  }
+
+  edf_set_equipment(hdl, devparms.modelname);
+
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    if(!devparms.chandisplay[i])
+    {
+      continue;
+    }
+
+    if(edfwrite_digital_short_samples(hdl, wavbuf[i]))
+    {
+      strcpy(str, "A write error occurred.");
+      goto OUT_ERROR;
+    }
+  }
+
+OUT_NORMAL:
+
+  if(hdl >= 0)
+  {
+    edfclose_file(hdl);
+  }
+
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    free(wavbuf[i]);
+  }
+
+  return;
+
+OUT_ERROR:
+
+  QMessageBox msgBox;
+  msgBox.setIcon(QMessageBox::Critical);
+  msgBox.setText(str);
+  msgBox.exec();
+
+  if(hdl >= 0)
+  {
+    edfclose_file(hdl);
+  }
+
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    free(wavbuf[i]);
+  }
+
+  QApplication::restoreOverrideCursor();
+
+  stat_timer->start(devparms.status_timer_ival);
+
+  scrn_timer->start(devparms.screen_timer_ival);
 }
 
 
