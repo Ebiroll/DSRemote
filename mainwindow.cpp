@@ -148,13 +148,14 @@ void UI_Mainwindow::open_connection()
 
   strcpy(devparms.softwvers, ptr);
 
-  if(strncmp(devparms.modelname, "DS6", 3))
+  if((devparms.modelserie != 6) &&
+     (devparms.modelserie != 1))
   {
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setText("Unsupported device detected.");
     msgBox.setInformativeText("This software has not been tested with your device.\n"
-      "It has been tested with the DS6000 series only.\n"
+      "It has been tested with the DS6000 and DS1054 series only.\n"
       "If you continue, it's likely that the program will not work correctly at some points.\n"
       "\nDo you want to continue?\n");
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -175,19 +176,16 @@ void UI_Mainwindow::open_connection()
 
   statusLabel->setText("Reading settings from device...");
 
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-
-  qApp->processEvents();
-
   if(get_device_settings())
   {
-    QApplication::restoreOverrideCursor();
-
     strcpy(str, "Can not read settings from device");
     goto OUT_ERROR;
   }
 
-  QApplication::restoreOverrideCursor();
+  if(devparms.modelserie == 1)
+  {
+    trig50pctButton->setEnabled(false);
+  }
 
   if(devparms.channel_cnt < 4)
   {
@@ -208,6 +206,13 @@ void UI_Mainwindow::open_connection()
     ch2Button->setEnabled(false);
 
     ch2Button->setVisible(false);
+  }
+
+  if(devparms.modelserie == 6)
+  {
+    devparms.status_timer_ival = 100;
+
+    devparms.screen_timer_ival = 50;
   }
 
   connect(adjDial,          SIGNAL(valueChanged(int)), this, SLOT(adjDialChanged(int)));
@@ -259,13 +264,13 @@ void UI_Mainwindow::open_connection()
 
   devparms.connected = 1;
 
-  stat_timer->start(STAT_TIMER_IVAL);
+  stat_timer->start(devparms.status_timer_ival);
 
 //  test_timer->start(2000);
 
   DPRwidget->setEnabled(true);
 
-  scrn_timer->start(SCRN_TIMER_IVAL);
+  scrn_timer->start(devparms.screen_timer_ival);
 
   return;
 
@@ -375,6 +380,10 @@ int UI_Mainwindow::get_device_settings()
   char str[512];
 
   devparms.activechannel = -1;
+
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+
+  qApp->processEvents();
 
   for(chn=0; chn<devparms.channel_cnt; chn++)
   {
@@ -499,33 +508,36 @@ int UI_Mainwindow::get_device_settings()
         goto OUT_ERROR;
       }
 
-    sprintf(str, ":CHAN%i:IMP?", chn + 1);
-
-    if(tmcdev_write(device, str) != 11)
+    if(devparms.modelserie != 1)
     {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
+      sprintf(str, ":CHAN%i:IMP?", chn + 1);
 
-    if(tmcdev_read(device) < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "OMEG"))
-    {
-      devparms.chanimpedance[chn] = 0;
-    }
-    else if(!strcmp(device->buf, "FIFT"))
-      {
-        devparms.chanimpedance[chn] = 1;
-      }
-      else
+      if(tmcdev_write(device, str) != 11)
       {
         line = __LINE__;
         goto OUT_ERROR;
       }
+
+      if(tmcdev_read(device) < 1)
+      {
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+
+      if(!strcmp(device->buf, "OMEG"))
+      {
+        devparms.chanimpedance[chn] = 0;
+      }
+      else if(!strcmp(device->buf, "FIFT"))
+        {
+          devparms.chanimpedance[chn] = 1;
+        }
+        else
+        {
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+    }
 
     sprintf(str, ":CHAN%i:INV?", chn + 1);
 
@@ -714,46 +726,49 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.timebasedelayscale = atof(device->buf);
 
-  if(tmcdev_write(device, ":TIM:HREF:MODE?") != 15)
+  if(devparms.modelserie != 1)
   {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmcdev_read(device) < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "CENT"))
-  {
-    devparms.timebasehrefmode = 0;
-  }
-  else if(!strcmp(device->buf, "TPOS"))
+    if(tmcdev_write(device, ":TIM:HREF:MODE?") != 15)
     {
-      devparms.timebasehrefmode = 1;
+      line = __LINE__;
+      goto OUT_ERROR;
     }
-    else if(!strcmp(device->buf, "USER"))
-      {
-        devparms.timebasehrefmode = 2;
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
 
-  if(tmcdev_write(device, ":TIM:HREF:POS?") != 14)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
+    if(tmcdev_read(device) < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
 
-  if(tmcdev_read(device) < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
+    if(!strcmp(device->buf, "CENT"))
+    {
+      devparms.timebasehrefmode = 0;
+    }
+    else if(!strcmp(device->buf, "TPOS"))
+      {
+        devparms.timebasehrefmode = 1;
+      }
+      else if(!strcmp(device->buf, "USER"))
+        {
+          devparms.timebasehrefmode = 2;
+        }
+        else
+        {
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+
+    if(tmcdev_write(device, ":TIM:HREF:POS?") != 14)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmcdev_read(device) < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
   }
 
   devparms.timebasehrefpos = atoi(device->buf);
@@ -788,83 +803,89 @@ int UI_Mainwindow::get_device_settings()
         goto OUT_ERROR;
       }
 
-  if(tmcdev_write(device, ":TIM:VERN?") != 10)
+  if(devparms.modelserie != 1)
   {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmcdev_read(device) < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "0"))
-  {
-    devparms.timebasevernier = 0;
-  }
-  else if(!strcmp(device->buf, "1"))
-    {
-      devparms.timebasevernier = 1;
-    }
-    else
+    if(tmcdev_write(device, ":TIM:VERN?") != 10)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-  if(tmcdev_write(device, ":TIM:XY1:DISP?") != 14)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmcdev_read(device) < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "0"))
-  {
-    devparms.timebasexy1display = 0;
-  }
-  else if(!strcmp(device->buf, "1"))
-    {
-      devparms.timebasexy1display = 1;
-    }
-    else
+    if(tmcdev_read(device) < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-  if(tmcdev_write(device, ":TIM:XY2:DISP?") != 14)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmcdev_read(device) < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "0"))
-  {
-    devparms.timebasexy2display = 0;
-  }
-  else if(!strcmp(device->buf, "1"))
+    if(!strcmp(device->buf, "0"))
     {
-      devparms.timebasexy2display = 1;
+      devparms.timebasevernier = 0;
     }
-    else
+    else if(!strcmp(device->buf, "1"))
+      {
+        devparms.timebasevernier = 1;
+      }
+      else
+      {
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+  }
+
+  if((devparms.modelserie != 1) && (devparms.modelserie != 2))
+  {
+    if(tmcdev_write(device, ":TIM:XY1:DISP?") != 14)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
+
+    if(tmcdev_read(device) < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(!strcmp(device->buf, "0"))
+    {
+      devparms.timebasexy1display = 0;
+    }
+    else if(!strcmp(device->buf, "1"))
+      {
+        devparms.timebasexy1display = 1;
+      }
+      else
+      {
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+
+    if(tmcdev_write(device, ":TIM:XY2:DISP?") != 14)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmcdev_read(device) < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(!strcmp(device->buf, "0"))
+    {
+      devparms.timebasexy2display = 0;
+    }
+    else if(!strcmp(device->buf, "1"))
+      {
+        devparms.timebasexy2display = 1;
+      }
+      else
+      {
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+  }
 
   if(tmcdev_write(device, ":TRIG:COUP?") != 11)
   {
@@ -1383,9 +1404,13 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.acquireaverages = atoi(device->buf);
 
+  QApplication::restoreOverrideCursor();
+
   return 0;
 
 OUT_ERROR:
+
+  QApplication::restoreOverrideCursor();
 
   sprintf(str, "An error occurred while reading settings from device.\n"
                "File %s line %i", __FILE__, line);
@@ -1572,11 +1597,15 @@ void UI_Mainwindow::get_device_model(const char *str)
 
   devparms.bandwidth = 0;
 
+  devparms.hordivisions = 14;
+
   if(!strcmp(str, "DS6104"))
   {
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 1000;
+
+    devparms.modelserie = 6;
   }
 
   if(!strcmp(str, "DS6064"))
@@ -1584,6 +1613,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 600;
+
+    devparms.modelserie = 6;
   }
 
   if(!strcmp(str, "DS6102"))
@@ -1591,6 +1622,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 1000;
+
+    devparms.modelserie = 6;
   }
 
   if(!strcmp(str, "DS6062"))
@@ -1598,6 +1631,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 600;
+
+    devparms.modelserie = 6;
   }
 
   if(!strcmp(str, "DS4012"))
@@ -1605,6 +1640,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 100;
+
+    devparms.modelserie = 4;
   }
 
   if(!strcmp(str, "DS4014"))
@@ -1612,6 +1649,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 100;
+
+    devparms.modelserie = 4;
   }
 
   if(!strcmp(str, "DS4022"))
@@ -1619,6 +1658,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 200;
+
+    devparms.modelserie = 4;
   }
 
   if(!strcmp(str, "DS4024"))
@@ -1626,6 +1667,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 200;
+
+    devparms.modelserie = 4;
   }
 
   if(!strcmp(str, "DS4032"))
@@ -1633,6 +1676,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 350;
+
+    devparms.modelserie = 4;
   }
 
   if(!strcmp(str, "DS4034"))
@@ -1640,6 +1685,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 350;
+
+    devparms.modelserie = 4;
   }
 
   if(!strcmp(str, "DS4052"))
@@ -1647,6 +1694,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 500;
+
+    devparms.modelserie = 4;
   }
 
   if(!strcmp(str, "DS4054"))
@@ -1654,6 +1703,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 500;
+
+    devparms.modelserie = 4;
   }
 
   if(!strcmp(str, "DS2072A"))
@@ -1661,6 +1712,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 70;
+
+    devparms.modelserie = 2;
   }
 
   if(!strcmp(str, "DS2072A-S"))
@@ -1668,6 +1721,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 70;
+
+    devparms.modelserie = 2;
   }
 
   if(!strcmp(str, "DS2102A"))
@@ -1675,6 +1730,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 100;
+
+    devparms.modelserie = 2;
   }
 
   if(!strcmp(str, "DS2102A-S"))
@@ -1682,6 +1739,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 100;
+
+    devparms.modelserie = 2;
   }
 
   if(!strcmp(str, "DS2202A"))
@@ -1689,6 +1748,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 200;
+
+    devparms.modelserie = 2;
   }
 
   if(!strcmp(str, "DS2202A-S"))
@@ -1696,6 +1757,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 200;
+
+    devparms.modelserie = 2;
   }
 
   if(!strcmp(str, "DS2302A"))
@@ -1703,6 +1766,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 300;
+
+    devparms.modelserie = 2;
   }
 
   if(!strcmp(str, "DS2302A-S"))
@@ -1710,6 +1775,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 300;
+
+    devparms.modelserie = 2;
   }
 
   if(!strcmp(str, "DS1054Z"))
@@ -1717,6 +1784,10 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 50;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
   }
 
   if(!strcmp(str, "DS1074Z"))
@@ -1724,6 +1795,10 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 70;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
   }
 
   if(!strcmp(str, "DS1074Z-S"))
@@ -1731,6 +1806,10 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 70;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
   }
 
   if(!strcmp(str, "DS1104Z"))
@@ -1738,6 +1817,10 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 100;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
   }
 
   if(!strcmp(str, "DS1104Z-S"))
@@ -1745,9 +1828,13 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 4;
 
     devparms.bandwidth = 100;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
   }
 
-  if(devparms.channel_cnt && devparms.bandwidth)
+  if(devparms.channel_cnt && devparms.bandwidth && devparms.modelserie)
   {
     strcpy(devparms.modelname, str);
   }

@@ -107,8 +107,7 @@ private:
 
   QFont smallfont;
 
-  double v_sense,
-         h_sense;
+  double v_sense;
 
   int bufsize,
       bordersize,

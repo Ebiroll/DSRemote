@@ -37,10 +37,6 @@
 
 #define MAX_CHNS                  4
 
-#define STAT_TIMER_IVAL         100
-
-#define SCRN_TIMER_IVAL          50
-
 #define ADJDIAL_TIMER_IVAL     3000
 
 #define SCRN_SHOT_BMP_SZ    1152054
@@ -77,6 +73,8 @@ struct device_settings
   char modelname[128];
   char serialnr[128];
   char softwvers[128];
+  int modelserie;               // 1=DS1000, 2=DS2000, etc.
+  int hordivisions;             // number of horizontal divisions
 
   double samplerate;            // Samplefrequency
   int memdepth;                 // Number of waveform points that the oscilloscope can store in a single trigger sample
@@ -129,7 +127,10 @@ struct device_settings
   double counterfreq;           // Value of frequency counter
 
   char *screenshot_buf;
-  char *wavebuf[MAX_CHNS];
+  short *wavebuf[MAX_CHNS];
+
+  int status_timer_ival;        // in milli-Sec.
+  int screen_timer_ival;        // in milli-Sec.
 
   struct waveform_preamble preamble;
 };

@@ -158,6 +158,8 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
  * For example, #9001152054. Wherein, N is 9 and 001152054
  * represents that the data stream contains 1152054 bytes
  * effective data.
+ * Reading from the file descriptor blocks,
+ * there is a timeout of 5000 milli-Sec.
  */
 int tmcdev_read(struct tmcdev *dev)
 {
@@ -176,6 +178,15 @@ int tmcdev_read(struct tmcdev *dev)
 
   size = read(dev->fd, dev->hdrbuf, MAX_RESP_LEN);
 
+  if((size < 2) || (size > MAX_RESP_LEN))
+  {
+    dev->hdrbuf[0] = 0;
+
+    dev->buf[0] = 0;
+
+    return -1;
+  }
+
   if(size >= 0)
   {
     dev->hdrbuf[size] = 0;
@@ -184,11 +195,6 @@ int tmcdev_read(struct tmcdev *dev)
   if(size == 0)
   {
     return 0;
-  }
-
-  if((size < 2) || (size > MAX_RESP_LEN))
-  {
-    return -1;
   }
 
   if(dev->hdrbuf[0] != '#')
@@ -211,6 +217,8 @@ int tmcdev_read(struct tmcdev *dev)
 
   if((len < 1) || (len > 9))
   {
+    blockhdr[31] = 0;
+
     return -1;
   }
 
@@ -220,8 +228,10 @@ int tmcdev_read(struct tmcdev *dev)
 
   size--;  // remove the last character
 
-  if(size != (size2 + len + 2))
+  if(size < size2)
   {
+    blockhdr[31] = 0;
+
     return -1;
   }
 

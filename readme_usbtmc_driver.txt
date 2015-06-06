@@ -1,4 +1,6 @@
 
+This applies to the DS6000 series.
+
 In order to let the system load the usbtmc driver automatically,
 proceed as follows:
 

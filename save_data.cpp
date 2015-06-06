@@ -44,6 +44,10 @@ void UI_Mainwindow::save_screenshot()
     return;
   }
 
+  stat_timer->stop();
+
+  scrn_timer->stop();
+
   tmcdev_write(device, ":DISP:DATA?");
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -56,8 +60,7 @@ void UI_Mainwindow::save_screenshot()
 
   if(n < 0)
   {
-    strcpy(str, "Can not read from device.\n"
-                "Have you already patched the usbtmc driver?");
+    strcpy(str, "Can not read from device.");
     goto OUT_ERROR;
   }
 
@@ -77,22 +80,34 @@ void UI_Mainwindow::save_screenshot()
 
   screenXpm.loadFromData((uchar *)(devparms.screenshot_buf), SCRN_SHOT_BMP_SZ);
 
-  if(!strncmp(devparms.modelname, "DS6", 3))
+  if(devparms.modelserie == 1)
   {
     painter.begin(&screenXpm);
 
-    painter.fillRect(0, 0, 95, 29, QColor(48, 48, 48));
-
-    path.addRoundedRect(5, 5, 85, 20, 3, 3);
-
-    painter.fillPath(path, Qt::black);
+    painter.fillRect(0, 0, 80, 29, Qt::black);
 
     painter.setPen(Qt::white);
 
-    painter.drawText(5, 5, 85, 20, Qt::AlignCenter, devparms.modelname);
+    painter.drawText(5, 8, 65, 20, Qt::AlignCenter, devparms.modelname);
 
     painter.end();
   }
+  else if(devparms.modelserie == 6)
+    {
+      painter.begin(&screenXpm);
+
+      painter.fillRect(0, 0, 95, 29, QColor(48, 48, 48));
+
+      path.addRoundedRect(5, 5, 85, 20, 3, 3);
+
+      painter.fillPath(path, Qt::black);
+
+      painter.setPen(Qt::white);
+
+      painter.drawText(5, 5, 85, 20, Qt::AlignCenter, devparms.modelname);
+
+      painter.end();
+    }
 
   opath[0] = 0;
   if(recent_savedir[0]!=0)
@@ -106,6 +121,10 @@ void UI_Mainwindow::save_screenshot()
 
   if(!strcmp(opath, ""))
   {
+    stat_timer->start(devparms.status_timer_ival);
+
+    scrn_timer->start(devparms.screen_timer_ival);
+
     return;
   }
 
@@ -132,9 +151,17 @@ void UI_Mainwindow::save_screenshot()
     goto OUT_ERROR;
   }
 
+  stat_timer->start(devparms.status_timer_ival);
+
+  scrn_timer->start(devparms.screen_timer_ival);
+
   return;
 
 OUT_ERROR:
+
+  stat_timer->start(devparms.status_timer_ival);
+
+  scrn_timer->start(devparms.screen_timer_ival);
 
   QMessageBox msgBox;
   msgBox.setIcon(QMessageBox::Critical);
@@ -297,8 +324,7 @@ void UI_Mainwindow::save_memory_waveform()
 //
 //       if(n < 0)
 //       {
-//         strcpy(str, "Can not read from device.\n"
-//                     "Have you already patched the usbtmc driver?");
+//         strcpy(str, "Can not read from device.");
 //         goto OUT_ERROR;
 //       }
 //
@@ -414,18 +440,36 @@ void UI_Mainwindow::save_screen_waveform()
   wavbuf[2] = NULL;
   wavbuf[3] = NULL;
 
-  if(devparms.timebasedelayenable)
+  stat_timer->stop();
+
+  scrn_timer->stop();
+
+  if(devparms.modelserie == 1)
   {
-    rec_len = devparms.timebasedelayscale * 14;
+    if(devparms.timebasedelayenable)
+    {
+      rec_len = devparms.timebasedelayscale * 12;
+    }
+    else
+    {
+      rec_len = devparms.timebasescale * 12;
+    }
   }
   else
   {
-    rec_len = devparms.timebasescale * 14;
+    if(devparms.timebasedelayenable)
+    {
+      rec_len = devparms.timebasedelayscale * 14;
+    }
+    else
+    {
+      rec_len = devparms.timebasescale * 14;
+    }
   }
 
   if(rec_len < 1e-6)
   {
-    strcpy(str, "Can not save waveforms shorter than 1 uSec.");
+    strcpy(str, "Can not save waveforms when timebase < 100nS.");
     goto OUT_ERROR;
   }
 
@@ -477,8 +521,7 @@ void UI_Mainwindow::save_screen_waveform()
 
     if(n < 0)
     {
-      strcpy(str, "Can not read from device.\n"
-                  "Have you already patched the usbtmc driver?");
+      strcpy(str, "Can not read from device.");
       goto OUT_ERROR;
     }
 
@@ -494,11 +537,11 @@ void UI_Mainwindow::save_screen_waveform()
       goto OUT_ERROR;
     }
 
-    yoffset[i] = ((devparms.chanoffset[i] / devparms.chanscale[i]) * 32.0);
+    yoffset[i] = ((devparms.chanoffset[i] / devparms.chanscale[i]) * 25.0);
 
     for(j=0; j<n; j++)
     {
-      wavbuf[i][j] = (char)(device->buf[j] + 128);
+      wavbuf[i][j] = (int)(((unsigned char *)device->buf)[j]) - 127;
 
       wavbuf[i][j] -= yoffset[i];
     }
@@ -548,14 +591,14 @@ void UI_Mainwindow::save_screen_waveform()
     edf_set_digital_minimum(hdl, j, -32768);
     if(devparms.chanscale[i] > 2)
     {
-      edf_set_physical_maximum(hdl, j, devparms.chanscale[i] * 4 * 256);
-      edf_set_physical_minimum(hdl, j, devparms.chanscale[i] * -4 * 256);
+      edf_set_physical_maximum(hdl, j, (devparms.chanscale[i] / 25) * 32767);
+      edf_set_physical_minimum(hdl, j, (devparms.chanscale[i] / 25) * 32767);
       edf_set_physical_dimension(hdl, j, "V");
     }
     else
     {
-      edf_set_physical_maximum(hdl, j, 1000 * devparms.chanscale[i] * 4 * 256);
-      edf_set_physical_minimum(hdl, j, 1000 * devparms.chanscale[i] * -4 * 256);
+      edf_set_physical_maximum(hdl, j, 1000 * (devparms.chanscale[i] / 25) * 32767);
+      edf_set_physical_minimum(hdl, j, 1000 * (devparms.chanscale[i] / 25) * -32768);
       edf_set_physical_dimension(hdl, j, "mV");
     }
     sprintf(str, "CHAN%i", i + 1);
@@ -592,6 +635,10 @@ OUT_NORMAL:
     free(wavbuf[i]);
   }
 
+  stat_timer->start(devparms.status_timer_ival);
+
+  scrn_timer->start(devparms.screen_timer_ival);
+
   return;
 
 OUT_ERROR:
@@ -610,6 +657,10 @@ OUT_ERROR:
   {
     free(wavbuf[i]);
   }
+
+  stat_timer->start(devparms.status_timer_ival);
+
+  scrn_timer->start(devparms.screen_timer_ival);
 }
 
 

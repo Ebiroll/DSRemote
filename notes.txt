@@ -14,7 +14,25 @@ Some settings are checked regularly and will always be synchronized:
 - memory depth
 
 
-Number of screen updates is approx. 20 waveforms per second.
+There are some peculiarities when testing with the DS6104 and the DS1054Z:
+
+DS6104:
+======
+
+Full-speed USB (12MBit)
+Reading screen data is pretty fast, 20 waveforms per second is easily possible.
+Reading a screenshot in BMP format is slow, approx. 3 seconds.
+Needs a usbtmc driver patch, needs to add an udev rule.
+
+DS1054Z: (softversion 00.04.02.SP4, boardversion 0.1.1)
+=======
+
+High-speed USB (480 Mbit)
+Reading screen data is slow, maximum 7 waveforms per second.
+Reading a screenshot in BMP format is faster, less than one second.
+No need to patch the usbtmc driver, no need to add an udev rule. It's plug and play.
+
+
 
 Use the mousewheel to change the dials. In order to simulate a push on a dial,
 click on it with the right mouse button.

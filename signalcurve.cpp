@@ -134,14 +134,15 @@ void SignalCurve::paintEvent(QPaintEvent *)
 
 void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 {
-  int i, chn, tmp, rot=1;
+  int i, chn, tmp, rot=1, small_rulers;
 
-  double offset=0.0,
-         h_step=0.0,
+  double h_step=0.0,
          step,
          step2;
 
 //  clk_start = clock();
+
+  small_rulers = 5 * devparms->hordivisions;
 
   painter->fillRect(0, 0, curve_w, curve_h, BackgroundColor);
 
@@ -154,7 +155,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   drawTopLabels(painter);
 
-  tmp = 407 - ((devparms->timebaseoffset / (devparms->timebasescale * 14.0)) * 233);
+  tmp = 407 - ((devparms->timebaseoffset / ((double)devparms->timebasescale * (double)devparms->hordivisions)) * 233);
 
   if(tmp < 291)
   {
@@ -205,9 +206,9 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
     if(devparms->displaygrid == 2)
     {
-      step = curve_w / 14.0;
+      step = (double)curve_w / (double)devparms->hordivisions;
 
-      for(i=1; i<14; i++)
+      for(i=1; i<devparms->hordivisions; i++)
       {
         painter->drawLine(step * i, curve_h - 1, step * i, 0);
       }
@@ -229,9 +230,9 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   painter->setPen(RasterColor);
 
-  step = curve_w / 70.0;
+  step = (double)curve_w / (double)small_rulers;
 
-  for(i=1; i<70; i++)
+  for(i=1; i<small_rulers; i++)
   {
     step2 = step * i;
 
@@ -284,13 +285,10 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     return;
   }
 
-  offset = -127;
-
-  v_sense = -((double)curve_h / 256.0);
-
-  h_sense = -((double)curve_w / 256.0);
-
 /////////////////////////////////// draw the arrows ///////////////////////////////////////////
+
+//  v_sense = -((double)curve_h / 256.0);
+  v_sense = -((double)curve_h / 200.0);
 
   drawTrigCenterArrow(painter, curve_w / 2, 0);
 
@@ -307,7 +305,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     }
     else
     {
-      chan_arrow_pos[chn] = (-128.0 + ((devparms->chanoffset[chn] / devparms->chanscale[chn]) * 32.0)) * v_sense;
+      chan_arrow_pos[chn] =  (curve_h / 2) - (devparms->chanoffset[chn] / ((devparms->chanscale[chn] * 8) / curve_h));
 
       if(chan_arrow_pos[chn] < 0)
       {
@@ -350,10 +348,10 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     {
       if(bufsize < (curve_w / 2))
       {
-        painter->drawLine(i * h_step, ((double)(devparms->wavebuf[chn][i]) + offset) * v_sense, (i + 1) * h_step, ((double)(devparms->wavebuf[chn][i]) + offset) * v_sense);
+        painter->drawLine(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2), (i + 1) * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
         if(i)
         {
-          painter->drawLine(i * h_step, ((double)(devparms->wavebuf[chn][i - 1]) + offset) * v_sense, i * h_step, ((double)(devparms->wavebuf[chn][i]) + offset) * v_sense);
+          painter->drawLine(i * h_step, (devparms->wavebuf[chn][i - 1] * v_sense) + (curve_h / 2), i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
         }
       }
       else
@@ -362,11 +360,11 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
         {
           if(devparms->displaytype)
           {
-            painter->drawPoint(i * h_step, ((double)(devparms->wavebuf[chn][i]) + offset) * v_sense);
+            painter->drawPoint(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
           }
           else
           {
-            painter->drawLine(i * h_step, ((double)(devparms->wavebuf[chn][i]) + offset) * v_sense, (i + 1) * h_step, ((double)(devparms->wavebuf[chn][i + 1]) + offset) * v_sense);
+            painter->drawLine(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2), (i + 1) * h_step, (devparms->wavebuf[chn][i + 1] * v_sense) + (curve_h / 2));
           }
         }
       }
@@ -389,7 +387,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   {
     if(devparms->triggeredgesource < 4)
     {
-      trig_level_arrow_pos = (-128.0 + (((devparms->triggeredgelevel[devparms->triggeredgesource] + devparms->chanoffset[devparms->triggeredgesource]) / devparms->chanscale[devparms->triggeredgesource]) * 32.0)) * v_sense;
+      trig_level_arrow_pos =  (curve_h / 2) - ((devparms->triggeredgelevel[devparms->triggeredgesource] + devparms->chanoffset[devparms->triggeredgesource]) / ((devparms->chanscale[devparms->triggeredgesource] * 8) / curve_h));
 
       if(trig_level_arrow_pos < 0)
       {
@@ -425,11 +423,11 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   {
     if(devparms->timebasedelayenable)
     {
-      trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebasedelayoffset / (devparms->timebasedelayscale * 14.0)) * curve_w);
+      trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebasedelayoffset / ((double)devparms->timebasedelayscale * (double)devparms->hordivisions)) * curve_w);
     }
     else
     {
-      trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebaseoffset / (devparms->timebasescale * 14.0)) * curve_w);
+      trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebaseoffset / ((double)devparms->timebasescale * (double)devparms->hordivisions)) * curve_w);
     }
 
     if(trig_pos_arrow_pos < 0)
@@ -618,11 +616,18 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(200, -1, 85, 20, Qt::AlignCenter, str);
 
-  convert_to_metric_suffix(str, devparms->memdepth, 1);
+  if(devparms->memdepth)
+  {
+    convert_to_metric_suffix(str, devparms->memdepth, 1);
 
-  strcat(str, "pts");
+    strcat(str, "pts");
 
-  painter->drawText(200, 14, 85, 20, Qt::AlignCenter, str);
+    painter->drawText(200, 14, 85, 20, Qt::AlignCenter, str);
+  }
+  else
+  {
+    painter->drawText(200, 14, 85, 20, Qt::AlignCenter, "AUTO");
+  }
 
 //////////////// memory position ///////////////////////////////
 
@@ -638,7 +643,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
   {
     dtmp1 = devparms->timebasedelayscale / devparms->timebasescale;
 
-    dtmp2 = (devparms->timebaseoffset - devparms->timebasedelayoffset) / (7 * devparms->timebasescale);
+    dtmp2 = (devparms->timebaseoffset - devparms->timebasedelayoffset) / ((devparms->hordivisions / 2) * devparms->timebasescale);
 
     painter->fillRect(288, 16, (116 - (dtmp1 * 116)) - (dtmp2 * 116), 8, QColor(64, 160, 255));
 
@@ -827,7 +832,7 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
 
       painter->drawRoundedRect(xpos + 25, ypos, 85, 20, 3, 3);
 
-      painter->drawText(xpos + 25, ypos + 1, 85, 20, Qt::AlignCenter, str2);
+      painter->drawText(xpos + 30, ypos + 1, 85, 20, Qt::AlignCenter, str2);
 
       if(devparms->chanbwlimit[chn])
       {
@@ -873,7 +878,7 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
 
       painter->drawText(xpos + 6, ypos + 15, str1);
 
-      painter->drawText(xpos + 25, ypos + 1, 85, 20, Qt::AlignCenter, str2);
+      painter->drawText(xpos + 30, ypos + 1, 85, 20, Qt::AlignCenter, str2);
 
       if(devparms->chanbwlimit[chn])
       {
@@ -920,7 +925,7 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
 
     painter->drawText(xpos + 6, ypos + 15, str1);
 
-    painter->drawText(xpos + 25, ypos + 1, 85, 20, Qt::AlignCenter, str2);
+    painter->drawText(xpos + 30, ypos + 1, 85, 20, Qt::AlignCenter, str2);
 
     if(devparms->chanbwlimit[chn])
     {
@@ -1256,17 +1261,17 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
     if(devparms->timebasedelayenable)
     {
-      devparms->timebasedelayoffset = ((devparms->timebasedelayscale * 14.0) / w) * ((w / 2) - trig_pos_arrow_pos);
+      devparms->timebasedelayoffset = ((devparms->timebasedelayscale * (double)devparms->hordivisions) / w) * ((w / 2) - trig_pos_arrow_pos);
 
       tmp = devparms->timebasedelayoffset / (devparms->timebasedelayscale / 50);
 
       devparms->timebasedelayoffset = (devparms->timebasedelayscale / 50) * tmp;
 
-      lefttime = (7 * devparms->timebasescale) - devparms->timebaseoffset;
+      lefttime = ((devparms->hordivisions / 2) * devparms->timebasescale) - devparms->timebaseoffset;
 
-      righttime = (7 * devparms->timebasescale) + devparms->timebaseoffset;
+      righttime = ((devparms->hordivisions / 2) * devparms->timebasescale) + devparms->timebaseoffset;
 
-      delayrange = 7 * devparms->timebasedelayscale;
+      delayrange = (devparms->hordivisions / 2) * devparms->timebasedelayscale;
 
       if(devparms->timebasedelayoffset < -(lefttime - delayrange))
       {
@@ -1292,7 +1297,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
     }
     else
     {
-      devparms->timebaseoffset = ((devparms->timebasescale * 14.0) / w) * ((w / 2) - trig_pos_arrow_pos);
+      devparms->timebaseoffset = ((devparms->timebasescale * (double)devparms->hordivisions) / w) * ((w / 2) - trig_pos_arrow_pos);
 
       tmp = devparms->timebaseoffset / (devparms->timebasescale / 50);
 
@@ -1333,7 +1338,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
   //       printf("chanoffset[chn] is: %e   chanscale[chn] is %e   trig_level_arrow_pos is: %i   v_sense is: %e\n",
   //              devparms->chanoffset[chn], devparms->chanscale[chn], trig_level_arrow_pos, v_sense);
 
-      devparms->triggeredgelevel[devparms->triggeredgesource] = ((devparms->chanscale[devparms->triggeredgesource] / 32.0) * (128 + (trig_level_arrow_pos / v_sense)))
+      devparms->triggeredgelevel[devparms->triggeredgesource] = (((h / 2) - trig_level_arrow_pos) * ((devparms->chanscale[devparms->triggeredgesource] * 8) / h))
                                                                 - devparms->chanoffset[devparms->triggeredgesource];
 
       tmp = devparms->triggeredgelevel[devparms->triggeredgesource] / (devparms->chanscale[devparms->triggeredgesource] / 50);
@@ -1383,7 +1388,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
     //       printf("chanoffset[chn] is: %e   chanscale[chn] is %e   chan_arrow_pos[chn] is: %i   v_sense is: %e\n",
     //              devparms->chanoffset[chn], devparms->chanscale[chn], chan_arrow_pos[chn], v_sense);
 
-          devparms->chanoffset[chn] = (devparms->chanscale[chn] / 32.0) * (128 + (chan_arrow_pos[chn] / v_sense));
+          devparms->chanoffset[chn] = ((h / 2) - chan_arrow_pos[chn]) * ((devparms->chanscale[chn] * 8) / h);
 
           tmp = devparms->chanoffset[chn] / (devparms->chanscale[chn] / 50);
 
@@ -1391,7 +1396,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
           sprintf(str, "Channel %i offset: ", chn + 1);
 
-          convert_to_metric_suffix(str + strlen(str), devparms->chanoffset[chn], 2);
+          convert_to_metric_suffix(str + strlen(str), devparms->chanoffset[chn], 3);
 
           strcat(str, "V");
 

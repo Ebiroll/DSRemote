@@ -62,7 +62,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   for(i=0; i< MAX_CHNS; i++)
   {
-    devparms.wavebuf[i] = (char *)malloc(WAVFRM_MAX_BUFSZ);
+    devparms.wavebuf[i] = (short *)malloc(WAVFRM_MAX_BUFSZ);
   }
 
   devparms.displaygrid = 2;
@@ -70,6 +70,12 @@ UI_Mainwindow::UI_Mainwindow()
   devparms.channel_cnt = 4;
 
   devparms.timebasescale = 1;
+
+  devparms.hordivisions = 14;
+
+  devparms.status_timer_ival = 200;
+
+  devparms.screen_timer_ival = 500;
 
   menubar = menuBar();
 

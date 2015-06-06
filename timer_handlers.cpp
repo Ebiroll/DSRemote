@@ -275,12 +275,55 @@ void UI_Mainwindow::scrn_timer_handler()
     return;
   }
 
+//struct waveform_preamble wfp;
+
   for(i=0; i<MAX_CHNS; i++)
   {
     if(!devparms.chandisplay[i])  // Download data only when channel is switched on
     {
       continue;
     }
+
+///////////////////////////////////////////////////////////
+
+//     tmcdev_write(device, ":WAV:PRE?");
+//
+//     n = tmcdev_read(device);
+//
+//     if(n < 0)
+//     {
+//       strcpy(str, "Can not read from device.");
+//       goto OUT_ERROR;
+//     }
+//
+//     printf("waveform preamble: %s\n", device->buf);
+//
+//     if(parse_preamble(device->buf, device->sz, &wfp, i))
+//     {
+//       strcpy(str, "Preamble parsing error.");
+//       goto OUT_ERROR;
+//     }
+//
+//     printf("waveform preamble:\n"
+//            "format: %i\n"
+//            "type: %i\n"
+//            "points: %i\n"
+//            "count: %i\n"
+//            "xincrement: %e\n"
+//            "xorigin: %e\n"
+//            "xreference: %e\n"
+//            "yincrement: %e\n"
+//            "yorigin: %e\n"
+//            "yreference: %i\n",
+//            wfp.format, wfp.type, wfp.points, wfp.count,
+//            wfp.xincrement[i], wfp.xorigin[i], wfp.xreference[i],
+//            wfp.yincrement[i], wfp.yorigin[i], wfp.yreference[i]);
+//
+//     printf("chanoffset[] is %e\n", devparms.chanoffset[i]);
+
+//     rec_len = wfp.xincrement[i] * wfp.points;
+
+///////////////////////////////////////////////////////////
 
     sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
 
@@ -313,7 +356,7 @@ void UI_Mainwindow::scrn_timer_handler()
 
     for(j=0; j<n; j++)
     {
-      devparms.wavebuf[i][j] = (device->buf[j] + 128);
+      devparms.wavebuf[i][j] = (int)(((unsigned char *)device->buf)[j]) - 127;
     }
   }
 
