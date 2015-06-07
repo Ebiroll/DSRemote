@@ -214,6 +214,12 @@ void UI_Mainwindow::open_connection()
 
     devparms.screen_timer_ival = 50;
   }
+  else
+  {
+    devparms.status_timer_ival = 500;
+
+    devparms.screen_timer_ival = 2000;
+  }
 
   connect(adjDial,          SIGNAL(valueChanged(int)), this, SLOT(adjDialChanged(int)));
   connect(trigAdjustDial,   SIGNAL(valueChanged(int)), this, SLOT(trigAdjustDialChanged(int)));

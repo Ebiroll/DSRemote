@@ -19,7 +19,7 @@ There are some peculiarities when testing with the DS6104 and the DS1054Z:
 DS6104:
 ======
 
-Full-speed USB (12MBit)
+USB connection: full speed (12MBit)
 Reading screen data is pretty fast, 20 waveforms per second is easily possible.
 Reading a screenshot in BMP format is slow, approx. 3 seconds.
 Needs a usbtmc driver patch, needs to add an udev rule.
@@ -27,8 +27,9 @@ Needs a usbtmc driver patch, needs to add an udev rule.
 DS1054Z: (softversion 00.04.02.SP4, boardversion 0.1.1)
 =======
 
-High-speed USB (480 Mbit)
-Reading screen data is slow, maximum 7 waveforms per second.
+USB connection: high speed (480 Mbit)
+Reading screen data is slow, maximum 7 waveforms per second with one channel.
+With all channels switched on, screen updates are very slow.
 Reading a screenshot in BMP format is faster, less than one second.
 No need to patch the usbtmc driver, no need to add an udev rule. It's plug and play.
 
@@ -82,11 +83,12 @@ What's implemented so far:
 
 - acquire normal
 - acquire average
+- acquire memory depth
 
 
 - save screenshot
-- save display data (raw waveform, the part that is visible on the screen)
-  saving deep memory is not yet implemented
+- save display data
+- save memory data
   fileformat for waveform data is EDF, these files can be read by lots
   of viewers and analyzing software like EDFbrowser, Scilab, Octave, Matlab, Labview, etc.
 

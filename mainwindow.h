@@ -61,6 +61,7 @@
 #include <QDial>
 #include <QSettings>
 #include <QProcess>
+#include <QProgressDialog>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -312,6 +313,31 @@ private slots:
 
   void set_acq_normal();
   void set_acq_average();
+
+  void set_memdepth_auto();
+  void set_memdepth_12k();
+  void set_memdepth_120k();
+  void set_memdepth_1200k();
+  void set_memdepth_12m();
+  void set_memdepth_24m();
+  void set_memdepth_6k();
+  void set_memdepth_60k();
+  void set_memdepth_600k();
+  void set_memdepth_6m();
+  void set_memdepth_3k();
+  void set_memdepth_30k();
+  void set_memdepth_300k();
+  void set_memdepth_3m();
+  void set_memdepth_7k();
+  void set_memdepth_70k();
+  void set_memdepth_700k();
+  void set_memdepth_7m();
+  void set_memdepth_70m();
+  void set_memdepth_14k();
+  void set_memdepth_140k();
+  void set_memdepth_1400k();
+  void set_memdepth_14m();
+  void set_memdepth_140m();
 
 protected:
   void closeEvent(QCloseEvent *);

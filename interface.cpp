@@ -181,15 +181,269 @@ void UI_Mainwindow::navDialReleased()
 
 void UI_Mainwindow::acqButtonClicked()
 {
-  QMenu menu,
-        submenuacquisition;
+  int chn,
+      chns_on=0;
 
-  submenuacquisition.setTitle("Acquisition");
+  QMenu menu,
+        submenuacquisition,
+        submenumemdepth;
+
+  for(chn=0; chn<MAX_CHNS; chn++)
+  {
+    if(devparms.chandisplay[chn])
+    {
+      chns_on++;
+    }
+  }
+
+  submenuacquisition.setTitle("Mode");
   submenuacquisition.addAction("Normal",  this, SLOT(set_acq_normal()));
   submenuacquisition.addAction("Average", this, SLOT(set_acq_average()));
   menu.addMenu(&submenuacquisition);
 
+  submenumemdepth.setTitle("Mem Depth");
+  submenumemdepth.addAction("Auto",  this, SLOT(set_memdepth_auto()));
+  if(devparms.modelserie == 6)
+  {
+    if(chns_on < 2)
+    {
+      submenumemdepth.addAction("14K",  this, SLOT(set_memdepth_14k()));
+      submenumemdepth.addAction("140K", this, SLOT(set_memdepth_140k()));
+      submenumemdepth.addAction("1.4M", this, SLOT(set_memdepth_1400k()));
+      submenumemdepth.addAction("14M",  this, SLOT(set_memdepth_14m()));
+      submenumemdepth.addAction("140M", this, SLOT(set_memdepth_140m()));
+    }
+    else
+    {
+      submenumemdepth.addAction("7K",   this, SLOT(set_memdepth_7k()));
+      submenumemdepth.addAction("70K",  this, SLOT(set_memdepth_70k()));
+      submenumemdepth.addAction("700K", this, SLOT(set_memdepth_700k()));
+      submenumemdepth.addAction("7M",   this, SLOT(set_memdepth_7m()));
+      submenumemdepth.addAction("70M",  this, SLOT(set_memdepth_70m()));
+    }
+  }
+  else if(devparms.modelserie == 1)
+    {
+    if(chns_on < 2)
+    {
+      submenumemdepth.addAction("12K",  this, SLOT(set_memdepth_12k()));
+      submenumemdepth.addAction("120K", this, SLOT(set_memdepth_120k()));
+      submenumemdepth.addAction("1.2M", this, SLOT(set_memdepth_1200k()));
+      submenumemdepth.addAction("12M",  this, SLOT(set_memdepth_12m()));
+      submenumemdepth.addAction("24M",  this, SLOT(set_memdepth_24m()));
+    }
+    else if(chns_on < 3)
+      {
+        submenumemdepth.addAction("6K",   this, SLOT(set_memdepth_6k()));
+        submenumemdepth.addAction("60K",  this, SLOT(set_memdepth_60k()));
+        submenumemdepth.addAction("600K", this, SLOT(set_memdepth_600k()));
+        submenumemdepth.addAction("6M",   this, SLOT(set_memdepth_6m()));
+        submenumemdepth.addAction("12M",  this, SLOT(set_memdepth_12m()));
+      }
+      else
+      {
+        submenumemdepth.addAction("3K",   this, SLOT(set_memdepth_3k()));
+        submenumemdepth.addAction("30K",  this, SLOT(set_memdepth_30k()));
+        submenumemdepth.addAction("300K", this, SLOT(set_memdepth_300k()));
+        submenumemdepth.addAction("3M",   this, SLOT(set_memdepth_3m()));
+        submenumemdepth.addAction("6M",   this, SLOT(set_memdepth_6m()));
+      }
+    }
+  menu.addMenu(&submenumemdepth);
+
   menu.exec(acqButton->mapToGlobal(QPoint(0,0)));
+}
+
+
+void UI_Mainwindow::set_memdepth_auto()
+{
+  statusLabel->setText("Memory depth: auto");
+
+  tmcdev_write(device, ":ACQ:MDEP AUTO");
+}
+
+
+void UI_Mainwindow::set_memdepth_12k()
+{
+  statusLabel->setText("Memory depth: 12k");
+
+  tmcdev_write(device, ":ACQ:MDEP 12000");
+}
+
+
+void UI_Mainwindow::set_memdepth_120k()
+{
+  statusLabel->setText("Memory depth: 120k");
+
+  tmcdev_write(device, ":ACQ:MDEP 120000");
+}
+
+
+void UI_Mainwindow::set_memdepth_1200k()
+{
+  statusLabel->setText("Memory depth: 1.2M");
+
+  tmcdev_write(device, ":ACQ:MDEP 1200000");
+}
+
+
+void UI_Mainwindow::set_memdepth_12m()
+{
+  statusLabel->setText("Memory depth: 12M");
+
+  tmcdev_write(device, ":ACQ:MDEP 12000000");
+}
+
+
+void UI_Mainwindow::set_memdepth_24m()
+{
+  statusLabel->setText("Memory depth: 24M");
+
+  tmcdev_write(device, ":ACQ:MDEP 24000000");
+}
+
+
+void UI_Mainwindow::set_memdepth_3k()
+{
+  statusLabel->setText("Memory depth: 3K");
+
+  tmcdev_write(device, ":ACQ:MDEP 3000");
+}
+
+
+void UI_Mainwindow::set_memdepth_30k()
+{
+  statusLabel->setText("Memory depth: 30K");
+
+  tmcdev_write(device, ":ACQ:MDEP 30000");
+}
+
+
+void UI_Mainwindow::set_memdepth_300k()
+{
+  statusLabel->setText("Memory depth: 300K");
+
+  tmcdev_write(device, ":ACQ:MDEP 300000");
+}
+
+
+void UI_Mainwindow::set_memdepth_3m()
+{
+  statusLabel->setText("Memory depth: 3M");
+
+  tmcdev_write(device, ":ACQ:MDEP 3000000");
+}
+
+
+void UI_Mainwindow::set_memdepth_6m()
+{
+  statusLabel->setText("Memory depth: 6M");
+
+  tmcdev_write(device, ":ACQ:MDEP 6000000");
+}
+
+
+void UI_Mainwindow::set_memdepth_6k()
+{
+  statusLabel->setText("Memory depth: 6K");
+
+  tmcdev_write(device, ":ACQ:MDEP 6000");
+}
+
+
+void UI_Mainwindow::set_memdepth_60k()
+{
+  statusLabel->setText("Memory depth: 60K");
+
+  tmcdev_write(device, ":ACQ:MDEP 60000");
+}
+
+
+void UI_Mainwindow::set_memdepth_600k()
+{
+  statusLabel->setText("Memory depth: 600K");
+
+  tmcdev_write(device, ":ACQ:MDEP 600000");
+}
+
+
+void UI_Mainwindow::set_memdepth_7k()
+{
+  statusLabel->setText("Memory depth: 7k");
+
+  tmcdev_write(device, ":ACQ:MDEP 7000");
+}
+
+
+void UI_Mainwindow::set_memdepth_70k()
+{
+  statusLabel->setText("Memory depth: 70k");
+
+  tmcdev_write(device, ":ACQ:MDEP 70000");
+}
+
+
+void UI_Mainwindow::set_memdepth_700k()
+{
+  statusLabel->setText("Memory depth: 700K");
+
+  tmcdev_write(device, ":ACQ:MDEP 700000");
+}
+
+
+void UI_Mainwindow::set_memdepth_7m()
+{
+  statusLabel->setText("Memory depth: 7M");
+
+  tmcdev_write(device, ":ACQ:MDEP 7000000");
+}
+
+
+void UI_Mainwindow::set_memdepth_70m()
+{
+  statusLabel->setText("Memory depth: 70M");
+
+  tmcdev_write(device, ":ACQ:MDEP 70000000");
+}
+
+
+void UI_Mainwindow::set_memdepth_14k()
+{
+  statusLabel->setText("Memory depth: 14k");
+
+  tmcdev_write(device, ":ACQ:MDEP 14000");
+}
+
+
+void UI_Mainwindow::set_memdepth_140k()
+{
+  statusLabel->setText("Memory depth: 140k");
+
+  tmcdev_write(device, ":ACQ:MDEP 140000");
+}
+
+
+void UI_Mainwindow::set_memdepth_1400k()
+{
+  statusLabel->setText("Memory depth: 1.4M");
+
+  tmcdev_write(device, ":ACQ:MDEP 1400000");
+}
+
+
+void UI_Mainwindow::set_memdepth_14m()
+{
+  statusLabel->setText("Memory depth: 14M");
+
+  tmcdev_write(device, ":ACQ:MDEP 14000000");
+}
+
+
+void UI_Mainwindow::set_memdepth_140m()
+{
+  statusLabel->setText("Memory depth: 140M");
+
+  tmcdev_write(device, ":ACQ:MDEP 140000000");
 }
 
 
@@ -241,7 +495,7 @@ void UI_Mainwindow::saveButtonClicked()
   QMenu menu;
 
   menu.addAction("Save screen waveform",   this, SLOT(save_screen_waveform()));
-//  menu.addAction("Save memory waveform",   this, SLOT(save_memory_waveform()));
+  menu.addAction("Save memory waveform",   this, SLOT(save_memory_waveform()));
   menu.addAction("Save screenshot", this, SLOT(save_screenshot()));
 
   menu.exec(saveButton->mapToGlobal(QPoint(0,0)));
@@ -308,7 +562,7 @@ void UI_Mainwindow::set_grid_type_dots()
 
   devparms.displaytype = 1;
 
-  statusLabel->setText("Display type: dotss");
+  statusLabel->setText("Display type: dots");
 
   tmcdev_write(device, ":DISP:TYPE DOTS");
 }

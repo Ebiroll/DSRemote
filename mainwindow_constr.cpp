@@ -73,9 +73,9 @@ UI_Mainwindow::UI_Mainwindow()
 
   devparms.hordivisions = 14;
 
-  devparms.status_timer_ival = 200;
+  devparms.status_timer_ival = 500;
 
-  devparms.screen_timer_ival = 500;
+  devparms.screen_timer_ival = 2000;
 
   menubar = menuBar();
 
