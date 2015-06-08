@@ -294,8 +294,14 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
 /////////////////////////////////// draw the arrows ///////////////////////////////////////////
 
-//  v_sense = -((double)curve_h / 256.0);
-  v_sense = -((double)curve_h / 200.0);
+  if(devparms->modelserie == 6)
+  {
+    v_sense = -((double)curve_h / 256.0);
+  }
+  else
+  {
+    v_sense = -((double)curve_h / 200.0);
+  }
 
   drawTrigCenterArrow(painter, curve_w / 2, 0);
 
