@@ -468,7 +468,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   char str[128];
 
-  if(mainwindow->adjDialFunc == NAV_DIAL_FUNC_HOLDOFF)
+  if((mainwindow->adjDialFunc == NAV_DIAL_FUNC_HOLDOFF) || (mainwindow->navDialFunc == NAV_DIAL_FUNC_HOLDOFF))
   {
     convert_to_metric_suffix(str, devparms->triggerholdoff, 2);
 

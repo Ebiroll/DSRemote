@@ -1579,6 +1579,11 @@ double UI_Mainwindow::get_stepsize_divide_by_1000(double val)
 {
   int exp=0;
 
+  if(val < 1e-9)
+  {
+    return 1e-9;
+  }
+
   while(val < 1)
   {
     val *= 10;

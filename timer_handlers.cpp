@@ -45,6 +45,8 @@ void UI_Mainwindow::navDial_timer_handler()
   else
   {
     navDial->setSliderPosition(50);
+
+    navDialFunc = NAV_DIAL_FUNC_NONE;
   }
 }
 

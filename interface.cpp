@@ -132,13 +132,25 @@ void UI_Mainwindow::navDialChanged(int npos)
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
-
-    tmcdev_write(device, str);
+//     sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
+//
+//     tmcdev_write(device, str);
   }
   else if(devparms.timebasedelayenable)
     {
-      val = get_stepsize_divide_by_1000(devparms.timebasedelayoffset);
+      val = devparms.timebasedelayoffset;
+
+      if(val < 0)
+      {
+        val *= -1;
+      }
+
+      if(val < 2e-7)
+      {
+        val = 2e-7;
+      }
+
+      val = get_stepsize_divide_by_1000(val);
 
       devparms.timebasedelayoffset += (val * mpr);
 
@@ -166,16 +178,33 @@ void UI_Mainwindow::navDialChanged(int npos)
 
       statusLabel->setText(str);
 
-      sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
-
-      tmcdev_write(device, str);
+//       sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+//
+//       tmcdev_write(device, str);
     }
 }
 
 
 void UI_Mainwindow::navDialReleased()
 {
+  char str[512];
+
   navDial->setSliderPosition(50);
+
+  if(navDialFunc == NAV_DIAL_FUNC_HOLDOFF)
+  {
+    sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
+
+    tmcdev_write(device, str);
+  }
+  else if(devparms.timebasedelayenable)
+    {
+      sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+
+      tmcdev_write(device, str);
+    }
+
+  adjDialFunc = NAV_DIAL_FUNC_NONE;
 }
 
 
