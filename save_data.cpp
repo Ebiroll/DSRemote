@@ -164,12 +164,13 @@ void UI_Mainwindow::save_memory_waveform()
       chn,
       chns=0,
       hdl=-1,
-      bytes_rcvd,
+      bytes_rcvd=0,
       mempnts,
       yref[MAX_CHNS],
       yor[MAX_CHNS],
       smps_per_record,
-      datrecs=1;
+      datrecs=1,
+      empty_buf;
 
   char str[128],
        opath[MAX_PATHLEN];
@@ -246,7 +247,7 @@ void UI_Mainwindow::save_memory_waveform()
     wavbuf[i] = (short *)malloc(mempnts * sizeof(short));
     if(wavbuf[i] == NULL)
     {
-      strcpy(str, "Malloc error.");
+      sprintf(str, "Malloc error.  line %i file %s", __LINE__, __FILE__);
       goto OUT_ERROR;
     }
   }
@@ -280,7 +281,7 @@ void UI_Mainwindow::save_memory_waveform()
 
     if(yinc[chn] < 1e-6)
     {
-      strcpy(str, "Error, parameter \"YINC\" out of range.");
+      sprintf(str, "Error, parameter \"YINC\" out of range.  line %i file %s", __LINE__, __FILE__);
       goto OUT_ERROR;
     }
 
@@ -292,7 +293,7 @@ void UI_Mainwindow::save_memory_waveform()
 
     if((yref[chn] < 1) || (yref[chn] > 255))
     {
-      strcpy(str, "Error, parameter \"YREF\" out of range.");
+      sprintf(str, "Error, parameter \"YREF\" out of range.  line %i file %s", __LINE__, __FILE__);
       goto OUT_ERROR;
     }
 
@@ -304,13 +305,20 @@ void UI_Mainwindow::save_memory_waveform()
 
     if((yor[chn] < -255) || (yor[chn] > 255))
     {
-      strcpy(str, "Error, parameter \"YOR\" out of range.");
+      sprintf(str, "Error, parameter \"YOR\" out of range.  line %i file %s", __LINE__, __FILE__);
       goto OUT_ERROR;
     }
 
-    bytes_rcvd = 0;
+    if(devparms.modelserie != 1)
+    {
+//      tmcdev_write(device, ":WAV:RES");
 
-    for(j=0; ; j++)
+      tmcdev_write(device, ":WAV:BEG");
+    }
+
+    empty_buf = 0;
+
+    for(bytes_rcvd=0; bytes_rcvd<mempnts ;)
     {
       progress.setValue(bytes_rcvd);
 
@@ -322,17 +330,41 @@ void UI_Mainwindow::save_memory_waveform()
         goto OUT_ERROR;
       }
 
-      sprintf(str, ":WAV:STAR %i",  (j * SAV_MEM_BSZ) + 1);
-
-      tmcdev_write(device, str);
-
-      if(((j + 1) * SAV_MEM_BSZ) > mempnts)
+      if(devparms.modelserie == 6)
       {
-        sprintf(str, ":WAV:STOP %i", mempnts);
+//         tmcdev_write(device, ":WAV:STAT?");
+//
+//         tmcdev_read(device);
+//
+//         printf(":WAV:STAT?: %s\n", device->buf);
+
+        sprintf(str, ":WAV:STAR %i",  bytes_rcvd);
+
+        tmcdev_write(device, str);
+
+        if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
+        {
+          sprintf(str, ":WAV:STOP %i", mempnts - 1);
+        }
+        else
+        {
+          sprintf(str, ":WAV:STOP %i", bytes_rcvd + SAV_MEM_BSZ - 1);
+        }
       }
       else
       {
-        sprintf(str, ":WAV:STOP %i", (j + 1) * SAV_MEM_BSZ);
+        sprintf(str, ":WAV:STAR %i",  bytes_rcvd + 1);
+
+        tmcdev_write(device, str);
+
+        if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
+        {
+          sprintf(str, ":WAV:STOP %i", mempnts);
+        }
+        else
+        {
+          sprintf(str, ":WAV:STOP %i", bytes_rcvd + SAV_MEM_BSZ);
+        }
       }
 
       tmcdev_write(device, str);
@@ -343,7 +375,7 @@ void UI_Mainwindow::save_memory_waveform()
 
       if(n < 0)
       {
-        strcpy(str, "Can not read from device.");
+        sprintf(str, "Can not read from device.  line %i file %s", __LINE__, __FILE__);
         goto OUT_ERROR;
       }
 
@@ -351,26 +383,40 @@ void UI_Mainwindow::save_memory_waveform()
 
       if(n > SAV_MEM_BSZ)
       {
-        strcpy(str, "Datablock too big for buffer.");
+        sprintf(str, "Datablock too big for buffer.  line %i file %s", __LINE__, __FILE__);
         goto OUT_ERROR;
       }
 
       if(n < 1)
       {
-        break;
+        if(empty_buf++ > 5)
+        {
+          break;
+        }
       }
 
       bytes_rcvd += n;
 
       for(k=0; k<n; k++)
       {
-        wavbuf[chn][(j * SAV_MEM_BSZ) + k] = (int)(((unsigned char *)device->buf)[k]) - yref[chn];
+        wavbuf[chn][bytes_rcvd + k] = (int)(((unsigned char *)device->buf)[k]) - yref[chn];
       }
 
       if(bytes_rcvd >= mempnts)
       {
         break;
       }
+    }
+
+    if(devparms.modelserie != 1)
+    {
+      tmcdev_write(device, ":WAV:END");
+    }
+
+    if(bytes_rcvd < mempnts)
+    {
+      sprintf(str, "Download error.  line %i file %s", __LINE__, __FILE__);
+      goto OUT_ERROR;
     }
   }
 
@@ -393,7 +439,15 @@ void UI_Mainwindow::save_memory_waveform()
 
   scrn_timer->start(devparms.screen_timer_ival);
 
-  statusLabel->setText("Downloading finished");
+  if(bytes_rcvd < mempnts)
+  {
+    sprintf(str, "Download error.  line %i file %s", __LINE__, __FILE__);
+    goto OUT_ERROR;
+  }
+  else
+  {
+    statusLabel->setText("Downloading finished");
+  }
 
   opath[0] = 0;
   if(recent_savedir[0]!=0)

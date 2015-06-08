@@ -155,17 +155,24 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   drawTopLabels(painter);
 
-  tmp = 407 - ((devparms->timebaseoffset / ((double)devparms->timebasescale * (double)devparms->hordivisions)) * 233);
-
-  if(tmp < 291)
+  if((devparms->memdepth > 1000) && !devparms->timebasedelayenable)
   {
-    tmp = 286;
+    tmp = 405 - ((devparms->timebaseoffset / (devparms->memdepth / devparms->samplerate)) * 233);
+  }
+  else
+  {
+    tmp = 405 - ((devparms->timebaseoffset / ((double)devparms->timebasescale * (double)devparms->hordivisions)) * 233);
+  }
+
+  if(tmp < 289)
+  {
+    tmp = 284;
 
     rot = 2;
   }
-  else if(tmp > 523)
+  else if(tmp > 521)
     {
-      tmp = 528;
+      tmp = 526;
 
       rot = 0;
     }
@@ -644,6 +651,18 @@ void SignalCurve::drawTopLabels(QPainter *painter)
     dtmp1 = devparms->timebasedelayscale / devparms->timebasescale;
 
     dtmp2 = (devparms->timebaseoffset - devparms->timebasedelayoffset) / ((devparms->hordivisions / 2) * devparms->timebasescale);
+
+    painter->fillRect(288, 16, (116 - (dtmp1 * 116)) - (dtmp2 * 116), 8, QColor(64, 160, 255));
+
+    x1 = (116 - (dtmp1 * 116)) + (dtmp2 * 116);
+
+    painter->fillRect(288 + 233 - x1, 16, x1, 8, QColor(64, 160, 255));
+  }
+  else if(devparms->memdepth > 1000)
+  {
+    dtmp1 = (devparms->hordivisions * devparms->timebasescale) / (devparms->memdepth / devparms->samplerate);
+
+    dtmp2 = devparms->timebaseoffset / dtmp1;
 
     painter->fillRect(288, 16, (116 - (dtmp1 * 116)) - (dtmp2 * 116), 8, QColor(64, 160, 255));
 

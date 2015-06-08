@@ -16,7 +16,7 @@ Some settings are checked regularly and will always be synchronized:
 
 There are some peculiarities when testing with the DS6104 and the DS1054Z:
 
-DS6104:
+DS6104: (software version 00.01.04, hardware version 1.8)
 ======
 
 USB connection: full speed (12MBit)

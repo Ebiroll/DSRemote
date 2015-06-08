@@ -205,7 +205,7 @@ void UI_Mainwindow::acqButtonClicked()
   submenumemdepth.addAction("Auto",  this, SLOT(set_memdepth_auto()));
   if(devparms.modelserie == 6)
   {
-    if(chns_on < 2)
+    if(chns_on < 3)
     {
       submenumemdepth.addAction("14K",  this, SLOT(set_memdepth_14k()));
       submenumemdepth.addAction("140K", this, SLOT(set_memdepth_140k()));
