@@ -90,6 +90,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   helpmenu = new QMenu;
   helpmenu->setTitle("Help");
+  helpmenu->addAction("How to operate", this, SLOT(helpButtonClicked()));
   helpmenu->addAction("About", this, SLOT(show_about_dialog()));
   menubar->addMenu(helpmenu);
 

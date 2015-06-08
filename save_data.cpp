@@ -265,6 +265,8 @@ void UI_Mainwindow::save_memory_waveform()
       continue;
     }
 
+    printf("start channel x\n");
+
     sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
 
     tmcdev_write(device, str);
@@ -311,7 +313,11 @@ void UI_Mainwindow::save_memory_waveform()
 
     if(devparms.modelserie != 1)
     {
-//      tmcdev_write(device, ":WAV:RES");
+      sprintf(str, ":WAV:POIN %i", mempnts);
+
+      tmcdev_write(device, str);
+
+      tmcdev_write(device, ":WAV:RES");
 
       tmcdev_write(device, ":WAV:BEG");
     }
@@ -330,28 +336,7 @@ void UI_Mainwindow::save_memory_waveform()
         goto OUT_ERROR;
       }
 
-      if(devparms.modelserie == 6)
-      {
-//         tmcdev_write(device, ":WAV:STAT?");
-//
-//         tmcdev_read(device);
-//
-//         printf(":WAV:STAT?: %s\n", device->buf);
-
-        sprintf(str, ":WAV:STAR %i",  bytes_rcvd);
-
-        tmcdev_write(device, str);
-
-        if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
-        {
-          sprintf(str, ":WAV:STOP %i", mempnts - 1);
-        }
-        else
-        {
-          sprintf(str, ":WAV:STOP %i", bytes_rcvd + SAV_MEM_BSZ - 1);
-        }
-      }
-      else
+      if(devparms.modelserie == 1)
       {
         sprintf(str, ":WAV:STAR %i",  bytes_rcvd + 1);
 
@@ -365,9 +350,9 @@ void UI_Mainwindow::save_memory_waveform()
         {
           sprintf(str, ":WAV:STOP %i", bytes_rcvd + SAV_MEM_BSZ);
         }
-      }
 
-      tmcdev_write(device, str);
+        tmcdev_write(device, str);
+      }
 
       tmcdev_write(device, ":WAV:DATA?");
 
@@ -379,28 +364,48 @@ void UI_Mainwindow::save_memory_waveform()
         goto OUT_ERROR;
       }
 
-      printf("received %i bytes\n", n);
+      printf("received %i bytes, total %i bytes\n", n, n + bytes_rcvd);
 
-      if(n > SAV_MEM_BSZ)
+      if(devparms.modelserie == 1)
       {
-        sprintf(str, "Datablock too big for buffer.  line %i file %s", __LINE__, __FILE__);
-        goto OUT_ERROR;
+        if(n > SAV_MEM_BSZ)
+        {
+          sprintf(str, "Datablock too big for buffer.  line %i file %s", __LINE__, __FILE__);
+          goto OUT_ERROR;
+        }
+      }
+      else
+      {
+        if(n > mempnts)
+        {
+          sprintf(str, "Datablock too big for buffer.  line %i file %s", __LINE__, __FILE__);
+          goto OUT_ERROR;
+        }
       }
 
       if(n < 1)
       {
-        if(empty_buf++ > 5)
+        if(empty_buf++ > 100)
         {
           break;
         }
       }
-
-      bytes_rcvd += n;
+      else
+      {
+        empty_buf = 0;
+      }
 
       for(k=0; k<n; k++)
       {
+        if((bytes_rcvd + k) >= mempnts)
+        {
+          break;
+        }
+
         wavbuf[chn][bytes_rcvd + k] = (int)(((unsigned char *)device->buf)[k]) - yref[chn];
       }
+
+      bytes_rcvd += n;
 
       if(bytes_rcvd >= mempnts)
       {
@@ -422,17 +427,38 @@ void UI_Mainwindow::save_memory_waveform()
 
   progress.reset();
 
-  tmcdev_write(device, ":WAV:MODE NORM");
-
-  tmcdev_write(device, ":WAV:STAR 1");
-
-  if(devparms.modelserie == 1)
+  for(chn=0; chn<MAX_CHNS; chn++)
   {
-    tmcdev_write(device, ":WAV:STOP 1200");
-  }
-  else
-  {
-    tmcdev_write(device, ":WAV:STOP 1400");
+    if(!devparms.chandisplay[chn])
+    {
+      continue;
+    }
+
+    sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
+
+    tmcdev_write(device, str);
+
+    tmcdev_write(device, ":WAV:MODE NORM");
+
+    if(devparms.modelserie == 6)
+    {
+      tmcdev_write(device, ":WAV:STAR 0");
+    }
+    else
+    {
+      tmcdev_write(device, ":WAV:STAR 1");
+    }
+
+    if(devparms.modelserie == 1)
+    {
+      tmcdev_write(device, ":WAV:STOP 1200");
+    }
+    else
+    {
+      tmcdev_write(device, ":WAV:STOP 1400");
+
+      tmcdev_write(device, ":WAV:POIN 1400");
+    }
   }
 
   stat_timer->start(devparms.status_timer_ival);
@@ -546,20 +572,12 @@ OUT_ERROR:
 
   progress.reset();
 
-  tmcdev_write(device, ":WAV:MODE NORM");
-
-  tmcdev_write(device, ":WAV:STAR 1");
-
-  if(devparms.modelserie == 1)
-  {
-    tmcdev_write(device, ":WAV:STOP 1200");
-  }
-  else
-  {
-    tmcdev_write(device, ":WAV:STOP 1400");
-  }
-
   statusLabel->setText("Downloading aborted");
+
+  if(hdl >= 0)
+  {
+    edfclose_file(hdl);
+  }
 
   if(progress.wasCanceled() == false)
   {
@@ -569,9 +587,38 @@ OUT_ERROR:
     msgBox.exec();
   }
 
-  if(hdl >= 0)
+  for(chn=0; chn<MAX_CHNS; chn++)
   {
-    edfclose_file(hdl);
+    if(!devparms.chandisplay[chn])
+    {
+      continue;
+    }
+
+    sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
+
+    tmcdev_write(device, str);
+
+    tmcdev_write(device, ":WAV:MODE NORM");
+
+    if(devparms.modelserie == 6)
+    {
+      tmcdev_write(device, ":WAV:STAR 0");
+    }
+    else
+    {
+      tmcdev_write(device, ":WAV:STAR 1");
+    }
+
+    if(devparms.modelserie == 1)
+    {
+      tmcdev_write(device, ":WAV:STOP 1200");
+    }
+    else
+    {
+      tmcdev_write(device, ":WAV:STOP 1400");
+
+      tmcdev_write(device, ":WAV:POIN 1400");
+    }
   }
 
   for(chn=0; chn<MAX_CHNS; chn++)

@@ -182,7 +182,8 @@ void UI_Mainwindow::navDialReleased()
 void UI_Mainwindow::acqButtonClicked()
 {
   int chn,
-      chns_on=0;
+      chns_on=0,
+      dual=0;
 
   QMenu menu,
         submenuacquisition,
@@ -196,6 +197,11 @@ void UI_Mainwindow::acqButtonClicked()
     }
   }
 
+  if((devparms.chandisplay[0] && devparms.chandisplay[1]) || (devparms.chandisplay[2] && devparms.chandisplay[3]))
+  {
+    dual = 1;
+  }
+
   submenuacquisition.setTitle("Mode");
   submenuacquisition.addAction("Normal",  this, SLOT(set_acq_normal()));
   submenuacquisition.addAction("Average", this, SLOT(set_acq_average()));
@@ -205,7 +211,7 @@ void UI_Mainwindow::acqButtonClicked()
   submenumemdepth.addAction("Auto",  this, SLOT(set_memdepth_auto()));
   if(devparms.modelserie == 6)
   {
-    if(chns_on < 3)
+    if(!dual)
     {
       submenumemdepth.addAction("14K",  this, SLOT(set_memdepth_14k()));
       submenumemdepth.addAction("140K", this, SLOT(set_memdepth_140k()));
@@ -222,33 +228,66 @@ void UI_Mainwindow::acqButtonClicked()
       submenumemdepth.addAction("70M",  this, SLOT(set_memdepth_70m()));
     }
   }
-  else if(devparms.modelserie == 1)
+  else if((devparms.modelserie == 2) || (devparms.modelserie == 4))
     {
-    if(chns_on < 2)
-    {
-      submenumemdepth.addAction("12K",  this, SLOT(set_memdepth_12k()));
-      submenumemdepth.addAction("120K", this, SLOT(set_memdepth_120k()));
-      submenumemdepth.addAction("1.2M", this, SLOT(set_memdepth_1200k()));
-      submenumemdepth.addAction("12M",  this, SLOT(set_memdepth_12m()));
-      submenumemdepth.addAction("24M",  this, SLOT(set_memdepth_24m()));
-    }
-    else if(chns_on < 3)
+      if(chns_on < 2)
       {
-        submenumemdepth.addAction("6K",   this, SLOT(set_memdepth_6k()));
-        submenumemdepth.addAction("60K",  this, SLOT(set_memdepth_60k()));
-        submenumemdepth.addAction("600K", this, SLOT(set_memdepth_600k()));
-        submenumemdepth.addAction("6M",   this, SLOT(set_memdepth_6m()));
-        submenumemdepth.addAction("12M",  this, SLOT(set_memdepth_12m()));
+        submenumemdepth.addAction("14K",  this, SLOT(set_memdepth_14k()));
+        submenumemdepth.addAction("140K", this, SLOT(set_memdepth_140k()));
+        submenumemdepth.addAction("1.4M", this, SLOT(set_memdepth_1400k()));
+        submenumemdepth.addAction("14M",  this, SLOT(set_memdepth_14m()));
+        if(devparms.modelserie == 2)
+        {
+          submenumemdepth.addAction("56M", this, SLOT(set_memdepth_56m()));
+        }
+        else
+        {
+          submenumemdepth.addAction("140M", this, SLOT(set_memdepth_140m()));
+        }
       }
       else
       {
-        submenumemdepth.addAction("3K",   this, SLOT(set_memdepth_3k()));
-        submenumemdepth.addAction("30K",  this, SLOT(set_memdepth_30k()));
-        submenumemdepth.addAction("300K", this, SLOT(set_memdepth_300k()));
-        submenumemdepth.addAction("3M",   this, SLOT(set_memdepth_3m()));
-        submenumemdepth.addAction("6M",   this, SLOT(set_memdepth_6m()));
+        submenumemdepth.addAction("7K",   this, SLOT(set_memdepth_7k()));
+        submenumemdepth.addAction("70K",  this, SLOT(set_memdepth_70k()));
+        submenumemdepth.addAction("700K", this, SLOT(set_memdepth_700k()));
+        submenumemdepth.addAction("7M",   this, SLOT(set_memdepth_7m()));
+        if(devparms.modelserie == 2)
+        {
+          submenumemdepth.addAction("28M",  this, SLOT(set_memdepth_28m()));
+        }
+        else
+        {
+          submenumemdepth.addAction("70M",  this, SLOT(set_memdepth_70m()));
+        }
       }
     }
+    else if(devparms.modelserie == 1)
+      {
+      if(chns_on < 2)
+      {
+        submenumemdepth.addAction("12K",  this, SLOT(set_memdepth_12k()));
+        submenumemdepth.addAction("120K", this, SLOT(set_memdepth_120k()));
+        submenumemdepth.addAction("1.2M", this, SLOT(set_memdepth_1200k()));
+        submenumemdepth.addAction("12M",  this, SLOT(set_memdepth_12m()));
+        submenumemdepth.addAction("24M",  this, SLOT(set_memdepth_24m()));
+      }
+      else if(chns_on < 3)
+        {
+          submenumemdepth.addAction("6K",   this, SLOT(set_memdepth_6k()));
+          submenumemdepth.addAction("60K",  this, SLOT(set_memdepth_60k()));
+          submenumemdepth.addAction("600K", this, SLOT(set_memdepth_600k()));
+          submenumemdepth.addAction("6M",   this, SLOT(set_memdepth_6m()));
+          submenumemdepth.addAction("12M",  this, SLOT(set_memdepth_12m()));
+        }
+        else
+        {
+          submenumemdepth.addAction("3K",   this, SLOT(set_memdepth_3k()));
+          submenumemdepth.addAction("30K",  this, SLOT(set_memdepth_30k()));
+          submenumemdepth.addAction("300K", this, SLOT(set_memdepth_300k()));
+          submenumemdepth.addAction("3M",   this, SLOT(set_memdepth_3m()));
+          submenumemdepth.addAction("6M",   this, SLOT(set_memdepth_6m()));
+        }
+      }
   menu.addMenu(&submenumemdepth);
 
   menu.exec(acqButton->mapToGlobal(QPoint(0,0)));
@@ -444,6 +483,22 @@ void UI_Mainwindow::set_memdepth_140m()
   statusLabel->setText("Memory depth: 140M");
 
   tmcdev_write(device, ":ACQ:MDEP 140000000");
+}
+
+
+void UI_Mainwindow::set_memdepth_28m()
+{
+  statusLabel->setText("Memory depth: 28M");
+
+  tmcdev_write(device, ":ACQ:MDEP 28000000");
+}
+
+
+void UI_Mainwindow::set_memdepth_56m()
+{
+  statusLabel->setText("Memory depth: 56M");
+
+  tmcdev_write(device, ":ACQ:MDEP 56000000");
 }
 
 
@@ -708,6 +763,24 @@ void UI_Mainwindow::utilButtonClicked()
 
 void UI_Mainwindow::helpButtonClicked()
 {
+  show_howto_operate();
+}
+
+
+void UI_Mainwindow::show_howto_operate()
+{
+  QMessageBox msgBox;
+  msgBox.setText(
+    "Use the mousewheel to change the dials. In order to simulate a push on a dial,"
+    "click on it with the right mouse button.\n"
+    "To toggle the delayed timebase, right-click on the timebase dial.\n"
+    "To set the horizontal position to zero, right-click on the horizontal position dial.\n"
+    "To set the vertical offset to zero, right-click on the vertical position dial.\n\n"
+    "In addition of using the dials to change the scale and offset of the traces and the trigger position,"
+    "you can use the mouse to drag the colored arrows aside of the plot.\n"
+    );
+
+  msgBox.exec();
 }
 
 

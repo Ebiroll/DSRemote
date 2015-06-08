@@ -1861,4 +1861,3 @@ void UI_Mainwindow::get_device_model(const char *str)
 
 
 
-

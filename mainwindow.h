@@ -208,6 +208,7 @@ private slots:
   void test_timer_handler();
 
   void show_about_dialog();
+  void show_howto_operate();
   void open_connection();
   void close_connection();
   void open_settings_dialog();
@@ -338,6 +339,8 @@ private slots:
   void set_memdepth_1400k();
   void set_memdepth_14m();
   void set_memdepth_140m();
+  void set_memdepth_28m();
+  void set_memdepth_56m();
 
 protected:
   void closeEvent(QCloseEvent *);
