@@ -73,10 +73,6 @@ UI_Mainwindow::UI_Mainwindow()
 
   devparms.hordivisions = 14;
 
-  devparms.status_timer_ival = 500;
-
-  devparms.screen_timer_ival = 2000;
-
   menubar = menuBar();
 
   devicemenu = new QMenu;
@@ -349,14 +345,12 @@ UI_Mainwindow::UI_Mainwindow()
   navDialFunc = NAV_DIAL_FUNC_NONE;
 
   scrn_timer = new QTimer(this);
-  stat_timer = new QTimer(this);
   adjdial_timer = new QTimer(this);
   navDial_timer = new QTimer(this);
   navDial_timer->setSingleShot(true);
   test_timer = new QTimer(this);
 
   connect(scrn_timer,    SIGNAL(timeout()),        this, SLOT(scrn_timer_handler()));
-  connect(stat_timer,    SIGNAL(timeout()),        this, SLOT(stat_timer_handler()));
   connect(adjdial_timer, SIGNAL(timeout()),        this, SLOT(adjdial_timer_handler()));
   connect(navDial,       SIGNAL(sliderReleased()), this, SLOT(navDialReleased()));
   connect(navDial_timer, SIGNAL(timeout()),        this, SLOT(navDial_timer_handler()));

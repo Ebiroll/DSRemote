@@ -2126,8 +2126,6 @@ void UI_Mainwindow::horizontal_delayed_toggle()
   }
   else
   {
-    stat_timer->stop();
-
     scrn_timer->stop();
 
     devparms.timebasedelayenable = 1;
@@ -2148,9 +2146,7 @@ void UI_Mainwindow::horizontal_delayed_toggle()
 
     devparms.timebasedelayscale = atof(device->buf);
 
-    stat_timer->start(devparms.status_timer_ival);
-
-    scrn_timer->start(devparms.screen_timer_ival);
+    scrn_timer->start(SCREEN_TIMER_IVAL);
   }
 }
 

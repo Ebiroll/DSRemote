@@ -110,6 +110,8 @@ public:
   int adjDialFunc,
       navDialFunc;
 
+  QTimer       *scrn_timer;
+
 private:
 
   QMenuBar     *menubar;
@@ -117,9 +119,7 @@ private:
   QMenu        *devicemenu,
                *helpmenu;
 
-  QTimer       *scrn_timer,
-               *stat_timer,
-               *adjdial_timer,
+  QTimer       *adjdial_timer,
                *navDial_timer,
                *test_timer;
 

@@ -243,6 +243,8 @@ void UI_Mainwindow::scrn_timer_handler()
     return;
   }
 
+  stat_timer_handler();
+
   for(i=0; i<MAX_CHNS; i++)
   {
     if(!devparms.chandisplay[i])  // Download data only when channel is switched on

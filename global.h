@@ -37,6 +37,8 @@
 
 #define MAX_CHNS                  4
 
+#define SCREEN_TIMER_IVAL        50
+
 #define ADJDIAL_TIMER_IVAL     3000
 
 #define SCRN_SHOT_BMP_SZ    1152054
@@ -128,9 +130,7 @@ struct device_settings
 
   char *screenshot_buf;
   short *wavebuf[MAX_CHNS];
-
-  int status_timer_ival;        // in milli-Sec.
-  int screen_timer_ival;        // in milli-Sec.
+  int wavebufsz;
 
   struct waveform_preamble preamble;
 };

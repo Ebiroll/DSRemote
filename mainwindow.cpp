@@ -208,19 +208,6 @@ void UI_Mainwindow::open_connection()
     ch2Button->setVisible(false);
   }
 
-  if(devparms.modelserie == 6)
-  {
-    devparms.status_timer_ival = 100;
-
-    devparms.screen_timer_ival = 50;
-  }
-  else
-  {
-    devparms.status_timer_ival = 500;
-
-    devparms.screen_timer_ival = 2000;
-  }
-
   connect(adjDial,          SIGNAL(valueChanged(int)), this, SLOT(adjDialChanged(int)));
   connect(trigAdjustDial,   SIGNAL(valueChanged(int)), this, SLOT(trigAdjustDialChanged(int)));
   connect(horScaleDial,     SIGNAL(valueChanged(int)), this, SLOT(horScaleDialChanged(int)));
@@ -270,13 +257,11 @@ void UI_Mainwindow::open_connection()
 
   devparms.connected = 1;
 
-  stat_timer->start(devparms.status_timer_ival);
-
 //  test_timer->start(2000);
 
   DPRwidget->setEnabled(true);
 
-  scrn_timer->start(devparms.screen_timer_ival);
+  scrn_timer->start(SCREEN_TIMER_IVAL);
 
   return;
 
@@ -303,8 +288,6 @@ void UI_Mainwindow::close_connection()
 
   scrn_timer->stop();
 
-  stat_timer->stop();
-
   adjdial_timer->stop();
 
   setWindowTitle(PROGRAM_NAME " " PROGRAM_VERSION);
@@ -315,7 +298,7 @@ void UI_Mainwindow::close_connection()
   disconnect(horPosDial,      SIGNAL(valueChanged(int)), this, SLOT(horPosDialChanged(int)));
   disconnect(vertOffsetDial,  SIGNAL(valueChanged(int)), this, SLOT(vertOffsetDialChanged(int)));
   disconnect(vertScaleDial,   SIGNAL(valueChanged(int)), this, SLOT(vertScaleDialChanged(int)));
-  disconnect(navDial,          SIGNAL(valueChanged(int)), this, SLOT(navDialChanged(int)));
+  disconnect(navDial,         SIGNAL(valueChanged(int)), this, SLOT(navDialChanged(int)));
 
   disconnect(ch1Button,        SIGNAL(clicked()),     this, SLOT(ch1ButtonClicked()));
   disconnect(ch2Button,        SIGNAL(clicked()),     this, SLOT(ch2ButtonClicked()));
@@ -366,8 +349,6 @@ void UI_Mainwindow::closeEvent(QCloseEvent *cl_event)
   test_timer->stop();
 
   scrn_timer->stop();
-
-  stat_timer->stop();
 
   adjdial_timer->stop();
 

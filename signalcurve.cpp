@@ -1246,6 +1246,11 @@ void SignalCurve::mousePressEvent(QMouseEvent *press_event)
         }
       }
   }
+
+  if(use_move_events)
+  {
+    mainwindow->scrn_timer->stop();
+  }
 }
 
 
@@ -1267,6 +1272,8 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
   {
     return;
   }
+
+  mainwindow->scrn_timer->start(SCREEN_TIMER_IVAL);
 
   if(trig_pos_arrow_moving)
   {
@@ -1449,6 +1456,8 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
   trig_pos_arrow_moving = 0;
   use_move_events = 0;
   setMouseTracking(false);
+
+  update();
 }
 
 

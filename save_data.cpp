@@ -46,8 +46,6 @@ void UI_Mainwindow::save_screenshot()
     return;
   }
 
-  stat_timer->stop();
-
   scrn_timer->stop();
 
   tmcdev_write(device, ":DISP:DATA?");
@@ -123,9 +121,7 @@ void UI_Mainwindow::save_screenshot()
 
   if(!strcmp(opath, ""))
   {
-    stat_timer->start(devparms.status_timer_ival);
-
-    scrn_timer->start(devparms.screen_timer_ival);
+    scrn_timer->start(SCREEN_TIMER_IVAL);
 
     return;
   }
@@ -138,17 +134,13 @@ void UI_Mainwindow::save_screenshot()
     goto OUT_ERROR;
   }
 
-  stat_timer->start(devparms.status_timer_ival);
-
-  scrn_timer->start(devparms.screen_timer_ival);
+  scrn_timer->start(SCREEN_TIMER_IVAL);
 
   return;
 
 OUT_ERROR:
 
-  stat_timer->start(devparms.status_timer_ival);
-
-  scrn_timer->start(devparms.screen_timer_ival);
+  scrn_timer->start(SCREEN_TIMER_IVAL);
 
   QMessageBox msgBox;
   msgBox.setIcon(QMessageBox::Critical);
@@ -253,8 +245,6 @@ void UI_Mainwindow::save_memory_waveform()
   }
 
   scrn_timer->stop();
-
-  stat_timer->stop();
 
   tmcdev_write(device, ":STOP");
 
@@ -461,9 +451,7 @@ void UI_Mainwindow::save_memory_waveform()
     }
   }
 
-  stat_timer->start(devparms.status_timer_ival);
-
-  scrn_timer->start(devparms.screen_timer_ival);
+  scrn_timer->start(SCREEN_TIMER_IVAL);
 
   if(bytes_rcvd < mempnts)
   {
@@ -626,9 +614,7 @@ OUT_ERROR:
     free(wavbuf[chn]);
   }
 
-  stat_timer->start(devparms.status_timer_ival);
-
-  scrn_timer->start(devparms.screen_timer_ival);
+  scrn_timer->start(SCREEN_TIMER_IVAL);
 }
 
 
@@ -691,8 +677,6 @@ void UI_Mainwindow::save_screen_waveform()
   wavbuf[1] = NULL;
   wavbuf[2] = NULL;
   wavbuf[3] = NULL;
-
-  stat_timer->stop();
 
   scrn_timer->stop();
 
@@ -889,9 +873,7 @@ OUT_NORMAL:
     free(wavbuf[i]);
   }
 
-  stat_timer->start(devparms.status_timer_ival);
-
-  scrn_timer->start(devparms.screen_timer_ival);
+  scrn_timer->start(SCREEN_TIMER_IVAL);
 
   return;
 
@@ -912,9 +894,7 @@ OUT_ERROR:
     free(wavbuf[i]);
   }
 
-  stat_timer->start(devparms.status_timer_ival);
-
-  scrn_timer->start(devparms.screen_timer_ival);
+  scrn_timer->start(SCREEN_TIMER_IVAL);
 }
 
 
