@@ -32,9 +32,9 @@ void UI_Mainwindow::navDialChanged(int npos)
 {
   int mpr = 1;
 
-  char str[512];
-
   double val, lefttime, righttime, delayrange;
+
+  scrn_timer->stop();
 
   if(navDial->isSliderDown() == true)
   {
@@ -108,7 +108,7 @@ void UI_Mainwindow::navDialChanged(int npos)
 
   if(navDialFunc == NAV_DIAL_FUNC_HOLDOFF)
   {
-    adjdial_timer->start(ADJDIAL_TIMER_IVAL);
+    adjdial_timer->start(ADJDIAL_TIMER_IVAL_2);
 
     val = get_stepsize_divide_by_1000(devparms.triggerholdoff);
 
@@ -123,18 +123,6 @@ void UI_Mainwindow::navDialChanged(int npos)
     {
       devparms.triggerholdoff = 10;
     }
-
-    strcpy(str, "Trigger holdoff: ");
-
-    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2);
-
-    strcat(str, "s");
-
-    statusLabel->setText(str);
-
-//     sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
-//
-//     tmcdev_write(device, str);
   }
   else if(devparms.timebasedelayenable)
     {
@@ -169,19 +157,9 @@ void UI_Mainwindow::navDialChanged(int npos)
       {
         devparms.timebasedelayoffset = (righttime - delayrange);
       }
-
-      strcpy(str, "Delayed timebase position: ");
-
-      convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
-
-      strcat(str, "s");
-
-      statusLabel->setText(str);
-
-//       sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
-//
-//       tmcdev_write(device, str);
     }
+
+    waveForm->update();
 }
 
 
@@ -193,18 +171,39 @@ void UI_Mainwindow::navDialReleased()
 
   if(navDialFunc == NAV_DIAL_FUNC_HOLDOFF)
   {
+    strcpy(str, "Trigger holdoff: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
     sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
 
     tmcdev_write(device, str);
   }
   else if(devparms.timebasedelayenable)
     {
+      strcpy(str, "Delayed timebase position: ");
+
+      convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+
+      strcat(str, "s");
+
+      statusLabel->setText(str);
+
       sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
       tmcdev_write(device, str);
     }
 
-  adjDialFunc = NAV_DIAL_FUNC_NONE;
+  adjDialFunc = ADJ_DIAL_FUNC_NONE;
+
+  if(devparms.screenupdates_on == 1)
+  {
+    scrn_timer->start(SCREEN_TIMER_IVAL);
+  }
 }
 
 
@@ -554,7 +553,7 @@ void UI_Mainwindow::set_acq_average()
 
   adjDialLabel->setStyleSheet("background: #66FF99; font: 7pt;");
 
-  adjdial_timer->start(ADJDIAL_TIMER_IVAL);
+  adjdial_timer->start(ADJDIAL_TIMER_IVAL_1);
 
   if(devparms.acquiretype == 1)
   {
@@ -825,12 +824,14 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
 
   int diff, dir;
 
-  char str[512];
-
   if(adjDialFunc == ADJ_DIAL_FUNC_NONE)
   {
     return;
   }
+
+  scrn_timer->stop();
+
+  adjdial_timer->start(ADJDIAL_TIMER_IVAL_2);
 
   diff = new_pos - old_pos;
 
@@ -869,8 +870,6 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
 
   if(adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF)
   {
-    adjdial_timer->start(ADJDIAL_TIMER_IVAL);
-
     if(!dir)
     {
       if(devparms.triggerholdoff >= 10)
@@ -897,23 +896,9 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
 
       devparms.triggerholdoff -= get_stepsize_divide_by_1000(devparms.triggerholdoff);
     }
-
-    strcpy(str, "Trigger holdoff: ");
-
-    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2);
-
-    strcat(str, "s");
-
-    statusLabel->setText(str);
-
-    sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
-
-    tmcdev_write(device, str);
   }
   else if(adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
     {
-      adjdial_timer->start(ADJDIAL_TIMER_IVAL);
-
       if(!dir)
       {
         if(devparms.acquireaverages >= 8192)
@@ -940,17 +925,11 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
 
         devparms.acquireaverages /= 2;
       }
-
-      sprintf(str, "Acquire averages: %i", devparms.acquireaverages);
-
-      statusLabel->setText(str);
-
-      sprintf(str, ":ACQ:AVER %i", devparms.acquireaverages);
-
-      tmcdev_write(device, str);
     }
 
   old_pos = new_pos;
+
+  waveForm->update();
 }
 
 
@@ -2498,7 +2477,7 @@ void UI_Mainwindow::trigger_setting_holdoff()
 
   adjDialLabel->setStyleSheet("background: #66FF99; font: 7pt;");
 
-  adjdial_timer->start(ADJDIAL_TIMER_IVAL);
+  adjdial_timer->start(ADJDIAL_TIMER_IVAL_1);
 }
 
 

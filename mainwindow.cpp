@@ -261,6 +261,8 @@ void UI_Mainwindow::open_connection()
 
   DPRwidget->setEnabled(true);
 
+  devparms.screenupdates_on = 1;
+
   scrn_timer->start(SCREEN_TIMER_IVAL);
 
   return;
@@ -289,6 +291,8 @@ void UI_Mainwindow::close_connection()
   scrn_timer->stop();
 
   adjdial_timer->stop();
+
+  devparms.screenupdates_on = 0;
 
   setWindowTitle(PROGRAM_NAME " " PROGRAM_VERSION);
 
@@ -349,6 +353,8 @@ void UI_Mainwindow::closeEvent(QCloseEvent *cl_event)
   test_timer->stop();
 
   scrn_timer->stop();
+
+  devparms.screenupdates_on = 0;
 
   adjdial_timer->stop();
 

@@ -39,7 +39,8 @@
 
 #define SCREEN_TIMER_IVAL        50
 
-#define ADJDIAL_TIMER_IVAL     3000
+#define ADJDIAL_TIMER_IVAL_1   3000
+#define ADJDIAL_TIMER_IVAL_2   1000
 
 #define SCRN_SHOT_BMP_SZ    1152054
 
@@ -131,6 +132,8 @@ struct device_settings
   char *screenshot_buf;
   short *wavebuf[MAX_CHNS];
   int wavebufsz;
+
+  int screenupdates_on;
 
   struct waveform_preamble preamble;
 };

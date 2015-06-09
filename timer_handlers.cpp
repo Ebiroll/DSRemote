@@ -47,12 +47,24 @@ void UI_Mainwindow::navDial_timer_handler()
     navDial->setSliderPosition(50);
 
     navDialFunc = NAV_DIAL_FUNC_NONE;
+
+    if(adjdial_timer->isActive() == false)
+    {
+      adjDialFunc = ADJ_DIAL_FUNC_NONE;
+    }
+
+    if(devparms.screenupdates_on == 1)
+    {
+      scrn_timer->start(SCREEN_TIMER_IVAL);
+    }
   }
 }
 
 
 void UI_Mainwindow::adjdial_timer_handler()
 {
+  char str[512];
+
   adjdial_timer->stop();
 
   adjDialLabel->setStyleSheet(def_stylesh);
@@ -61,7 +73,42 @@ void UI_Mainwindow::adjdial_timer_handler()
 
   adjDialLabel->setText("");
 
-  adjDialFunc = NAV_DIAL_FUNC_NONE;
+  if(adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF)
+  {
+    strcpy(str, "Trigger holdoff: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
+
+    tmcdev_write(device, str);
+  }
+  else if(adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
+    {
+      sprintf(str, "Acquire averages: %i", devparms.acquireaverages);
+
+      statusLabel->setText(str);
+
+      sprintf(str, ":ACQ:AVER %i", devparms.acquireaverages);
+
+      tmcdev_write(device, str);
+    }
+
+  adjDialFunc = ADJ_DIAL_FUNC_NONE;
+
+  if(navDial_timer->isActive() == false)
+  {
+    navDialFunc = NAV_DIAL_FUNC_NONE;
+  }
+
+  if(devparms.screenupdates_on == 1)
+  {
+    scrn_timer->start(SCREEN_TIMER_IVAL);
+  }
 }
 
 
@@ -346,6 +393,8 @@ void UI_Mainwindow::scrn_timer_handler()
       devparms.wavebuf[i][j] = (int)(((unsigned char *)device->buf)[j]) - 127;
     }
   }
+
+  devparms.wavebufsz = n;
 
   waveForm->drawCurve(&devparms, device, n);
 

@@ -468,7 +468,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   char str[128];
 
-  if((mainwindow->adjDialFunc == NAV_DIAL_FUNC_HOLDOFF) || (mainwindow->navDialFunc == NAV_DIAL_FUNC_HOLDOFF))
+  if((mainwindow->adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF) || (mainwindow->navDialFunc == NAV_DIAL_FUNC_HOLDOFF))
   {
     convert_to_metric_suffix(str, devparms->triggerholdoff, 2);
 
@@ -1273,7 +1273,10 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
     return;
   }
 
-  mainwindow->scrn_timer->start(SCREEN_TIMER_IVAL);
+  if(devparms->screenupdates_on == 1)
+  {
+    mainwindow->scrn_timer->start(SCREEN_TIMER_IVAL);
+  }
 
   if(trig_pos_arrow_moving)
   {
