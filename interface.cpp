@@ -2495,6 +2495,8 @@ void UI_Mainwindow::trig50pctButtonClicked()
 
   tmcdev_write(device, ":TLHA");
 
+  usleep(30000);
+
   tmcdev_write(device, ":TRIG:EDG:LEV?");
 
   tmcdev_read(device);
