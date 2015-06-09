@@ -16,6 +16,7 @@ Some settings are checked regularly and will always be synchronized:
 
 There are some peculiarities when testing with the DS6104 and the DS1054Z:
 
+
 DS6104: (software version 00.01.04, hardware version 1.8)
 ======
 
@@ -24,14 +25,15 @@ Reading screen data is pretty fast, 20 waveforms per second is easily possible.
 Reading a screenshot in BMP format is slow, approx. 3 seconds.
 Needs a usbtmc driver patch, needs to add an udev rule.
 
+
 DS1054Z: (softversion 00.04.02.SP4, boardversion 0.1.1)
 =======
 
 USB connection: high speed (480 Mbit)
 Reading screen data is slow, maximum 7 waveforms per second with one channel.
-With all channels switched on, screen updates are very slow.
+With all four channels active, downloading the screen waveform data is really slow.
 Reading a screenshot in BMP format is faster, less than one second.
-No need to patch the usbtmc driver, no need to add an udev rule. It's plug and play.
+It's plug and play. No need to patch the usbtmc driver, no need to add an udev rule.
 
 
 
