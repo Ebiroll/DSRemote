@@ -311,12 +311,14 @@ void UI_Mainwindow::scrn_timer_handler()
 
 //struct waveform_preamble wfp;
 
-  for(i=0; i<MAX_CHNS; i++)
+  if(devparms.triggerstatus != 1)  // Don't download waveform data when triggerstatus is "wait"
   {
-    if(!devparms.chandisplay[i])  // Download data only when channel is switched on
+    for(i=0; i<MAX_CHNS; i++)
     {
-      continue;
-    }
+      if(!devparms.chandisplay[i])  // Download data only when channel is switched on
+      {
+        continue;
+      }
 
 ///////////////////////////////////////////////////////////
 
@@ -359,38 +361,39 @@ void UI_Mainwindow::scrn_timer_handler()
 
 ///////////////////////////////////////////////////////////
 
-    sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
+      sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
 
-    tmcdev_write(device, str);
+      tmcdev_write(device, str);
 
-    tmcdev_write(device, ":WAV:FORM BYTE");
+      tmcdev_write(device, ":WAV:FORM BYTE");
 
-    tmcdev_write(device, ":WAV:MODE NORM");
+      tmcdev_write(device, ":WAV:MODE NORM");
 
-    tmcdev_write(device, ":WAV:DATA?");
+      tmcdev_write(device, ":WAV:DATA?");
 
-    n = tmcdev_read(device);
+      n = tmcdev_read(device);
 
-    if(n < 0)
-    {
-      printf("Can not read from device.\n");
-      return;
-    }
+      if(n < 0)
+      {
+        printf("Can not read from device.\n");
+        return;
+      }
 
-    if(n > WAVFRM_MAX_BUFSZ)
-    {
-      strcpy(str, "Datablock too big for buffer.");
-      goto OUT_ERROR;
-    }
+      if(n > WAVFRM_MAX_BUFSZ)
+      {
+        strcpy(str, "Datablock too big for buffer.");
+        goto OUT_ERROR;
+      }
 
-    if(n < 16)
-    {
-      return;
-    }
+      if(n < 32)
+      {
+        n = 0;
+      }
 
-    for(j=0; j<n; j++)
-    {
-      devparms.wavebuf[i][j] = (int)(((unsigned char *)device->buf)[j]) - 127;
+      for(j=0; j<n; j++)
+      {
+        devparms.wavebuf[i][j] = (int)(((unsigned char *)device->buf)[j]) - 127;
+      }
     }
   }
 

@@ -341,50 +341,51 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
 /////////////////////////////////// draw the curve ///////////////////////////////////////////
 
-  if(bufsize < 2)  return;
-
-  painter->setClipping(true);
-  painter->setClipRegion(QRegion(0, 0, curve_w, curve_h), Qt::ReplaceClip);
-
-  h_step = (double)curve_w / (double)bufsize;
-
-  for(chn=0; chn<devparms->channel_cnt; chn++)
+  if(bufsize > 32)
   {
-    if(!devparms->chandisplay[chn])
-    {
-      continue;
-    }
+    painter->setClipping(true);
+    painter->setClipRegion(QRegion(0, 0, curve_w, curve_h), Qt::ReplaceClip);
 
-    painter->setPen(QPen(QBrush(SignalColor[chn], Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+    h_step = (double)curve_w / (double)bufsize;
 
-    for(i=0; i<bufsize; i++)
+    for(chn=0; chn<devparms->channel_cnt; chn++)
     {
-      if(bufsize < (curve_w / 2))
+      if(!devparms->chandisplay[chn])
       {
-        painter->drawLine(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2), (i + 1) * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
-        if(i)
-        {
-          painter->drawLine(i * h_step, (devparms->wavebuf[chn][i - 1] * v_sense) + (curve_h / 2), i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
-        }
+        continue;
       }
-      else
+
+      painter->setPen(QPen(QBrush(SignalColor[chn], Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+
+      for(i=0; i<bufsize; i++)
       {
-        if(i < (bufsize - 1))
+        if(bufsize < (curve_w / 2))
         {
-          if(devparms->displaytype)
+          painter->drawLine(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2), (i + 1) * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
+          if(i)
           {
-            painter->drawPoint(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
-          }
-          else
-          {
-            painter->drawLine(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2), (i + 1) * h_step, (devparms->wavebuf[chn][i + 1] * v_sense) + (curve_h / 2));
+            painter->drawLine(i * h_step, (devparms->wavebuf[chn][i - 1] * v_sense) + (curve_h / 2), i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
           }
         }
+        else
+        {
+          if(i < (bufsize - 1))
+          {
+            if(devparms->displaytype)
+            {
+              painter->drawPoint(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
+            }
+            else
+            {
+              painter->drawLine(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2), (i + 1) * h_step, (devparms->wavebuf[chn][i + 1] * v_sense) + (curve_h / 2));
+            }
+          }
+        }
       }
     }
+
+    painter->setClipping(false);
   }
-
-  painter->setClipping(false);
 
 /////////////////////////////////// draw the trigger arrows ///////////////////////////////////////////
 
