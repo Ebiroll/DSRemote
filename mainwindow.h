@@ -110,7 +110,8 @@ public:
   int adjDialFunc,
       navDialFunc;
 
-  QTimer       *scrn_timer;
+  QTimer       *scrn_timer,
+               *label_timer;
 
 private:
 
@@ -205,6 +206,7 @@ private slots:
   void scrn_timer_handler();
   void stat_timer_handler();
   void adjdial_timer_handler();
+  void label_timer_handler();
   void test_timer_handler();
 
   void show_about_dialog();

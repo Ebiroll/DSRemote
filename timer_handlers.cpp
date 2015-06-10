@@ -36,6 +36,12 @@ void UI_Mainwindow::test_timer_handler()
 }
 
 
+void UI_Mainwindow::label_timer_handler()
+{
+  waveForm->label_active = LABEL_ACTIVE_NONE;
+}
+
+
 void UI_Mainwindow::navDial_timer_handler()
 {
   if(navDial->isSliderDown() == true)

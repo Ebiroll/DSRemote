@@ -31,7 +31,7 @@
 
 
 #define PROGRAM_NAME     "DSRemote"
-#define PROGRAM_VERSION       "0.1"
+#define PROGRAM_VERSION       "0.11"
 
 #define MAX_PATHLEN            4096
 
@@ -52,6 +52,15 @@
 
 #define NAV_DIAL_FUNC_NONE        0
 #define NAV_DIAL_FUNC_HOLDOFF     1
+
+#define LABEL_TIMER_IVAL       1000
+
+#define LABEL_ACTIVE_NONE         0
+#define LABEL_ACTIVE_CHAN1        1
+#define LABEL_ACTIVE_CHAN2        2
+#define LABEL_ACTIVE_CHAN3        3
+#define LABEL_ACTIVE_CHAN4        4
+#define LABEL_ACTIVE_TRIG         5
 
 
 

@@ -68,6 +68,8 @@ public:
   QSize sizeHint() const {return minimumSizeHint(); }
   QSize minimumSizeHint() const {return QSize(30,10); }
 
+  int label_active;
+
   void setSignalColor1(QColor);
   void setSignalColor2(QColor);
   void setSignalColor3(QColor);
@@ -141,7 +143,7 @@ private:
   void drawTrigCenterArrow(QPainter *, int, int);
   void drawChanLabel(QPainter *, int, int, int);
   void drawTopLabels(QPainter *);
-  void paintLabel(QPainter *, int, int, int, int, const char *);
+  void paintLabel(QPainter *, int, int, int, int, const char *, QColor);
   void paintCounterLabel(QPainter *, int, int);
 
   struct device_settings *devparms;

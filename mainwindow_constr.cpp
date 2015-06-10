@@ -348,12 +348,14 @@ UI_Mainwindow::UI_Mainwindow()
   adjdial_timer = new QTimer(this);
   navDial_timer = new QTimer(this);
   navDial_timer->setSingleShot(true);
+  label_timer = new QTimer(this);
   test_timer = new QTimer(this);
 
   connect(scrn_timer,    SIGNAL(timeout()),        this, SLOT(scrn_timer_handler()));
   connect(adjdial_timer, SIGNAL(timeout()),        this, SLOT(adjdial_timer_handler()));
   connect(navDial,       SIGNAL(sliderReleased()), this, SLOT(navDialReleased()));
   connect(navDial_timer, SIGNAL(timeout()),        this, SLOT(navDial_timer_handler()));
+  connect(label_timer,   SIGNAL(timeout()),        this, SLOT(label_timer_handler()));
   connect(test_timer,    SIGNAL(timeout()),        this, SLOT(test_timer_handler()));
 
 ///// TEST /////////////////////////////////////

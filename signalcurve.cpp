@@ -65,6 +65,8 @@ SignalCurve::SignalCurve(QWidget *w_parent) : QWidget(w_parent)
   mouse_old_x = 0;
   mouse_old_y = 0;
 
+  label_active = LABEL_ACTIVE_NONE;
+
   for(i=0; i<MAX_CHNS; i++)
   {
     chan_arrow_moving[i] = 0;
@@ -135,6 +137,8 @@ void SignalCurve::paintEvent(QPaintEvent *)
 void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 {
   int i, chn, tmp, rot=1, small_rulers;
+
+  char str[256];
 
   double h_step=0.0,
          step,
@@ -467,22 +471,61 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     paintCounterLabel(painter, curve_w - 150, 6);
   }
 
-  char str[128];
-
   if((mainwindow->adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF) || (mainwindow->navDialFunc == NAV_DIAL_FUNC_HOLDOFF))
   {
     convert_to_metric_suffix(str, devparms->triggerholdoff, 2);
 
     strcat(str, "S");
 
-    paintLabel(painter, curve_w - 110, 5, 100, 20, str);
+    paintLabel(painter, curve_w - 110, 5, 100, 20, str, Qt::white);
   }
   else if(mainwindow->adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
     {
       sprintf(str, "%i", devparms->acquireaverages);
 
-      paintLabel(painter, curve_w - 110, 5, 100, 20, str);
+      paintLabel(painter, curve_w - 110, 5, 100, 20, str, Qt::white);
     }
+
+  if(label_active == LABEL_ACTIVE_TRIG)
+  {
+    convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource], 2);
+
+    strcat(str, "V");
+
+    paintLabel(painter, curve_w - 120, curve_h - 50, 100, 20, str, QColor(255, 128, 0));
+  }
+  else if(label_active == LABEL_ACTIVE_CHAN1)
+    {
+      convert_to_metric_suffix(str, devparms->chanoffset[0], 2);
+
+      strcat(str, "V");
+
+      paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[0]);
+    }
+    else if(label_active == LABEL_ACTIVE_CHAN2)
+      {
+        convert_to_metric_suffix(str, devparms->chanoffset[1], 2);
+
+        strcat(str, "V");
+
+        paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[1]);
+      }
+      else if(label_active == LABEL_ACTIVE_CHAN3)
+        {
+          convert_to_metric_suffix(str, devparms->chanoffset[2], 2);
+
+          strcat(str, "V");
+
+          paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[2]);
+        }
+        else if(label_active == LABEL_ACTIVE_CHAN4)
+          {
+            convert_to_metric_suffix(str, devparms->chanoffset[3], 2);
+
+            strcat(str, "V");
+
+            paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[3]);
+          }
 
 //   clk_end = clock();
 //
@@ -1469,6 +1512,8 @@ void SignalCurve::mouseMoveEvent(QMouseEvent *move_event)
 {
   int chn;
 
+  double dtmp;
+
   if(!use_move_events)
   {
     return;
@@ -1509,6 +1554,17 @@ void SignalCurve::mouseMoveEvent(QMouseEvent *move_event)
       {
         trig_level_arrow_pos = h;
       }
+
+      devparms->triggeredgelevel[devparms->triggeredgesource] = (((h / 2) - trig_level_arrow_pos) * ((devparms->chanscale[devparms->triggeredgesource] * 8) / h))
+                                                                - devparms->chanoffset[devparms->triggeredgesource];
+
+      dtmp = devparms->triggeredgelevel[devparms->triggeredgesource] / (devparms->chanscale[devparms->triggeredgesource] / 50);
+
+      devparms->triggeredgelevel[devparms->triggeredgesource] = (devparms->chanscale[devparms->triggeredgesource] / 50) * dtmp;
+
+      label_active = LABEL_ACTIVE_TRIG;
+
+      mainwindow->label_timer->start(LABEL_TIMER_IVAL);
     }
     else
     {
@@ -1532,6 +1588,16 @@ void SignalCurve::mouseMoveEvent(QMouseEvent *move_event)
           {
             chan_arrow_pos[chn] = h;
           }
+
+          devparms->chanoffset[chn] = ((h / 2) - chan_arrow_pos[chn]) * ((devparms->chanscale[chn] * 8) / h);
+
+          dtmp = devparms->chanoffset[chn] / (devparms->chanscale[chn] / 50);
+
+          devparms->chanoffset[chn] = (devparms->chanscale[chn] / 50) * dtmp;
+
+          label_active = chn + 1;
+
+          mainwindow->label_timer->start(LABEL_TIMER_IVAL);
 
           break;
         }
@@ -1576,7 +1642,7 @@ void SignalCurve::trig_stat_timer_handler()
 }
 
 
-void SignalCurve::paintLabel(QPainter *painter, int xpos, int ypos, int xw, int yh, const char *str)
+void SignalCurve::paintLabel(QPainter *painter, int xpos, int ypos, int xw, int yh, const char *str, QColor color)
 {
   QPainterPath path;
 
@@ -1584,7 +1650,7 @@ void SignalCurve::paintLabel(QPainter *painter, int xpos, int ypos, int xw, int 
 
   painter->fillPath(path, Qt::black);
 
-  painter->setPen(Qt::white);
+  painter->setPen(color);
 
   painter->drawRoundedRect(xpos, ypos, xw, yh, 3, 3);
 
