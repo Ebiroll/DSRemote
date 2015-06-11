@@ -316,6 +316,8 @@ private slots:
 
   void set_acq_normal();
   void set_acq_average();
+  void set_acq_peak();
+  void set_acq_hres();
 
   void set_memdepth_auto();
   void set_memdepth_12k();

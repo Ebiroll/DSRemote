@@ -92,6 +92,13 @@ void UI_Mainwindow::adjdial_timer_handler()
     sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
 
     tmcdev_write(device, str);
+
+    if(devparms.modelserie == 6)
+    {
+      usleep(20000);
+
+      tmcdev_write(device, ":CLE");
+    }
   }
   else if(adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
     {

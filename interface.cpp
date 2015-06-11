@@ -204,6 +204,764 @@ void UI_Mainwindow::navDialReleased()
   {
     scrn_timer->start(SCREEN_TIMER_IVAL);
   }
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::adjDialChanged(int new_pos)
+{
+  static int old_pos=0;
+
+  int diff, dir;
+
+  if(adjDialFunc == ADJ_DIAL_FUNC_NONE)
+  {
+    return;
+  }
+
+  scrn_timer->stop();
+
+  adjdial_timer->start(ADJDIAL_TIMER_IVAL_2);
+
+  diff = new_pos - old_pos;
+
+  if(diff < 0)
+  {
+    diff *= -1;
+  }
+
+  if(diff < 6)
+  {
+    return;
+  }
+
+  if(new_pos > old_pos)
+  {
+    if(diff < 12)
+    {
+      dir = 0;
+    }
+    else
+    {
+      dir = 1;
+    }
+  }
+  else
+  {
+    if(diff < 12)
+    {
+      dir = 1;
+    }
+    else
+    {
+      dir = 0;
+    }
+  }
+
+  if(adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF)
+  {
+    if(!dir)
+    {
+      if(devparms.triggerholdoff >= 10)
+      {
+        devparms.triggerholdoff = 10;
+
+        old_pos = new_pos;
+
+        return;
+      }
+
+      devparms.triggerholdoff += get_stepsize_divide_by_1000(devparms.triggerholdoff);
+    }
+    else
+    {
+      if(devparms.triggerholdoff <= 1e-7)
+      {
+        devparms.triggerholdoff = 1e-7;
+
+        old_pos = new_pos;
+
+        return;
+      }
+
+      devparms.triggerholdoff -= get_stepsize_divide_by_1000(devparms.triggerholdoff);
+    }
+  }
+  else if(adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
+    {
+      if(!dir)
+      {
+        if(devparms.acquireaverages >= 8192)
+        {
+          devparms.acquireaverages = 8192;
+
+          old_pos = new_pos;
+
+          return;
+        }
+
+        devparms.acquireaverages *= 2;
+      }
+      else
+      {
+        if(devparms.acquireaverages <= 2)
+        {
+          devparms.acquireaverages = 2;
+
+          old_pos = new_pos;
+
+          return;
+        }
+
+        devparms.acquireaverages /= 2;
+      }
+    }
+
+  old_pos = new_pos;
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::trigAdjustDialChanged(int new_pos)
+{
+  static int old_pos=0;
+
+  int diff, dir, chn;
+
+  char str[512];
+
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
+  chn = devparms.triggeredgesource;
+
+  if((chn < 0) || (chn > 3))
+  {
+    return;
+  }
+
+  diff = new_pos - old_pos;
+
+  if(diff < 0)
+  {
+    diff *= -1;
+  }
+
+  if(diff < 6)
+  {
+    return;
+  }
+
+  if(new_pos > old_pos)
+  {
+    if(diff < 12)
+    {
+      dir = 0;
+    }
+    else
+    {
+      dir = 1;
+    }
+  }
+  else
+  {
+    if(diff < 12)
+    {
+      dir = 1;
+    }
+    else
+    {
+      dir = 0;
+    }
+  }
+
+  if(dir)
+  {
+    if(devparms.triggeredgelevel[chn] <= (-6 * devparms.chanscale[chn]))
+    {
+      devparms.triggeredgelevel[chn] = -6 * devparms.chanscale[chn];
+
+      old_pos = new_pos;
+
+      return;
+    }
+
+    devparms.triggeredgelevel[chn] -= devparms.chanscale[chn] / 50;
+  }
+  else
+  {
+    if(devparms.triggeredgelevel[chn] >= (6 * devparms.chanscale[chn]))
+    {
+      devparms.triggeredgelevel[chn] = 6 * devparms.chanscale[chn];
+
+      old_pos = new_pos;
+
+      return;
+    }
+
+    devparms.triggeredgelevel[chn] += devparms.chanscale[chn] / 50;
+  }
+
+  strcpy(str, "Trigger level: ");
+
+  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[chn], 2);
+
+  strcat(str, "V");
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":TRIG:EDG:LEV %e", devparms.triggeredgelevel[chn]);
+
+  tmcdev_write(device, str);
+
+  old_pos = new_pos;
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::horScaleDialChanged(int new_pos)
+{
+  static int old_pos=0;
+
+  int diff, dir;
+
+  char str[512];
+
+  diff = new_pos - old_pos;
+
+  if(diff < 0)
+  {
+    diff *= -1;
+  }
+
+  if(diff < 6)
+  {
+    return;
+  }
+
+  if(new_pos > old_pos)
+  {
+    if(diff < 12)
+    {
+      dir = 0;
+    }
+    else
+    {
+      dir = 1;
+    }
+  }
+  else
+  {
+    if(diff < 12)
+    {
+      dir = 1;
+    }
+    else
+    {
+      dir = 0;
+    }
+  }
+
+  if(devparms.timebasedelayenable)
+  {
+    if(dir)
+    {
+      if(devparms.timebasedelayscale >= devparms.timebasescale / 2)
+      {
+        devparms.timebasedelayscale = devparms.timebasescale / 2;
+
+        old_pos = new_pos;
+
+        return;
+      }
+
+      if(devparms.timebasedelayscale >= 0.1)
+      {
+        devparms.timebasedelayscale = 0.1;
+
+        old_pos = new_pos;
+
+        return;
+      }
+    }
+    else
+    {
+      if(devparms.bandwidth == 1000)
+      {
+        if(devparms.timebasedelayscale <= 5e-10)
+        {
+          devparms.timebasedelayscale = 5e-10;
+
+          old_pos = new_pos;
+
+          return;
+        }
+      }
+      else
+      {
+        if(devparms.timebasedelayscale <= 1e-9)
+        {
+          devparms.timebasedelayscale = 1e-9;
+
+          old_pos = new_pos;
+
+          return;
+        }
+      }
+    }
+
+    if(dir)
+    {
+      devparms.timebasedelayscale = round_up_step125(devparms.timebasedelayscale);
+    }
+    else
+    {
+      devparms.timebasedelayscale = round_down_step125(devparms.timebasedelayscale);
+    }
+
+    strcpy(str, "Delayed timebase: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
+
+    tmcdev_write(device, str);
+
+    old_pos = new_pos;
+  }
+  else
+  {
+    if(dir)
+    {
+      if(devparms.timebasescale >= 10)
+      {
+        devparms.timebasescale = 10;
+
+        old_pos = new_pos;
+
+        return;
+      }
+    }
+    else
+    {
+      if(devparms.bandwidth == 1000)
+      {
+        if(devparms.timebasescale <= 5e-10)
+        {
+          devparms.timebasescale = 5e-10;
+
+          old_pos = new_pos;
+
+          return;
+        }
+      }
+      else
+      {
+        if(devparms.timebasescale <= 1e-9)
+        {
+          devparms.timebasescale = 1e-9;
+
+          old_pos = new_pos;
+
+          return;
+        }
+      }
+    }
+
+    if(dir)
+    {
+      devparms.timebasescale = round_up_step125(devparms.timebasescale);
+    }
+    else
+    {
+      devparms.timebasescale = round_down_step125(devparms.timebasescale);
+    }
+
+    strcpy(str, "Timebase: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
+
+    tmcdev_write(device, str);
+
+    old_pos = new_pos;
+  }
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::horPosDialChanged(int new_pos)
+{
+  static int old_pos=0;
+
+  int diff, dir;
+
+  char str[512];
+
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
+  diff = new_pos - old_pos;
+
+  if(diff < 0)
+  {
+    diff *= -1;
+  }
+
+  if(diff < 6)
+  {
+    return;
+  }
+
+  if(new_pos > old_pos)
+  {
+    if(diff < 12)
+    {
+      dir = 0;
+    }
+    else
+    {
+      dir = 1;
+    }
+  }
+  else
+  {
+    if(diff < 12)
+    {
+      dir = 1;
+    }
+    else
+    {
+      dir = 0;
+    }
+  }
+
+  if(devparms.timebasedelayenable)
+  {
+    if(dir)
+    {
+      if(devparms.timebasedelayoffset >= ((7 * devparms.timebasescale) + devparms.timebaseoffset - (7 * devparms.timebasedelayscale)))
+      {
+        old_pos = new_pos;
+
+        return;
+      }
+
+      devparms.timebasedelayoffset += (devparms.timebasedelayscale / 50);
+    }
+    else
+    {
+      if(devparms.timebasedelayoffset <= -((7 * devparms.timebasescale) - devparms.timebaseoffset - (7 * devparms.timebasedelayscale)))
+      {
+        old_pos = new_pos;
+
+        return;
+      }
+
+      devparms.timebasedelayoffset -= (devparms.timebasedelayscale / 50);
+    }
+
+    strcpy(str, "Delayed timebase position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+
+    tmcdev_write(device, str);
+
+    old_pos = new_pos;
+  }
+  else
+  {
+    if(dir)
+    {
+      if(devparms.timebaseoffset >= 1)
+      {
+        devparms.timebaseoffset = 1;
+
+        old_pos = new_pos;
+
+        return;
+      }
+
+      devparms.timebaseoffset += devparms.timebasescale / 50;
+    }
+    else
+    {
+      if(devparms.timebaseoffset <= -1)
+      {
+        devparms.timebaseoffset = -1;
+
+        old_pos = new_pos;
+
+        return;
+      }
+
+      devparms.timebaseoffset -= devparms.timebasescale / 50;
+    }
+
+    strcpy(str, "Horizontal position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
+
+    tmcdev_write(device, str);
+
+    old_pos = new_pos;
+  }
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::vertOffsetDialChanged(int new_pos)
+{
+  static int old_pos=0;
+
+  int diff, dir, chn;
+
+  char str[512];
+
+  double val;
+
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
+  chn = devparms.activechannel;
+
+  diff = new_pos - old_pos;
+
+  if(diff < 0)
+  {
+    diff *= -1;
+  }
+
+  if(diff < 6)
+  {
+    return;
+  }
+
+  if(new_pos > old_pos)
+  {
+    if(diff < 12)
+    {
+      dir = 0;
+    }
+    else
+    {
+      dir = 1;
+    }
+  }
+  else
+  {
+    if(diff < 12)
+    {
+      dir = 1;
+    }
+    else
+    {
+      dir = 0;
+    }
+  }
+
+  val = round_up_step125(devparms.chanscale[chn]) / 100;
+
+  if(dir)
+  {
+    if(devparms.chanoffset[chn] <= -20)
+    {
+      devparms.chanoffset[chn] = -20;
+
+      old_pos = new_pos;
+
+      return;
+    }
+
+    devparms.chanoffset[chn] -= val;
+  }
+  else
+  {
+    if(devparms.chanoffset[chn] >= 20)
+    {
+      devparms.chanoffset[chn] = 20;
+
+      old_pos = new_pos;
+
+      return;
+    }
+
+    devparms.chanoffset[chn] += val;
+  }
+
+  sprintf(str, "Channel %i offset: ", chn + 1);
+
+  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
+
+  strcat(str, "V");
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:OFFS %e", chn + 1, devparms.chanoffset[chn]);
+
+  tmcdev_write(device, str);
+
+  old_pos = new_pos;
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::vertScaleDialChanged(int new_pos)
+{
+  static int old_pos=0;
+
+  int diff, dir, chn;
+
+  double val, ltmp;
+
+  char str[512];
+
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
+  chn = devparms.activechannel;
+
+  diff = new_pos - old_pos;
+
+  if(diff < 0)
+  {
+    diff *= -1;
+  }
+
+  if(diff < 6)
+  {
+    return;
+  }
+
+  if(new_pos > old_pos)
+  {
+    if(diff < 12)
+    {
+      dir = 0;
+    }
+    else
+    {
+      dir = 1;
+    }
+  }
+  else
+  {
+    if(diff < 12)
+    {
+      dir = 1;
+    }
+    else
+    {
+      dir = 0;
+    }
+  }
+
+  if(dir)
+  {
+    if(devparms.chanscale[chn] >= 20)
+    {
+      devparms.chanscale[chn] = 20;
+
+      old_pos = new_pos;
+
+      return;
+    }
+  }
+  else
+  {
+    if(devparms.chanscale[chn] <= 2e-2)
+    {
+      devparms.chanscale[chn] = 2e-2;
+
+      old_pos = new_pos;
+
+      return;
+    }
+  }
+
+  ltmp = devparms.chanscale[chn];
+
+  if(dir || devparms.chanvernier[chn])
+  {
+    val = round_up_step125(devparms.chanscale[chn]);
+  }
+  else
+  {
+    val = round_down_step125(devparms.chanscale[chn]);
+  }
+
+  if(devparms.chanvernier[chn])
+  {
+    val /= 100;
+
+    if(dir)
+    {
+      devparms.chanscale[chn] += val;
+    }
+    else
+    {
+      devparms.chanscale[chn] -= val;
+    }
+  }
+  else
+  {
+    devparms.chanscale[chn] = val;
+  }
+
+  ltmp /= val;
+
+  devparms.chanoffset[chn] /= ltmp;
+
+  sprintf(str, "Channel %i scale: ", chn + 1);
+
+  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+
+  strcat(str, "V");
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+
+  tmcdev_write(device, str);
+
+  old_pos = new_pos;
+
+  waveForm->update();
 }
 
 
@@ -233,6 +991,8 @@ void UI_Mainwindow::acqButtonClicked()
   submenuacquisition.setTitle("Mode");
   submenuacquisition.addAction("Normal",  this, SLOT(set_acq_normal()));
   submenuacquisition.addAction("Average", this, SLOT(set_acq_average()));
+  submenuacquisition.addAction("Peak Detect",  this, SLOT(set_acq_peak()));
+  submenuacquisition.addAction("High Resolution",  this, SLOT(set_acq_hres()));
   menu.addMenu(&submenuacquisition);
 
   submenumemdepth.setTitle("Mem Depth");
@@ -545,6 +1305,36 @@ void UI_Mainwindow::set_acq_normal()
 }
 
 
+void UI_Mainwindow::set_acq_peak()
+{
+  if(devparms.acquiretype == 2)
+  {
+    return;
+  }
+
+  devparms.acquiretype = 2;
+
+  statusLabel->setText("Acquire: peak");
+
+  tmcdev_write(device, ":ACQ:TYPE PEAK");
+}
+
+
+void UI_Mainwindow::set_acq_hres()
+{
+  if(devparms.acquiretype == 3)
+  {
+    return;
+  }
+
+  devparms.acquiretype = 3;
+
+  statusLabel->setText("Acquire: high resolution");
+
+  tmcdev_write(device, ":ACQ:TYPE HRES");
+}
+
+
 void UI_Mainwindow::set_acq_average()
 {
   adjDialFunc = ADJ_DIAL_FUNC_ACQ_AVG;
@@ -815,752 +1605,6 @@ void UI_Mainwindow::show_howto_operate()
 void UI_Mainwindow::show_about_dialog()
 {
   UI_Aboutwindow aboutwindow;
-}
-
-
-void UI_Mainwindow::adjDialChanged(int new_pos)
-{
-  static int old_pos=0;
-
-  int diff, dir;
-
-  if(adjDialFunc == ADJ_DIAL_FUNC_NONE)
-  {
-    return;
-  }
-
-  scrn_timer->stop();
-
-  adjdial_timer->start(ADJDIAL_TIMER_IVAL_2);
-
-  diff = new_pos - old_pos;
-
-  if(diff < 0)
-  {
-    diff *= -1;
-  }
-
-  if(diff < 6)
-  {
-    return;
-  }
-
-  if(new_pos > old_pos)
-  {
-    if(diff < 12)
-    {
-      dir = 0;
-    }
-    else
-    {
-      dir = 1;
-    }
-  }
-  else
-  {
-    if(diff < 12)
-    {
-      dir = 1;
-    }
-    else
-    {
-      dir = 0;
-    }
-  }
-
-  if(adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF)
-  {
-    if(!dir)
-    {
-      if(devparms.triggerholdoff >= 10)
-      {
-        devparms.triggerholdoff = 10;
-
-        old_pos = new_pos;
-
-        return;
-      }
-
-      devparms.triggerholdoff += get_stepsize_divide_by_1000(devparms.triggerholdoff);
-    }
-    else
-    {
-      if(devparms.triggerholdoff <= 1e-7)
-      {
-        devparms.triggerholdoff = 1e-7;
-
-        old_pos = new_pos;
-
-        return;
-      }
-
-      devparms.triggerholdoff -= get_stepsize_divide_by_1000(devparms.triggerholdoff);
-    }
-  }
-  else if(adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
-    {
-      if(!dir)
-      {
-        if(devparms.acquireaverages >= 8192)
-        {
-          devparms.acquireaverages = 8192;
-
-          old_pos = new_pos;
-
-          return;
-        }
-
-        devparms.acquireaverages *= 2;
-      }
-      else
-      {
-        if(devparms.acquireaverages <= 2)
-        {
-          devparms.acquireaverages = 2;
-
-          old_pos = new_pos;
-
-          return;
-        }
-
-        devparms.acquireaverages /= 2;
-      }
-    }
-
-  old_pos = new_pos;
-
-  waveForm->update();
-}
-
-
-void UI_Mainwindow::trigAdjustDialChanged(int new_pos)
-{
-  static int old_pos=0;
-
-  int diff, dir, chn;
-
-  char str[512];
-
-  if(devparms.activechannel < 0)
-  {
-    return;
-  }
-
-  chn = devparms.triggeredgesource;
-
-  if((chn < 0) || (chn > 3))
-  {
-    return;
-  }
-
-  diff = new_pos - old_pos;
-
-  if(diff < 0)
-  {
-    diff *= -1;
-  }
-
-  if(diff < 6)
-  {
-    return;
-  }
-
-  if(new_pos > old_pos)
-  {
-    if(diff < 12)
-    {
-      dir = 0;
-    }
-    else
-    {
-      dir = 1;
-    }
-  }
-  else
-  {
-    if(diff < 12)
-    {
-      dir = 1;
-    }
-    else
-    {
-      dir = 0;
-    }
-  }
-
-  if(dir)
-  {
-    if(devparms.triggeredgelevel[chn] <= (-6 * devparms.chanscale[chn]))
-    {
-      devparms.triggeredgelevel[chn] = -6 * devparms.chanscale[chn];
-
-      old_pos = new_pos;
-
-      return;
-    }
-
-    devparms.triggeredgelevel[chn] -= devparms.chanscale[chn] / 50;
-  }
-  else
-  {
-    if(devparms.triggeredgelevel[chn] >= (6 * devparms.chanscale[chn]))
-    {
-      devparms.triggeredgelevel[chn] = 6 * devparms.chanscale[chn];
-
-      old_pos = new_pos;
-
-      return;
-    }
-
-    devparms.triggeredgelevel[chn] += devparms.chanscale[chn] / 50;
-  }
-
-  strcpy(str, "Trigger level: ");
-
-  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[chn], 2);
-
-  strcat(str, "V");
-
-  statusLabel->setText(str);
-
-  sprintf(str, ":TRIG:EDG:LEV %e", devparms.triggeredgelevel[chn]);
-
-  tmcdev_write(device, str);
-
-  old_pos = new_pos;
-}
-
-
-void UI_Mainwindow::horScaleDialChanged(int new_pos)
-{
-  static int old_pos=0;
-
-  int diff, dir;
-
-  char str[512];
-
-  diff = new_pos - old_pos;
-
-  if(diff < 0)
-  {
-    diff *= -1;
-  }
-
-  if(diff < 6)
-  {
-    return;
-  }
-
-  if(new_pos > old_pos)
-  {
-    if(diff < 12)
-    {
-      dir = 0;
-    }
-    else
-    {
-      dir = 1;
-    }
-  }
-  else
-  {
-    if(diff < 12)
-    {
-      dir = 1;
-    }
-    else
-    {
-      dir = 0;
-    }
-  }
-
-  if(devparms.timebasedelayenable)
-  {
-    if(dir)
-    {
-      if(devparms.timebasedelayscale >= devparms.timebasescale / 2)
-      {
-        devparms.timebasedelayscale = devparms.timebasescale / 2;
-
-        old_pos = new_pos;
-
-        return;
-      }
-
-      if(devparms.timebasedelayscale >= 0.1)
-      {
-        devparms.timebasedelayscale = 0.1;
-
-        old_pos = new_pos;
-
-        return;
-      }
-    }
-    else
-    {
-      if(devparms.bandwidth == 1000)
-      {
-        if(devparms.timebasedelayscale <= 5e-10)
-        {
-          devparms.timebasedelayscale = 5e-10;
-
-          old_pos = new_pos;
-
-          return;
-        }
-      }
-      else
-      {
-        if(devparms.timebasedelayscale <= 1e-9)
-        {
-          devparms.timebasedelayscale = 1e-9;
-
-          old_pos = new_pos;
-
-          return;
-        }
-      }
-    }
-
-    if(dir)
-    {
-      devparms.timebasedelayscale = round_up_step125(devparms.timebasedelayscale);
-    }
-    else
-    {
-      devparms.timebasedelayscale = round_down_step125(devparms.timebasedelayscale);
-    }
-
-    strcpy(str, "Delayed timebase: ");
-
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
-
-    strcat(str, "s");
-
-    statusLabel->setText(str);
-
-    sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
-
-    tmcdev_write(device, str);
-
-    old_pos = new_pos;
-  }
-  else
-  {
-    if(dir)
-    {
-      if(devparms.timebasescale >= 10)
-      {
-        devparms.timebasescale = 10;
-
-        old_pos = new_pos;
-
-        return;
-      }
-    }
-    else
-    {
-      if(devparms.bandwidth == 1000)
-      {
-        if(devparms.timebasescale <= 5e-10)
-        {
-          devparms.timebasescale = 5e-10;
-
-          old_pos = new_pos;
-
-          return;
-        }
-      }
-      else
-      {
-        if(devparms.timebasescale <= 1e-9)
-        {
-          devparms.timebasescale = 1e-9;
-
-          old_pos = new_pos;
-
-          return;
-        }
-      }
-    }
-
-    if(dir)
-    {
-      devparms.timebasescale = round_up_step125(devparms.timebasescale);
-    }
-    else
-    {
-      devparms.timebasescale = round_down_step125(devparms.timebasescale);
-    }
-
-    strcpy(str, "Timebase: ");
-
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2);
-
-    strcat(str, "s");
-
-    statusLabel->setText(str);
-
-    sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
-
-    tmcdev_write(device, str);
-
-    old_pos = new_pos;
-  }
-}
-
-
-void UI_Mainwindow::horPosDialChanged(int new_pos)
-{
-  static int old_pos=0;
-
-  int diff, dir;
-
-  char str[512];
-
-  if(devparms.activechannel < 0)
-  {
-    return;
-  }
-
-  diff = new_pos - old_pos;
-
-  if(diff < 0)
-  {
-    diff *= -1;
-  }
-
-  if(diff < 6)
-  {
-    return;
-  }
-
-  if(new_pos > old_pos)
-  {
-    if(diff < 12)
-    {
-      dir = 0;
-    }
-    else
-    {
-      dir = 1;
-    }
-  }
-  else
-  {
-    if(diff < 12)
-    {
-      dir = 1;
-    }
-    else
-    {
-      dir = 0;
-    }
-  }
-
-  if(devparms.timebasedelayenable)
-  {
-    if(dir)
-    {
-      if(devparms.timebasedelayoffset >= ((7 * devparms.timebasescale) + devparms.timebaseoffset - (7 * devparms.timebasedelayscale)))
-      {
-        old_pos = new_pos;
-
-        return;
-      }
-
-      devparms.timebasedelayoffset += (devparms.timebasedelayscale / 50);
-    }
-    else
-    {
-      if(devparms.timebasedelayoffset <= -((7 * devparms.timebasescale) - devparms.timebaseoffset - (7 * devparms.timebasedelayscale)))
-      {
-        old_pos = new_pos;
-
-        return;
-      }
-
-      devparms.timebasedelayoffset -= (devparms.timebasedelayscale / 50);
-    }
-
-    strcpy(str, "Delayed timebase position: ");
-
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
-
-    strcat(str, "s");
-
-    statusLabel->setText(str);
-
-    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
-
-    tmcdev_write(device, str);
-
-    old_pos = new_pos;
-  }
-  else
-  {
-    if(dir)
-    {
-      if(devparms.timebaseoffset >= 1)
-      {
-        devparms.timebaseoffset = 1;
-
-        old_pos = new_pos;
-
-        return;
-      }
-
-      devparms.timebaseoffset += devparms.timebasescale / 50;
-    }
-    else
-    {
-      if(devparms.timebaseoffset <= -1)
-      {
-        devparms.timebaseoffset = -1;
-
-        old_pos = new_pos;
-
-        return;
-      }
-
-      devparms.timebaseoffset -= devparms.timebasescale / 50;
-    }
-
-    strcpy(str, "Horizontal position: ");
-
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
-
-    strcat(str, "s");
-
-    statusLabel->setText(str);
-
-    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
-
-    tmcdev_write(device, str);
-
-    old_pos = new_pos;
-  }
-}
-
-
-void UI_Mainwindow::vertOffsetDialChanged(int new_pos)
-{
-  static int old_pos=0;
-
-  int diff, dir, chn;
-
-  char str[512];
-
-  double val;
-
-  if(devparms.activechannel < 0)
-  {
-    return;
-  }
-
-  chn = devparms.activechannel;
-
-  diff = new_pos - old_pos;
-
-  if(diff < 0)
-  {
-    diff *= -1;
-  }
-
-  if(diff < 6)
-  {
-    return;
-  }
-
-  if(new_pos > old_pos)
-  {
-    if(diff < 12)
-    {
-      dir = 0;
-    }
-    else
-    {
-      dir = 1;
-    }
-  }
-  else
-  {
-    if(diff < 12)
-    {
-      dir = 1;
-    }
-    else
-    {
-      dir = 0;
-    }
-  }
-
-  val = round_up_step125(devparms.chanscale[chn]) / 100;
-
-  if(dir)
-  {
-    if(devparms.chanoffset[chn] <= -20)
-    {
-      devparms.chanoffset[chn] = -20;
-
-      old_pos = new_pos;
-
-      return;
-    }
-
-    devparms.chanoffset[chn] -= val;
-  }
-  else
-  {
-    if(devparms.chanoffset[chn] >= 20)
-    {
-      devparms.chanoffset[chn] = 20;
-
-      old_pos = new_pos;
-
-      return;
-    }
-
-    devparms.chanoffset[chn] += val;
-  }
-
-  sprintf(str, "Channel %i offset: ", chn + 1);
-
-  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
-
-  strcat(str, "V");
-
-  statusLabel->setText(str);
-
-  sprintf(str, ":CHAN%i:OFFS %e", chn + 1, devparms.chanoffset[chn]);
-
-  tmcdev_write(device, str);
-
-  old_pos = new_pos;
-}
-
-
-void UI_Mainwindow::vertScaleDialChanged(int new_pos)
-{
-  static int old_pos=0;
-
-  int diff, dir, chn;
-
-  double val, ltmp;
-
-  char str[512];
-
-  if(devparms.activechannel < 0)
-  {
-    return;
-  }
-
-  chn = devparms.activechannel;
-
-  diff = new_pos - old_pos;
-
-  if(diff < 0)
-  {
-    diff *= -1;
-  }
-
-  if(diff < 6)
-  {
-    return;
-  }
-
-  if(new_pos > old_pos)
-  {
-    if(diff < 12)
-    {
-      dir = 0;
-    }
-    else
-    {
-      dir = 1;
-    }
-  }
-  else
-  {
-    if(diff < 12)
-    {
-      dir = 1;
-    }
-    else
-    {
-      dir = 0;
-    }
-  }
-
-  if(dir)
-  {
-    if(devparms.chanscale[chn] >= 20)
-    {
-      devparms.chanscale[chn] = 20;
-
-      old_pos = new_pos;
-
-      return;
-    }
-  }
-  else
-  {
-    if(devparms.chanscale[chn] <= 2e-2)
-    {
-      devparms.chanscale[chn] = 2e-2;
-
-      old_pos = new_pos;
-
-      return;
-    }
-  }
-
-  ltmp = devparms.chanscale[chn];
-
-  if(dir || devparms.chanvernier[chn])
-  {
-    val = round_up_step125(devparms.chanscale[chn]);
-  }
-  else
-  {
-    val = round_down_step125(devparms.chanscale[chn]);
-  }
-
-  if(devparms.chanvernier[chn])
-  {
-    val /= 100;
-
-    if(dir)
-    {
-      devparms.chanscale[chn] += val;
-    }
-    else
-    {
-      devparms.chanscale[chn] -= val;
-    }
-  }
-  else
-  {
-    devparms.chanscale[chn] = val;
-  }
-
-  ltmp /= val;
-
-  devparms.chanoffset[chn] /= ltmp;
-
-  sprintf(str, "Channel %i scale: ", chn + 1);
-
-  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
-
-  strcat(str, "V");
-
-  statusLabel->setText(str);
-
-  sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
-
-  tmcdev_write(device, str);
-
-  old_pos = new_pos;
 }
 
 
@@ -2038,11 +2082,18 @@ void UI_Mainwindow::adjustDialClicked(QPoint)
 {
   if(adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF)
   {
-    devparms.triggerholdoff = 1e-7;
+    if(devparms.modelserie == 1)
+    {
+      devparms.triggerholdoff = 1.6e-8;
 
-    statusLabel->setText("Holdoff: 100ns");
+      statusLabel->setText("Holdoff: 16ns");
+    }
+    else
+    {
+      devparms.triggerholdoff = 1e-7;
 
-    tmcdev_write(device, ":TRIG:HOLD 1e-7");
+      statusLabel->setText("Holdoff: 100ns");
+    }
   }
 }
 

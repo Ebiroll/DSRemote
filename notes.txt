@@ -85,6 +85,8 @@ What's implemented so far:
 
 - acquire normal
 - acquire average
+- acquire peak detect
+- acquire high resolution
 - acquire memory depth
 
 

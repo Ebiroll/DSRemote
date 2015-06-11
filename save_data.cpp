@@ -248,6 +248,8 @@ void UI_Mainwindow::save_memory_waveform()
 
   tmcdev_write(device, ":STOP");
 
+  usleep(20000);
+
   for(chn=0; chn<MAX_CHNS; chn++)
   {
     if(!devparms.chandisplay[chn])  // Download data only when channel is switched on
@@ -255,7 +257,7 @@ void UI_Mainwindow::save_memory_waveform()
       continue;
     }
 
-    printf("start channel x\n");
+//    printf("start channel x\n");
 
     sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
 
@@ -263,9 +265,15 @@ void UI_Mainwindow::save_memory_waveform()
 
     tmcdev_write(device, ":WAV:FORM BYTE");
 
+    usleep(20000);
+
     tmcdev_write(device, ":WAV:MODE RAW");
 
+    usleep(20000);
+
     tmcdev_write(device, ":WAV:YINC?");
+
+    usleep(20000);
 
     tmcdev_read(device);
 
@@ -277,7 +285,11 @@ void UI_Mainwindow::save_memory_waveform()
       goto OUT_ERROR;
     }
 
+    usleep(20000);
+
     tmcdev_write(device, ":WAV:YREF?");
+
+    usleep(20000);
 
     tmcdev_read(device);
 
@@ -289,7 +301,11 @@ void UI_Mainwindow::save_memory_waveform()
       goto OUT_ERROR;
     }
 
+    usleep(20000);
+
     tmcdev_write(device, ":WAV:YOR?");
+
+    usleep(20000);
 
     tmcdev_read(device);
 
@@ -301,16 +317,22 @@ void UI_Mainwindow::save_memory_waveform()
       goto OUT_ERROR;
     }
 
-    if(devparms.modelserie != 1)
-    {
-      sprintf(str, ":WAV:POIN %i", mempnts);
-
-      tmcdev_write(device, str);
-
-      tmcdev_write(device, ":WAV:RES");
-
-      tmcdev_write(device, ":WAV:BEG");
-    }
+//     if(devparms.modelserie != 1)
+//     {
+//       sprintf(str, ":WAV:POIN %i", mempnts);
+//
+//       usleep(20000);
+//
+//       tmcdev_write(device, str);
+//
+//       usleep(20000);
+//
+//       tmcdev_write(device, ":WAV:RES");
+//
+//       usleep(20000);
+//
+//       tmcdev_write(device, ":WAV:BEG");
+//     }
 
     empty_buf = 0;
 
@@ -330,6 +352,8 @@ void UI_Mainwindow::save_memory_waveform()
       {
         sprintf(str, ":WAV:STAR %i",  bytes_rcvd + 1);
 
+        usleep(20000);
+
         tmcdev_write(device, str);
 
         if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
@@ -341,12 +365,52 @@ void UI_Mainwindow::save_memory_waveform()
           sprintf(str, ":WAV:STOP %i", bytes_rcvd + SAV_MEM_BSZ);
         }
 
+        usleep(20000);
+
         tmcdev_write(device, str);
       }
+      else
+      {
+        sprintf(str, ":WAV:STAR %i",  bytes_rcvd + 1);
+
+        usleep(20000);
+
+        tmcdev_write(device, str);
+
+        if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
+        {
+          sprintf(str, ":WAV:STOP %i", mempnts);
+        }
+        else
+        {
+          sprintf(str, ":WAV:STOP %i", bytes_rcvd + SAV_MEM_BSZ);
+        }
+
+        usleep(20000);
+
+        tmcdev_write(device, str);
+
+        usleep(20000);
+
+        tmcdev_write(device, ":WAV:RES");
+
+        usleep(20000);
+
+        tmcdev_write(device, ":WAV:BEG");
+      }
+
+      usleep(20000);
 
       tmcdev_write(device, ":WAV:DATA?");
 
       n = tmcdev_read(device);
+
+      if(devparms.modelserie != 1)
+      {
+        usleep(20000);
+
+        tmcdev_write(device, ":WAV:END");
+      }
 
       if(n < 0)
       {
@@ -403,10 +467,12 @@ void UI_Mainwindow::save_memory_waveform()
       }
     }
 
-    if(devparms.modelserie != 1)
-    {
-      tmcdev_write(device, ":WAV:END");
-    }
+//     if(devparms.modelserie != 1)
+//     {
+//       usleep(20000);
+//
+//       tmcdev_write(device, ":WAV:END");
+//     }
 
     if(bytes_rcvd < mempnts)
     {
@@ -426,26 +492,40 @@ void UI_Mainwindow::save_memory_waveform()
 
     sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
 
+    usleep(20000);
+
     tmcdev_write(device, str);
+
+    usleep(20000);
 
     tmcdev_write(device, ":WAV:MODE NORM");
 
     if(devparms.modelserie == 6)
     {
+      usleep(20000);
+
       tmcdev_write(device, ":WAV:STAR 0");
     }
     else
     {
+      usleep(20000);
+
       tmcdev_write(device, ":WAV:STAR 1");
     }
 
     if(devparms.modelserie == 1)
     {
+      usleep(20000);
+
       tmcdev_write(device, ":WAV:STOP 1200");
     }
     else
     {
+      usleep(20000);
+
       tmcdev_write(device, ":WAV:STOP 1400");
+
+      usleep(20000);
 
       tmcdev_write(device, ":WAV:POIN 1400");
     }
