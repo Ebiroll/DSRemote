@@ -349,6 +349,16 @@ UI_Mainwindow::UI_Mainwindow()
   connect(next_page_act, SIGNAL(triggered()), this, SLOT(next_page()));
   addAction(next_page_act);
 
+  zoom_in_act = new QAction(this);
+  zoom_in_act->setShortcut(QKeySequence::ZoomIn);
+  connect(zoom_in_act, SIGNAL(triggered()), this, SLOT(zoom_in()));
+  addAction(zoom_in_act);
+
+  zoom_out_act = new QAction(this);
+  zoom_out_act->setShortcut(QKeySequence::ZoomOut);
+  connect(zoom_out_act, SIGNAL(triggered()), this, SLOT(zoom_out()));
+  addAction(zoom_out_act);
+
   DPRwidget->setEnabled(false);
 
   recent_dir[0] = 0;

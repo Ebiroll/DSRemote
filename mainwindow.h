@@ -191,7 +191,9 @@ private:
   QAction *former_page_act,
           *shift_page_left_act,
           *shift_page_right_act,
-          *next_page_act;
+          *next_page_act,
+          *zoom_in_act,
+          *zoom_out_act;
 
   struct tmcdev *device;
 
@@ -355,6 +357,8 @@ private slots:
   void shift_page_left();
   void shift_page_right();
   void next_page();
+  void zoom_in();
+  void zoom_out();
 
 protected:
   void closeEvent(QCloseEvent *);

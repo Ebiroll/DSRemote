@@ -2063,6 +2063,16 @@ void UI_Mainwindow::shift_page_right()
 }
 
 
+void UI_Mainwindow::zoom_in()
+{
+}
+
+
+void UI_Mainwindow::zoom_out()
+{
+}
+
+
 
 
 
