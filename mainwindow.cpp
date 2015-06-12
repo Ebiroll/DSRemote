@@ -2065,11 +2065,142 @@ void UI_Mainwindow::shift_page_right()
 
 void UI_Mainwindow::zoom_in()
 {
+  char str[256];
+
+  if(devparms.timebasedelayenable)
+  {
+    if(devparms.bandwidth == 1000)
+    {
+      if(devparms.timebasedelayscale <= 5e-10)
+      {
+        devparms.timebasedelayscale = 5e-10;
+
+        return;
+      }
+    }
+    else
+    {
+      if(devparms.timebasedelayscale <= 1e-9)
+      {
+        devparms.timebasedelayscale = 1e-9;
+
+        return;
+      }
+    }
+
+    devparms.timebasedelayscale = round_down_step125(devparms.timebasedelayscale);
+
+    strcpy(str, "Delayed timebase: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
+
+    tmcdev_write(device, str);
+  }
+  else
+  {
+    if(devparms.bandwidth == 1000)
+    {
+      if(devparms.timebasescale <= 5e-10)
+      {
+        devparms.timebasescale = 5e-10;
+
+        return;
+      }
+    }
+    else
+    {
+      if(devparms.timebasescale <= 1e-9)
+      {
+        devparms.timebasescale = 1e-9;
+
+        return;
+      }
+    }
+
+    devparms.timebasescale = round_down_step125(devparms.timebasescale);
+
+    strcpy(str, "Timebase: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
+
+    tmcdev_write(device, str);
+  }
+
+  waveForm->update();
 }
 
 
 void UI_Mainwindow::zoom_out()
 {
+  char str[256];
+
+  if(devparms.timebasedelayenable)
+  {
+    if(devparms.timebasedelayscale >= devparms.timebasescale / 2)
+    {
+      devparms.timebasedelayscale = devparms.timebasescale / 2;
+
+      return;
+    }
+
+    if(devparms.timebasedelayscale >= 0.1)
+    {
+      devparms.timebasedelayscale = 0.1;
+
+      return;
+    }
+
+    devparms.timebasedelayscale = round_up_step125(devparms.timebasedelayscale);
+
+    strcpy(str, "Delayed timebase: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
+
+    tmcdev_write(device, str);
+  }
+  else
+  {
+    if(devparms.timebasescale >= 10)
+    {
+      devparms.timebasescale = 10;
+
+      return;
+    }
+
+    devparms.timebasescale = round_up_step125(devparms.timebasescale);
+
+    strcpy(str, "Timebase: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
+
+    tmcdev_write(device, str);
+  }
+
+  waveForm->update();
 }
 
 

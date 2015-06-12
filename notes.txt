@@ -48,6 +48,8 @@ PageUp: move trace 12 (or 14) divisions to the right.
 PageDn: move trace 12 (or 14) divisions to the left.
 Arrow left: move trace 1 division to the right.
 Arrow right: move trace 1 division to the left.
+Zoom In (decrease timebase): Ctl+
+Zoom Out (increase timebase): Ctl-
 
 
 

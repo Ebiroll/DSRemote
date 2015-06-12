@@ -1601,6 +1601,8 @@ void UI_Mainwindow::show_howto_operate()
     "PageDn: move trace 12 (or 14) divisions to the left.\n"
     "Arrow left: move trace 1 division to the right.\n"
     "Arrow right: move trace 1 division to the left.\n"
+    "Zoom In (decrease timebase): Ctl+\n"
+    "Zoom Out (increase timebase): Ctl-\n"
     );
 
   msgBox.exec();
