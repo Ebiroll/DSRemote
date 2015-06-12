@@ -188,6 +188,11 @@ private:
 
   QPixmap screenXpm;
 
+  QAction *former_page_act,
+          *shift_page_left_act,
+          *shift_page_right_act,
+          *next_page_act;
+
   struct tmcdev *device;
 
   TLed *trigModeAutoLed,
@@ -345,6 +350,11 @@ private slots:
   void set_memdepth_140m();
   void set_memdepth_28m();
   void set_memdepth_56m();
+
+  void former_page();
+  void shift_page_left();
+  void shift_page_right();
+  void next_page();
 
 protected:
   void closeEvent(QCloseEvent *);

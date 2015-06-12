@@ -1,6 +1,6 @@
 
-DSRemote 0.1
-------------
+DSRemote 0.11
+-------------
 
 When opening a connection, the program reads the settings from the device.
 It does not lock the device, so it's still possible to change settings on the device.
@@ -42,6 +42,14 @@ click on it with the right mouse button.
 
 In addition of using the dials to change the scale and offset of the traces and the trigger position,
 you can use the mouse to drag the yellow and orange arrows aside of the plot.
+
+Keyboard shortcuts:
+PageUp: move trace 12 (or 14) divisions to the right.
+PageDn: move trace 12 (or 14) divisions to the left.
+Arrow left: move trace 1 division to the right.
+Arrow right: move trace 1 division to the left.
+
+
 
 
 What's implemented so far:

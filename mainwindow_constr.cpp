@@ -329,6 +329,26 @@ UI_Mainwindow::UI_Mainwindow()
   dockPanelRight->setMinimumHeight(400);
   addDockWidget(Qt::RightDockWidgetArea, dockPanelRight);
 
+  former_page_act = new QAction(this);
+  former_page_act->setShortcut(QKeySequence::MoveToPreviousPage);
+  connect(former_page_act, SIGNAL(triggered()), this, SLOT(former_page()));
+  addAction(former_page_act);
+
+  shift_page_left_act = new QAction(this);
+  shift_page_left_act->setShortcut(QKeySequence::MoveToPreviousChar);
+  connect(shift_page_left_act, SIGNAL(triggered()), this, SLOT(shift_page_left()));
+  addAction(shift_page_left_act);
+
+  shift_page_right_act = new QAction(this);
+  shift_page_right_act->setShortcut(QKeySequence::MoveToNextChar);
+  connect(shift_page_right_act, SIGNAL(triggered()), this, SLOT(shift_page_right()));
+  addAction(shift_page_right_act);
+
+  next_page_act = new QAction(this);
+  next_page_act->setShortcut(QKeySequence::MoveToNextPage);
+  connect(next_page_act, SIGNAL(triggered()), this, SLOT(next_page()));
+  addAction(next_page_act);
+
   DPRwidget->setEnabled(false);
 
   recent_dir[0] = 0;

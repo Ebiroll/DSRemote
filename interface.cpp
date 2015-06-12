@@ -142,11 +142,11 @@ void UI_Mainwindow::navDialChanged(int npos)
 
       devparms.timebasedelayoffset += (val * mpr);
 
-      lefttime = (7 * devparms.timebasescale) - devparms.timebaseoffset;
+      lefttime = ((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset;
 
-      righttime = (7 * devparms.timebasescale) + devparms.timebaseoffset;
+      righttime = ((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset;
 
-      delayrange = 7 * devparms.timebasedelayscale;
+      delayrange = (devparms.hordivisions / 2) * devparms.timebasedelayscale;
 
       if(devparms.timebasedelayoffset < -(lefttime - delayrange))
       {
@@ -657,7 +657,7 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
   {
     if(dir)
     {
-      if(devparms.timebasedelayoffset >= ((7 * devparms.timebasescale) + devparms.timebaseoffset - (7 * devparms.timebasedelayscale)))
+      if(devparms.timebasedelayoffset >= (((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
       {
         old_pos = new_pos;
 
@@ -668,7 +668,7 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
     }
     else
     {
-      if(devparms.timebasedelayoffset <= -((7 * devparms.timebasescale) - devparms.timebaseoffset - (7 * devparms.timebasedelayscale)))
+      if(devparms.timebasedelayoffset <= -(((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
       {
         old_pos = new_pos;
 
@@ -1595,7 +1595,12 @@ void UI_Mainwindow::show_howto_operate()
     "To set the horizontal position to zero, right-click on the horizontal position dial.\n"
     "To set the vertical offset to zero, right-click on the vertical position dial.\n\n"
     "In addition of using the dials to change the scale and offset of the traces and the trigger position,"
-    "you can use the mouse to drag the colored arrows aside of the plot.\n"
+    "you can use the mouse to drag the colored arrows aside of the plot.\n\n"
+    "Keyboard shortcuts:\n"
+    "PageUp: move trace 12 (or 14) divisions to the right.\n"
+    "PageDn: move trace 12 (or 14) divisions to the left.\n"
+    "Arrow left: move trace 1 division to the right.\n"
+    "Arrow right: move trace 1 division to the left.\n"
     );
 
   msgBox.exec();

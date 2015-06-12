@@ -1839,6 +1839,231 @@ void UI_Mainwindow::get_device_model(const char *str)
 }
 
 
+void UI_Mainwindow::former_page()
+{
+  char str[256];
+
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
+
+  if(devparms.timebasedelayenable)
+  {
+    if(devparms.timebasedelayoffset <= -(((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
+    {
+      return;
+    }
+
+    devparms.timebasedelayoffset -= devparms.timebasedelayscale * devparms.hordivisions;
+
+    if(devparms.timebasedelayoffset <= -(((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
+    {
+      devparms.timebasedelayoffset = -(((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale));
+    }
+
+    strcpy(str, "Delayed timebase position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+
+    tmcdev_write(device, str);
+  }
+  else
+  {
+    devparms.timebaseoffset -= devparms.timebasescale * devparms.hordivisions;
+
+    strcpy(str, "Horizontal position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
+
+    tmcdev_write(device, str);
+  }
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::next_page()
+{
+  char str[256];
+
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
+
+  if(devparms.timebasedelayenable)
+  {
+    if(devparms.timebasedelayoffset >= (((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
+    {
+      return;
+    }
+
+    devparms.timebasedelayoffset += devparms.timebasedelayscale * devparms.hordivisions;
+
+    if(devparms.timebasedelayoffset >= (((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
+    {
+      devparms.timebasedelayoffset = (((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale));
+    }
+
+    strcpy(str, "Delayed timebase position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+
+    tmcdev_write(device, str);
+  }
+  else
+  {
+    devparms.timebaseoffset += devparms.timebasescale * devparms.hordivisions;
+
+    strcpy(str, "Horizontal position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
+
+    tmcdev_write(device, str);
+  }
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::shift_page_left()
+{
+  char str[256];
+
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
+
+  if(devparms.timebasedelayenable)
+  {
+    if(devparms.timebasedelayoffset <= -(((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
+    {
+      return;
+    }
+
+    devparms.timebasedelayoffset -= devparms.timebasedelayscale;
+
+    if(devparms.timebasedelayoffset <= -(((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
+    {
+      devparms.timebasedelayoffset = -(((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale));
+    }
+
+    strcpy(str, "Delayed timebase position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+
+    tmcdev_write(device, str);
+  }
+  else
+  {
+    devparms.timebaseoffset -= devparms.timebasescale;
+
+    strcpy(str, "Horizontal position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
+
+    tmcdev_write(device, str);
+  }
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::shift_page_right()
+{
+  char str[256];
+
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
+
+  if(devparms.timebasedelayenable)
+  {
+    if(devparms.timebasedelayoffset >= (((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
+    {
+      return;
+    }
+
+    devparms.timebasedelayoffset += devparms.timebasedelayscale;
+
+    if(devparms.timebasedelayoffset >= (((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale)))
+    {
+      devparms.timebasedelayoffset = (((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale));
+    }
+
+    strcpy(str, "Delayed timebase position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+
+    tmcdev_write(device, str);
+  }
+  else
+  {
+    devparms.timebaseoffset += devparms.timebasescale;
+
+    strcpy(str, "Horizontal position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
+
+    tmcdev_write(device, str);
+  }
+
+  waveForm->update();
+}
+
+
+
 
 
 
