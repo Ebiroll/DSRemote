@@ -50,6 +50,8 @@ Arrow left: move trace 1 division to the right.
 Arrow right: move trace 1 division to the left.
 Zoom In (decrease timebase): Ctl+
 Zoom Out (increase timebase): Ctl-
+Increase vertical scale: -
+Decrease vertical scale: +
 
 
 

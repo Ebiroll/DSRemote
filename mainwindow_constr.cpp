@@ -359,6 +359,16 @@ UI_Mainwindow::UI_Mainwindow()
   connect(zoom_out_act, SIGNAL(triggered()), this, SLOT(zoom_out()));
   addAction(zoom_out_act);
 
+  chan_scale_plus_act = new QAction(this);
+  chan_scale_plus_act->setShortcut(Qt::Key_Minus);
+  connect(chan_scale_plus_act, SIGNAL(triggered()), this, SLOT(chan_scale_plus()));
+  addAction(chan_scale_plus_act);
+
+  chan_scale_minus_act = new QAction(this);
+  chan_scale_minus_act->setShortcut(Qt::Key_Plus);
+  connect(chan_scale_minus_act, SIGNAL(triggered()), this, SLOT(chan_scale_minus()));
+  addAction(chan_scale_minus_act);
+
   DPRwidget->setEnabled(false);
 
   recent_dir[0] = 0;

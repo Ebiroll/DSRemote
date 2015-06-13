@@ -491,11 +491,11 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
     }
     else
     {
-      if(devparms.bandwidth == 1000)
+      if(devparms.modelserie == 1)
       {
-        if(devparms.timebasedelayscale <= 5e-10)
+        if(devparms.timebasescale <= 5.001e-9)
         {
-          devparms.timebasedelayscale = 5e-10;
+          devparms.timebasescale = 5e-9;
 
           old_pos = new_pos;
 
@@ -504,13 +504,27 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
       }
       else
       {
-        if(devparms.timebasedelayscale <= 1e-9)
+        if(devparms.bandwidth == 1000)
         {
-          devparms.timebasedelayscale = 1e-9;
+          if(devparms.timebasedelayscale <= 5.001e-10)
+          {
+            devparms.timebasedelayscale = 5e-10;
 
-          old_pos = new_pos;
+            old_pos = new_pos;
 
-          return;
+            return;
+          }
+        }
+        else
+        {
+          if(devparms.timebasedelayscale <= 1.001e-9)
+          {
+            devparms.timebasedelayscale = 1e-9;
+
+            old_pos = new_pos;
+
+            return;
+          }
         }
       }
     }
@@ -553,11 +567,11 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
     }
     else
     {
-      if(devparms.bandwidth == 1000)
+      if(devparms.modelserie == 1)
       {
-        if(devparms.timebasescale <= 5e-10)
+        if(devparms.timebasescale <= 5.001e-9)
         {
-          devparms.timebasescale = 5e-10;
+          devparms.timebasescale = 5e-9;
 
           old_pos = new_pos;
 
@@ -566,13 +580,27 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
       }
       else
       {
-        if(devparms.timebasescale <= 1e-9)
+        if(devparms.bandwidth == 1000)
         {
-          devparms.timebasescale = 1e-9;
+          if(devparms.timebasescale <= 5.001e-10)
+          {
+            devparms.timebasescale = 5e-10;
 
-          old_pos = new_pos;
+            old_pos = new_pos;
 
-          return;
+            return;
+          }
+        }
+        else
+        {
+          if(devparms.timebasescale <= 1.001e-9)
+          {
+            devparms.timebasescale = 1e-9;
+
+            old_pos = new_pos;
+
+            return;
+          }
         }
       }
     }
@@ -904,9 +932,9 @@ void UI_Mainwindow::vertScaleDialChanged(int new_pos)
   }
   else
   {
-    if(devparms.chanscale[chn] <= 2e-2)
+    if(devparms.chanscale[chn] <= 1e-2)
     {
-      devparms.chanscale[chn] = 2e-2;
+      devparms.chanscale[chn] = 1e-2;
 
       old_pos = new_pos;
 
@@ -1603,6 +1631,8 @@ void UI_Mainwindow::show_howto_operate()
     "Arrow right: move trace 1 division to the left.\n"
     "Zoom In (decrease timebase): Ctl+\n"
     "Zoom Out (increase timebase): Ctl-\n"
+    "Increase vertical scale: -\n"
+    "Decrease vertical scale: +\n"
     );
 
   msgBox.exec();

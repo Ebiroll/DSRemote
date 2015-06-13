@@ -193,7 +193,9 @@ private:
           *shift_page_right_act,
           *next_page_act,
           *zoom_in_act,
-          *zoom_out_act;
+          *zoom_out_act,
+          *chan_scale_plus_act,
+          *chan_scale_minus_act;
 
   struct tmcdev *device;
 
@@ -359,6 +361,8 @@ private slots:
   void next_page();
   void zoom_in();
   void zoom_out();
+  void chan_scale_plus();
+  void chan_scale_minus();
 
 protected:
   void closeEvent(QCloseEvent *);

@@ -1585,7 +1585,14 @@ double UI_Mainwindow::get_stepsize_divide_by_1000(double val)
     exp++;
   }
 
-  return(exp10(exp - 2));
+  val = exp10(exp - 2);
+
+  if((val < 1e-13) && (val > -1e-13))
+  {
+    return 0;
+  }
+
+  return val;
 }
 
 
@@ -2067,24 +2074,41 @@ void UI_Mainwindow::zoom_in()
 {
   char str[256];
 
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
+
   if(devparms.timebasedelayenable)
   {
-    if(devparms.bandwidth == 1000)
+    if(devparms.modelserie == 1)
     {
-      if(devparms.timebasedelayscale <= 5e-10)
+      if(devparms.timebasescale <= 5.001e-9)
       {
-        devparms.timebasedelayscale = 5e-10;
+        devparms.timebasescale = 5e-9;
 
         return;
       }
     }
     else
     {
-      if(devparms.timebasedelayscale <= 1e-9)
+      if(devparms.bandwidth == 1000)
       {
-        devparms.timebasedelayscale = 1e-9;
+        if(devparms.timebasedelayscale <= 5.001e-10)
+        {
+          devparms.timebasedelayscale = 5e-10;
 
-        return;
+          return;
+        }
+      }
+      else
+      {
+        if(devparms.timebasedelayscale <= 1.001e-9)
+        {
+          devparms.timebasedelayscale = 1e-9;
+
+          return;
+        }
       }
     }
 
@@ -2104,22 +2128,34 @@ void UI_Mainwindow::zoom_in()
   }
   else
   {
-    if(devparms.bandwidth == 1000)
+    if(devparms.modelserie == 1)
     {
-      if(devparms.timebasescale <= 5e-10)
+      if(devparms.timebasescale <= 5.001e-9)
       {
-        devparms.timebasescale = 5e-10;
+        devparms.timebasescale = 5e-9;
 
         return;
       }
     }
     else
     {
-      if(devparms.timebasescale <= 1e-9)
+      if(devparms.bandwidth == 1000)
       {
-        devparms.timebasescale = 1e-9;
+        if(devparms.timebasescale <= 5.001e-10)
+        {
+          devparms.timebasescale = 5e-10;
 
-        return;
+          return;
+        }
+      }
+      else
+      {
+        if(devparms.timebasescale <= 1.001e-9)
+        {
+          devparms.timebasescale = 1e-9;
+
+          return;
+        }
       }
     }
 
@@ -2145,6 +2181,11 @@ void UI_Mainwindow::zoom_in()
 void UI_Mainwindow::zoom_out()
 {
   char str[256];
+
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
 
   if(devparms.timebasedelayenable)
   {
@@ -2204,6 +2245,125 @@ void UI_Mainwindow::zoom_out()
 }
 
 
+void UI_Mainwindow::chan_scale_plus()
+{
+  int chn;
+
+  double val, ltmp;
+
+  char str[512];
+
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
+
+  chn = devparms.activechannel;
+
+  if(devparms.chanscale[chn] >= 20)
+  {
+    devparms.chanscale[chn] = 20;
+
+    return;
+  }
+
+  ltmp = devparms.chanscale[chn];
+
+  val = round_up_step125(devparms.chanscale[chn]);
+
+  if(devparms.chanvernier[chn])
+  {
+    val /= 100;
+
+    devparms.chanscale[chn] += val;
+  }
+  else
+  {
+    devparms.chanscale[chn] = val;
+  }
+
+  ltmp /= val;
+
+  devparms.chanoffset[chn] /= ltmp;
+
+  sprintf(str, "Channel %i scale: ", chn + 1);
+
+  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+
+  strcat(str, "V");
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+
+  tmcdev_write(device, str);
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::chan_scale_minus()
+{
+  int chn;
+
+  double val, ltmp;
+
+  char str[512];
+
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
+
+  chn = devparms.activechannel;
+
+  if(devparms.chanscale[chn] <= 1e-2)
+  {
+    devparms.chanscale[chn] = 1e-2;
+
+    return;
+  }
+
+  ltmp = devparms.chanscale[chn];
+
+  if(devparms.chanvernier[chn])
+  {
+    val = round_up_step125(devparms.chanscale[chn]);
+  }
+  else
+  {
+    val = round_down_step125(devparms.chanscale[chn]);
+  }
+
+  if(devparms.chanvernier[chn])
+  {
+    val /= 100;
+
+    devparms.chanscale[chn] -= val;
+  }
+  else
+  {
+    devparms.chanscale[chn] = val;
+  }
+
+  ltmp /= val;
+
+  devparms.chanoffset[chn] /= ltmp;
+
+  sprintf(str, "Channel %i scale: ", chn + 1);
+
+  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+
+  strcat(str, "V");
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+
+  tmcdev_write(device, str);
+
+  waveForm->update();
+}
 
 
 

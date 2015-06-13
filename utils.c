@@ -1752,6 +1752,11 @@ double round_up_step125(double val)
     ltmp /= 10;
   }
 
+  if((ltmp < 1e-13) && (ltmp > -1e-13))
+  {
+    return 0;
+  }
+
   return ltmp;
 }
 
@@ -1803,6 +1808,11 @@ double round_down_step125(double val)
   for(i=0; i>exp; i--)
   {
     ltmp /= 10;
+  }
+
+  if((ltmp < 1e-13) && (ltmp > -1e-13))
+  {
+    return 0;
   }
 
   return ltmp;

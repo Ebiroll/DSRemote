@@ -468,7 +468,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   if(devparms->countersrc)
   {
-    paintCounterLabel(painter, curve_w - 150, 6);
+    paintCounterLabel(painter, curve_w - 180, 6);
   }
 
   if((mainwindow->adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF) || (mainwindow->navDialFunc == NAV_DIAL_FUNC_HOLDOFF))
@@ -1660,17 +1660,19 @@ void SignalCurve::paintLabel(QPainter *painter, int xpos, int ypos, int xw, int 
 
 void SignalCurve::paintCounterLabel(QPainter *painter, int xpos, int ypos)
 {
+  int i;
+
   char str[128];
 
   QPainterPath path;
 
-  path.addRoundedRect(xpos, ypos, 122, 20, 3, 3);
+  path.addRoundedRect(xpos, ypos, 175, 20, 3, 3);
 
   painter->fillPath(path, Qt::black);
 
   painter->setPen(Qt::darkGray);
 
-  painter->drawRoundedRect(xpos, ypos, 122, 20, 3, 3);
+  painter->drawRoundedRect(xpos, ypos, 175, 20, 3, 3);
 
   path = QPainterPath();
 
@@ -1692,12 +1694,21 @@ void SignalCurve::paintCounterLabel(QPainter *painter, int xpos, int ypos)
   }
   else
   {
-    convert_to_metric_suffix(str, devparms->counterfreq, 4);
+    convert_to_metric_suffix(str, devparms->counterfreq, 5);
 
     strcat(str, "Hz");
   }
 
-  painter->drawText(xpos + 22, ypos, 100, 20, Qt::AlignCenter, str);
+  for(i=0; i<3; i++)
+  {
+    painter->drawLine(xpos + 22 + (i * 14), ypos + 14, xpos + 29 + (i * 14), ypos + 14);
+    painter->drawLine(xpos + 29 + (i * 14), ypos + 14, xpos + 29 + (i * 14), ypos + 7);
+    painter->drawLine(xpos + 29 + (i * 14), ypos + 7, xpos + 36 + (i * 14), ypos + 7);
+    painter->drawLine(xpos + 36 + (i * 14), ypos + 7, xpos + 36 + (i * 14), ypos + 14);
+  }
+  painter->drawLine(xpos + 22 + (i * 14), ypos + 14, xpos + 29 + (i * 14), ypos + 14);
+
+  painter->drawText(xpos + 75, ypos, 100, 20, Qt::AlignCenter, str);
 }
 
 
