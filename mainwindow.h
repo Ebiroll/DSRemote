@@ -126,10 +126,7 @@ private:
 
   QStatusBar   *statusBar;
 
-  QVBoxLayout *vlayout1;
-
-  QLabel       *mainLabel,
-               *adjDialLabel,
+  QLabel       *adjDialLabel,
                *horScaleLabel,
                *horPosLabel,
                *vertScaleLabel,

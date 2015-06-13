@@ -296,6 +296,8 @@ void UI_Mainwindow::close_connection()
 
   setWindowTitle(PROGRAM_NAME " " PROGRAM_VERSION);
 
+  strcpy(devparms.modelname, "-----");
+
   disconnect(adjDial,         SIGNAL(valueChanged(int)), this, SLOT(adjDialChanged(int)));
   disconnect(trigAdjustDial,  SIGNAL(valueChanged(int)), this, SLOT(trigAdjustDialChanged(int)));
   disconnect(horScaleDial,    SIGNAL(valueChanged(int)), this, SLOT(horScaleDialChanged(int)));

@@ -63,19 +63,23 @@ UI_Mainwindow::UI_Mainwindow()
   for(i=0; i< MAX_CHNS; i++)
   {
     devparms.wavebuf[i] = (short *)malloc(WAVFRM_MAX_BUFSZ);
+
+    devparms.chanscale[i] = 1;
   }
 
   devparms.displaygrid = 2;
 
   devparms.channel_cnt = 4;
 
-  devparms.timebasescale = 1;
+  devparms.timebasescale = 0.001;
 
   devparms.hordivisions = 14;
 
+  strcpy(devparms.modelname, "-----");
+
   menubar = menuBar();
 
-  devicemenu = new QMenu;
+  devicemenu = new QMenu(this);
   devicemenu->setTitle("Device");
   devicemenu->addAction("Connect",    this, SLOT(open_connection()));
   devicemenu->addAction("Disconnect", this, SLOT(close_connection()));
@@ -84,18 +88,13 @@ UI_Mainwindow::UI_Mainwindow()
 
   menubar->addAction("Settings", this, SLOT(open_settings_dialog()));
 
-  helpmenu = new QMenu;
+  helpmenu = new QMenu(this);
   helpmenu->setTitle("Help");
   helpmenu->addAction("How to operate", this, SLOT(helpButtonClicked()));
   helpmenu->addAction("About", this, SLOT(show_about_dialog()));
   menubar->addMenu(helpmenu);
 
   statusLabel = new QLabel;
-
-  mainLabel = new QLabel();
-
-  vlayout1 = new QVBoxLayout;
-  vlayout1->addWidget(mainLabel);
 
   waveForm = new SignalCurve(this);
   waveForm->setBackgroundColor(Qt::black);
