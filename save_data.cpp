@@ -456,7 +456,7 @@ void UI_Mainwindow::save_memory_waveform()
           break;
         }
 
-        wavbuf[chn][bytes_rcvd + k] = (int)(((unsigned char *)device->buf)[k]) - yref[chn];
+        wavbuf[chn][bytes_rcvd + k] = (int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn];
       }
 
       bytes_rcvd += n;
@@ -531,8 +531,6 @@ void UI_Mainwindow::save_memory_waveform()
     }
   }
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
-
   if(bytes_rcvd < mempnts)
   {
     sprintf(str, "Download error.  line %i file %s", __LINE__, __FILE__);
@@ -588,7 +586,7 @@ void UI_Mainwindow::save_memory_waveform()
     if(devparms.chanscale[chn] > 2)
     {
       edf_set_physical_maximum(hdl, j, yinc[chn] * 32767);
-      edf_set_physical_minimum(hdl, j, yinc[chn] * 32767);
+      edf_set_physical_minimum(hdl, j, yinc[chn] * -32768);
       edf_set_physical_dimension(hdl, j, "V");
     }
     else
@@ -633,6 +631,8 @@ OUT_NORMAL:
   {
     free(wavbuf[chn]);
   }
+
+  scrn_timer->start(SCREEN_TIMER_IVAL);
 
   return;
 
@@ -739,14 +739,21 @@ OUT_ERROR:
 
 void UI_Mainwindow::save_screen_waveform()
 {
-  int i, j, n=0, chns=0, hdl=-1, yoffset[MAX_CHNS];
+  int i, j,
+      n=0,
+      chn,
+      chns=0,
+      hdl=-1,
+      yref[MAX_CHNS],
+      yor[MAX_CHNS];
 
   char str[128],
        opath[MAX_PATHLEN];
 
   short *wavbuf[4];
 
-  double rec_len = 0;
+  double rec_len = 0,
+         yinc[MAX_CHNS];
 
   if(device == NULL)
   {
@@ -760,27 +767,13 @@ void UI_Mainwindow::save_screen_waveform()
 
   scrn_timer->stop();
 
-  if(devparms.modelserie == 1)
+  if(devparms.timebasedelayenable)
   {
-    if(devparms.timebasedelayenable)
-    {
-      rec_len = devparms.timebasedelayscale * 12;
-    }
-    else
-    {
-      rec_len = devparms.timebasescale * 12;
-    }
+    rec_len = devparms.timebasedelayscale * devparms.hordivisions;
   }
   else
   {
-    if(devparms.timebasedelayenable)
-    {
-      rec_len = devparms.timebasedelayscale * 14;
-    }
-    else
-    {
-      rec_len = devparms.timebasescale * 14;
-    }
+    rec_len = devparms.timebasescale * devparms.hordivisions;
   }
 
   if(rec_len < 1e-6)
@@ -789,15 +782,15 @@ void UI_Mainwindow::save_screen_waveform()
     goto OUT_ERROR;
   }
 
-  for(i=0; i<MAX_CHNS; i++)
+  for(chn=0; chn<MAX_CHNS; chn++)
   {
-    if(!devparms.chandisplay[i])  // Download data only when channel is switched on
+    if(!devparms.chandisplay[chn])  // Download data only when channel is switched on
     {
       continue;
     }
 
-    wavbuf[i] = (short *)malloc(WAVFRM_MAX_BUFSZ * sizeof(short));
-    if(wavbuf[i] == NULL)
+    wavbuf[chn] = (short *)malloc(WAVFRM_MAX_BUFSZ * sizeof(short));
+    if(wavbuf[chn] == NULL)
     {
       strcpy(str, "Malloc error.");
       goto OUT_ERROR;
@@ -812,20 +805,76 @@ void UI_Mainwindow::save_screen_waveform()
     goto OUT_ERROR;
   }
 
-  for(i=0; i<MAX_CHNS; i++)
+  for(chn=0; chn<MAX_CHNS; chn++)
   {
-    if(!devparms.chandisplay[i])  // Download data only when channel is switched on
+    if(!devparms.chandisplay[chn])  // Download data only when channel is switched on
     {
       continue;
     }
 
-    sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
+    usleep(20000);
+
+    sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
 
     tmcdev_write(device, str);
 
+    usleep(20000);
+
     tmcdev_write(device, ":WAV:FORM BYTE");
 
+    usleep(20000);
+
     tmcdev_write(device, ":WAV:MODE NORM");
+
+    usleep(20000);
+
+    tmcdev_write(device, ":WAV:YINC?");
+
+    usleep(20000);
+
+    tmcdev_read(device);
+
+    yinc[chn] = atof(device->buf);
+
+    if(yinc[chn] < 1e-6)
+    {
+      sprintf(str, "Error, parameter \"YINC\" out of range.  line %i file %s", __LINE__, __FILE__);
+      goto OUT_ERROR;
+    }
+
+    usleep(20000);
+
+    tmcdev_write(device, ":WAV:YREF?");
+
+    usleep(20000);
+
+    tmcdev_read(device);
+
+    yref[chn] = atoi(device->buf);
+
+    if((yref[chn] < 1) || (yref[chn] > 255))
+    {
+      sprintf(str, "Error, parameter \"YREF\" out of range.  line %i file %s", __LINE__, __FILE__);
+      goto OUT_ERROR;
+    }
+
+    usleep(20000);
+
+    tmcdev_write(device, ":WAV:YOR?");
+
+    usleep(20000);
+
+    tmcdev_read(device);
+
+    yor[chn] = atoi(device->buf);
+
+    if((yor[chn] < -255) || (yor[chn] > 255))
+    {
+      sprintf(str, "Error, parameter \"YOR\" out of range.  line %i file %s", __LINE__, __FILE__);
+      goto OUT_ERROR;
+    }
+
+    usleep(20000);
 
     tmcdev_write(device, ":WAV:DATA?");
 
@@ -855,13 +904,9 @@ void UI_Mainwindow::save_screen_waveform()
       goto OUT_ERROR;
     }
 
-    yoffset[i] = ((devparms.chanoffset[i] / devparms.chanscale[i]) * 25.0);
-
-    for(j=0; j<n; j++)
+    for(i=0; i<n; i++)
     {
-      wavbuf[i][j] = (int)(((unsigned char *)device->buf)[j]) - 127;
-
-      wavbuf[i][j] -= yoffset[i];
+      wavbuf[chn][i] = (int)(((unsigned char *)device->buf)[i]) - yref[chn] - yor[chn];
     }
   }
 
@@ -897,9 +942,9 @@ void UI_Mainwindow::save_screen_waveform()
 
   j = 0;
 
-  for(i=0; i<MAX_CHNS; i++)
+  for(chn=0; chn<MAX_CHNS; chn++)
   {
-    if(!devparms.chandisplay[i])
+    if(!devparms.chandisplay[chn])
     {
       continue;
     }
@@ -907,19 +952,19 @@ void UI_Mainwindow::save_screen_waveform()
     edf_set_samplefrequency(hdl, j, n);
     edf_set_digital_maximum(hdl, j, 32767);
     edf_set_digital_minimum(hdl, j, -32768);
-    if(devparms.chanscale[i] > 2)
+    if(devparms.chanscale[chn] > 2)
     {
-      edf_set_physical_maximum(hdl, j, (devparms.chanscale[i] / 25) * 32767);
-      edf_set_physical_minimum(hdl, j, (devparms.chanscale[i] / 25) * 32767);
+      edf_set_physical_maximum(hdl, j, yinc[chn] * 32767);
+      edf_set_physical_minimum(hdl, j, yinc[chn] * -32768);
       edf_set_physical_dimension(hdl, j, "V");
     }
     else
     {
-      edf_set_physical_maximum(hdl, j, 1000 * (devparms.chanscale[i] / 25) * 32767);
-      edf_set_physical_minimum(hdl, j, 1000 * (devparms.chanscale[i] / 25) * -32768);
+      edf_set_physical_maximum(hdl, j, 1000 * yinc[chn] * 32767);
+      edf_set_physical_minimum(hdl, j, 1000 * yinc[chn] * -32768);
       edf_set_physical_dimension(hdl, j, "mV");
     }
-    sprintf(str, "CHAN%i", i + 1);
+    sprintf(str, "CHAN%i", chn + 1);
     edf_set_label(hdl, j, str);
 
     j++;
@@ -927,14 +972,14 @@ void UI_Mainwindow::save_screen_waveform()
 
   edf_set_equipment(hdl, devparms.modelname);
 
-  for(i=0; i<MAX_CHNS; i++)
+  for(chn=0; chn<MAX_CHNS; chn++)
   {
-    if(!devparms.chandisplay[i])
+    if(!devparms.chandisplay[chn])
     {
       continue;
     }
 
-    if(edfwrite_digital_short_samples(hdl, wavbuf[i]))
+    if(edfwrite_digital_short_samples(hdl, wavbuf[chn]))
     {
       strcpy(str, "A write error occurred.");
       goto OUT_ERROR;
@@ -948,9 +993,9 @@ OUT_NORMAL:
     edfclose_file(hdl);
   }
 
-  for(i=0; i<MAX_CHNS; i++)
+  for(chn=0; chn<MAX_CHNS; chn++)
   {
-    free(wavbuf[i]);
+    free(wavbuf[chn]);
   }
 
   scrn_timer->start(SCREEN_TIMER_IVAL);
@@ -969,9 +1014,9 @@ OUT_ERROR:
     edfclose_file(hdl);
   }
 
-  for(i=0; i<MAX_CHNS; i++)
+  for(chn=0; chn<MAX_CHNS; chn++)
   {
-    free(wavbuf[i]);
+    free(wavbuf[chn]);
   }
 
   scrn_timer->start(SCREEN_TIMER_IVAL);
