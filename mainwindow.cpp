@@ -1887,6 +1887,21 @@ void UI_Mainwindow::former_page()
   {
     devparms.timebaseoffset -= devparms.timebasescale * devparms.hordivisions;
 
+    if(devparms.memdepth > 10)
+    {
+      if(devparms.timebaseoffset <= -(((double)devparms.memdepth / devparms.samplerate) / 2))
+      {
+        devparms.timebaseoffset = -(((double)devparms.memdepth / devparms.samplerate) / 2);
+      }
+    }
+    else
+    {
+      if(devparms.timebaseoffset <= -((devparms.hordivisions / 2) * devparms.timebasescale))
+      {
+        devparms.timebaseoffset = -((devparms.hordivisions / 2) * devparms.timebasescale);
+      }
+    }
+
     strcpy(str, "Horizontal position: ");
 
     convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
@@ -1942,6 +1957,21 @@ void UI_Mainwindow::next_page()
   else
   {
     devparms.timebaseoffset += devparms.timebasescale * devparms.hordivisions;
+
+    if(devparms.memdepth > 10)
+    {
+      if(devparms.timebaseoffset >= (((double)devparms.memdepth / devparms.samplerate) / 2))
+      {
+        devparms.timebaseoffset = (((double)devparms.memdepth / devparms.samplerate) / 2);
+      }
+    }
+    else
+    {
+      if(devparms.timebaseoffset >= (devparms.hordivisions / 2) * devparms.timebasescale)
+      {
+        devparms.timebaseoffset = (devparms.hordivisions / 2) * devparms.timebasescale;
+      }
+    }
 
     strcpy(str, "Horizontal position: ");
 
@@ -1999,6 +2029,21 @@ void UI_Mainwindow::shift_page_left()
   {
     devparms.timebaseoffset -= devparms.timebasescale;
 
+    if(devparms.memdepth > 10)
+    {
+      if(devparms.timebaseoffset <= -(((double)devparms.memdepth / devparms.samplerate) / 2))
+      {
+        devparms.timebaseoffset = -(((double)devparms.memdepth / devparms.samplerate) / 2);
+      }
+    }
+    else
+    {
+      if(devparms.timebaseoffset <= -((devparms.hordivisions / 2) * devparms.timebasescale))
+      {
+        devparms.timebaseoffset = -((devparms.hordivisions / 2) * devparms.timebasescale);
+      }
+    }
+
     strcpy(str, "Horizontal position: ");
 
     convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
@@ -2054,6 +2099,21 @@ void UI_Mainwindow::shift_page_right()
   else
   {
     devparms.timebaseoffset += devparms.timebasescale;
+
+    if(devparms.memdepth > 10)
+    {
+      if(devparms.timebaseoffset >= (((double)devparms.memdepth / devparms.samplerate) / 2))
+      {
+        devparms.timebaseoffset = (((double)devparms.memdepth / devparms.samplerate) / 2);
+      }
+    }
+    else
+    {
+      if(devparms.timebaseoffset >= (devparms.hordivisions / 2) * devparms.timebasescale)
+      {
+        devparms.timebaseoffset = (devparms.hordivisions / 2) * devparms.timebasescale;
+      }
+    }
 
     strcpy(str, "Horizontal position: ");
 
