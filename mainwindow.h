@@ -362,6 +362,8 @@ private slots:
   void chan_scale_plus();
   void chan_scale_minus();
 
+  void set_to_factory();
+
 protected:
   void closeEvent(QCloseEvent *);
 

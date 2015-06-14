@@ -2428,6 +2428,88 @@ void UI_Mainwindow::chan_scale_minus()
 }
 
 
+void UI_Mainwindow::set_to_factory()
+{
+  int i;
+
+  scrn_timer->stop();
+
+  tmcdev_write(device, "*RST");
+
+  devparms.timebasescale = 1e-6;
+
+  devparms.timebaseoffset = 0;
+
+  devparms.timebasedelayenable = 0;
+
+  devparms.timebasedelayoffset = 0;
+
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    devparms.chanscale[i] = 1;
+
+    devparms.chanoffset[i] = 0;
+
+    devparms.chandisplay[i] = 0;
+
+    devparms.chancoupling[i] = 1;
+
+    devparms.chanbwlimit[i] = 0;
+
+    devparms.chanprobe[i] = 10;
+
+    devparms.chaninvert[i] = 0;
+
+    devparms.chanvernier[i] = 0;
+
+    devparms.triggeredgelevel[i] = 0;
+  }
+
+  devparms.chandisplay[0] = 1;
+
+  devparms.activechannel = 0;
+
+  devparms.acquiretype = 0;
+
+  devparms.memdepth = 0;
+
+  devparms.triggermode = 0;
+
+  devparms.triggeredgesource = 0;
+
+  devparms.triggeredgeslope = 0;
+
+  devparms.triggerstatus = 3;
+
+  devparms.triggercoupling = 1;
+
+  if(devparms.modelserie == 1)
+  {
+    devparms.triggerholdoff = 1.6e-8;
+  }
+  else
+  {
+    devparms.triggerholdoff = 1e-7;
+  }
+
+  devparms.displaytype = 0;
+
+  devparms.displaygrid = 2;
+
+  statusLabel->setText("Reset to factory settings");
+
+  waveForm->update();
+
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+
+  qApp->processEvents();
+
+  sleep(10);
+
+  QApplication::restoreOverrideCursor();
+
+  scrn_timer->start(SCREEN_TIMER_IVAL);
+}
 
 
 
