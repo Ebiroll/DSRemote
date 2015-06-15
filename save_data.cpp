@@ -397,6 +397,16 @@ void UI_Mainwindow::save_memory_waveform()
         usleep(20000);
 
         tmcdev_write(device, ":WAV:BEG");
+
+        usleep(20000);
+
+        tmcdev_write(device, ":WAV:STAT?");
+
+        usleep(20000);
+
+        tmcdev_read(device);
+
+        printf(":WAV:STAT?   %s\n", device->buf);
       }
 
       usleep(20000);

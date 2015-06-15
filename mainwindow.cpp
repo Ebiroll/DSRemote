@@ -2432,6 +2432,8 @@ void UI_Mainwindow::set_to_factory()
 {
   int i;
 
+  char str[256];
+
   scrn_timer->stop();
 
   tmcdev_write(device, "*RST");
@@ -2505,6 +2507,18 @@ void UI_Mainwindow::set_to_factory()
   qApp->processEvents();
 
   sleep(10);
+
+  if(devparms.modelserie == 6)
+  {
+    for(i=0; i<MAX_CHNS; i++)
+    {
+      sprintf(str, ":CHAN%i:SCAL 1", i + 1);
+
+      tmcdev_write(device, str);
+
+      usleep(20000);
+    }
+  }
 
   QApplication::restoreOverrideCursor();
 

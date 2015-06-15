@@ -562,7 +562,7 @@ void SignalCurve::setDeviceParameters(struct device_settings *devp)
 
 void SignalCurve::drawTopLabels(QPainter *painter)
 {
-  int i, x1;
+  int i, x1, tmp;
 
   char str[128];
 
@@ -702,11 +702,19 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
     dtmp2 = (devparms->timebaseoffset - devparms->timebasedelayoffset) / ((devparms->hordivisions / 2) * devparms->timebasescale);
 
-    painter->fillRect(288, 16, (116 - (dtmp1 * 116)) - (dtmp2 * 116), 8, QColor(64, 160, 255));
+    tmp = (116 - (dtmp1 * 116)) - (dtmp2 * 116);
+
+    if(tmp > 0)
+    {
+      painter->fillRect(288, 16, tmp, 8, QColor(64, 160, 255));
+    }
 
     x1 = (116 - (dtmp1 * 116)) + (dtmp2 * 116);
 
-    painter->fillRect(288 + 233 - x1, 16, x1, 8, QColor(64, 160, 255));
+    if(x1 > 0)
+    {
+      painter->fillRect(288 + 233 - x1, 16, x1, 8, QColor(64, 160, 255));
+    }
   }
   else if(devparms->memdepth > 1000)
   {
@@ -714,11 +722,19 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
     dtmp2 = devparms->timebaseoffset / dtmp1;
 
-    painter->fillRect(288, 16, (116 - (dtmp1 * 116)) - (dtmp2 * 116), 8, QColor(64, 160, 255));
+    tmp = (116 - (dtmp1 * 116)) - (dtmp2 * 116);
+
+    if(tmp > 0)
+    {
+      painter->fillRect(288, 16, tmp, 8, QColor(64, 160, 255));
+    }
 
     x1 = (116 - (dtmp1 * 116)) + (dtmp2 * 116);
 
-    painter->fillRect(288 + 233 - x1, 16, x1, 8, QColor(64, 160, 255));
+    if(x1 > 0)
+    {
+      painter->fillRect(288 + 233 - x1, 16, x1, 8, QColor(64, 160, 255));
+    }
   }
 
   painter->drawRect(288, 16, 233, 8);
