@@ -177,6 +177,8 @@ void UI_Mainwindow::save_memory_waveform()
     return;
   }
 
+  scrn_timer->stop();
+
   wavbuf[0] = NULL;
   wavbuf[1] = NULL;
   wavbuf[2] = NULL;
@@ -243,8 +245,6 @@ void UI_Mainwindow::save_memory_waveform()
       goto OUT_ERROR;
     }
   }
-
-  scrn_timer->stop();
 
   tmcdev_write(device, ":STOP");
 
