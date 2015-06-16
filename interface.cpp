@@ -2070,6 +2070,13 @@ void UI_Mainwindow::clearButtonClicked()
 
 void UI_Mainwindow::autoButtonClicked()
 {
+  if((device == NULL) || (!devparms.connected))
+  {
+    return;
+  }
+
+  scrn_timer->stop();
+
   statusLabel->setText("Auto settings");
 
   tmcdev_write(device, ":AUT");
@@ -2083,6 +2090,8 @@ void UI_Mainwindow::autoButtonClicked()
   sleep(2);
 
   get_device_settings();
+
+  scrn_timer->start(SCREEN_TIMER_IVAL);
 }
 
 
