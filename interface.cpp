@@ -2073,6 +2073,16 @@ void UI_Mainwindow::autoButtonClicked()
   statusLabel->setText("Auto settings");
 
   tmcdev_write(device, ":AUT");
+
+  qApp->processEvents();
+
+  usleep(20000);
+
+  qApp->processEvents();
+
+  sleep(2);
+
+  get_device_settings();
 }
 
 
