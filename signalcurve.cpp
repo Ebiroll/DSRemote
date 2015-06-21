@@ -1266,7 +1266,9 @@ void SignalCurve::mousePressEvent(QMouseEvent *press_event)
 
   if(press_event->button()==Qt::LeftButton)
   {
-    if((m_x > (trig_pos_arrow_pos - 8)) && (m_x < (trig_pos_arrow_pos + 8)) && (m_y > 5) && (m_y < 24))
+    if(((m_x > (trig_pos_arrow_pos - 8)) && (m_x < (trig_pos_arrow_pos + 8)) && (m_y > 5) && (m_y < 24)) ||
+       ((trig_pos_arrow_pos > w) && (m_x > (trig_pos_arrow_pos - 24)) && (m_x <= trig_pos_arrow_pos) && (m_y > 9) && (m_y < 26)) ||
+       ((trig_pos_arrow_pos < 0) && (m_x < 24) && (m_x >= 0) && (m_y > 9) && (m_y < 26)))
     {
       trig_pos_arrow_moving = 1;
       use_move_events = 1;
@@ -1274,7 +1276,9 @@ void SignalCurve::mousePressEvent(QMouseEvent *press_event)
       mouse_old_x = m_x;
       mouse_old_y = m_y;
     }
-    else if((m_x > w) && (m_x < (w + 26)) && (m_y > (trig_level_arrow_pos - 7)) && (m_y < (trig_level_arrow_pos + 7)))
+    else if(((m_x > w) && (m_x < (w + 26)) && (m_y > (trig_level_arrow_pos - 7)) && (m_y < (trig_level_arrow_pos + 7))) ||
+            ((trig_level_arrow_pos < 0) && (m_x >= w) && (m_x < (w + 18)) && (m_y >= 0) && (m_y < 22)) ||
+            ((trig_level_arrow_pos > h) && (m_x >= w) && (m_x < (w + 18)) && (m_y <= h) && (m_y > (h - 22))))
       {
         trig_level_arrow_moving = 1;
         use_move_events = 1;
@@ -1292,7 +1296,9 @@ void SignalCurve::mousePressEvent(QMouseEvent *press_event)
             continue;
           }
 
-          if(m_x > -26 && (m_x < 0) && (m_y > (chan_arrow_pos[chn] - 7)) && (m_y < (chan_arrow_pos[chn] + 7)))
+          if((m_x > -26 && (m_x < 0) && (m_y > (chan_arrow_pos[chn] - 7)) && (m_y < (chan_arrow_pos[chn] + 7))) ||
+             ((chan_arrow_pos[chn] < 0) && (m_x > -18) && (m_x <= 0) && (m_y >= 0) && (m_y < 22)) ||
+             ((chan_arrow_pos[chn] > h) && (m_x > -18) && (m_x <= 0) && (m_y <= h) && (m_y > (h - 22))))
           {
             chan_arrow_moving[chn] = 1;
             devparms->activechannel = chn;
