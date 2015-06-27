@@ -44,9 +44,9 @@ void UI_Mainwindow::open_connection()
 {
   int n;
 
-  char str[1024],
-       dev_str[128] = {""},
-       resp_str[1024],
+  char str[1024] = {""},
+       dev_str[256] = {""},
+       resp_str[1024] = {""},
        *ptr;
 
   QSettings settings;
@@ -74,7 +74,7 @@ void UI_Mainwindow::open_connection()
 
   if(devparms.connectiontype == 0)  // USB
   {
-    strcpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data());
+    strcpy(dev_str, settings.value("connection/device").toString().toLatin1().data());
 
     if(!strcmp(dev_str, ""))
     {
@@ -93,6 +93,20 @@ void UI_Mainwindow::open_connection()
 
   if(devparms.connectiontype == 1)  // LAN
   {
+    strcpy(dev_str, settings.value("connection/ip").toString().toLatin1().data());
+
+    if(!strcmp(dev_str, ""))
+    {
+      sprintf(str, "No IP address set");
+      goto OUT_ERROR;
+    }
+
+    device = tmc_open_lan(dev_str);
+    if(device == NULL)
+    {
+      sprintf(str, "Can not open connection to %s", dev_str);
+      goto OUT_ERROR;
+    }
   }
 
   if(tmc_write("*IDN?") != 5)
@@ -2383,6 +2397,12 @@ void UI_Mainwindow::chan_scale_plus()
 
   tmc_write(str);
 
+  tmc_write(":TRIG:EDG:LEV?");
+
+  tmc_read();
+
+  devparms.triggeredgelevel[chn] = atof(device->buf);
+
   waveForm->update();
 }
 
@@ -2446,6 +2466,12 @@ void UI_Mainwindow::chan_scale_minus()
   sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
   tmc_write(str);
+
+  tmc_write(":TRIG:EDG:LEV?");
+
+  tmc_read();
+
+  devparms.triggeredgelevel[chn] = atof(device->buf);
 
   waveForm->update();
 }

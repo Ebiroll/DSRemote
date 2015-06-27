@@ -987,6 +987,12 @@ void UI_Mainwindow::vertScaleDialChanged(int new_pos)
 
   tmc_write(str);
 
+  tmc_write(":TRIG:EDG:LEV?");
+
+  tmc_read();
+
+  devparms.triggeredgelevel[chn] = atof(device->buf);
+
   old_pos = new_pos;
 
   waveForm->update();

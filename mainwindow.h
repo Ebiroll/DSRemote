@@ -32,6 +32,7 @@
 
 #include <QtGlobal>
 #include <QApplication>
+#include <QObject>
 #include <QtGui>
 #include <QWidget>
 #include <QMainWindow>

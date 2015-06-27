@@ -54,7 +54,7 @@ struct tmcdev * tmcdev_open(const char *device)
     return NULL;
   }
 
-  dev->hdrbuf = calloc(1, MAX_RESP_LEN + 1024);
+  dev->hdrbuf = (char *)calloc(1, MAX_RESP_LEN + 1024);
   if(dev->hdrbuf == NULL)
   {
     free(dev);

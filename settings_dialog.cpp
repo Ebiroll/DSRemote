@@ -103,7 +103,19 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
 
   comboBox1->setCurrentIndex(dev_str[11] - '0');
 
-  QObject::connect(applyButton,    SIGNAL(clicked()),     this, SLOT(applyButtonClicked()));
+  if(mainwindow->devparms.connected)
+  {
+    usbRadioButton->setEnabled(false);
+    lanRadioButton->setEnabled(false);
+    ipLineEdit->setEnabled(false);
+    comboBox1->setEnabled(false);
+    applyButton->setEnabled(false);
+  }
+  else
+  {
+    QObject::connect(applyButton,    SIGNAL(clicked()),     this, SLOT(applyButtonClicked()));
+  }
+
   QObject::connect(cancelButton,   SIGNAL(clicked()),     this, SLOT(close()));
 
   exec();

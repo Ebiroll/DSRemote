@@ -11,6 +11,7 @@ CONFIG += static
 CONFIG += largefile
 
 QT += widgets
+QT += network
 
 QMAKE_CXXFLAGS += -Wextra -Wshadow -Wformat-nonliteral -Wformat-security -Wtype-limits -Wfatal-errors
 
