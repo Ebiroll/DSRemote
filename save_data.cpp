@@ -121,7 +121,7 @@ void UI_Mainwindow::save_screenshot()
 
   if(!strcmp(opath, ""))
   {
-    scrn_timer->start(SCREEN_TIMER_IVAL);
+    scrn_timer->start(devparms.screentimerival);
 
     return;
   }
@@ -134,13 +134,13 @@ void UI_Mainwindow::save_screenshot()
     goto OUT_ERROR;
   }
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
+  scrn_timer->start(devparms.screentimerival);
 
   return;
 
 OUT_ERROR:
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
+  scrn_timer->start(devparms.screentimerival);
 
   QMessageBox msgBox;
   msgBox.setIcon(QMessageBox::Critical);
@@ -642,7 +642,7 @@ OUT_NORMAL:
     free(wavbuf[chn]);
   }
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
+  scrn_timer->start(devparms.screentimerival);
 
   return;
 
@@ -704,7 +704,7 @@ OUT_ERROR:
     free(wavbuf[chn]);
   }
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
+  scrn_timer->start(devparms.screentimerival);
 }
 
 
@@ -1008,7 +1008,7 @@ OUT_NORMAL:
     free(wavbuf[chn]);
   }
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
+  scrn_timer->start(devparms.screentimerival);
 
   return;
 
@@ -1029,7 +1029,7 @@ OUT_ERROR:
     free(wavbuf[chn]);
   }
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
+  scrn_timer->start(devparms.screentimerival);
 }
 
 

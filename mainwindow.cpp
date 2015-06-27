@@ -300,7 +300,7 @@ void UI_Mainwindow::open_connection()
 
   devparms.screenupdates_on = 1;
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
+  scrn_timer->start(devparms.screentimerival);
 
   return;
 
@@ -2571,7 +2571,7 @@ void UI_Mainwindow::set_to_factory()
 
   QApplication::restoreOverrideCursor();
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
+  scrn_timer->start(devparms.screentimerival);
 }
 
 

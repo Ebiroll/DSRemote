@@ -202,7 +202,7 @@ void UI_Mainwindow::navDialReleased()
 
   if(devparms.screenupdates_on == 1)
   {
-    scrn_timer->start(SCREEN_TIMER_IVAL);
+    scrn_timer->start(devparms.screentimerival);
   }
 
   waveForm->update();
@@ -2097,7 +2097,7 @@ void UI_Mainwindow::autoButtonClicked()
 
   get_device_settings();
 
-  scrn_timer->start(SCREEN_TIMER_IVAL);
+  scrn_timer->start(devparms.screentimerival);
 }
 
 
@@ -2224,7 +2224,7 @@ void UI_Mainwindow::horizontal_delayed_toggle()
 
     devparms.timebasedelayscale = atof(device->buf);
 
-    scrn_timer->start(SCREEN_TIMER_IVAL);
+    scrn_timer->start(devparms.screentimerival);
   }
 }
 

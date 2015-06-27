@@ -1341,7 +1341,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
   if(devparms->screenupdates_on == 1)
   {
-    mainwindow->scrn_timer->start(SCREEN_TIMER_IVAL);
+    mainwindow->scrn_timer->start(devparms->screentimerival);
   }
 
   if(trig_pos_arrow_moving)

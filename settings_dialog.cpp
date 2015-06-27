@@ -40,8 +40,8 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
 
   char dev_str[128];
 
-  setMinimumSize(QSize(400, 200));
-  setMaximumSize(QSize(400, 200));
+  setMinimumSize(QSize(490, 200));
+  setMaximumSize(QSize(490, 200));
   setWindowTitle("Settings");
   setModal(true);
 
@@ -55,7 +55,7 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
 
   lanRadioButton = new QRadioButton("LAN", this);
   lanRadioButton->setAutoExclusive(true);
-  lanRadioButton->setGeometry(260, 20, 110, 25);
+  lanRadioButton->setGeometry(220, 20, 110, 25);
   if(mainwindow->devparms.connectiontype == 1)
   {
     lanRadioButton->setChecked(true);
@@ -75,7 +75,7 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   comboBox1->addItem("/dev/usbtmc9");
 
   ipLineEdit = new QLineEdit(this);
-  ipLineEdit->setGeometry(240, 65, 110, 25);
+  ipLineEdit->setGeometry(200, 65, 110, 25);
   ipLineEdit->setInputMask("000.000.000.000;_");
   if(settings.contains("connection/ip"))
   {
@@ -86,12 +86,23 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
     ipLineEdit->setText("192.168.001.088");
   }
 
+  refreshLabel = new QLabel(this);
+  refreshLabel->setGeometry(370, 20, 120, 35);
+  refreshLabel->setText("Screen update\n interval");
+
+  refreshSpinbox = new QSpinBox(this);
+  refreshSpinbox->setGeometry(370, 65, 100, 25);
+  refreshSpinbox->setSuffix(" mS");
+  refreshSpinbox->setRange(50, 2000);
+  refreshSpinbox->setSingleStep(10);
+  refreshSpinbox->setValue(mainwindow->devparms.screentimerival);
+
   applyButton = new QPushButton(this);
   applyButton->setGeometry(20, 155, 100, 25);
   applyButton->setText("Apply");
 
   cancelButton = new QPushButton(this);
-  cancelButton->setGeometry(240, 155, 100, 25);
+  cancelButton->setGeometry(200, 155, 100, 25);
   cancelButton->setText("Cancel");
 
   strcpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data());
@@ -113,10 +124,11 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   }
   else
   {
-    QObject::connect(applyButton,    SIGNAL(clicked()),     this, SLOT(applyButtonClicked()));
+    QObject::connect(applyButton, SIGNAL(clicked()), this, SLOT(applyButtonClicked()));
   }
 
-  QObject::connect(cancelButton,   SIGNAL(clicked()),     this, SLOT(close()));
+  QObject::connect(cancelButton,   SIGNAL(clicked()),         this, SLOT(close()));
+  QObject::connect(refreshSpinbox, SIGNAL(valueChanged(int)), this, SLOT(refreshSpinboxChanged(int)));
 
   exec();
 }
@@ -158,8 +170,19 @@ void UI_settings_window::applyButtonClicked()
 }
 
 
+void UI_settings_window::refreshSpinboxChanged(int value)
+{
+  QSettings settings;
 
+  mainwindow->devparms.screentimerival = value;
 
+  settings.setValue("gui/refresh", value);
+
+  if(mainwindow->scrn_timer->isActive())
+  {
+    mainwindow->scrn_timer->start(value);
+  }
+}
 
 
 

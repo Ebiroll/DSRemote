@@ -61,7 +61,7 @@ void UI_Mainwindow::navDial_timer_handler()
 
     if(devparms.screenupdates_on == 1)
     {
-      scrn_timer->start(SCREEN_TIMER_IVAL);
+      scrn_timer->start(devparms.screentimerival);
     }
   }
 }
@@ -120,7 +120,7 @@ void UI_Mainwindow::adjdial_timer_handler()
 
   if(devparms.screenupdates_on == 1)
   {
-    scrn_timer->start(SCREEN_TIMER_IVAL);
+    scrn_timer->start(devparms.screentimerival);
   }
 }
 

@@ -31,13 +31,11 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.20_1506272131"
+#define PROGRAM_VERSION       "0.20_1506272231"
 
 #define MAX_PATHLEN            4096
 
 #define MAX_CHNS                  4
-
-#define SCREEN_TIMER_IVAL        50
 
 #define ADJDIAL_TIMER_IVAL_1   3000
 #define ADJDIAL_TIMER_IVAL_2   2000
@@ -88,6 +86,8 @@ struct device_settings
   char softwvers[128];
   int modelserie;               // 1=DS1000, 2=DS2000, etc.
   int hordivisions;             // number of horizontal divisions
+
+  int screentimerival;
 
   double samplerate;            // Samplefrequency
   int memdepth;                 // Number of waveform points that the oscilloscope can store in a single trigger sample

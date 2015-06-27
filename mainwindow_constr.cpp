@@ -58,6 +58,8 @@ UI_Mainwindow::UI_Mainwindow()
   QCoreApplication::setOrganizationDomain("teuniz.net");
   QCoreApplication::setApplicationName(PROGRAM_NAME);
 
+  QSettings settings;
+
   memset(&devparms, 0, sizeof(struct device_settings));
 
   devparms.screenshot_buf = (char *)malloc(1024 * 1024 * 2);
@@ -67,6 +69,15 @@ UI_Mainwindow::UI_Mainwindow()
     devparms.wavebuf[i] = (short *)malloc(WAVFRM_MAX_BUFSZ);
 
     devparms.chanscale[i] = 1;
+  }
+
+  devparms.screentimerival = settings.value("gui/refresh").toInt();
+
+  if((devparms.screentimerival < 50) || (devparms.screentimerival > 2000))
+  {
+    devparms.screentimerival = 500;
+
+    settings.setValue("gui/refresh", devparms.screentimerival);
   }
 
   devparms.displaygrid = 2;
@@ -377,8 +388,6 @@ UI_Mainwindow::UI_Mainwindow()
   recent_savedir[0] = 0;
 
   device = NULL;
-
-  QSettings settings;
 
   strcpy(recent_savedir, settings.value("path/savedir").toString().toLocal8Bit().data());
 

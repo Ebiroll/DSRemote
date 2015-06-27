@@ -42,6 +42,7 @@
 #include <QSettings>
 #include <QLineEdit>
 #include <QRadioButton>
+#include <QSpinBox>
 
 #include "mainwindow.h"
 #include "global.h"
@@ -70,11 +71,16 @@ QComboBox    *comboBox1;
 
 QLineEdit    *ipLineEdit;
 
+QSpinBox     *refreshSpinbox;
+
+QLabel       *refreshLabel;
+
 UI_Mainwindow *mainwindow;
 
 private slots:
 
 void applyButtonClicked();
+void refreshSpinboxChanged(int);
 
 };
 
