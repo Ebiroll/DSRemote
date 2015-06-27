@@ -181,7 +181,7 @@ void UI_Mainwindow::navDialReleased()
 
     sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
   else if(devparms.timebasedelayenable)
     {
@@ -195,7 +195,7 @@ void UI_Mainwindow::navDialReleased()
 
       sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
-      tmcdev_write(device, str);
+      tmc_write(str);
     }
 
   adjDialFunc = ADJ_DIAL_FUNC_NONE;
@@ -416,7 +416,7 @@ void UI_Mainwindow::trigAdjustDialChanged(int new_pos)
 
   sprintf(str, ":TRIG:EDG:LEV %e", devparms.triggeredgelevel[chn]);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 
   old_pos = new_pos;
 
@@ -548,7 +548,7 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
 
     sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
 
     old_pos = new_pos;
   }
@@ -624,7 +624,7 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
 
     sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
 
     old_pos = new_pos;
   }
@@ -716,7 +716,7 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
 
     sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
 
     old_pos = new_pos;
   }
@@ -759,7 +759,7 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
 
     sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
 
     old_pos = new_pos;
   }
@@ -859,7 +859,7 @@ void UI_Mainwindow::vertOffsetDialChanged(int new_pos)
 
   sprintf(str, ":CHAN%i:OFFS %e", chn + 1, devparms.chanoffset[chn]);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 
   old_pos = new_pos;
 
@@ -985,7 +985,7 @@ void UI_Mainwindow::vertScaleDialChanged(int new_pos)
 
   sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 
   old_pos = new_pos;
 
@@ -1118,13 +1118,13 @@ void UI_Mainwindow::set_memdepth(int mdepth)
   {
     statusLabel->setText("Memory depth: auto");
 
-    tmcdev_write(device, ":ACQ:MDEP AUTO");
+    tmc_write(":ACQ:MDEP AUTO");
 
     devparms.timebaseoffset = 0;
 
     usleep(20000);
 
-    tmcdev_write(device, ":TIM:OFFS 0");
+    tmc_write(":TIM:OFFS 0");
 
     return;
   }
@@ -1137,13 +1137,13 @@ void UI_Mainwindow::set_memdepth(int mdepth)
 
   sprintf(str, ":ACQ:MDEP %i", mdepth);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 
   devparms.timebaseoffset = 0;
 
   usleep(20000);
 
-  tmcdev_write(device, ":TIM:OFFS 0");
+  tmc_write(":TIM:OFFS 0");
 }
 
 
@@ -1314,7 +1314,7 @@ void UI_Mainwindow::set_acq_normal()
 
   statusLabel->setText("Acquire: normal");
 
-  tmcdev_write(device, ":ACQ:TYPE NORM");
+  tmc_write(":ACQ:TYPE NORM");
 }
 
 
@@ -1329,7 +1329,7 @@ void UI_Mainwindow::set_acq_peak()
 
   statusLabel->setText("Acquire: peak");
 
-  tmcdev_write(device, ":ACQ:TYPE PEAK");
+  tmc_write(":ACQ:TYPE PEAK");
 }
 
 
@@ -1344,7 +1344,7 @@ void UI_Mainwindow::set_acq_hres()
 
   statusLabel->setText("Acquire: high resolution");
 
-  tmcdev_write(device, ":ACQ:TYPE HRES");
+  tmc_write(":ACQ:TYPE HRES");
 }
 
 
@@ -1367,7 +1367,7 @@ void UI_Mainwindow::set_acq_average()
 
   statusLabel->setText("Acquire: average");
 
-  tmcdev_write(device, ":ACQ:TYPE AVER");
+  tmc_write(":ACQ:TYPE AVER");
 }
 
 
@@ -1436,7 +1436,7 @@ void UI_Mainwindow::set_grid_type_vectors()
 
   statusLabel->setText("Display type: vectors");
 
-  tmcdev_write(device, ":DISP:TYPE VECT");
+  tmc_write(":DISP:TYPE VECT");
 }
 
 
@@ -1451,7 +1451,7 @@ void UI_Mainwindow::set_grid_type_dots()
 
   statusLabel->setText("Display type: dots");
 
-  tmcdev_write(device, ":DISP:TYPE DOTS");
+  tmc_write(":DISP:TYPE DOTS");
 }
 
 
@@ -1466,7 +1466,7 @@ void UI_Mainwindow::set_grid_full()
 
   statusLabel->setText("Display grid: full");
 
-  tmcdev_write(device, ":DISP:GRID FULL");
+  tmc_write(":DISP:GRID FULL");
 }
 
 
@@ -1481,7 +1481,7 @@ void UI_Mainwindow::set_grid_half()
 
   statusLabel->setText("Display grid: half");
 
-  tmcdev_write(device, ":DISP:GRID HALF");
+  tmc_write(":DISP:GRID HALF");
 }
 
 
@@ -1496,7 +1496,7 @@ void UI_Mainwindow::set_grid_none()
 
   statusLabel->setText("Display grid: none");
 
-  tmcdev_write(device, ":DISP:GRID NONE");
+  tmc_write(":DISP:GRID NONE");
 }
 
 
@@ -1504,7 +1504,7 @@ void UI_Mainwindow::set_grading_min()
 {
   statusLabel->setText("Display grading: Minimum");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME MIN");
+  tmc_write(":DISP:GRAD:TIME MIN");
 }
 
 
@@ -1512,7 +1512,7 @@ void UI_Mainwindow::set_grading_005()
 {
   statusLabel->setText("Display grading: 0.05 Sec.");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME 0.05");
+  tmc_write(":DISP:GRAD:TIME 0.05");
 }
 
 
@@ -1520,7 +1520,7 @@ void UI_Mainwindow::set_grading_01()
 {
   statusLabel->setText("Display grading: 0.1 Sec.");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME 0.1");
+  tmc_write(":DISP:GRAD:TIME 0.1");
 }
 
 
@@ -1528,7 +1528,7 @@ void UI_Mainwindow::set_grading_02()
 {
   statusLabel->setText("Display grading: 0.2 Sec.");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME 0.2");
+  tmc_write(":DISP:GRAD:TIME 0.2");
 }
 
 
@@ -1536,7 +1536,7 @@ void UI_Mainwindow::set_grading_05()
 {
   statusLabel->setText("Display grading: 0.5 Sec.");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME 0.5");
+  tmc_write(":DISP:GRAD:TIME 0.5");
 }
 
 
@@ -1544,7 +1544,7 @@ void UI_Mainwindow::set_grading_1()
 {
   statusLabel->setText("Display grading: 1 Sec.");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME 1");
+  tmc_write(":DISP:GRAD:TIME 1");
 }
 
 
@@ -1552,7 +1552,7 @@ void UI_Mainwindow::set_grading_2()
 {
   statusLabel->setText("Display grading: 2 Sec.");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME 2");
+  tmc_write(":DISP:GRAD:TIME 2");
 }
 
 
@@ -1560,7 +1560,7 @@ void UI_Mainwindow::set_grading_5()
 {
   statusLabel->setText("Display grading: 5 Sec.");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME 5");
+  tmc_write(":DISP:GRAD:TIME 5");
 }
 
 
@@ -1568,7 +1568,7 @@ void UI_Mainwindow::set_grading_10()
 {
   statusLabel->setText("Display grading: 10 Sec.");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME 10");
+  tmc_write(":DISP:GRAD:TIME 10");
 }
 
 
@@ -1576,7 +1576,7 @@ void UI_Mainwindow::set_grading_20()
 {
   statusLabel->setText("Display grading: 20 Sec.");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME 20");
+  tmc_write(":DISP:GRAD:TIME 20");
 }
 
 
@@ -1584,7 +1584,7 @@ void UI_Mainwindow::set_grading_inf()
 {
   statusLabel->setText("Display grading: Infinite");
 
-  tmcdev_write(device, ":DISP:GRAD:TIME INF");
+  tmc_write(":DISP:GRAD:TIME INF");
 }
 
 
@@ -1654,7 +1654,7 @@ void UI_Mainwindow::vertScaleDialClicked(QPoint)
 
     sprintf(str, ":CHAN%i:VERN 0", chn + 1);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
   else
   {
@@ -1666,7 +1666,7 @@ void UI_Mainwindow::vertScaleDialClicked(QPoint)
 
     sprintf(str, ":CHAN%i:VERN 1", chn + 1);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
 }
 
@@ -1681,7 +1681,7 @@ void UI_Mainwindow::ch1ButtonClicked()
 
       statusLabel->setText("Channel 1 off");
 
-      tmcdev_write(device, ":CHAN1:DISP 0");
+      tmc_write(":CHAN1:DISP 0");
 
       ch1Button->setStyleSheet(def_stylesh);
 
@@ -1708,7 +1708,7 @@ void UI_Mainwindow::ch1ButtonClicked()
 
     statusLabel->setText("Channel 1 on");
 
-    tmcdev_write(device, ":CHAN1:DISP 1");
+    tmc_write(":CHAN1:DISP 1");
 
     ch1Button->setStyleSheet("background: #FFFF33;");
 
@@ -1727,7 +1727,7 @@ void UI_Mainwindow::ch2ButtonClicked()
 
       statusLabel->setText("Channel 2 off");
 
-      tmcdev_write(device, ":CHAN2:DISP 0");
+      tmc_write(":CHAN2:DISP 0");
 
       ch2Button->setStyleSheet(def_stylesh);
 
@@ -1754,7 +1754,7 @@ void UI_Mainwindow::ch2ButtonClicked()
 
     statusLabel->setText("Channel 2 on");
 
-    tmcdev_write(device, ":CHAN2:DISP 1");
+    tmc_write(":CHAN2:DISP 1");
 
     ch2Button->setStyleSheet("background: #33FFFF;");
 
@@ -1773,7 +1773,7 @@ void UI_Mainwindow::ch3ButtonClicked()
 
       statusLabel->setText("Channel 3 off");
 
-      tmcdev_write(device, ":CHAN3:DISP 0");
+      tmc_write(":CHAN3:DISP 0");
 
       ch3Button->setStyleSheet(def_stylesh);
 
@@ -1800,7 +1800,7 @@ void UI_Mainwindow::ch3ButtonClicked()
 
     statusLabel->setText("Channel 3 on");
 
-    tmcdev_write(device, ":CHAN3:DISP 1");
+    tmc_write(":CHAN3:DISP 1");
 
     ch3Button->setStyleSheet("background: #FF33FF;");
 
@@ -1819,7 +1819,7 @@ void UI_Mainwindow::ch4ButtonClicked()
 
       statusLabel->setText("Channel 4 off");
 
-      tmcdev_write(device, ":CHAN4:DISP 0");
+      tmc_write(":CHAN4:DISP 0");
 
       ch4Button->setStyleSheet(def_stylesh);
 
@@ -1846,7 +1846,7 @@ void UI_Mainwindow::ch4ButtonClicked()
 
     statusLabel->setText("Channel 4 on");
 
-    tmcdev_write(device, ":CHAN4:DISP 1");
+    tmc_write(":CHAN4:DISP 1");
 
     ch4Button->setStyleSheet("background: #0066CC;");
 
@@ -1900,7 +1900,7 @@ void UI_Mainwindow::chan_coupling_ac()
 
   sprintf(str, ":CHAN%i:COUP AC", devparms.activechannel + 1);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 
@@ -1916,7 +1916,7 @@ void UI_Mainwindow::chan_coupling_dc()
 
   sprintf(str, ":CHAN%i:COUP DC", devparms.activechannel + 1);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 
@@ -1932,7 +1932,7 @@ void UI_Mainwindow::chan_coupling_gnd()
 
   sprintf(str, ":CHAN%i:COUP GND", devparms.activechannel + 1);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 
@@ -1948,7 +1948,7 @@ void UI_Mainwindow::chan_bwl_off()
 
   sprintf(str, ":CHAN%i:BWL OFF", devparms.activechannel + 1);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 
@@ -1964,7 +1964,7 @@ void UI_Mainwindow::chan_bwl_20()
 
   sprintf(str, ":CHAN%i:BWL 20M", devparms.activechannel + 1);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 
@@ -1980,7 +1980,7 @@ void UI_Mainwindow::chan_bwl_250()
 
   sprintf(str, ":CHAN%i:BWL 250M", devparms.activechannel + 1);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 
@@ -2001,7 +2001,7 @@ void UI_Mainwindow::chan_invert_on()
 
   sprintf(str, ":CHAN%i:INV 1", devparms.activechannel + 1);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 
@@ -2022,7 +2022,7 @@ void UI_Mainwindow::chan_invert_off()
 
   sprintf(str, ":CHAN%i:INV 0", devparms.activechannel + 1);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 
@@ -2056,7 +2056,7 @@ void UI_Mainwindow::vertOffsetDialClicked(QPoint)
 
   sprintf(str, ":CHAN%i:OFFS %e", chn + 1, devparms.chanoffset[chn]);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 
@@ -2064,7 +2064,7 @@ void UI_Mainwindow::clearButtonClicked()
 {
   statusLabel->setText("Display cleared");
 
-  tmcdev_write(device, ":DISP:CLE");
+  tmc_write(":DISP:CLE");
 }
 
 
@@ -2079,7 +2079,7 @@ void UI_Mainwindow::autoButtonClicked()
 
   statusLabel->setText("Auto settings");
 
-  tmcdev_write(device, ":AUT");
+  tmc_write(":AUT");
 
   qApp->processEvents();
 
@@ -2101,13 +2101,13 @@ void UI_Mainwindow::runButtonClicked()
   {
     statusLabel->setText("Trigger: run");
 
-    tmcdev_write(device, ":RUN");
+    tmc_write(":RUN");
   }
   else
   {
     statusLabel->setText("Trigger: stop");
 
-    tmcdev_write(device, ":STOP");
+    tmc_write(":STOP");
   }
 }
 
@@ -2116,7 +2116,7 @@ void UI_Mainwindow::singleButtonClicked()
 {
   statusLabel->setText("Trigger: single");
 
-  tmcdev_write(device, ":SING");
+  tmc_write(":SING");
 }
 
 
@@ -2165,7 +2165,7 @@ void UI_Mainwindow::horizontal_delayed_on()
 
   statusLabel->setText("Delayed timebase enabled");
 
-  tmcdev_write(device, ":TIM:DEL:ENAB 1");
+  tmc_write(":TIM:DEL:ENAB 1");
 
   devparms.timebasedelayoffset = devparms.timebaseoffset;
 }
@@ -2182,7 +2182,7 @@ void UI_Mainwindow::horizontal_delayed_off()
 
   statusLabel->setText("Delayed timebase disabled");
 
-  tmcdev_write(device, ":TIM:DEL:ENAB 0");
+  tmc_write(":TIM:DEL:ENAB 0");
 }
 
 
@@ -2194,7 +2194,7 @@ void UI_Mainwindow::horizontal_delayed_toggle()
 
     statusLabel->setText("Delayed timebase disabled");
 
-    tmcdev_write(device, ":TIM:DEL:ENAB 0");
+    tmc_write(":TIM:DEL:ENAB 0");
   }
   else
   {
@@ -2204,17 +2204,17 @@ void UI_Mainwindow::horizontal_delayed_toggle()
 
     statusLabel->setText("Delayed timebase enabled");
 
-    tmcdev_write(device, ":TIM:DEL:ENAB 1");
+    tmc_write(":TIM:DEL:ENAB 1");
 
-    tmcdev_write(device, ":TIM:DEL:OFFS?");
+    tmc_write(":TIM:DEL:OFFS?");
 
-    tmcdev_read(device);
+    tmc_read();
 
     devparms.timebasedelayoffset = atof(device->buf);
 
-    tmcdev_write(device, ":TIM:DEL:SCAL?");
+    tmc_write(":TIM:DEL:SCAL?");
 
-    tmcdev_read(device);
+    tmc_read();
 
     devparms.timebasedelayscale = atof(device->buf);
 
@@ -2241,7 +2241,7 @@ void UI_Mainwindow::horPosDialClicked(QPoint)
 
     sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
   else
   {
@@ -2257,7 +2257,7 @@ void UI_Mainwindow::horPosDialClicked(QPoint)
 
     sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
 }
 
@@ -2301,7 +2301,7 @@ void UI_Mainwindow::counter_off()
 
   statusLabel->setText("Freq. counter off");
 
-  tmcdev_write(device, ":MEAS:COUN:SOUR OFF");
+  tmc_write(":MEAS:COUN:SOUR OFF");
 }
 
 
@@ -2311,7 +2311,7 @@ void UI_Mainwindow::counter_ch1()
 
   statusLabel->setText("Freq. counter channel 1");
 
-  tmcdev_write(device, ":MEAS:COUN:SOUR CHAN1");
+  tmc_write(":MEAS:COUN:SOUR CHAN1");
 }
 
 
@@ -2321,7 +2321,7 @@ void UI_Mainwindow::counter_ch2()
 
   statusLabel->setText("Freq. counter channel 2");
 
-  tmcdev_write(device, ":MEAS:COUN:SOUR CHAN2");
+  tmc_write(":MEAS:COUN:SOUR CHAN2");
 }
 
 
@@ -2331,7 +2331,7 @@ void UI_Mainwindow::counter_ch3()
 
   statusLabel->setText("Freq. counter channel 3");
 
-  tmcdev_write(device, ":MEAS:COUN:SOUR CHAN3");
+  tmc_write(":MEAS:COUN:SOUR CHAN3");
 }
 
 
@@ -2341,7 +2341,7 @@ void UI_Mainwindow::counter_ch4()
 
   statusLabel->setText("Freq. counter channel 4");
 
-  tmcdev_write(device, ":MEAS:COUN:SOUR CHAN4");
+  tmc_write(":MEAS:COUN:SOUR CHAN4");
 }
 
 
@@ -2356,17 +2356,17 @@ void UI_Mainwindow::trigModeButtonClicked()
     case 0: trigModeAutoLed->setValue(true);
             trigModeSingLed->setValue(false);
             statusLabel->setText("Trigger auto");
-            tmcdev_write(device, ":TRIG:SWE AUTO");
+            tmc_write(":TRIG:SWE AUTO");
             break;
     case 1: trigModeNormLed->setValue(true);
             trigModeAutoLed->setValue(false);
             statusLabel->setText("Trigger norm");
-            tmcdev_write(device, ":TRIG:SWE NORM");
+            tmc_write(":TRIG:SWE NORM");
             break;
     case 2: trigModeSingLed->setValue(true);
             trigModeNormLed->setValue(false);
             statusLabel->setText("Trigger single");
-            tmcdev_write(device, ":TRIG:SWE SING");
+            tmc_write(":TRIG:SWE SING");
             break;
   }
 }
@@ -2426,7 +2426,7 @@ void UI_Mainwindow::trigger_source_ch1()
 
   statusLabel->setText("Trigger source channel 1");
 
-  tmcdev_write(device, ":TRIG:EDG:SOUR CHAN1");
+  tmc_write(":TRIG:EDG:SOUR CHAN1");
 }
 
 
@@ -2436,7 +2436,7 @@ void UI_Mainwindow::trigger_source_ch2()
 
   statusLabel->setText("Trigger source channel 2");
 
-  tmcdev_write(device, ":TRIG:EDG:SOUR CHAN2");
+  tmc_write(":TRIG:EDG:SOUR CHAN2");
 }
 
 
@@ -2446,7 +2446,7 @@ void UI_Mainwindow::trigger_source_ch3()
 
   statusLabel->setText("Trigger source channel 3");
 
-  tmcdev_write(device, ":TRIG:EDG:SOUR CHAN3");
+  tmc_write(":TRIG:EDG:SOUR CHAN3");
 }
 
 
@@ -2456,7 +2456,7 @@ void UI_Mainwindow::trigger_source_ch4()
 
   statusLabel->setText("Trigger source channel 4");
 
-  tmcdev_write(device, ":TRIG:EDG:SOUR CHAN4");
+  tmc_write(":TRIG:EDG:SOUR CHAN4");
 }
 
 
@@ -2466,7 +2466,7 @@ void UI_Mainwindow::trigger_source_ext()
 
   statusLabel->setText("Trigger source extern");
 
-  tmcdev_write(device, ":TRIG:EDG:SOUR EXT");
+  tmc_write(":TRIG:EDG:SOUR EXT");
 }
 
 
@@ -2476,7 +2476,7 @@ void UI_Mainwindow::trigger_source_ext5()
 
   statusLabel->setText("Trigger source extern 5");
 
-  tmcdev_write(device, ":TRIG:EDG:SOUR EXT5");
+  tmc_write(":TRIG:EDG:SOUR EXT5");
 }
 
 
@@ -2486,7 +2486,7 @@ void UI_Mainwindow::trigger_source_acl()
 
   statusLabel->setText("Trigger source AC powerline");
 
-  tmcdev_write(device, ":TRIG:EDG:SOUR ACL");
+  tmc_write(":TRIG:EDG:SOUR ACL");
 }
 
 
@@ -2496,7 +2496,7 @@ void UI_Mainwindow::trigger_coupling_ac()
 
   statusLabel->setText("Trigger coupling AC");
 
-  tmcdev_write(device, ":TRIG:COUP AC");
+  tmc_write(":TRIG:COUP AC");
 }
 
 
@@ -2506,7 +2506,7 @@ void UI_Mainwindow::trigger_coupling_dc()
 
   statusLabel->setText("Trigger coupling DC");
 
-  tmcdev_write(device, ":TRIG:COUP DC");
+  tmc_write(":TRIG:COUP DC");
 }
 
 
@@ -2516,7 +2516,7 @@ void UI_Mainwindow::trigger_coupling_lfreject()
 
   statusLabel->setText("Trigger LF reject");
 
-  tmcdev_write(device, ":TRIG:COUP LFR");
+  tmc_write(":TRIG:COUP LFR");
 }
 
 
@@ -2526,7 +2526,7 @@ void UI_Mainwindow::trigger_coupling_hfreject()
 
   statusLabel->setText("Trigger HF reject");
 
-  tmcdev_write(device, ":TRIG:COUP HFR");
+  tmc_write(":TRIG:COUP HFR");
 }
 
 
@@ -2536,7 +2536,7 @@ void UI_Mainwindow::trigger_slope_pos()
 
   statusLabel->setText("Trigger edge positive");
 
-  tmcdev_write(device, ":TRIG:EDG:SLOP POS");
+  tmc_write(":TRIG:EDG:SLOP POS");
 }
 
 
@@ -2546,7 +2546,7 @@ void UI_Mainwindow::trigger_slope_neg()
 
   statusLabel->setText("Trigger edge negative");
 
-  tmcdev_write(device, ":TRIG:EDG:SLOP NEG");
+  tmc_write(":TRIG:EDG:SLOP NEG");
 }
 
 
@@ -2556,7 +2556,7 @@ void UI_Mainwindow::trigger_slope_rfal()
 
   statusLabel->setText("Trigger edge positive /negative");
 
-  tmcdev_write(device, ":TRIG:EDG:SLOP RFAL");
+  tmc_write(":TRIG:EDG:SLOP RFAL");
 }
 
 
@@ -2578,7 +2578,7 @@ void UI_Mainwindow::trigForceButtonClicked()
 {
   statusLabel->setText("Trigger force");
 
-  tmcdev_write(device, ":TFOR");
+  tmc_write(":TFOR");
 }
 
 
@@ -2586,13 +2586,13 @@ void UI_Mainwindow::trig50pctButtonClicked()
 {
   statusLabel->setText("Trigger 50%");
 
-  tmcdev_write(device, ":TLHA");
+  tmc_write(":TLHA");
 
   usleep(30000);
 
-  tmcdev_write(device, ":TRIG:EDG:LEV?");
+  tmc_write(":TRIG:EDG:LEV?");
 
-  tmcdev_read(device);
+  tmc_read();
 
   devparms.triggeredgelevel[devparms.triggeredgesource] = atof(device->buf);
 
@@ -2616,7 +2616,7 @@ void UI_Mainwindow::trigAdjustDialClicked(QPoint)
 
   sprintf(str, ":TRIG:EDG:LEV %e", devparms.triggeredgelevel[devparms.triggeredgesource]);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 }
 
 

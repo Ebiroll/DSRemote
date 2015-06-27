@@ -26,60 +26,61 @@
 */
 
 
+#include "connection.h"
 
 
-#ifndef SELECT_DEVICE_FORM1_H
-#define SELECT_DEVICE_FORM1_H
+int tmc_connection_type;
+
+struct tmcdev *usb_tmcdev;
 
 
 
-#include <QApplication>
-#include <QObject>
-#include <QDialog>
-#include <QLabel>
-#include <QPushButton>
-#include <QComboBox>
-#include <QSettings>
-#include <QLineEdit>
-#include <QRadioButton>
-
-#include "mainwindow.h"
-#include "global.h"
-
-
-class UI_Mainwindow;
-
-
-class UI_settings_window : public QDialog
+struct tmcdev * tmc_open_usb(const char *device)
 {
-  Q_OBJECT
+  tmc_connection_type = 0;
 
-public:
+  usb_tmcdev = tmcdev_open(device);
 
-  UI_settings_window(QWidget *parent=0);
-
-private:
-
-QPushButton  *cancelButton,
-             *applyButton;
-
-QRadioButton *usbRadioButton,
-             *lanRadioButton;
-
-QComboBox    *comboBox1;
-
-QLineEdit    *ipLineEdit;
-
-UI_Mainwindow *mainwindow;
-
-private slots:
-
-void applyButtonClicked();
-
-};
+  return usb_tmcdev;
+}
 
 
+void tmc_close(void)
+{
+  if(tmc_connection_type == 0)
+  {
+    tmcdev_close(usb_tmcdev);
 
-#endif
+    usb_tmcdev = NULL;
+  }
+}
+
+
+int tmc_write(const char *msg)
+{
+  if(tmc_connection_type == 0)
+  {
+    return tmcdev_write(usb_tmcdev, msg);
+  }
+
+  return -1;
+}
+
+
+int tmc_read(void)
+{
+  if(tmc_connection_type == 0)
+  {
+    return tmcdev_read(usb_tmcdev);
+  }
+
+  return -1;
+}
+
+
+
+
+
+
 
 

@@ -48,13 +48,13 @@ void UI_Mainwindow::save_screenshot()
 
   scrn_timer->stop();
 
-  tmcdev_write(device, ":DISP:DATA?");
+  tmc_write(":DISP:DATA?");
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
 
   qApp->processEvents();
 
-  n = tmcdev_read(device);
+  n = tmc_read();
 
   QApplication::restoreOverrideCursor();
 
@@ -246,7 +246,7 @@ void UI_Mainwindow::save_memory_waveform()
     }
   }
 
-  tmcdev_write(device, ":STOP");
+  tmc_write(":STOP");
 
   usleep(20000);
 
@@ -261,21 +261,21 @@ void UI_Mainwindow::save_memory_waveform()
 
     sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
 
-    tmcdev_write(device, ":WAV:FORM BYTE");
-
-    usleep(20000);
-
-    tmcdev_write(device, ":WAV:MODE RAW");
+    tmc_write(":WAV:FORM BYTE");
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:YINC?");
+    tmc_write(":WAV:MODE RAW");
 
     usleep(20000);
 
-    tmcdev_read(device);
+    tmc_write(":WAV:YINC?");
+
+    usleep(20000);
+
+    tmc_read();
 
     yinc[chn] = atof(device->buf);
 
@@ -287,11 +287,11 @@ void UI_Mainwindow::save_memory_waveform()
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:YREF?");
+    tmc_write(":WAV:YREF?");
 
     usleep(20000);
 
-    tmcdev_read(device);
+    tmc_read();
 
     yref[chn] = atoi(device->buf);
 
@@ -303,11 +303,11 @@ void UI_Mainwindow::save_memory_waveform()
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:YOR?");
+    tmc_write(":WAV:YOR?");
 
     usleep(20000);
 
-    tmcdev_read(device);
+    tmc_read();
 
     yor[chn] = atoi(device->buf);
 
@@ -323,15 +323,15 @@ void UI_Mainwindow::save_memory_waveform()
 //
 //       usleep(20000);
 //
-//       tmcdev_write(device, str);
+//       tmc_write(str);
 //
 //       usleep(20000);
 //
-//       tmcdev_write(device, ":WAV:RES");
+//       tmc_write(":WAV:RES");
 //
 //       usleep(20000);
 //
-//       tmcdev_write(device, ":WAV:BEG");
+//       tmc_write(":WAV:BEG");
 //     }
 
     empty_buf = 0;
@@ -354,7 +354,7 @@ void UI_Mainwindow::save_memory_waveform()
 
         usleep(20000);
 
-        tmcdev_write(device, str);
+        tmc_write(str);
 
         if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
         {
@@ -367,7 +367,7 @@ void UI_Mainwindow::save_memory_waveform()
 
         usleep(20000);
 
-        tmcdev_write(device, str);
+        tmc_write(str);
       }
       else
       {
@@ -375,7 +375,7 @@ void UI_Mainwindow::save_memory_waveform()
 
         usleep(20000);
 
-        tmcdev_write(device, str);
+        tmc_write(str);
 
         if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
         {
@@ -388,38 +388,38 @@ void UI_Mainwindow::save_memory_waveform()
 
         usleep(20000);
 
-        tmcdev_write(device, str);
+        tmc_write(str);
 
         usleep(20000);
 
-        tmcdev_write(device, ":WAV:RES");
+        tmc_write(":WAV:RES");
 
         usleep(20000);
 
-        tmcdev_write(device, ":WAV:BEG");
+        tmc_write(":WAV:BEG");
 
         usleep(20000);
 
-        tmcdev_write(device, ":WAV:STAT?");
+        tmc_write(":WAV:STAT?");
 
         usleep(20000);
 
-        tmcdev_read(device);
+        tmc_read();
 
         printf(":WAV:STAT?   %s\n", device->buf);
       }
 
       usleep(20000);
 
-      tmcdev_write(device, ":WAV:DATA?");
+      tmc_write(":WAV:DATA?");
 
-      n = tmcdev_read(device);
+      n = tmc_read();
 
       if(devparms.modelserie != 1)
       {
         usleep(20000);
 
-        tmcdev_write(device, ":WAV:END");
+        tmc_write(":WAV:END");
       }
 
       if(n < 0)
@@ -481,7 +481,7 @@ void UI_Mainwindow::save_memory_waveform()
 //     {
 //       usleep(20000);
 //
-//       tmcdev_write(device, ":WAV:END");
+//       tmc_write(":WAV:END");
 //     }
 
     if(bytes_rcvd < mempnts)
@@ -504,40 +504,40 @@ void UI_Mainwindow::save_memory_waveform()
 
     usleep(20000);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:MODE NORM");
+    tmc_write(":WAV:MODE NORM");
 
     if(devparms.modelserie == 6)
     {
       usleep(20000);
 
-      tmcdev_write(device, ":WAV:STAR 0");
+      tmc_write(":WAV:STAR 0");
     }
     else
     {
       usleep(20000);
 
-      tmcdev_write(device, ":WAV:STAR 1");
+      tmc_write(":WAV:STAR 1");
     }
 
     if(devparms.modelserie == 1)
     {
       usleep(20000);
 
-      tmcdev_write(device, ":WAV:STOP 1200");
+      tmc_write(":WAV:STOP 1200");
     }
     else
     {
       usleep(20000);
 
-      tmcdev_write(device, ":WAV:STOP 1400");
+      tmc_write(":WAV:STOP 1400");
 
       usleep(20000);
 
-      tmcdev_write(device, ":WAV:POIN 1400");
+      tmc_write(":WAV:POIN 1400");
     }
   }
 
@@ -674,28 +674,28 @@ OUT_ERROR:
 
     sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
 
-    tmcdev_write(device, ":WAV:MODE NORM");
+    tmc_write(":WAV:MODE NORM");
 
     if(devparms.modelserie == 6)
     {
-      tmcdev_write(device, ":WAV:STAR 0");
+      tmc_write(":WAV:STAR 0");
     }
     else
     {
-      tmcdev_write(device, ":WAV:STAR 1");
+      tmc_write(":WAV:STAR 1");
     }
 
     if(devparms.modelserie == 1)
     {
-      tmcdev_write(device, ":WAV:STOP 1200");
+      tmc_write(":WAV:STOP 1200");
     }
     else
     {
-      tmcdev_write(device, ":WAV:STOP 1400");
+      tmc_write(":WAV:STOP 1400");
 
-      tmcdev_write(device, ":WAV:POIN 1400");
+      tmc_write(":WAV:POIN 1400");
     }
   }
 
@@ -708,9 +708,9 @@ OUT_ERROR:
 }
 
 
-//     tmcdev_write(device, ":WAV:PRE?");
+//     tmc_write(":WAV:PRE?");
 //
-//     n = tmcdev_read(device);
+//     n = tmc_read();
 //
 //     if(n < 0)
 //     {
@@ -826,23 +826,23 @@ void UI_Mainwindow::save_screen_waveform()
 
     sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:FORM BYTE");
+    tmc_write(":WAV:FORM BYTE");
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:MODE NORM");
+    tmc_write(":WAV:MODE NORM");
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:YINC?");
+    tmc_write(":WAV:YINC?");
 
     usleep(20000);
 
-    tmcdev_read(device);
+    tmc_read();
 
     yinc[chn] = atof(device->buf);
 
@@ -854,11 +854,11 @@ void UI_Mainwindow::save_screen_waveform()
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:YREF?");
+    tmc_write(":WAV:YREF?");
 
     usleep(20000);
 
-    tmcdev_read(device);
+    tmc_read();
 
     yref[chn] = atoi(device->buf);
 
@@ -870,11 +870,11 @@ void UI_Mainwindow::save_screen_waveform()
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:YOR?");
+    tmc_write(":WAV:YOR?");
 
     usleep(20000);
 
-    tmcdev_read(device);
+    tmc_read();
 
     yor[chn] = atoi(device->buf);
 
@@ -886,13 +886,13 @@ void UI_Mainwindow::save_screen_waveform()
 
     usleep(20000);
 
-    tmcdev_write(device, ":WAV:DATA?");
+    tmc_write(":WAV:DATA?");
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     qApp->processEvents();
 
-    n = tmcdev_read(device);
+    n = tmc_read();
 
     QApplication::restoreOverrideCursor();
 

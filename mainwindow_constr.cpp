@@ -34,6 +34,8 @@ UI_Mainwindow::UI_Mainwindow()
 {
   int i;
 
+  char str[1024];
+
   setMinimumSize(1170, 630);
   setWindowTitle(PROGRAM_NAME " " PROGRAM_VERSION);
   setWindowIcon(QIcon(":/images/r.png"));
@@ -379,6 +381,17 @@ UI_Mainwindow::UI_Mainwindow()
   QSettings settings;
 
   strcpy(recent_savedir, settings.value("path/savedir").toString().toLocal8Bit().data());
+
+  strcpy(str, settings.value("connection/type").toString().toLatin1().data());
+
+  if(!strcmp(str, "LAN"))
+  {
+    devparms.connectiontype = 1;
+  }
+  else
+  {
+    devparms.connectiontype = 0;
+  }
 
   adjDialFunc = ADJ_DIAL_FUNC_NONE;
   navDialFunc = NAV_DIAL_FUNC_NONE;

@@ -32,7 +32,7 @@
 
 
 
-UI_select_device_window::UI_select_device_window(QDialog *parnt)
+UI_settings_window::UI_settings_window(QWidget *parnt)
 {
   QSettings settings;
 
@@ -45,8 +45,24 @@ UI_select_device_window::UI_select_device_window(QDialog *parnt)
   setWindowTitle("Settings");
   setModal(true);
 
+  usbRadioButton = new QRadioButton("USB", this);
+  usbRadioButton->setAutoExclusive(true);
+  usbRadioButton->setGeometry(40, 20, 110, 25);
+  if(mainwindow->devparms.connectiontype == 0)
+  {
+    usbRadioButton->setChecked(true);
+  }
+
+  lanRadioButton = new QRadioButton("LAN", this);
+  lanRadioButton->setAutoExclusive(true);
+  lanRadioButton->setGeometry(260, 20, 110, 25);
+  if(mainwindow->devparms.connectiontype == 1)
+  {
+    lanRadioButton->setChecked(true);
+  }
+
   comboBox1 = new QComboBox(this);
-  comboBox1->setGeometry(20, 20, 110, 26);
+  comboBox1->setGeometry(20, 65, 110, 25);
   comboBox1->addItem("/dev/usbtmc0");
   comboBox1->addItem("/dev/usbtmc1");
   comboBox1->addItem("/dev/usbtmc2");
@@ -58,12 +74,24 @@ UI_select_device_window::UI_select_device_window(QDialog *parnt)
   comboBox1->addItem("/dev/usbtmc8");
   comboBox1->addItem("/dev/usbtmc9");
 
+  ipLineEdit = new QLineEdit(this);
+  ipLineEdit->setGeometry(240, 65, 110, 25);
+  ipLineEdit->setInputMask("000.000.000.000;_");
+  if(settings.contains("connection/ip"))
+  {
+    ipLineEdit->setText(settings.value("connection/ip").toString());
+  }
+  else
+  {
+    ipLineEdit->setText("192.168.001.088");
+  }
+
   applyButton = new QPushButton(this);
   applyButton->setGeometry(20, 155, 100, 25);
   applyButton->setText("Apply");
 
   cancelButton = new QPushButton(this);
-  cancelButton->setGeometry(280, 155, 100, 25);
+  cancelButton->setGeometry(240, 155, 100, 25);
   cancelButton->setText("Cancel");
 
   strcpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data());
@@ -75,28 +103,52 @@ UI_select_device_window::UI_select_device_window(QDialog *parnt)
 
   comboBox1->setCurrentIndex(dev_str[11] - '0');
 
-  QObject::connect(applyButton,  SIGNAL(clicked()), this, SLOT(applyButtonClicked()));
-  QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(applyButton,    SIGNAL(clicked()),     this, SLOT(applyButtonClicked()));
+  QObject::connect(cancelButton,   SIGNAL(clicked()),     this, SLOT(close()));
 
   exec();
 }
 
 
-
-void UI_select_device_window::applyButtonClicked()
+void UI_settings_window::applyButtonClicked()
 {
   char dev_str[128];
 
   QSettings settings;
 
+  if(mainwindow->devparms.connected)
+  {
+    close();
+  }
+
   strcpy(dev_str, "/dev/usbtmc0");
 
   dev_str[11] = '0' + comboBox1->currentIndex();
 
+  if(usbRadioButton->isChecked() == true)
+  {
+    settings.setValue("connection/type", "USB");
+
+    mainwindow->devparms.connectiontype = 0;
+  }
+  else
+  {
+    settings.setValue("connection/type", "LAN");
+
+    mainwindow->devparms.connectiontype = 1;
+  }
+
   settings.setValue("connection/device", dev_str);
+
+  settings.setValue("connection/ip", ipLineEdit->text());
 
   close();
 }
+
+
+
+
+
 
 
 

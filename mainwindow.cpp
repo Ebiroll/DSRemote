@@ -36,7 +36,7 @@
 
 void UI_Mainwindow::open_settings_dialog()
 {
-  UI_select_device_window sel_device;
+  UI_settings_window settings(this);
 }
 
 
@@ -56,29 +56,52 @@ void UI_Mainwindow::open_connection()
     return;
   }
 
-  strcpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data());
-
-  if(!strcmp(dev_str, ""))
+  if(devparms.connected)
   {
-    strcpy(dev_str, "/dev/usbtmc0");
-
-    settings.setValue("connection/device", dev_str);
+    return;
   }
 
-  device = tmcdev_open(dev_str);
-  if(device == NULL)
+  strcpy(str, settings.value("connection/type").toString().toLatin1().data());
+
+  if(!strcmp(str, "LAN"))
   {
-    sprintf(str, "Can not open device %s", dev_str);
-    goto OUT_ERROR;
+    devparms.connectiontype = 1;
+  }
+  else
+  {
+    devparms.connectiontype = 0;
   }
 
-  if(tmcdev_write(device, "*IDN?") != 5)
+  if(devparms.connectiontype == 0)  // USB
+  {
+    strcpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data());
+
+    if(!strcmp(dev_str, ""))
+    {
+      strcpy(dev_str, "/dev/usbtmc0");
+
+      settings.setValue("connection/device", dev_str);
+    }
+
+    device = tmc_open_usb(dev_str);
+    if(device == NULL)
+    {
+      sprintf(str, "Can not open device %s", dev_str);
+      goto OUT_ERROR;
+    }
+  }
+
+  if(devparms.connectiontype == 1)  // LAN
+  {
+  }
+
+  if(tmc_write("*IDN?") != 5)
   {
     sprintf(str, "Can not write to device %s", dev_str);
     goto OUT_ERROR;
   }
 
-  n = tmcdev_read(device);
+  n = tmc_read();
 
   if(n < 0)
   {
@@ -155,7 +178,7 @@ void UI_Mainwindow::open_connection()
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setText("Unsupported device detected.");
     msgBox.setInformativeText("This software has not been tested with your device.\n"
-      "It has been tested with the DS6000 and DS1054 series only.\n"
+      "It has been tested with the DS6000 and DS1000Z series only.\n"
       "If you continue, it's likely that the program will not work correctly at some points.\n"
       "\nDo you want to continue?\n");
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -342,7 +365,7 @@ void UI_Mainwindow::close_connection()
 
   waveForm->clear();
 
-  tmcdev_close(device);
+  tmc_close();
 
   device = NULL;
 
@@ -360,7 +383,7 @@ void UI_Mainwindow::closeEvent(QCloseEvent *cl_event)
 
   adjdial_timer->stop();
 
-  tmcdev_close(device);
+  tmc_close();
 
   device = NULL;
 
@@ -384,13 +407,13 @@ int UI_Mainwindow::get_device_settings()
   {
     sprintf(str, ":CHAN%i:BWL?", chn + 1);
 
-    if(tmcdev_write(device, str) != 11)
+    if(tmc_write(str) != 11)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -416,13 +439,13 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:COUP?", chn + 1);
 
-    if(tmcdev_write(device, str) != 12)
+    if(tmc_write(str) != 12)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -448,13 +471,13 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:DISP?", chn + 1);
 
-    if(tmcdev_write(device, str) != 12)
+    if(tmc_write(str) != 12)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -507,13 +530,13 @@ int UI_Mainwindow::get_device_settings()
     {
       sprintf(str, ":CHAN%i:IMP?", chn + 1);
 
-      if(tmcdev_write(device, str) != 11)
+      if(tmc_write(str) != 11)
       {
         line = __LINE__;
         goto OUT_ERROR;
       }
 
-      if(tmcdev_read(device) < 1)
+      if(tmc_read() < 1)
       {
         line = __LINE__;
         goto OUT_ERROR;
@@ -536,13 +559,13 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:INV?", chn + 1);
 
-    if(tmcdev_write(device, str) != 11)
+    if(tmc_write(str) != 11)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -564,13 +587,13 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:OFFS?", chn + 1);
 
-    if(tmcdev_write(device, str) != 12)
+    if(tmc_write(str) != 12)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -580,13 +603,13 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:PROB?", chn + 1);
 
-    if(tmcdev_write(device, str) != 12)
+    if(tmc_write(str) != 12)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -596,13 +619,13 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:SCAL?", chn + 1);
 
-    if(tmcdev_write(device, str) != 12)
+    if(tmc_write(str) != 12)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -612,13 +635,13 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:VERN?", chn + 1);
 
-    if(tmcdev_write(device, str) != 12)
+    if(tmc_write(str) != 12)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -639,13 +662,13 @@ int UI_Mainwindow::get_device_settings()
       }
   }
 
-  if(tmcdev_write(device, ":TIM:OFFS?") != 10)
+  if(tmc_write(":TIM:OFFS?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -653,13 +676,13 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.timebaseoffset = atof(device->buf);
 
-  if(tmcdev_write(device, ":TIM:SCAL?") != 10)
+  if(tmc_write(":TIM:SCAL?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -667,13 +690,13 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.timebasescale = atof(device->buf);
 
-  if(tmcdev_write(device, ":TIM:DEL:ENAB?") != 14)
+  if(tmc_write(":TIM:DEL:ENAB?") != 14)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -693,13 +716,13 @@ int UI_Mainwindow::get_device_settings()
       goto OUT_ERROR;
     }
 
-  if(tmcdev_write(device, ":TIM:DEL:OFFS?") != 14)
+  if(tmc_write(":TIM:DEL:OFFS?") != 14)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -707,13 +730,13 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.timebasedelayoffset = atof(device->buf);
 
-  if(tmcdev_write(device, ":TIM:DEL:SCAL?") != 14)
+  if(tmc_write(":TIM:DEL:SCAL?") != 14)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -723,13 +746,13 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.modelserie != 1)
   {
-    if(tmcdev_write(device, ":TIM:HREF:MODE?") != 15)
+    if(tmc_write(":TIM:HREF:MODE?") != 15)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -753,13 +776,13 @@ int UI_Mainwindow::get_device_settings()
           goto OUT_ERROR;
         }
 
-    if(tmcdev_write(device, ":TIM:HREF:POS?") != 14)
+    if(tmc_write(":TIM:HREF:POS?") != 14)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -768,13 +791,13 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.timebasehrefpos = atoi(device->buf);
 
-  if(tmcdev_write(device, ":TIM:MODE?") != 10)
+  if(tmc_write(":TIM:MODE?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -800,13 +823,13 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.modelserie != 1)
   {
-    if(tmcdev_write(device, ":TIM:VERN?") != 10)
+    if(tmc_write(":TIM:VERN?") != 10)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -829,13 +852,13 @@ int UI_Mainwindow::get_device_settings()
 
   if((devparms.modelserie != 1) && (devparms.modelserie != 2))
   {
-    if(tmcdev_write(device, ":TIM:XY1:DISP?") != 14)
+    if(tmc_write(":TIM:XY1:DISP?") != 14)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -855,13 +878,13 @@ int UI_Mainwindow::get_device_settings()
         goto OUT_ERROR;
       }
 
-    if(tmcdev_write(device, ":TIM:XY2:DISP?") != 14)
+    if(tmc_write(":TIM:XY2:DISP?") != 14)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -882,13 +905,13 @@ int UI_Mainwindow::get_device_settings()
       }
   }
 
-  if(tmcdev_write(device, ":TRIG:COUP?") != 11)
+  if(tmc_write(":TRIG:COUP?") != 11)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -916,13 +939,13 @@ int UI_Mainwindow::get_device_settings()
           goto OUT_ERROR;
         }
 
-  if(tmcdev_write(device, ":TRIG:SWE?") != 10)
+  if(tmc_write(":TRIG:SWE?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -958,13 +981,13 @@ int UI_Mainwindow::get_device_settings()
         goto OUT_ERROR;
       }
 
-  if(tmcdev_write(device, ":TRIG:MODE?") != 11)
+  if(tmc_write(":TRIG:MODE?") != 11)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1016,13 +1039,13 @@ int UI_Mainwindow::get_device_settings()
                       goto OUT_ERROR;
                     }
 
-  if(tmcdev_write(device, ":TRIG:STAT?") != 11)
+  if(tmc_write(":TRIG:STAT?") != 11)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1058,13 +1081,13 @@ int UI_Mainwindow::get_device_settings()
               goto OUT_ERROR;
             }
 
-  if(tmcdev_write(device, ":TRIG:EDG:SLOP?") != 15)
+  if(tmc_write(":TRIG:EDG:SLOP?") != 15)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1088,13 +1111,13 @@ int UI_Mainwindow::get_device_settings()
         goto OUT_ERROR;
       }
 
-  if(tmcdev_write(device, ":TRIG:EDG:SOUR?") != 15)
+  if(tmc_write(":TRIG:EDG:SOUR?") != 15)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1138,19 +1161,19 @@ int UI_Mainwindow::get_device_settings()
   {
     sprintf(str, ":TRIG:EDG:SOUR CHAN%i", chn + 1);
 
-    if(tmcdev_write(device, str) != 20)
+    if(tmc_write(str) != 20)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_write(device, ":TRIG:EDG:LEV?") != 14)
+    if(tmc_write(":TRIG:EDG:LEV?") != 14)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -1163,7 +1186,7 @@ int UI_Mainwindow::get_device_settings()
   {
     sprintf(str, ":TRIG:EDG:SOUR CHAN%i", devparms.triggeredgesource + 1);
 
-    if(tmcdev_write(device, str) != 20)
+    if(tmc_write(str) != 20)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -1172,7 +1195,7 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.triggeredgesource== 4)
   {
-    if(tmcdev_write(device, ":TRIG:EDG:SOUR EXT") != 18)
+    if(tmc_write(":TRIG:EDG:SOUR EXT") != 18)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -1181,7 +1204,7 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.triggeredgesource== 5)
   {
-    if(tmcdev_write(device, ":TRIG:EDG:SOUR EXT5") != 19)
+    if(tmc_write(":TRIG:EDG:SOUR EXT5") != 19)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -1190,20 +1213,20 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.triggeredgesource== 6)
   {
-    if(tmcdev_write(device, ":TRIG:EDG:SOUR AC") != 17)
+    if(tmc_write(":TRIG:EDG:SOUR AC") != 17)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
   }
 
-  if(tmcdev_write(device, ":TRIG:HOLD?") != 11)
+  if(tmc_write(":TRIG:HOLD?") != 11)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1243,13 +1266,13 @@ int UI_Mainwindow::get_device_settings()
     }
   }
 
-  if(tmcdev_write(device, ":ACQ:SRAT?") != 10)
+  if(tmc_write(":ACQ:SRAT?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1257,13 +1280,13 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.samplerate = atof(device->buf);
 
-  if(tmcdev_write(device, ":DISP:GRID?") != 11)
+  if(tmc_write(":DISP:GRID?") != 11)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1287,13 +1310,13 @@ int UI_Mainwindow::get_device_settings()
         goto OUT_ERROR;
       }
 
-  if(tmcdev_write(device, ":MEAS:COUN:SOUR?") != 16)
+  if(tmc_write(":MEAS:COUN:SOUR?") != 16)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1325,13 +1348,13 @@ int UI_Mainwindow::get_device_settings()
             goto OUT_ERROR;
           }
 
-  if(tmcdev_write(device, ":DISP:TYPE?") != 11)
+  if(tmc_write(":DISP:TYPE?") != 11)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1351,13 +1374,13 @@ int UI_Mainwindow::get_device_settings()
       goto OUT_ERROR;
     }
 
-  if(tmcdev_write(device, ":ACQ:TYPE?") != 10)
+  if(tmc_write(":ACQ:TYPE?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1385,13 +1408,13 @@ int UI_Mainwindow::get_device_settings()
           goto OUT_ERROR;
         }
 
-  if(tmcdev_write(device, ":ACQ:AVER?") != 10)
+  if(tmc_write(":ACQ:AVER?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -1881,7 +1904,7 @@ void UI_Mainwindow::former_page()
 
     sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
   else
   {
@@ -1912,7 +1935,7 @@ void UI_Mainwindow::former_page()
 
     sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
 
   waveForm->update();
@@ -1952,7 +1975,7 @@ void UI_Mainwindow::next_page()
 
     sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
   else
   {
@@ -1983,7 +2006,7 @@ void UI_Mainwindow::next_page()
 
     sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
 
   waveForm->update();
@@ -2023,7 +2046,7 @@ void UI_Mainwindow::shift_page_left()
 
     sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
   else
   {
@@ -2054,7 +2077,7 @@ void UI_Mainwindow::shift_page_left()
 
     sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
 
   waveForm->update();
@@ -2094,7 +2117,7 @@ void UI_Mainwindow::shift_page_right()
 
     sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
   else
   {
@@ -2125,7 +2148,7 @@ void UI_Mainwindow::shift_page_right()
 
     sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
 
   waveForm->update();
@@ -2186,7 +2209,7 @@ void UI_Mainwindow::zoom_in()
 
     sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
   else
   {
@@ -2233,7 +2256,7 @@ void UI_Mainwindow::zoom_in()
 
     sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
 
   waveForm->update();
@@ -2277,7 +2300,7 @@ void UI_Mainwindow::zoom_out()
 
     sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
   else
   {
@@ -2300,7 +2323,7 @@ void UI_Mainwindow::zoom_out()
 
     sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
   }
 
   waveForm->update();
@@ -2358,7 +2381,7 @@ void UI_Mainwindow::chan_scale_plus()
 
   sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 
   waveForm->update();
 }
@@ -2422,7 +2445,7 @@ void UI_Mainwindow::chan_scale_minus()
 
   sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
-  tmcdev_write(device, str);
+  tmc_write(str);
 
   waveForm->update();
 }
@@ -2436,7 +2459,7 @@ void UI_Mainwindow::set_to_factory()
 
   scrn_timer->stop();
 
-  tmcdev_write(device, "*RST");
+  tmc_write("*RST");
 
   devparms.timebasescale = 1e-6;
 
@@ -2514,7 +2537,7 @@ void UI_Mainwindow::set_to_factory()
     {
       sprintf(str, ":CHAN%i:SCAL 1", i + 1);
 
-      tmcdev_write(device, str);
+      tmc_write(str);
 
       usleep(20000);
     }

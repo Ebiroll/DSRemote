@@ -26,12 +26,12 @@
 */
 
 
-#ifndef DEMO_GLOBAL_H
-#define DEMO_GLOBAL_H
+#ifndef DSR_GLOBAL_H
+#define DSR_GLOBAL_H
 
 
-#define PROGRAM_NAME     "DSRemote"
-#define PROGRAM_VERSION       "0.11_1506220825"
+#define PROGRAM_NAME          "DSRemote"
+#define PROGRAM_VERSION       "0.11_1506271103"
 
 #define MAX_PATHLEN            4096
 
@@ -82,6 +82,7 @@ struct waveform_preamble
 struct device_settings
 {
   int connected;
+  int connectiontype;           // 0=USB, 1=LAN
   char modelname[128];
   char serialnr[128];
   char softwvers[128];

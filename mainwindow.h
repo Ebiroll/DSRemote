@@ -75,6 +75,7 @@
 #include "global.h"
 #include "about_dialog.h"
 #include "utils.h"
+#include "connection.h"
 #include "tmc_dev.h"
 #include "tled.h"
 #include "edflib.h"

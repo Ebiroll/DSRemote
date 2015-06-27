@@ -26,60 +26,21 @@
 */
 
 
+#ifndef DSR_CONNECTION_H
+#define DSR_CONNECTION_H
 
 
-#ifndef SELECT_DEVICE_FORM1_H
-#define SELECT_DEVICE_FORM1_H
-
-
-
-#include <QApplication>
-#include <QObject>
-#include <QDialog>
-#include <QLabel>
-#include <QPushButton>
-#include <QComboBox>
-#include <QSettings>
-#include <QLineEdit>
-#include <QRadioButton>
-
-#include "mainwindow.h"
 #include "global.h"
+#include "tmc_dev.h"
+#include "utils.h"
 
 
-class UI_Mainwindow;
-
-
-class UI_settings_window : public QDialog
-{
-  Q_OBJECT
-
-public:
-
-  UI_settings_window(QWidget *parent=0);
-
-private:
-
-QPushButton  *cancelButton,
-             *applyButton;
-
-QRadioButton *usbRadioButton,
-             *lanRadioButton;
-
-QComboBox    *comboBox1;
-
-QLineEdit    *ipLineEdit;
-
-UI_Mainwindow *mainwindow;
-
-private slots:
-
-void applyButtonClicked();
-
-};
+struct tmcdev * tmc_open_usb(const char *device);
+void tmc_close(void);
+int tmc_write(const char *);
+int tmc_read(void);
 
 
 
 #endif
-
 

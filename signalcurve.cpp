@@ -1394,7 +1394,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       sprintf(str, ":TIM:DEL:OFFS %e", devparms->timebasedelayoffset);
 
-      tmcdev_write(device, str);
+      tmc_write(str);
     }
     else
     {
@@ -1414,7 +1414,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       sprintf(str, ":TIM:OFFS %e", devparms->timebaseoffset);
 
-      tmcdev_write(device, str);
+      tmc_write(str);
     }
   }
   else if(trig_level_arrow_moving)
@@ -1458,7 +1458,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       if(device != NULL)
       {
-        tmcdev_write(device, str);
+        tmc_write(str);
       }
 
       trig_line_timer->start(1000);
@@ -1507,7 +1507,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
           if(device != NULL)
           {
-            tmcdev_write(device, str);
+            tmc_write(str);
           }
 
           devparms->activechannel = chn;

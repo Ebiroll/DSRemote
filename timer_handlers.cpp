@@ -91,13 +91,13 @@ void UI_Mainwindow::adjdial_timer_handler()
 
     sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
 
-    tmcdev_write(device, str);
+    tmc_write(str);
 
     if(devparms.modelserie == 6)
     {
       usleep(20000);
 
-      tmcdev_write(device, ":CLE");
+      tmc_write(":CLE");
     }
   }
   else if(adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
@@ -108,7 +108,7 @@ void UI_Mainwindow::adjdial_timer_handler()
 
       sprintf(str, ":ACQ:AVER %i", devparms.acquireaverages);
 
-      tmcdev_write(device, str);
+      tmc_write(str);
     }
 
   adjDialFunc = ADJ_DIAL_FUNC_NONE;
@@ -131,13 +131,13 @@ void UI_Mainwindow::stat_timer_handler()
 
   char str[512];
 
-  if(tmcdev_write(device, ":TRIG:STAT?") != 11)
+  if(tmc_write(":TRIG:STAT?") != 11)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -189,13 +189,13 @@ void UI_Mainwindow::stat_timer_handler()
               goto OUT_ERROR;
             }
 
-  if(tmcdev_write(device, ":TRIG:SWE?") != 10)
+  if(tmc_write(":TRIG:SWE?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -231,13 +231,13 @@ void UI_Mainwindow::stat_timer_handler()
         goto OUT_ERROR;
       }
 
-  if(tmcdev_write(device, ":ACQ:SRAT?") != 10)
+  if(tmc_write(":ACQ:SRAT?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -245,13 +245,13 @@ void UI_Mainwindow::stat_timer_handler()
 
   devparms.samplerate = atof(device->buf);
 
-  if(tmcdev_write(device, ":ACQ:MDEP?") != 10)
+  if(tmc_write(":ACQ:MDEP?") != 10)
   {
     line = __LINE__;
     goto OUT_ERROR;
   }
 
-  if(tmcdev_read(device) < 1)
+  if(tmc_read() < 1)
   {
     line = __LINE__;
     goto OUT_ERROR;
@@ -261,13 +261,13 @@ void UI_Mainwindow::stat_timer_handler()
 
   if(devparms.countersrc)
   {
-    if(tmcdev_write(device, ":MEAS:COUN:VAL?") != 15)
+    if(tmc_write(":MEAS:COUN:VAL?") != 15)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
 
-    if(tmcdev_read(device) < 1)
+    if(tmc_read() < 1)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -335,9 +335,9 @@ void UI_Mainwindow::scrn_timer_handler()
 
 ///////////////////////////////////////////////////////////
 
-//     tmcdev_write(device, ":WAV:PRE?");
+//     tmc_write(":WAV:PRE?");
 //
-//     n = tmcdev_read(device);
+//     n = tmc_read();
 //
 //     if(n < 0)
 //     {
@@ -376,15 +376,15 @@ void UI_Mainwindow::scrn_timer_handler()
 
       sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
 
-      tmcdev_write(device, str);
+      tmc_write(str);
 
-      tmcdev_write(device, ":WAV:FORM BYTE");
+      tmc_write(":WAV:FORM BYTE");
 
-      tmcdev_write(device, ":WAV:MODE NORM");
+      tmc_write(":WAV:MODE NORM");
 
-      tmcdev_write(device, ":WAV:DATA?");
+      tmc_write(":WAV:DATA?");
 
-      n = tmcdev_read(device);
+      n = tmc_read();
 
       if(n < 0)
       {

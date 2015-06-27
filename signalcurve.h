@@ -50,6 +50,7 @@
 
 #include "mainwindow.h"
 #include "global.h"
+#include "connection.h"
 #include "tmc_dev.h"
 #include "utils.h"
 
