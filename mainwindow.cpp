@@ -2485,7 +2485,11 @@ void UI_Mainwindow::set_to_factory()
 
   scrn_timer->stop();
 
+  qApp->processEvents();
+
   tmc_write("*RST");
+
+  qApp->processEvents();
 
   devparms.timebasescale = 1e-6;
 
@@ -2555,7 +2559,21 @@ void UI_Mainwindow::set_to_factory()
 
   qApp->processEvents();
 
-  sleep(10);
+  for(i=0; i<50; i++)
+  {
+    qApp->processEvents();
+
+    usleep(500000);
+
+    tmc_write("*OPC?");
+
+    tmc_read();
+
+    if(device->buf[0] == '1')
+    {
+      break;
+    }
+  }
 
   if(devparms.modelserie == 6)
   {
