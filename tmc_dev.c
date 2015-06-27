@@ -96,9 +96,10 @@ void tmcdev_close(struct tmcdev *dev)
 
 int tmcdev_write(struct tmcdev *dev, const char *cmd)
 {
-  int size;
+  int i, size, qry;
 
-  char buf[MAX_CMD_LEN + 16];
+  char buf[MAX_CMD_LEN + 16],
+       str[256];
 
   if(dev == NULL)
   {
@@ -117,6 +118,11 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
     printf("tmcdev error: command too short\n");
 
     return -1;
+  }
+
+  if(cmd[strlen(cmd) - 1] == '?')
+  {
+    qry = 1;
   }
 
   strncpy(buf, cmd, MAX_CMD_LEN);
@@ -144,6 +150,24 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
   if(size < 0)
   {
     printf("tmcdev error: device write error");
+  }
+
+  if(!qry)
+  {
+    for(i=0; i<20; i++)
+    {
+      usleep(50000);
+
+      write(dev->fd, "*OPC?\n", 6);
+
+      if(read(dev->fd, str, 128) == 2)
+      {
+        if(str[0] == '1')
+        {
+          break;
+        }
+      }
+    }
   }
 
   return size - 1;
