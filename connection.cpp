@@ -191,8 +191,6 @@ int tmc_write(const char *cmd)
  * For example, #9001152054. Wherein, N is 9 and 001152054
  * represents that the data stream contains 1152054 bytes
  * effective data.
- * Reading from the file descriptor blocks,
- * there is a timeout of 5000 milli-Sec.
  */
 int tmc_read(void)
 {
@@ -306,15 +304,28 @@ struct tmcdev * tmc_open_lan(const char *address)
 
   sck = new QTcpSocket;
 
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+
+  qApp->processEvents();
+
   sck->connectToHost(address, 5555);
+
+  qApp->processEvents();
 
   if(sck->waitForConnected(TMC_LAN_TIMEOUT) == false)
   {
     sck->abort();
     delete sck;
     sck = NULL;
+
+    QApplication::restoreOverrideCursor();
+
     return NULL;
   }
+
+  QApplication::restoreOverrideCursor();
+
+  qApp->processEvents();
 
   tmc_device = (struct tmcdev *)calloc(1, sizeof(struct tmcdev));
   if(tmc_device == NULL)
