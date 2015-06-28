@@ -26,80 +26,48 @@
 */
 
 
-#include "connection.h"
+#ifndef TMC_LAN_H
+#define TMC_LAN_H
+
+#include <QtGlobal>
+#include <QApplication>
+#include <QObject>
+#include <QTcpSocket>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+#include "global.h"
+#include "tmc_dev.h"
+#include "utils.h"
 
 
 
-int tmc_connection_type;
 
-struct tmcdev *tmc_device;
-
-
-
-
-struct tmcdev * tmc_open_usb(const char *device)
-{
-  tmc_connection_type = 0;
-
-  tmc_device = tmcdev_open(device);
-
-  return tmc_device;
-}
+struct tmcdev * tmclan_open(const char *);
+void tmclan_close(struct tmcdev *);
+int tmclan_write(struct tmcdev *, const char *);
+int tmclan_read(struct tmcdev *);
 
 
-struct tmcdev * tmc_open_lan(const char *address)
-{
-  tmc_connection_type = 1;
 
-  tmc_device =  tmclan_open(address);
-
-  return tmc_device;
-}
+#endif
 
 
-void tmc_close(void)
-{
-  if(tmc_connection_type == 0)
-  {
-    tmcdev_close(tmc_device);
-  }
-  else
-  {
-    tmclan_close(tmc_device);
-  }
-
-  tmc_device = NULL;
-}
 
 
-int tmc_write(const char *cmd)
-{
-  if(tmc_connection_type == 0)
-  {
-    return tmcdev_write(tmc_device, cmd);
-  }
-  else
-  {
-    return tmclan_write(tmc_device, cmd);
-  }
-
-  return -1;
-}
 
 
-int tmc_read(void)
-{
-  if(tmc_connection_type == 0)
-  {
-    return tmcdev_read(tmc_device);
-  }
-  else
-  {
-    return tmclan_read(tmc_device);
-  }
 
-  return -1;
-}
+
+
+
 
 
 
