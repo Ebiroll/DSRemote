@@ -408,11 +408,15 @@ void UI_Mainwindow::scrn_timer_handler()
         devparms.wavebuf[i][j] = (int)(((unsigned char *)device->buf)[j]) - 127;
       }
     }
+
+    devparms.wavebufsz = n;
+
+    waveForm->drawCurve(&devparms, device, n);
   }
-
-  devparms.wavebufsz = n;
-
-  waveForm->drawCurve(&devparms, device, n);
+  else  // triggerstatus is "wait"
+  {
+    waveForm->update();
+  }
 
   return;
 

@@ -2071,6 +2071,8 @@ void UI_Mainwindow::clearButtonClicked()
   statusLabel->setText("Display cleared");
 
   tmc_write(":DISP:CLE");
+
+  waveForm->clear();
 }
 
 
