@@ -1412,7 +1412,7 @@ int UI_Mainwindow::get_device_settings()
       {
         devparms.acquiretype = 2;
       }
-      else if(!strcmp(device->buf, "HRESR"))
+      else if(!strcmp(device->buf, "HRES"))
         {
           devparms.acquiretype = 3;
         }
