@@ -294,16 +294,32 @@ OUT_ERROR:
 
 void UI_Mainwindow::scrn_timer_handler()
 {
-  int i, j, n=0, chns=0;
+  int i, j, n=0, chns=0, line;
 
   char str[128];
+
+  static int h_busy=0;
 
   if(device == NULL)
   {
     return;
   }
 
+  if(h_busy)
+  {
+    return;
+  }
+
+  h_busy = 1;
+
   stat_timer_handler();
+
+  if(!devparms.connected)
+  {
+    h_busy = 0;
+
+    return;
+  }
 
   for(i=0; i<MAX_CHNS; i++)
   {
@@ -318,6 +334,8 @@ void UI_Mainwindow::scrn_timer_handler()
   if(!chns)
   {
     waveForm->clear();
+
+    h_busy = 0;
 
     return;
   }
@@ -389,12 +407,14 @@ void UI_Mainwindow::scrn_timer_handler()
       if(n < 0)
       {
         printf("Can not read from device.\n");
-        return;
+        line = __LINE__;
+        goto OUT_ERROR;
       }
 
       if(n > WAVFRM_MAX_BUFSZ)
       {
-        strcpy(str, "Datablock too big for buffer.");
+        printf("Datablock too big for buffer.\n");
+        line = __LINE__;
         goto OUT_ERROR;
       }
 
@@ -418,16 +438,23 @@ void UI_Mainwindow::scrn_timer_handler()
     waveForm->update();
   }
 
+  h_busy = 0;
+
   return;
 
 OUT_ERROR:
 
   scrn_timer->stop();
 
+  sprintf(str, "An error occurred while reading screen data from device.\n"
+               "File %s line %i", __FILE__, line);
+
   QMessageBox msgBox;
   msgBox.setIcon(QMessageBox::Critical);
   msgBox.setText(str);
   msgBox.exec();
+
+  h_busy = 0;
 }
 
 
