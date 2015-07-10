@@ -99,7 +99,10 @@ UI_Mainwindow::UI_Mainwindow()
   devicemenu->addAction("Exit",       this, SLOT(close()), QKeySequence::Quit);
   menubar->addMenu(devicemenu);
 
-  menubar->addAction("Settings", this, SLOT(open_settings_dialog()));
+  settingsmenu = new QMenu(this);
+  settingsmenu->setTitle("Settings");
+  settingsmenu->addAction("Settings", this, SLOT(open_settings_dialog()));
+  menubar->addMenu(settingsmenu);
 
   helpmenu = new QMenu(this);
   helpmenu->setTitle("Help");

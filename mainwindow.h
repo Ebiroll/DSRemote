@@ -120,6 +120,7 @@ private:
   QMenuBar     *menubar;
 
   QMenu        *devicemenu,
+               *settingsmenu,
                *helpmenu;
 
   QTimer       *adjdial_timer,
