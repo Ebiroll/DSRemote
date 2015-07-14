@@ -667,7 +667,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->setPen(Qt::gray);
 
-  convert_to_metric_suffix(str, devparms->samplerate, 3);
+  convert_to_metric_suffix(str, devparms->samplerate, 0);
 
   strcat(str, "Sa/s");
 

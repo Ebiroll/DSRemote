@@ -1713,14 +1713,14 @@ double round_up_step125(double val)
 
   double ltmp;
 
-   while(val < 1)
+   while(val < 0.999)
   {
     val *= 10;
 
     exp--;
   }
 
-  while(val >= 10)
+  while(val > 9.999)
   {
     val /= 10;
 
@@ -1729,11 +1729,11 @@ double round_up_step125(double val)
 
   val = nearbyint(val);
 
-  if(val >= 5)
+  if(val > 4.999)
   {
     ltmp = 10;
   }
-  else if(val >= 2)
+  else if(val > 1.999)
     {
       ltmp = 5;
     }
@@ -1767,14 +1767,14 @@ double round_down_step125(double val)
 
   double ltmp;
 
-  while(val < 1)
+  while(val < 0.999)
   {
     val *= 10;
 
     exp--;
   }
 
-  while(val >= 10)
+  while(val > 9.999)
   {
     val /= 10;
 
@@ -1783,15 +1783,15 @@ double round_down_step125(double val)
 
   val = nearbyint(val);
 
-  if(val <= 1)
+  if(val < 1.001)
   {
     ltmp = 0.5;
   }
-  else if(val <= 2)
+  else if(val < 2.001)
     {
       ltmp = 1;
     }
-    else if(val <= 5)
+    else if(val < 5.001)
       {
         ltmp = 2;
       }
