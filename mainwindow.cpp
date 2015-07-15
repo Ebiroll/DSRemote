@@ -421,6 +421,8 @@ int UI_Mainwindow::get_device_settings()
   {
     sprintf(str, ":CHAN%i:BWL?", chn + 1);
 
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(str) != 11)
     {
       line = __LINE__;
@@ -453,6 +455,8 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:COUP?", chn + 1);
 
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(str) != 12)
     {
       line = __LINE__;
@@ -484,6 +488,8 @@ int UI_Mainwindow::get_device_settings()
         }
 
     sprintf(str, ":CHAN%i:DISP?", chn + 1);
+
+    usleep(TMC_GDS_DELAY);
 
     if(tmc_write(str) != 12)
     {
@@ -544,6 +550,8 @@ int UI_Mainwindow::get_device_settings()
     {
       sprintf(str, ":CHAN%i:IMP?", chn + 1);
 
+      usleep(TMC_GDS_DELAY);
+
       if(tmc_write(str) != 11)
       {
         line = __LINE__;
@@ -573,6 +581,8 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:INV?", chn + 1);
 
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(str) != 11)
     {
       line = __LINE__;
@@ -601,6 +611,8 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:OFFS?", chn + 1);
 
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(str) != 12)
     {
       line = __LINE__;
@@ -616,6 +628,8 @@ int UI_Mainwindow::get_device_settings()
     devparms.chanoffset[chn] = atof(device->buf);
 
     sprintf(str, ":CHAN%i:PROB?", chn + 1);
+
+    usleep(TMC_GDS_DELAY);
 
     if(tmc_write(str) != 12)
     {
@@ -633,6 +647,8 @@ int UI_Mainwindow::get_device_settings()
 
     sprintf(str, ":CHAN%i:SCAL?", chn + 1);
 
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(str) != 12)
     {
       line = __LINE__;
@@ -648,6 +664,8 @@ int UI_Mainwindow::get_device_settings()
     devparms.chanscale[chn] = atof(device->buf);
 
     sprintf(str, ":CHAN%i:VERN?", chn + 1);
+
+    usleep(TMC_GDS_DELAY);
 
     if(tmc_write(str) != 12)
     {
@@ -676,6 +694,8 @@ int UI_Mainwindow::get_device_settings()
       }
   }
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":TIM:OFFS?") != 10)
   {
     line = __LINE__;
@@ -690,6 +710,8 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.timebaseoffset = atof(device->buf);
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":TIM:SCAL?") != 10)
   {
     line = __LINE__;
@@ -703,6 +725,8 @@ int UI_Mainwindow::get_device_settings()
   }
 
   devparms.timebasescale = atof(device->buf);
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":TIM:DEL:ENAB?") != 14)
   {
@@ -730,6 +754,8 @@ int UI_Mainwindow::get_device_settings()
       goto OUT_ERROR;
     }
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":TIM:DEL:OFFS?") != 14)
   {
     line = __LINE__;
@@ -743,6 +769,8 @@ int UI_Mainwindow::get_device_settings()
   }
 
   devparms.timebasedelayoffset = atof(device->buf);
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":TIM:DEL:SCAL?") != 14)
   {
@@ -760,6 +788,8 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.modelserie != 1)
   {
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(":TIM:HREF:MODE?") != 15)
     {
       line = __LINE__;
@@ -790,6 +820,8 @@ int UI_Mainwindow::get_device_settings()
           goto OUT_ERROR;
         }
 
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(":TIM:HREF:POS?") != 14)
     {
       line = __LINE__;
@@ -804,6 +836,8 @@ int UI_Mainwindow::get_device_settings()
   }
 
   devparms.timebasehrefpos = atoi(device->buf);
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":TIM:MODE?") != 10)
   {
@@ -837,6 +871,8 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.modelserie != 1)
   {
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(":TIM:VERN?") != 10)
     {
       line = __LINE__;
@@ -866,6 +902,8 @@ int UI_Mainwindow::get_device_settings()
 
   if((devparms.modelserie != 1) && (devparms.modelserie != 2))
   {
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(":TIM:XY1:DISP?") != 14)
     {
       line = __LINE__;
@@ -891,6 +929,8 @@ int UI_Mainwindow::get_device_settings()
         line = __LINE__;
         goto OUT_ERROR;
       }
+
+    usleep(TMC_GDS_DELAY);
 
     if(tmc_write(":TIM:XY2:DISP?") != 14)
     {
@@ -918,6 +958,8 @@ int UI_Mainwindow::get_device_settings()
         goto OUT_ERROR;
       }
   }
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":TRIG:COUP?") != 11)
   {
@@ -952,6 +994,8 @@ int UI_Mainwindow::get_device_settings()
           line = __LINE__;
           goto OUT_ERROR;
         }
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":TRIG:SWE?") != 10)
   {
@@ -994,6 +1038,8 @@ int UI_Mainwindow::get_device_settings()
         line = __LINE__;
         goto OUT_ERROR;
       }
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":TRIG:MODE?") != 11)
   {
@@ -1053,6 +1099,8 @@ int UI_Mainwindow::get_device_settings()
                       goto OUT_ERROR;
                     }
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":TRIG:STAT?") != 11)
   {
     line = __LINE__;
@@ -1095,6 +1143,8 @@ int UI_Mainwindow::get_device_settings()
               goto OUT_ERROR;
             }
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":TRIG:EDG:SLOP?") != 15)
   {
     line = __LINE__;
@@ -1124,6 +1174,8 @@ int UI_Mainwindow::get_device_settings()
         line = __LINE__;
         goto OUT_ERROR;
       }
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":TRIG:EDG:SOUR?") != 15)
   {
@@ -1175,11 +1227,15 @@ int UI_Mainwindow::get_device_settings()
   {
     sprintf(str, ":TRIG:EDG:SOUR CHAN%i", chn + 1);
 
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(str) != 20)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
+
+    usleep(TMC_GDS_DELAY);
 
     if(tmc_write(":TRIG:EDG:LEV?") != 14)
     {
@@ -1200,6 +1256,8 @@ int UI_Mainwindow::get_device_settings()
   {
     sprintf(str, ":TRIG:EDG:SOUR CHAN%i", devparms.triggeredgesource + 1);
 
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(str) != 20)
     {
       line = __LINE__;
@@ -1209,6 +1267,8 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.triggeredgesource== 4)
   {
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(":TRIG:EDG:SOUR EXT") != 18)
     {
       line = __LINE__;
@@ -1218,6 +1278,8 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.triggeredgesource== 5)
   {
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(":TRIG:EDG:SOUR EXT5") != 19)
     {
       line = __LINE__;
@@ -1227,12 +1289,16 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.triggeredgesource== 6)
   {
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(":TRIG:EDG:SOUR AC") != 17)
     {
       line = __LINE__;
       goto OUT_ERROR;
     }
   }
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":TRIG:HOLD?") != 11)
   {
@@ -1280,6 +1346,8 @@ int UI_Mainwindow::get_device_settings()
     }
   }
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":ACQ:SRAT?") != 10)
   {
     line = __LINE__;
@@ -1293,6 +1361,8 @@ int UI_Mainwindow::get_device_settings()
   }
 
   devparms.samplerate = atof(device->buf);
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":DISP:GRID?") != 11)
   {
@@ -1323,6 +1393,8 @@ int UI_Mainwindow::get_device_settings()
         line = __LINE__;
         goto OUT_ERROR;
       }
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":MEAS:COUN:SOUR?") != 16)
   {
@@ -1362,6 +1434,8 @@ int UI_Mainwindow::get_device_settings()
             goto OUT_ERROR;
           }
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":DISP:TYPE?") != 11)
   {
     line = __LINE__;
@@ -1387,6 +1461,8 @@ int UI_Mainwindow::get_device_settings()
       line = __LINE__;
       goto OUT_ERROR;
     }
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":ACQ:TYPE?") != 10)
   {
@@ -1421,6 +1497,8 @@ int UI_Mainwindow::get_device_settings()
           line = __LINE__;
           goto OUT_ERROR;
         }
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":ACQ:AVER?") != 10)
   {
