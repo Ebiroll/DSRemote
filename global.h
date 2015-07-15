@@ -60,7 +60,7 @@
 #define LABEL_ACTIVE_CHAN4        4
 #define LABEL_ACTIVE_TRIG         5
 
-#define TMC_GDS_DELAY         30000
+#define TMC_GDS_DELAY         10000
 
 
 

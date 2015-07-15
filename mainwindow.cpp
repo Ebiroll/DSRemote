@@ -2629,6 +2629,8 @@ void UI_Mainwindow::set_to_factory()
 
   devparms.displaygrid = 2;
 
+  devparms.countersrc = 0;
+
   statusLabel->setText("Reset to factory settings");
 
   waveForm->update();
