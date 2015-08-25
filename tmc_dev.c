@@ -96,7 +96,7 @@ void tmcdev_close(struct tmcdev *dev)
 
 int tmcdev_write(struct tmcdev *dev, const char *cmd)
 {
-  int i, size, qry;
+  int i, size, qry=0;
 
   char buf[MAX_CMD_LEN + 16],
        str[256];

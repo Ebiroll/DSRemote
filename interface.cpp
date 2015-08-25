@@ -971,7 +971,7 @@ void UI_Mainwindow::vertScaleDialChanged(int new_pos)
     devparms.chanscale[chn] = val;
   }
 
-  ltmp /= val;
+  ltmp /= devparms.chanscale[chn];
 
   devparms.chanoffset[chn] /= ltmp;
 
