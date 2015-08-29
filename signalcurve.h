@@ -69,7 +69,10 @@ public:
   QSize sizeHint() const {return minimumSizeHint(); }
   QSize minimumSizeHint() const {return QSize(30,10); }
 
-  int label_active;
+  int label_active,
+      trig_line_visible;
+
+  unsigned int scr_update_cntr;
 
   void setSignalColor1(QColor);
   void setSignalColor2(QColor);
@@ -85,8 +88,7 @@ public:
   void setUpdatesEnabled(bool);
   void setTrigLineVisible(void);
   void setDeviceParameters(struct device_settings *);
-
-  unsigned int scr_update_cntr;
+  bool hasMoveEvent(void);
 
 signals: void chan1Clicked();
          void chan2Clicked();
@@ -126,7 +128,6 @@ private:
       chan_arrow_pos[MAX_CHNS],
       trig_level_arrow_pos,
       trig_pos_arrow_pos,
-      trig_line_visible,
       trig_stat_flash,
       mouse_x,
       mouse_y,

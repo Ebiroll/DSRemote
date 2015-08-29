@@ -44,7 +44,6 @@
 #include "utils.h"
 
 
-
 struct tmcdev * tmc_open_usb(const char *);
 void tmc_close(void);
 int tmc_write(const char *);

@@ -82,6 +82,7 @@
 #include "edflib.h"
 #include "signalcurve.h"
 #include "settings_dialog.h"
+#include "screen_thread.h"
 
 
 
@@ -102,6 +103,8 @@ public:
   void read_settings(void);
   void write_settings(void);
 
+  void set_cue_cmd(const char *);
+
   struct device_settings devparms;
 
   QLabel       *statusLabel;
@@ -115,6 +118,8 @@ public:
   QTimer       *scrn_timer,
                *label_timer;
 
+  screenThread *scrn_thread;
+
 private:
 
   QMenuBar     *menubar;
@@ -125,6 +130,11 @@ private:
 
   QTimer       *adjdial_timer,
                *navDial_timer,
+               *horPosDial_timer,
+               *trigAdjDial_timer,
+               *vertOffsDial_timer,
+               *horScaleDial_timer,
+               *vertScaleDial_timer,
                *test_timer;
 
   QStatusBar   *statusBar;
@@ -195,7 +205,9 @@ private:
           *zoom_in_act,
           *zoom_out_act,
           *chan_scale_plus_act,
-          *chan_scale_minus_act;
+          *chan_scale_minus_act,
+          *shift_trace_up_act,
+          *shift_trace_down_act;
 
   struct tmcdev *device;
 
@@ -213,10 +225,15 @@ private:
 private slots:
 
   void scrn_timer_handler();
-  void stat_timer_handler();
+  void screenUpdate();
   void adjdial_timer_handler();
   void label_timer_handler();
   void test_timer_handler();
+  void horPosDial_timer_handler();
+  void trigAdjDial_timer_handler();
+  void vertOffsDial_timer_handler();
+  void horScaleDial_timer_handler();
+  void vertScaleDial_timer_handler();
 
   void show_about_dialog();
   void show_howto_operate();
@@ -364,6 +381,8 @@ private slots:
   void zoom_out();
   void chan_scale_plus();
   void chan_scale_minus();
+  void shift_trace_up();
+  void shift_trace_down();
 
   void set_to_factory();
 

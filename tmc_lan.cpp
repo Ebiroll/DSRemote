@@ -34,56 +34,97 @@
 #define MAX_RESP_LEN    (1024 * 1024 * 2)
 
 
-QTcpSocket *sck;
+int sockfd;
+
+struct sockaddr_in inet_address;
+
+struct timeval timeout, temp_timeout;
+
+fd_set tcp_fds, temp_tcp_fds;  /* filedescriptor pool */
 
 
 
 
-struct tmcdev * tmclan_open(const char *address)
+static int tmclan_send(const char *str)
+{
+  int n, len;
+
+  len = strlen(str);
+
+  n = send(sockfd, str, len, MSG_NOSIGNAL);
+
+  if(n == len)
+  {
+    return n;
+  }
+  else
+  {
+    return -1;
+  }
+}
+
+
+static int tmclan_recv(char *buf, int sz)
+{
+  temp_tcp_fds = tcp_fds;  /* because select overwrites the arguments */
+  temp_timeout = timeout;
+
+  if(select(sockfd + 1, &temp_tcp_fds, 0, 0, &temp_timeout))
+  {
+    if(FD_ISSET(sockfd, &temp_tcp_fds))  /* check if our file descriptor is set */
+    {
+      return recv(sockfd, buf, sz, MSG_NOSIGNAL);
+    }
+  }
+
+  return -1;
+}
+
+
+struct tmcdev * tmclan_open(const char *ip_address)
 {
   struct tmcdev *tmc_device;
 
-  sck = new QTcpSocket;
-
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-
-  qApp->processEvents();
-
-  sck->connectToHost(address, 5555);
-
-  qApp->processEvents();
-
-  if(sck->waitForConnected(TMC_LAN_TIMEOUT) == false)
+  sockfd = socket(PF_INET, SOCK_STREAM, 0);
+  if(sockfd == -1)
   {
-    sck->abort();
-    delete sck;
-    sck = NULL;
-
-    QApplication::restoreOverrideCursor();
-
     return NULL;
   }
 
-  QApplication::restoreOverrideCursor();
+  FD_ZERO(&tcp_fds);                      /* clear file descriptor pool       */
+  FD_SET(sockfd, &tcp_fds);               /* add our filedescriptor to pool   */
 
-  qApp->processEvents();
+  timeout.tv_sec = 0;
+  timeout.tv_usec = TMC_LAN_TIMEOUT;
+  timeout.tv_usec *= 1000;
+
+  memset(&inet_address, 0, sizeof(struct sockaddr_in));
+
+  inet_address.sin_family = AF_INET;
+  if(inet_aton(ip_address, &inet_address.sin_addr) == 0)
+  {
+    return NULL;
+  }
+  inet_address.sin_port = htons(5555);
+
+  if(connect(sockfd, (struct sockaddr *) &inet_address, sizeof(struct sockaddr)) < 0)
+  {
+    return NULL;
+  }
 
   tmc_device = (struct tmcdev *)calloc(1, sizeof(struct tmcdev));
   if(tmc_device == NULL)
   {
-    sck->abort();
-    delete sck;
-    sck = NULL;
+    close(sockfd);
+    sockfd = -1;
     return NULL;
   }
 
   tmc_device->hdrbuf = (char *)calloc(1, MAX_RESP_LEN + 1024);
   if(tmc_device->hdrbuf == NULL)
   {
-    free(tmc_device);
-    sck->abort();
-    delete sck;
-    sck = NULL;
+    close(sockfd);
+    sockfd = -1;
     return NULL;
   }
 
@@ -95,13 +136,10 @@ struct tmcdev * tmclan_open(const char *address)
 
 void tmclan_close(struct tmcdev *tmc_device)
 {
-  if(sck != NULL)
+  if(sockfd != -1)
   {
-    sck->abort();
-
-    delete sck;
-
-    sck = NULL;
+    close(sockfd);
+    sockfd = -1;
   }
 
   if(tmc_device != NULL)
@@ -117,31 +155,33 @@ void tmclan_close(struct tmcdev *tmc_device)
 
 int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char *cmd)
 {
-  int qry=0;
+  int n, len, qry=0;
 
   char buf[MAX_CMD_LEN + 16],
        str[256];
 
-  if(sck == NULL)
+  if(sockfd == -1)
   {
     return -1;
   }
 
-  if(strlen(cmd) > MAX_CMD_LEN)
+  len = strlen(cmd);
+
+  if(len > MAX_CMD_LEN)
   {
     printf("tmc_lan error: command too long\n");
 
     return -1;
   }
 
-  if(strlen(cmd) < 2)
+  if(len < 2)
   {
     printf("tmc_lan error: command too short\n");
 
     return -1;
   }
 
-  if(cmd[strlen(cmd) - 1] == '?')
+  if(cmd[len - 1] == '?')
   {
     qry = 1;
   }
@@ -166,9 +206,9 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
     printf("tmc_lan write: %s", buf);
   }
 
-  sck->write(buf);
+  n = tmclan_send(buf);
 
-  if(sck->waitForBytesWritten(TMC_LAN_TIMEOUT) == false)
+  if(n != (len + 1))
   {
     return -1;
   }
@@ -179,19 +219,12 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
     {
       usleep(50000);
 
-      sck->write("*OPC?\n");
-
-      if(sck->waitForBytesWritten(TMC_LAN_TIMEOUT) == false)
+      if(tmclan_send("*OPC?\n") != 6)
       {
         return -1;
       }
 
-      if(sck->waitForReadyRead(TMC_LAN_TIMEOUT) == false)
-      {
-        return -1;
-      }
-
-      if(sck->read(str, 128) == 2)
+      if(tmclan_recv(str, 128) == 2)
       {
         if(str[0] == '1')
         {
@@ -201,7 +234,7 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
     }
   }
 
-  return strlen(cmd);
+  return len;
 }
 
 
@@ -216,11 +249,11 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
  */
 int tmclan_read(struct tmcdev *tmc_device)
 {
-  int size, size2, len;
+  int n, size, size2, len;
 
   char blockhdr[32];
 
-  if(sck == NULL)
+  if(sockfd == -1)
   {
     return -1;
   }
@@ -233,12 +266,14 @@ int tmclan_read(struct tmcdev *tmc_device)
 
   while(1)
   {
-    if(sck->waitForReadyRead(TMC_LAN_TIMEOUT) == false)
+    n = tmclan_recv(tmc_device->hdrbuf + size, MAX_RESP_LEN - size);
+
+    if(n < 1)
     {
-      return -1;
+      return -2;
     }
 
-    size += sck->read(tmc_device->hdrbuf + size, MAX_RESP_LEN - size);
+    size += n;
 
     if(tmc_device->hdrbuf[size - 1] == '\n')
     {
@@ -252,7 +287,7 @@ int tmclan_read(struct tmcdev *tmc_device)
 
     tmc_device->buf[0] = 0;
 
-    return -1;
+    return -3;
   }
 
   if(size >= 0)

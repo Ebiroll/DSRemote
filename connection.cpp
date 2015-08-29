@@ -36,7 +36,6 @@ struct tmcdev *tmc_device;
 
 
 
-
 struct tmcdev * tmc_open_usb(const char *device)
 {
   tmc_connection_type = 0;

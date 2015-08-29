@@ -1339,11 +1339,6 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
     return;
   }
 
-  if(devparms->screenupdates_on == 1)
-  {
-    mainwindow->scrn_timer->start(devparms->screentimerival);
-  }
-
   if(trig_pos_arrow_moving)
   {
     trig_pos_arrow_pos = mouse_x;
@@ -1394,7 +1389,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       sprintf(str, ":TIM:DEL:OFFS %e", devparms->timebasedelayoffset);
 
-      tmc_write(str);
+      mainwindow->set_cue_cmd(str);
     }
     else
     {
@@ -1414,7 +1409,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       sprintf(str, ":TIM:OFFS %e", devparms->timebaseoffset);
 
-      tmc_write(str);
+      mainwindow->set_cue_cmd(str);
     }
   }
   else if(trig_level_arrow_moving)
@@ -1456,12 +1451,9 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       sprintf(str, ":TRIG:EDG:LEV %e", devparms->triggeredgelevel[devparms->triggeredgesource]);
 
-      if(device != NULL)
-      {
-        tmc_write(str);
-      }
+      mainwindow->set_cue_cmd(str);
 
-      trig_line_timer->start(1000);
+      trig_line_timer->start(1300);
     }
     else
     {
@@ -1505,10 +1497,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
           sprintf(str, ":CHAN%i:OFFS %e", chn + 1, devparms->chanoffset[chn]);
 
-          if(device != NULL)
-          {
-            tmc_write(str);
-          }
+          mainwindow->set_cue_cmd(str);
 
           devparms->activechannel = chn;
 
@@ -1525,6 +1514,11 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
   trig_pos_arrow_moving = 0;
   use_move_events = 0;
   setMouseTracking(false);
+
+  if(devparms->screenupdates_on == 1)
+  {
+    mainwindow->scrn_timer->start(devparms->screentimerival);
+  }
 
   update();
 }
@@ -1640,7 +1634,7 @@ void SignalCurve::setTrigLineVisible(void)
 {
   trig_line_visible = 1;
 
-  trig_line_timer->start(1000);
+  trig_line_timer->start(1300);
 }
 
 
@@ -1732,6 +1726,27 @@ void SignalCurve::paintCounterLabel(QPainter *painter, int xpos, int ypos)
 
   painter->drawText(xpos + 75, ypos, 100, 20, Qt::AlignCenter, str);
 }
+
+
+bool SignalCurve::hasMoveEvent(void)
+{
+  if(use_move_events)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

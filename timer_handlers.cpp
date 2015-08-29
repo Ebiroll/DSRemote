@@ -58,11 +58,6 @@ void UI_Mainwindow::navDial_timer_handler()
     {
       adjDialFunc = ADJ_DIAL_FUNC_NONE;
     }
-
-    if(devparms.screenupdates_on == 1)
-    {
-      scrn_timer->start(devparms.screentimerival);
-    }
   }
 }
 
@@ -91,13 +86,13 @@ void UI_Mainwindow::adjdial_timer_handler()
 
     sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
 
-    tmc_write(str);
+    set_cue_cmd(str);
 
     if(devparms.modelserie == 6)
     {
       usleep(20000);
 
-      tmc_write(":CLE");
+      set_cue_cmd(":CLE");
     }
   }
   else if(adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
@@ -108,7 +103,7 @@ void UI_Mainwindow::adjdial_timer_handler()
 
       sprintf(str, ":ACQ:AVER %i", devparms.acquireaverages);
 
-      tmc_write(str);
+      set_cue_cmd(str);
     }
 
   adjDialFunc = ADJ_DIAL_FUNC_NONE;
@@ -117,351 +112,111 @@ void UI_Mainwindow::adjdial_timer_handler()
   {
     navDialFunc = NAV_DIAL_FUNC_NONE;
   }
-
-  if(devparms.screenupdates_on == 1)
-  {
-    scrn_timer->start(devparms.screentimerival);
-  }
-}
-
-
-void UI_Mainwindow::stat_timer_handler()
-{
-  int line;
-
-  char str[512];
-
-  if(tmc_write(":TRIG:STAT?") != 11)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-//  old_stat = devparms.triggerstatus;
-
-  runButton->setStyleSheet(def_stylesh);
-
-  singleButton->setStyleSheet(def_stylesh);
-
-  if(!strcmp(device->buf, "TD"))
-  {
-    devparms.triggerstatus = 0;
-
-    runButton->setStyleSheet("background: #66FF99;");
-  }
-  else if(!strcmp(device->buf, "WAIT"))
-    {
-      devparms.triggerstatus = 1;
-
-      singleButton->setStyleSheet("background: #FF9966;");
-    }
-    else if(!strcmp(device->buf, "RUN"))
-      {
-        devparms.triggerstatus = 2;
-
-        runButton->setStyleSheet("background: #66FF99;");
-      }
-      else if(!strcmp(device->buf, "AUTO"))
-        {
-          devparms.triggerstatus = 3;
-
-          runButton->setStyleSheet("background: #66FF99;");
-        }
-        else if(!strcmp(device->buf, "FIN"))
-          {
-            devparms.triggerstatus = 4;
-          }
-          else if(!strcmp(device->buf, "STOP"))
-            {
-              devparms.triggerstatus = 5;
-
-              runButton->setStyleSheet("background: #FF0066;");
-            }
-            else
-            {
-              line = __LINE__;
-              goto OUT_ERROR;
-            }
-
-  if(tmc_write(":TRIG:SWE?") != 10)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "AUTO"))
-  {
-    devparms.triggersweep = 0;
-
-    trigModeAutoLed->setValue(true);
-    trigModeNormLed->setValue(false);
-    trigModeSingLed->setValue(false);
-  }
-  else if(!strcmp(device->buf, "NORM"))
-    {
-      devparms.triggersweep = 1;
-
-      trigModeAutoLed->setValue(false);
-      trigModeNormLed->setValue(true);
-      trigModeSingLed->setValue(false);
-    }
-    else if(!strcmp(device->buf, "SING"))
-      {
-        devparms.triggersweep = 2;
-
-        trigModeAutoLed->setValue(false);
-        trigModeNormLed->setValue(false);
-        trigModeSingLed->setValue(true);
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-  if(tmc_write(":ACQ:SRAT?") != 10)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.samplerate = atof(device->buf);
-
-  if(tmc_write(":ACQ:MDEP?") != 10)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.memdepth = atoi(device->buf);
-
-  if(devparms.countersrc)
-  {
-    if(tmc_write(":MEAS:COUN:VAL?") != 15)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.counterfreq = atof(device->buf);
-  }
-
-  return;
-
-OUT_ERROR:
-
-  sprintf(str, "An error occurred while reading status from device.\n"
-               "File %s line %i", __FILE__, line);
-
-  QMessageBox msgBox;
-  msgBox.setIcon(QMessageBox::Critical);
-  msgBox.setText(str);
-  msgBox.exec();
-
-  close_connection();
 }
 
 
 void UI_Mainwindow::scrn_timer_handler()
 {
-  int i, j, n=0, chns=0, line;
-
-  char str[128];
-
-  static int h_busy=0;
-
-  if(device == NULL)
+  if(devparms.mutexx->tryLock() == false)
   {
     return;
   }
 
-  if(h_busy)
-  {
-    return;
-  }
+  scrn_thread->set_params(&devparms);
 
-  h_busy = 1;
-
-  stat_timer_handler();
-
-  if(!devparms.connected)
-  {
-    h_busy = 0;
-
-    return;
-  }
-
-  for(i=0; i<MAX_CHNS; i++)
-  {
-    if(!devparms.chandisplay[i])  // Download data only when channel is switched on
-    {
-      continue;
-    }
-
-    chns++;
-  }
-
-  if(!chns)
-  {
-    waveForm->clear();
-
-    h_busy = 0;
-
-    return;
-  }
-
-//struct waveform_preamble wfp;
-
-  if(devparms.triggerstatus != 1)  // Don't download waveform data when triggerstatus is "wait"
-  {
-    for(i=0; i<MAX_CHNS; i++)
-    {
-      if(!devparms.chandisplay[i])  // Download data only when channel is switched on
-      {
-        continue;
-      }
-
-///////////////////////////////////////////////////////////
-
-//     tmc_write(":WAV:PRE?");
-//
-//     n = tmc_read();
-//
-//     if(n < 0)
-//     {
-//       strcpy(str, "Can not read from device.");
-//       goto OUT_ERROR;
-//     }
-//
-//     printf("waveform preamble: %s\n", device->buf);
-//
-//     if(parse_preamble(device->buf, device->sz, &wfp, i))
-//     {
-//       strcpy(str, "Preamble parsing error.");
-//       goto OUT_ERROR;
-//     }
-//
-//     printf("waveform preamble:\n"
-//            "format: %i\n"
-//            "type: %i\n"
-//            "points: %i\n"
-//            "count: %i\n"
-//            "xincrement: %e\n"
-//            "xorigin: %e\n"
-//            "xreference: %e\n"
-//            "yincrement: %e\n"
-//            "yorigin: %e\n"
-//            "yreference: %i\n",
-//            wfp.format, wfp.type, wfp.points, wfp.count,
-//            wfp.xincrement[i], wfp.xorigin[i], wfp.xreference[i],
-//            wfp.yincrement[i], wfp.yorigin[i], wfp.yreference[i]);
-//
-//     printf("chanoffset[] is %e\n", devparms.chanoffset[i]);
-
-//     rec_len = wfp.xincrement[i] * wfp.points;
-
-///////////////////////////////////////////////////////////
-
-      sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
-
-      tmc_write(str);
-
-      tmc_write(":WAV:FORM BYTE");
-
-      tmc_write(":WAV:MODE NORM");
-
-      tmc_write(":WAV:DATA?");
-
-      n = tmc_read();
-
-      if(n < 0)
-      {
-        printf("Can not read from device.\n");
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-      if(n > WAVFRM_MAX_BUFSZ)
-      {
-        printf("Datablock too big for buffer.\n");
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-      if(n < 32)
-      {
-        n = 0;
-      }
-
-      for(j=0; j<n; j++)
-      {
-        devparms.wavebuf[i][j] = (int)(((unsigned char *)device->buf)[j]) - 127;
-      }
-    }
-
-    devparms.wavebufsz = n;
-
-    waveForm->drawCurve(&devparms, device, n);
-  }
-  else  // triggerstatus is "wait"
-  {
-    waveForm->update();
-  }
-
-  h_busy = 0;
-
-  return;
-
-OUT_ERROR:
-
-  scrn_timer->stop();
-
-  sprintf(str, "An error occurred while reading screen data from device.\n"
-               "File %s line %i", __FILE__, line);
-
-  QMessageBox msgBox;
-  msgBox.setIcon(QMessageBox::Critical);
-  msgBox.setText(str);
-  msgBox.exec();
-
-  h_busy = 0;
+  scrn_thread->start();
 }
 
 
+void UI_Mainwindow::horPosDial_timer_handler()
+{
+  char str[256];
+
+  if(devparms.timebasedelayenable)
+  {
+    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+  }
+  else
+  {
+    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
+  }
+
+  set_cue_cmd(str);
+}
 
 
+void UI_Mainwindow::trigAdjDial_timer_handler()
+{
+  int chn;
+
+  char str[256];
+
+  chn = devparms.triggeredgesource;
+
+  if((chn < 0) || (chn > 3))
+  {
+    return;
+  }
+
+  sprintf(str, ":TRIG:EDG:LEV %e", devparms.triggeredgelevel[chn]);
+
+  set_cue_cmd(str);
+}
 
 
+void UI_Mainwindow::vertOffsDial_timer_handler()
+{
+  int chn;
+
+  char str[256];
+
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
+  chn = devparms.activechannel;
+
+  sprintf(str, ":CHAN%i:OFFS %e", chn + 1, devparms.chanoffset[chn]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::horScaleDial_timer_handler()
+{
+  char str[256];
+
+  if(devparms.timebasedelayenable)
+  {
+    sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
+  }
+  else
+  {
+    sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
+  }
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::vertScaleDial_timer_handler()
+{
+  int chn;
+
+  char str[256];
+
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
+  chn = devparms.activechannel;
+
+  sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+
+  set_cue_cmd(str);
+}
 
 
 

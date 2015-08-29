@@ -245,6 +245,9 @@ void UI_Mainwindow::open_connection()
     ch2Button->setVisible(false);
   }
 
+  devparms.cmd_cue_idx_in = 0;
+  devparms.cmd_cue_idx_out = 0;
+
   connect(adjDial,          SIGNAL(valueChanged(int)), this, SLOT(adjDialChanged(int)));
   connect(trigAdjustDial,   SIGNAL(valueChanged(int)), this, SLOT(trigAdjustDialChanged(int)));
   connect(horScaleDial,     SIGNAL(valueChanged(int)), this, SLOT(horScaleDialChanged(int)));
@@ -292,6 +295,8 @@ void UI_Mainwindow::open_connection()
 
   statusLabel->setText("Connected");
 
+  scrn_thread->set_device(device);
+
   devparms.connected = 1;
 
 //  test_timer->start(2000);
@@ -299,6 +304,8 @@ void UI_Mainwindow::open_connection()
   DPRwidget->setEnabled(true);
 
   devparms.screenupdates_on = 1;
+
+  scrn_thread->h_busy = 0;
 
   scrn_timer->start(devparms.screentimerival);
 
@@ -329,11 +336,27 @@ void UI_Mainwindow::close_connection()
 
   adjdial_timer->stop();
 
+  devparms.connected = 0;
+
+  if(scrn_thread->wait(5000) == false)
+  {
+    scrn_thread->terminate();
+
+    scrn_thread->wait(5000);
+
+    devparms.mutexx->unlock();
+
+    scrn_thread->h_busy = 0;
+  }
+
   devparms.screenupdates_on = 0;
 
   setWindowTitle(PROGRAM_NAME " " PROGRAM_VERSION);
 
   strcpy(devparms.modelname, "-----");
+
+  adjDialFunc = ADJ_DIAL_FUNC_NONE;
+  navDialFunc = NAV_DIAL_FUNC_NONE;
 
   disconnect(adjDial,         SIGNAL(valueChanged(int)), this, SLOT(adjDialChanged(int)));
   disconnect(trigAdjustDial,  SIGNAL(valueChanged(int)), this, SLOT(trigAdjustDialChanged(int)));
@@ -375,7 +398,7 @@ void UI_Mainwindow::close_connection()
   disconnect(trigAdjustDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(trigAdjustDialClicked(QPoint)));
   disconnect(adjDial,        SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(adjustDialClicked(QPoint)));
 
-  devparms.connected = 0;
+  scrn_thread->set_device(NULL);
 
   waveForm->clear();
 
@@ -389,13 +412,23 @@ void UI_Mainwindow::close_connection()
 
 void UI_Mainwindow::closeEvent(QCloseEvent *cl_event)
 {
+  devparms.connected = 0;
+
   test_timer->stop();
 
   scrn_timer->stop();
 
+  adjdial_timer->stop();
+
+  scrn_thread->wait(5000);
+
+  scrn_thread->terminate();
+
+  scrn_thread->wait(5000);
+
   devparms.screenupdates_on = 0;
 
-  adjdial_timer->stop();
+  scrn_thread->set_device(NULL);
 
   tmc_close();
 
@@ -1994,9 +2027,7 @@ void UI_Mainwindow::former_page()
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
-
-    tmc_write(str);
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
   }
   else
   {
@@ -2025,9 +2056,7 @@ void UI_Mainwindow::former_page()
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
-
-    tmc_write(str);
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
   }
 
   waveForm->update();
@@ -2065,9 +2094,7 @@ void UI_Mainwindow::next_page()
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
-
-    tmc_write(str);
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
   }
   else
   {
@@ -2096,9 +2123,7 @@ void UI_Mainwindow::next_page()
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
-
-    tmc_write(str);
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
   }
 
   waveForm->update();
@@ -2136,9 +2161,7 @@ void UI_Mainwindow::shift_page_left()
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
-
-    tmc_write(str);
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
   }
   else
   {
@@ -2167,9 +2190,7 @@ void UI_Mainwindow::shift_page_left()
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
-
-    tmc_write(str);
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
   }
 
   waveForm->update();
@@ -2207,9 +2228,7 @@ void UI_Mainwindow::shift_page_right()
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
-
-    tmc_write(str);
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
   }
   else
   {
@@ -2238,9 +2257,7 @@ void UI_Mainwindow::shift_page_right()
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
-
-    tmc_write(str);
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
   }
 
   waveForm->update();
@@ -2301,7 +2318,7 @@ void UI_Mainwindow::zoom_in()
 
     sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
 
-    tmc_write(str);
+    set_cue_cmd(str);
   }
   else
   {
@@ -2348,7 +2365,7 @@ void UI_Mainwindow::zoom_in()
 
     sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
 
-    tmc_write(str);
+    set_cue_cmd(str);
   }
 
   waveForm->update();
@@ -2392,7 +2409,7 @@ void UI_Mainwindow::zoom_out()
 
     sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
 
-    tmc_write(str);
+    set_cue_cmd(str);
   }
   else
   {
@@ -2415,7 +2432,7 @@ void UI_Mainwindow::zoom_out()
 
     sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
 
-    tmc_write(str);
+    set_cue_cmd(str);
   }
 
   waveForm->update();
@@ -2473,13 +2490,87 @@ void UI_Mainwindow::chan_scale_plus()
 
   sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
-  tmc_write(str);
+  set_cue_cmd(str);
 
-  tmc_write(":TRIG:EDG:LEV?");
+  waveForm->update();
+}
 
-  tmc_read();
 
-  devparms.triggeredgelevel[chn] = atof(device->buf);
+void UI_Mainwindow::shift_trace_up()
+{
+  int chn;
+
+  char str[512];
+
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
+
+  chn = devparms.activechannel;
+
+  if(devparms.chanoffset[chn] >= 20)
+  {
+    devparms.chanoffset[chn] = 20;
+
+    return;
+  }
+
+  devparms.chanoffset[chn] += devparms.chanscale[chn];
+
+  sprintf(str, "Channel %i offset: ", chn + 1);
+
+  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
+
+  strcat(str, "V");
+
+  statusLabel->setText(str);
+
+  waveForm->label_active = chn + 1;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  vertOffsDial_timer->start(TMC_DIAL_TIMER_DELAY);
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::shift_trace_down()
+{
+  int chn;
+
+  char str[512];
+
+  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  {
+    return;
+  }
+
+  chn = devparms.activechannel;
+
+  if(devparms.chanoffset[chn] <= -20)
+  {
+    devparms.chanoffset[chn] = -20;
+
+    return;
+  }
+
+  devparms.chanoffset[chn] -= devparms.chanscale[chn];
+
+  sprintf(str, "Channel %i offset: ", chn + 1);
+
+  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
+
+  strcat(str, "V");
+
+  statusLabel->setText(str);
+
+  waveForm->label_active = chn + 1;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  vertOffsDial_timer->start(TMC_DIAL_TIMER_DELAY);
 
   waveForm->update();
 }
@@ -2543,13 +2634,7 @@ void UI_Mainwindow::chan_scale_minus()
 
   sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
-  tmc_write(str);
-
-  tmc_write(":TRIG:EDG:LEV?");
-
-  tmc_read();
-
-  devparms.triggeredgelevel[chn] = atof(device->buf);
+  set_cue_cmd(str);
 
   waveForm->update();
 }
@@ -2561,7 +2646,14 @@ void UI_Mainwindow::set_to_factory()
 
   char str[256];
 
+  if((device == NULL) || (!devparms.connected))
+  {
+    return;
+  }
+
   scrn_timer->stop();
+
+  scrn_thread->wait();
 
   qApp->processEvents();
 
@@ -2671,6 +2763,181 @@ void UI_Mainwindow::set_to_factory()
 
   scrn_timer->start(devparms.screentimerival);
 }
+
+
+// this function is called when screen_thread has finished
+void UI_Mainwindow::screenUpdate()
+{
+  int i, chns=0;
+
+  char str[512];
+
+  if(device == NULL)
+  {
+    devparms.mutexx->unlock();
+
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    devparms.mutexx->unlock();
+
+    return;
+  }
+
+  if(!devparms.screenupdates_on)
+  {
+    devparms.mutexx->unlock();
+
+    return;
+  }
+
+  scrn_thread->get_params(&devparms);
+
+  if(devparms.thread_error_stat)
+  {
+    scrn_timer->stop();
+
+    sprintf(str, "An error occurred while reading screen data from device.\n"
+                "File screen_thread.cpp line %i", devparms.thread_error_line);
+
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.setText(str);
+    msgBox.exec();
+
+    devparms.mutexx->unlock();
+
+    close_connection();
+
+    return;
+  }
+
+  if(devparms.thread_result == TMC_THRD_RESULT_NONE)
+  {
+    devparms.mutexx->unlock();
+
+    return;
+  }
+
+  if(devparms.thread_result == TMC_THRD_RESULT_CMD)
+  {
+    if(devparms.thread_job == TMC_THRD_JOB_TRIGEDGELEV)
+    {
+      devparms.triggeredgelevel[devparms.triggeredgesource] = devparms.thread_value;
+
+//      waveForm->setTrigLineVisible();
+    }
+
+    devparms.mutexx->unlock();
+
+    return;
+  }
+
+  if(scrn_timer->isActive() == false)
+  {
+    devparms.mutexx->unlock();
+
+    return;
+  }
+
+  runButton->setStyleSheet(def_stylesh);
+
+  singleButton->setStyleSheet(def_stylesh);
+
+  if(devparms.triggerstatus == 0)
+  {
+    runButton->setStyleSheet("background: #66FF99;");
+  }
+  else if(devparms.triggerstatus == 1)
+    {
+      singleButton->setStyleSheet("background: #FF9966;");
+    }
+    else if(devparms.triggerstatus == 2)
+      {
+        runButton->setStyleSheet("background: #66FF99;");
+      }
+      else if(devparms.triggerstatus == 3)
+        {
+          runButton->setStyleSheet("background: #66FF99;");
+        }
+        else if(devparms.triggerstatus == 5)
+          {
+            runButton->setStyleSheet("background: #FF0066;");
+          }
+
+  if(devparms.triggersweep == 0)
+  {
+    trigModeAutoLed->setValue(true);
+    trigModeNormLed->setValue(false);
+    trigModeSingLed->setValue(false);
+  }
+  else if(devparms.triggersweep == 1)
+    {
+      trigModeAutoLed->setValue(false);
+      trigModeNormLed->setValue(true);
+      trigModeSingLed->setValue(false);
+    }
+    else if(devparms.triggersweep == 2)
+      {
+        trigModeAutoLed->setValue(false);
+        trigModeNormLed->setValue(false);
+        trigModeSingLed->setValue(true);
+      }
+
+  if(waveForm->hasMoveEvent() == true)
+  {
+    devparms.mutexx->unlock();
+
+    return;
+  }
+
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    if(!devparms.chandisplay[i])  // Display data only when channel is switched on
+    {
+      continue;
+    }
+
+    chns++;
+  }
+
+  if(!chns)
+  {
+    waveForm->clear();
+
+    devparms.mutexx->unlock();
+
+    return;
+  }
+
+  if(devparms.triggerstatus != 1)  // Don't plot waveform data when triggerstatus is "wait"
+  {
+    waveForm->drawCurve(&devparms, device, devparms.wavebufsz);
+  }
+  else
+  {
+    waveForm->update();
+  }
+
+  devparms.mutexx->unlock();
+}
+
+
+void UI_Mainwindow::set_cue_cmd(const char *str)
+{
+  strncpy(devparms.cmd_cue[devparms.cmd_cue_idx_in], str, 128);
+
+  devparms.cmd_cue[devparms.cmd_cue_idx_in][127] = 0;
+
+  devparms.cmd_cue_idx_in++;
+
+  devparms.cmd_cue_idx_in %= TMC_CMD_CUE_SZ;
+
+  scrn_timer_handler();
+}
+
 
 
 

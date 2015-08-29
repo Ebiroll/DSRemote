@@ -1,12 +1,16 @@
 
-DSRemote 0.11
+DSRemote 0.30
 -------------
+
+This is the first version that is using a separate thread for the communication with the oscilloscope.
+This is done to keep the graphical user interface smooth and responsive.
+
 
 When opening a connection, the program reads the settings from the device.
 It does not lock the device, so it's still possible to change settings on the device.
 This will cause a mismatch between the programs settings and the device settings.
 This can be solved by letting the program re-read the settings of the device.
-At this moment, the only way to do that is to disconnect and connect again.
+Either, disconnect and connect again, or click on the "Factory" setting in the "Save" menu of the program.
 Some settings are checked regularly and will always be synchronized:
 - trigger status
 - trigger sweep
@@ -26,7 +30,7 @@ Reading a screenshot in BMP format is slow, approx. 3 seconds.
 Needs a usbtmc driver patch, needs to add an udev rule.
 
 
-DS1054Z: (softversion 00.04.02.SP4, boardversion 0.1.1)
+DS1054Z: (softversion 00.04.03.SP1, boardversion 0.1.1)
 =======
 
 USB connection: high speed (480 Mbit)
@@ -36,24 +40,27 @@ Reading a screenshot in BMP format is faster, less than one second.
 It's plug and play. No need to patch the usbtmc driver, no need to add an udev rule.
 
 
+How to operate:
+==============
 
-Use the mousewheel to change the dials. In order to simulate a push on a dial,
-click on it with the right mouse button.
+Use the mousewheel to change the dials. In order to simulate a push on a dial,click on it with the right mouse button.
+To toggle the delayed timebase, right-click on the timebase dial.
+To set the horizontal position to zero, right-click on the horizontal position dial.
+To set the vertical offset to zero, right-click on the vertical position dial.
 
-In addition of using the dials to change the scale and offset of the traces and the trigger position,
-you can use the mouse to drag the yellow and orange arrows aside of the plot.
+In addition of using the dials to change the scale and offset of the traces and the trigger position,you can use the mouse to drag the colored arrows aside of the plot.
 
 Keyboard shortcuts:
-PageUp: move trace 12 (or 14) divisions to the right.
-PageDn: move trace 12 (or 14) divisions to the left.
-Arrow left: move trace 1 division to the right.
-Arrow right: move trace 1 division to the left.
+PageUp: move traces 12 (or 14) divisions to the right.
+PageDn: move traces 12 (or 14) divisions to the left.
+Arrow left: move traces 1 division to the right.
+Arrow right: move traces 1 division to the left.
+Arrow up: move active trace 1 division up.
+Arrow down: move active trace 1 division down.
 Zoom In (decrease timebase): Ctl+
 Zoom Out (increase timebase): Ctl-
 Increase vertical scale: -
 Decrease vertical scale: +
-
-
 
 
 What's implemented so far:
@@ -62,7 +69,6 @@ What's implemented so far:
 - horizontal timebase
 - horizontal offset
 - horizontal timebase delay on/off
-  (display is not yet implemented)
 - horizontal vernier
 
 
@@ -81,7 +87,7 @@ What's implemented so far:
 - trigger source (chan1/4, ext, ext5, ac)
 - trigger edge (positive, negative, rising edge & falling edge)
 - trigger level
-- trigger level 50%
+- trigger level 50% (DS6000 series only)
 - trigger force
 
 
@@ -108,7 +114,7 @@ What's implemented so far:
   fileformat for waveform data is EDF, these files can be read by lots
   of viewers and analyzing software like EDFbrowser, Scilab, Octave, Matlab, Labview, etc.
 
-
+- Set to factory settings
 
 
 

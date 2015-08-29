@@ -26,55 +26,80 @@
 */
 
 
-#ifndef TMC_LAN_H
-#define TMC_LAN_H
+#ifndef DEF_SCREEN_THREAD_H
+#define DEF_SCREEN_THREAD_H
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <locale.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <sys/time.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stropts.h>
+
+#include <QObject>
+#include <QThread>
 
 #include "global.h"
-#include "tmc_dev.h"
 #include "utils.h"
+#include "connection.h"
+#include "tmc_dev.h"
 
 
 
+class screenThread : public QThread
+{
+  Q_OBJECT
 
-struct tmcdev * tmclan_open(const char *);
-void tmclan_close(struct tmcdev *);
-int tmclan_write(struct tmcdev *, const char *);
-int tmclan_read(struct tmcdev *);
+public:
+
+  screenThread();
+  ~screenThread();
+
+  int h_busy;
+
+  void set_device(struct tmcdev *);
+
+  void set_params(struct device_settings *);
+  void get_params(struct device_settings *);
+
+private:
+
+  struct {
+    int connected;
+    int chandisplay[MAX_CHNS];
+    int triggerstatus;
+    int triggersweep;
+    double samplerate;
+    int memdepth;
+    int countersrc;
+    double counterfreq;
+    int wavebufsz;
+    short *wavebuf[MAX_CHNS];
+    int error_stat;
+    int error_line;
+    int cmd_cue_idx_in;
+    int cmd_cue_idx_out;
+    int result;
+    int job;
+
+    double triggeredgelevel;
+    double timebasedelayoffset;
+    double timebasedelayscale;
+
+    char debug_str[1024];
+  } params;
+
+  struct tmcdev *device;
+
+  struct device_settings *deviceparms;
+
+  void run();
+
+  int get_devicestatus();
+
+};
 
 
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

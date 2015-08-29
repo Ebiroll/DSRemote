@@ -64,7 +64,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   devparms.screenshot_buf = (char *)malloc(1024 * 1024 * 2);
 
-  for(i=0; i< MAX_CHNS; i++)
+  for(i=0; i<MAX_CHNS; i++)
   {
     devparms.wavebuf[i] = (short *)malloc(WAVFRM_MAX_BUFSZ);
 
@@ -89,6 +89,11 @@ UI_Mainwindow::UI_Mainwindow()
   devparms.hordivisions = 14;
 
   strcpy(devparms.modelname, "-----");
+
+  devparms.mutexx = new QMutex();
+
+  scrn_thread = new screenThread;
+  scrn_thread->set_device(NULL);
 
   menubar = menuBar();
 
@@ -349,6 +354,16 @@ UI_Mainwindow::UI_Mainwindow()
   connect(former_page_act, SIGNAL(triggered()), this, SLOT(former_page()));
   addAction(former_page_act);
 
+  shift_trace_up_act = new QAction(this);
+  shift_trace_up_act->setShortcut(QKeySequence::MoveToPreviousLine);
+  connect(shift_trace_up_act, SIGNAL(triggered()), this, SLOT(shift_trace_up()));
+  addAction(shift_trace_up_act);
+
+  shift_trace_down_act = new QAction(this);
+  shift_trace_down_act->setShortcut(QKeySequence::MoveToNextLine);
+  connect(shift_trace_down_act, SIGNAL(triggered()), this, SLOT(shift_trace_down()));
+  addAction(shift_trace_down_act);
+
   shift_page_left_act = new QAction(this);
   shift_page_left_act->setShortcut(QKeySequence::MoveToPreviousChar);
   connect(shift_page_left_act, SIGNAL(triggered()), this, SLOT(shift_page_left()));
@@ -414,13 +429,29 @@ UI_Mainwindow::UI_Mainwindow()
   navDial_timer->setSingleShot(true);
   label_timer = new QTimer(this);
   test_timer = new QTimer(this);
+  horPosDial_timer = new QTimer(this);
+  horPosDial_timer->setSingleShot(true);
+  trigAdjDial_timer = new QTimer(this);
+  trigAdjDial_timer->setSingleShot(true);
+  vertOffsDial_timer = new QTimer(this);
+  vertOffsDial_timer->setSingleShot(true);
+  horScaleDial_timer = new QTimer(this);
+  horScaleDial_timer->setSingleShot(true);
+  vertScaleDial_timer = new QTimer(this);
+  vertScaleDial_timer->setSingleShot(true);
 
-  connect(scrn_timer,    SIGNAL(timeout()),        this, SLOT(scrn_timer_handler()));
-  connect(adjdial_timer, SIGNAL(timeout()),        this, SLOT(adjdial_timer_handler()));
-  connect(navDial,       SIGNAL(sliderReleased()), this, SLOT(navDialReleased()));
-  connect(navDial_timer, SIGNAL(timeout()),        this, SLOT(navDial_timer_handler()));
-  connect(label_timer,   SIGNAL(timeout()),        this, SLOT(label_timer_handler()));
-  connect(test_timer,    SIGNAL(timeout()),        this, SLOT(test_timer_handler()));
+  connect(scrn_timer,          SIGNAL(timeout()),        this, SLOT(scrn_timer_handler()));
+  connect(scrn_thread,         SIGNAL(finished()),       this, SLOT(screenUpdate()));
+  connect(adjdial_timer,       SIGNAL(timeout()),        this, SLOT(adjdial_timer_handler()));
+  connect(navDial,             SIGNAL(sliderReleased()), this, SLOT(navDialReleased()));
+  connect(navDial_timer,       SIGNAL(timeout()),        this, SLOT(navDial_timer_handler()));
+  connect(label_timer,         SIGNAL(timeout()),        this, SLOT(label_timer_handler()));
+  connect(test_timer,          SIGNAL(timeout()),        this, SLOT(test_timer_handler()));
+  connect(horPosDial_timer,    SIGNAL(timeout()),        this, SLOT(horPosDial_timer_handler()));
+  connect(trigAdjDial_timer,   SIGNAL(timeout()),        this, SLOT(trigAdjDial_timer_handler()));
+  connect(vertOffsDial_timer,  SIGNAL(timeout()),        this, SLOT(vertOffsDial_timer_handler()));
+  connect(horScaleDial_timer,  SIGNAL(timeout()),        this, SLOT(horScaleDial_timer_handler()));
+  connect(vertScaleDial_timer, SIGNAL(timeout()),        this, SLOT(vertScaleDial_timer_handler()));
 
 ///// TEST /////////////////////////////////////
 //   DPRwidget->setEnabled(true);
@@ -472,8 +503,10 @@ UI_Mainwindow::~UI_Mainwindow()
 
   settings.setValue("path/savedir", recent_savedir);
 
+  delete scrn_thread;
   delete appfont;
   delete monofont;
+  delete devparms.mutexx;
 
   free(devparms.screenshot_buf);
 

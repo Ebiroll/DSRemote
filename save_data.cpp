@@ -48,6 +48,8 @@ void UI_Mainwindow::save_screenshot()
 
   scrn_timer->stop();
 
+  scrn_thread->wait();
+
   tmc_write(":DISP:DATA?");
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -178,6 +180,8 @@ void UI_Mainwindow::save_memory_waveform()
   }
 
   scrn_timer->stop();
+
+  scrn_thread->wait();
 
   wavbuf[0] = NULL;
   wavbuf[1] = NULL;
@@ -776,6 +780,8 @@ void UI_Mainwindow::save_screen_waveform()
   wavbuf[3] = NULL;
 
   scrn_timer->stop();
+
+  scrn_thread->wait();
 
   if(devparms.timebasedelayenable)
   {

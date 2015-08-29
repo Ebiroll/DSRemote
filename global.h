@@ -29,15 +29,17 @@
 #ifndef DSR_GLOBAL_H
 #define DSR_GLOBAL_H
 
+#include <QMutex>
+
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.20_1508250935"
+#define PROGRAM_VERSION       "0.30_1508291645"
 
 #define MAX_PATHLEN            4096
 
 #define MAX_CHNS                  4
 
-#define ADJDIAL_TIMER_IVAL_1   3000
+#define ADJDIAL_TIMER_IVAL_1   4000
 #define ADJDIAL_TIMER_IVAL_2   2000
 
 #define SCRN_SHOT_BMP_SZ    1152054
@@ -51,7 +53,7 @@
 #define NAV_DIAL_FUNC_NONE        0
 #define NAV_DIAL_FUNC_HOLDOFF     1
 
-#define LABEL_TIMER_IVAL       1000
+#define LABEL_TIMER_IVAL       1500
 
 #define LABEL_ACTIVE_NONE         0
 #define LABEL_ACTIVE_CHAN1        1
@@ -61,6 +63,19 @@
 #define LABEL_ACTIVE_TRIG         5
 
 #define TMC_GDS_DELAY         10000
+
+#define TMC_CMD_CUE_SZ         1024
+
+#define TMC_THRD_RESULT_NONE      0
+#define TMC_THRD_RESULT_SCRN      1
+#define TMC_THRD_RESULT_CMD       2
+
+#define TMC_THRD_JOB_NONE         0
+#define TMC_THRD_JOB_TRIGEDGELEV  1
+#define TMC_THRD_JOB_TIMDELAY     2
+
+#define TMC_DIAL_TIMER_DELAY    300
+
 
 
 
@@ -148,7 +163,20 @@ struct device_settings
 
   int screenupdates_on;
 
+  QMutex *mutexx;
+
+  int thread_error_stat;
+  int thread_error_line;
+  int thread_result;
+  int thread_job;
+  double thread_value;
+
   struct waveform_preamble preamble;
+
+  char cmd_cue[TMC_CMD_CUE_SZ][128];
+
+  int cmd_cue_idx_in;
+  int cmd_cue_idx_out;
 };
 
 
