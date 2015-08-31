@@ -96,7 +96,7 @@ void tmcdev_close(struct tmcdev *dev)
 
 int tmcdev_write(struct tmcdev *dev, const char *cmd)
 {
-  int i, size, qry=0;
+  int i, n, len, qry=0;
 
   char buf[MAX_CMD_LEN + 16],
        str[256];
@@ -106,21 +106,23 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
     return -1;
   }
 
-  if(strlen(cmd) > MAX_CMD_LEN)
+  len = strlen(cmd);
+
+  if(len > MAX_CMD_LEN)
   {
     printf("tmcdev error: command too long\n");
 
     return -1;
   }
 
-  if(strlen(cmd) < 2)
+  if(len < 2)
   {
     printf("tmcdev error: command too short\n");
 
     return -1;
   }
 
-  if(cmd[strlen(cmd) - 1] == '?')
+  if(cmd[len - 1] == '?')
   {
     qry = 1;
   }
@@ -145,22 +147,40 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
     printf("tmc_dev write: %s", buf);
   }
 
-  size = write(dev->fd, buf, strlen(buf));
+  n = write(dev->fd, buf, strlen(buf));
 
-  if(size < 0)
+  if(n != (len + 1))
   {
     printf("tmcdev error: device write error");
+
+    return -1;
   }
 
   if(!qry)
   {
     for(i=0; i<20; i++)
     {
-      usleep(50000);
+      usleep(25000);
 
-      write(dev->fd, "*OPC?\n", 6);
+      n = write(dev->fd, "*OPC?\n", 6);
 
-      if(read(dev->fd, str, 128) == 2)
+      if(n < 0)
+      {
+        printf("tmcdev error: device write error");
+
+        return -1;
+      }
+
+      n = read(dev->fd, str, 128);
+
+      if(n < 0)
+      {
+        printf("tmcdev error: device read error");
+
+        return -1;
+      }
+
+      if(n == 2)
       {
         if(str[0] == '1')
         {
@@ -170,7 +190,7 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
     }
   }
 
-  return size - 1;
+  return len;
 }
 
 
@@ -211,15 +231,7 @@ int tmcdev_read(struct tmcdev *dev)
     return -1;
   }
 
-  if(size >= 0)
-  {
-    dev->hdrbuf[size] = 0;
-  }
-
-  if(size == 0)
-  {
-    return 0;
-  }
+  dev->hdrbuf[size] = 0;
 
   if(dev->hdrbuf[0] != '#')
   {

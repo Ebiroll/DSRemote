@@ -38,38 +38,40 @@ int sockfd;
 
 struct sockaddr_in inet_address;
 
-struct timeval timeout, temp_timeout;
+struct timeval timeout;
 
-fd_set tcp_fds, temp_tcp_fds;  /* filedescriptor pool */
+fd_set tcp_fds;  /* filedescriptor pool */
 
 
 
 
 static int tmclan_send(const char *str)
 {
-  int n, len;
+  int len;
+
+  fd_set temp_tcp_fds = tcp_fds;  /* because select overwrites the arguments */
+  struct timeval temp_timeout = timeout;
 
   len = strlen(str);
 
-  n = send(sockfd, str, len, MSG_NOSIGNAL);
+  if(select(sockfd + 1, 0, &temp_tcp_fds, 0, &temp_timeout) != -1)
+  {
+    if(FD_ISSET(sockfd, &temp_tcp_fds))  /* check if our file descriptor is set */
+    {
+      return send(sockfd, str, len, MSG_NOSIGNAL);
+    }
+  }
 
-  if(n == len)
-  {
-    return n;
-  }
-  else
-  {
-    return -1;
-  }
+  return -1;
 }
 
 
 static int tmclan_recv(char *buf, int sz)
 {
-  temp_tcp_fds = tcp_fds;  /* because select overwrites the arguments */
-  temp_timeout = timeout;
+  fd_set temp_tcp_fds = tcp_fds;  /* because select overwrites the arguments */
+  struct timeval temp_timeout = timeout;
 
-  if(select(sockfd + 1, &temp_tcp_fds, 0, 0, &temp_timeout))
+  if(select(sockfd + 1, &temp_tcp_fds, 0, 0, &temp_timeout) != -1)
   {
     if(FD_ISSET(sockfd, &temp_tcp_fds))  /* check if our file descriptor is set */
     {
@@ -217,14 +219,25 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
   {
     for(int i=0; i<20; i++)
     {
-      usleep(50000);
+      usleep(25000);
 
       if(tmclan_send("*OPC?\n") != 6)
       {
+        printf("tmcdev error: device write error");
+
         return -1;
       }
 
-      if(tmclan_recv(str, 128) == 2)
+      n = tmclan_recv(str, 128);
+
+      if(n < 0)
+      {
+        printf("tmcdev error: device read error");
+
+        return -1;
+      }
+
+      if(n == 2)
       {
         if(str[0] == '1')
         {
@@ -290,15 +303,7 @@ int tmclan_read(struct tmcdev *tmc_device)
     return -3;
   }
 
-  if(size >= 0)
-  {
-    tmc_device->hdrbuf[size] = 0;
-  }
-
-  if(size == 0)
-  {
-    return 0;
-  }
+  tmc_device->hdrbuf[size] = 0;
 
   if(tmc_device->hdrbuf[0] != '#')
   {
