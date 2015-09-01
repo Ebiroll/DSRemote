@@ -29,26 +29,10 @@
 #ifndef TMC_LAN_H
 #define TMC_LAN_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <locale.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <sys/time.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stropts.h>
 
-#include "global.h"
-#include "tmc_dev.h"
-#include "utils.h"
-
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 struct tmcdev * tmclan_open(const char *);
@@ -56,6 +40,10 @@ void tmclan_close(struct tmcdev *);
 int tmclan_write(struct tmcdev *, const char *);
 int tmclan_read(struct tmcdev *);
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 
 #endif

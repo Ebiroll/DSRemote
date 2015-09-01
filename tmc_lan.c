@@ -25,7 +25,27 @@
 ***************************************************************************
 */
 
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <stropts.h>
+
+#include "tmc_dev.h"
+#include "utils.h"
 #include "tmc_lan.h"
+
 
 
 #define TMC_LAN_TIMEOUT   5000
@@ -157,7 +177,7 @@ void tmclan_close(struct tmcdev *tmc_device)
 
 int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char *cmd)
 {
-  int n, len, qry=0;
+  int i, n, len, qry=0;
 
   char buf[MAX_CMD_LEN + 16],
        str[256];
@@ -217,7 +237,7 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
 
   if(!qry)
   {
-    for(int i=0; i<20; i++)
+    for(i=0; i<20; i++)
     {
       usleep(25000);
 
