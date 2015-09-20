@@ -1266,6 +1266,38 @@ void SignalCurve::mousePressEvent(QMouseEvent *press_event)
 
   if(press_event->button()==Qt::LeftButton)
   {
+    if(m_y > (h + 12))
+    {
+//      printf("m_x is: %i   m_y is: %i\n", m_x, m_y);
+
+      m_x += bordersize;
+
+      if((m_x > 8) && (m_x < 118))
+      {
+        emit chan1Clicked();
+      }
+      else if((m_x > 133) && (m_x < 243))
+        {
+          emit chan2Clicked();
+        }
+        else if((m_x > 258) && (m_x < 368))
+          {
+            if(devparms->channel_cnt > 2)
+            {
+              emit chan3Clicked();
+            }
+          }
+          else if((m_x > 383) && (m_x < 493))
+            {
+              if(devparms->channel_cnt > 3)
+              {
+                emit chan4Clicked();
+              }
+            }
+
+      return;
+    }
+
     if(((m_x > (trig_pos_arrow_pos - 8)) && (m_x < (trig_pos_arrow_pos + 8)) && (m_y > 5) && (m_y < 24)) ||
        ((trig_pos_arrow_pos > w) && (m_x > (trig_pos_arrow_pos - 24)) && (m_x <= trig_pos_arrow_pos) && (m_y > 9) && (m_y < 26)) ||
        ((trig_pos_arrow_pos < 0) && (m_x < 24) && (m_x >= 0) && (m_y > 9) && (m_y < 26)))
