@@ -486,9 +486,9 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
     {
       if(devparms.modelserie == 1)
       {
-        if(devparms.timebasescale <= 5.001e-9)
+        if(devparms.timebasedelayscale <= 5.001e-9)
         {
-          devparms.timebasescale = 5e-9;
+          devparms.timebasedelayscale = 5e-9;
 
           old_pos = new_pos;
 
