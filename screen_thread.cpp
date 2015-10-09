@@ -129,6 +129,8 @@ int screenThread::get_devicestatus()
 {
   int line;
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":TRIG:STAT?") != 11)
   {
     line = __LINE__;
@@ -171,6 +173,8 @@ int screenThread::get_devicestatus()
               goto OUT_ERROR;
             }
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":TRIG:SWE?") != 10)
   {
     line = __LINE__;
@@ -201,6 +205,8 @@ int screenThread::get_devicestatus()
         goto OUT_ERROR;
       }
 
+  usleep(TMC_GDS_DELAY);
+
   if(tmc_write(":ACQ:SRAT?") != 10)
   {
     line = __LINE__;
@@ -214,6 +220,8 @@ int screenThread::get_devicestatus()
   }
 
   params.samplerate = atof(device->buf);
+
+  usleep(TMC_GDS_DELAY);
 
   if(tmc_write(":ACQ:MDEP?") != 10)
   {
@@ -231,6 +239,8 @@ int screenThread::get_devicestatus()
 
   if(params.countersrc)
   {
+    usleep(TMC_GDS_DELAY);
+
     if(tmc_write(":MEAS:COUN:VAL?") != 15)
     {
       line = __LINE__;
@@ -296,12 +306,16 @@ void screenThread::run()
 
   while(params.cmd_cue_idx_out != params.cmd_cue_idx_in)
   {
+    usleep(TMC_GDS_DELAY);
+
     tmc_write(deviceparms->cmd_cue[params.cmd_cue_idx_out]);
 
     if((!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":TLHA", 5)) ||
        ((!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":CHAN", 5)) &&
        (!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out] + 6, ":SCAL ", 6))))
     {
+      usleep(TMC_GDS_DELAY);
+
       if(tmc_write(":TRIG:EDG:LEV?") != 14)
       {
         printf("Can not write to device.\n");
@@ -322,6 +336,8 @@ void screenThread::run()
     }
     else if(!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":TIM:DEL:ENAB 1", 15))
       {
+        usleep(TMC_GDS_DELAY);
+
         if(tmc_write(":TIM:DEL:OFFS?") != 14)
         {
           printf("Can not write to device.\n");
@@ -337,6 +353,8 @@ void screenThread::run()
         }
 
         params.timebasedelayoffset = atof(device->buf);
+
+        usleep(TMC_GDS_DELAY);
 
         if(tmc_write(":TIM:DEL:SCAL?") != 14)
         {

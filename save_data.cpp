@@ -261,8 +261,6 @@ void UI_Mainwindow::save_memory_waveform()
       continue;
     }
 
-//    printf("start channel x\n");
-
     sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
 
     tmc_write(str);
@@ -321,23 +319,6 @@ void UI_Mainwindow::save_memory_waveform()
       goto OUT_ERROR;
     }
 
-//     if(devparms.modelserie != 1)
-//     {
-//       sprintf(str, ":WAV:POIN %i", mempnts);
-//
-//       usleep(20000);
-//
-//       tmc_write(str);
-//
-//       usleep(20000);
-//
-//       tmc_write(":WAV:RES");
-//
-//       usleep(20000);
-//
-//       tmc_write(":WAV:BEG");
-//     }
-
     empty_buf = 0;
 
     for(bytes_rcvd=0; bytes_rcvd<mempnts ;)
@@ -352,79 +333,30 @@ void UI_Mainwindow::save_memory_waveform()
         goto OUT_ERROR;
       }
 
-      if(devparms.modelserie == 1)
+      sprintf(str, ":WAV:STAR %i",  bytes_rcvd + 1);
+
+      usleep(20000);
+
+      tmc_write(str);
+
+      if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
       {
-        sprintf(str, ":WAV:STAR %i",  bytes_rcvd + 1);
-
-        usleep(20000);
-
-        tmc_write(str);
-
-        if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
-        {
-          sprintf(str, ":WAV:STOP %i", mempnts);
-        }
-        else
-        {
-          sprintf(str, ":WAV:STOP %i", bytes_rcvd + SAV_MEM_BSZ);
-        }
-
-        usleep(20000);
-
-        tmc_write(str);
+        sprintf(str, ":WAV:STOP %i", mempnts);
       }
       else
       {
-        sprintf(str, ":WAV:STAR %i",  bytes_rcvd + 1);
-
-        usleep(20000);
-
-        tmc_write(str);
-
-        if((bytes_rcvd + SAV_MEM_BSZ) > mempnts)
-        {
-          sprintf(str, ":WAV:STOP %i", mempnts);
-        }
-        else
-        {
-          sprintf(str, ":WAV:STOP %i", bytes_rcvd + SAV_MEM_BSZ);
-        }
-
-        usleep(20000);
-
-        tmc_write(str);
-
-        usleep(20000);
-
-        tmc_write(":WAV:RES");
-
-        usleep(20000);
-
-        tmc_write(":WAV:BEG");
-
-        usleep(20000);
-
-        tmc_write(":WAV:STAT?");
-
-        usleep(20000);
-
-        tmc_read();
-
-        printf(":WAV:STAT?   %s\n", device->buf);
+        sprintf(str, ":WAV:STOP %i", bytes_rcvd + SAV_MEM_BSZ);
       }
+
+      usleep(20000);
+
+      tmc_write(str);
 
       usleep(20000);
 
       tmc_write(":WAV:DATA?");
 
       n = tmc_read();
-
-      if(devparms.modelserie != 1)
-      {
-        usleep(20000);
-
-        tmc_write(":WAV:END");
-      }
 
       if(n < 0)
       {
@@ -434,21 +366,10 @@ void UI_Mainwindow::save_memory_waveform()
 
       printf("received %i bytes, total %i bytes\n", n, n + bytes_rcvd);
 
-      if(devparms.modelserie == 1)
+      if(n > SAV_MEM_BSZ)
       {
-        if(n > SAV_MEM_BSZ)
-        {
-          sprintf(str, "Datablock too big for buffer.  line %i file %s", __LINE__, __FILE__);
-          goto OUT_ERROR;
-        }
-      }
-      else
-      {
-        if(n > mempnts)
-        {
-          sprintf(str, "Datablock too big for buffer.  line %i file %s", __LINE__, __FILE__);
-          goto OUT_ERROR;
-        }
+        sprintf(str, "Datablock too big for buffer.  line %i file %s", __LINE__, __FILE__);
+        goto OUT_ERROR;
       }
 
       if(n < 1)
@@ -481,13 +402,6 @@ void UI_Mainwindow::save_memory_waveform()
       }
     }
 
-//     if(devparms.modelserie != 1)
-//     {
-//       usleep(20000);
-//
-//       tmc_write(":WAV:END");
-//     }
-
     if(bytes_rcvd < mempnts)
     {
       sprintf(str, "Download error.  line %i file %s", __LINE__, __FILE__);
@@ -514,18 +428,9 @@ void UI_Mainwindow::save_memory_waveform()
 
     tmc_write(":WAV:MODE NORM");
 
-    if(devparms.modelserie == 6)
-    {
-      usleep(20000);
+    usleep(20000);
 
-      tmc_write(":WAV:STAR 0");
-    }
-    else
-    {
-      usleep(20000);
-
-      tmc_write(":WAV:STAR 1");
-    }
+    tmc_write(":WAV:STAR 1");
 
     if(devparms.modelserie == 1)
     {
@@ -682,14 +587,7 @@ OUT_ERROR:
 
     tmc_write(":WAV:MODE NORM");
 
-    if(devparms.modelserie == 6)
-    {
-      tmc_write(":WAV:STAR 0");
-    }
-    else
-    {
-      tmc_write(":WAV:STAR 1");
-    }
+    tmc_write(":WAV:STAR 1");
 
     if(devparms.modelserie == 1)
     {

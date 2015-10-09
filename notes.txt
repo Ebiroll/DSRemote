@@ -1,5 +1,5 @@
 
-DSRemote 0.30
+DSRemote 0.31
 -------------
 
 This is the first version that is using a separate thread for the communication with the oscilloscope.
@@ -21,13 +21,13 @@ Some settings are checked regularly and will always be synchronized:
 There are some peculiarities when testing with the DS6104 and the DS1054Z:
 
 
-DS6104: (software version 00.01.04, hardware version 1.8)
+DS6104: (software version 00.02.00.SP5, hardware version 1.8)
 ======
 
 USB connection: full speed (12MBit)
 Reading screen data is pretty fast, 20 waveforms per second is easily possible.
 Reading a screenshot in BMP format is slow, approx. 3 seconds.
-Needs a usbtmc driver patch, needs to add an udev rule.
+You need to add an udev rule. See readme_usbtmc_driver.txt for how to do that.
 
 
 DS1054Z: (softversion 00.04.03.SP1, boardversion 0.1.1)
@@ -37,7 +37,7 @@ USB connection: high speed (480 Mbit)
 Reading screen data is slow, maximum 7 waveforms per second with one channel.
 With all four channels active, downloading the screen waveform data is really slow.
 Reading a screenshot in BMP format is faster, less than one second.
-It's plug and play. No need to patch the usbtmc driver, no need to add an udev rule.
+It's plug and play, no need to add an udev rule.
 
 
 How to operate:
