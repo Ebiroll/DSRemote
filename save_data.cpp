@@ -171,8 +171,9 @@ void UI_Mainwindow::save_memory_waveform()
 
   short *wavbuf[4];
 
-  double rec_len = 0,
-         yinc[MAX_CHNS];
+  long long rec_len=0LL;
+
+  double yinc[MAX_CHNS];
 
   if(device == NULL)
   {
@@ -227,11 +228,12 @@ void UI_Mainwindow::save_memory_waveform()
     goto OUT_ERROR;
   }
 
-  rec_len = mempnts / devparms.samplerate;
+  rec_len = (EDFLIB_TIME_DIMENSION * (long long)mempnts) / devparms.samplerate;
 
-  if(rec_len < 1e-6)
+  if(rec_len < 100)
   {
-    strcpy(str, "Can not save waveforms shorter than 1 uSec.");
+    strcpy(str, "Can not save waveforms shorter than 10 uSec.\n"
+                "Set the horizontal timebase to 1 uSec or higher.");
     goto OUT_ERROR;
   }
 
@@ -484,7 +486,7 @@ void UI_Mainwindow::save_memory_waveform()
     goto OUT_ERROR;
   }
 
-  if(edf_set_double_datarecord_duration(hdl, rec_len / datrecs))
+  if(edf_set_datarecord_duration(hdl, (rec_len / 100LL) / datrecs))
   {
     strcpy(str, "Can not set datarecord duration of EDF file.");
     goto OUT_ERROR;
@@ -664,8 +666,9 @@ void UI_Mainwindow::save_screen_waveform()
 
   short *wavbuf[4];
 
-  double rec_len = 0,
-         yinc[MAX_CHNS];
+  long long rec_len=0LL;
+
+  double yinc[MAX_CHNS];
 
   if(device == NULL)
   {
@@ -683,16 +686,16 @@ void UI_Mainwindow::save_screen_waveform()
 
   if(devparms.timebasedelayenable)
   {
-    rec_len = devparms.timebasedelayscale * devparms.hordivisions;
+    rec_len = EDFLIB_TIME_DIMENSION * devparms.timebasedelayscale * devparms.hordivisions;
   }
   else
   {
-    rec_len = devparms.timebasescale * devparms.hordivisions;
+    rec_len = EDFLIB_TIME_DIMENSION * devparms.timebasescale * devparms.hordivisions;
   }
 
-  if(rec_len < 1e-6)
+  if(rec_len < 10LL)
   {
-    strcpy(str, "Can not save waveforms when timebase < 100nS.");
+    strcpy(str, "Can not save waveforms when timebase < 1uSec.");
     goto OUT_ERROR;
   }
 
@@ -848,7 +851,7 @@ void UI_Mainwindow::save_screen_waveform()
     goto OUT_ERROR;
   }
 
-  if(edf_set_double_datarecord_duration(hdl, rec_len))
+  if(edf_set_datarecord_duration(hdl, rec_len / 100LL))
   {
     strcpy(str, "Can not set datarecord duration of EDF file.");
     goto OUT_ERROR;

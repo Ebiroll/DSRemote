@@ -605,8 +605,6 @@ int edf_set_datarecord_duration(int handle, int duration);
 /* or set the samplefrequency to 1 Hz and the datarecord duration to 2 seconds. */
 /* Do not use this function, except when absolutely necessary! */
 
-int edf_set_double_datarecord_duration(int, double);
-
 int edf_set_number_of_annotation_signals(int handle, int annot_signals);
 
 /* Sets the number of annotation signals. The default value is 1 */

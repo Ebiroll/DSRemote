@@ -3819,7 +3819,7 @@ int edf_set_datarecord_duration(int handle, int duration)
     return(-1);
   }
 
-  if((duration < 100) || (duration > 6000000))
+  if((duration < 1) || (duration > 6000000))
   {
     return(-1);
   }
@@ -3838,46 +3838,6 @@ int edf_set_datarecord_duration(int handle, int duration)
 
     hdrlist[handle]->long_data_record_duration *= 100LL;
   }
-
-  hdrlist[handle]->data_record_duration = ((double)(hdrlist[handle]->long_data_record_duration)) / EDFLIB_TIME_DIMENSION;
-
-  return(0);
-}
-
-
-int edf_set_double_datarecord_duration(int handle, double duration)
-{
-  if(handle<0)
-  {
-    return(-1);
-  }
-
-  if(handle>=EDFLIB_MAXFILES)
-  {
-    return(-1);
-  }
-
-  if(hdrlist[handle]==NULL)
-  {
-    return(-1);
-  }
-
-  if(!(hdrlist[handle]->writemode))
-  {
-    return(-1);
-  }
-
-  if(hdrlist[handle]->datarecords)
-  {
-    return(-1);
-  }
-
-  if((duration < 1e-6) || (duration > 10))
-  {
-    return(-1);
-  }
-
-  hdrlist[handle]->long_data_record_duration = duration * EDFLIB_TIME_DIMENSION;
 
   hdrlist[handle]->data_record_duration = ((double)(hdrlist[handle]->long_data_record_duration)) / EDFLIB_TIME_DIMENSION;
 
