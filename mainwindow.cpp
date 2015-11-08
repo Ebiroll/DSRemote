@@ -1573,6 +1573,58 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.acquireaverages = atoi(device->buf);
 
+  usleep(TMC_GDS_DELAY);
+
+  if(tmc_write(":DISP:GRAD:TIME?") != 16)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "MIN"))
+  {
+    devparms.displaygrading = 0;
+  }
+  else if(!strcmp(device->buf, "0.1"))
+    {
+      devparms.displaygrading = 1;
+    }
+    else if(!strcmp(device->buf, "0.2"))
+      {
+        devparms.displaygrading = 2;
+      }
+      else if(!strcmp(device->buf, "0.5"))
+        {
+          devparms.displaygrading = 5;
+        }
+        else if(!strcmp(device->buf, "1"))
+          {
+            devparms.displaygrading = 10;
+          }
+          else if(!strcmp(device->buf, "2"))
+            {
+              devparms.displaygrading = 20;
+            }
+            else if(!strcmp(device->buf, "5"))
+              {
+                devparms.displaygrading = 50;
+              }
+              else if(!strcmp(device->buf, "INF"))
+                {
+                  devparms.displaygrading = 10000;
+                }
+                else
+                {
+                  line = __LINE__;
+                  goto OUT_ERROR;
+                }
+
   QApplication::restoreOverrideCursor();
 
   return 0;
@@ -2059,11 +2111,11 @@ void UI_Mainwindow::former_page()
   {
     devparms.timebaseoffset -= devparms.timebasescale * devparms.hordivisions;
 
-    if(devparms.memdepth > 10)
+    if(devparms.acquirememdepth > 10)
     {
-      if(devparms.timebaseoffset <= -(((double)devparms.memdepth / devparms.samplerate) / 2))
+      if(devparms.timebaseoffset <= -(((double)devparms.acquirememdepth / devparms.samplerate) / 2))
       {
-        devparms.timebaseoffset = -(((double)devparms.memdepth / devparms.samplerate) / 2);
+        devparms.timebaseoffset = -(((double)devparms.acquirememdepth / devparms.samplerate) / 2);
       }
     }
     else
@@ -2126,11 +2178,11 @@ void UI_Mainwindow::next_page()
   {
     devparms.timebaseoffset += devparms.timebasescale * devparms.hordivisions;
 
-    if(devparms.memdepth > 10)
+    if(devparms.acquirememdepth > 10)
     {
-      if(devparms.timebaseoffset >= (((double)devparms.memdepth / devparms.samplerate) / 2))
+      if(devparms.timebaseoffset >= (((double)devparms.acquirememdepth / devparms.samplerate) / 2))
       {
-        devparms.timebaseoffset = (((double)devparms.memdepth / devparms.samplerate) / 2);
+        devparms.timebaseoffset = (((double)devparms.acquirememdepth / devparms.samplerate) / 2);
       }
     }
     else
@@ -2193,11 +2245,11 @@ void UI_Mainwindow::shift_page_left()
   {
     devparms.timebaseoffset -= devparms.timebasescale;
 
-    if(devparms.memdepth > 10)
+    if(devparms.acquirememdepth > 10)
     {
-      if(devparms.timebaseoffset <= -(((double)devparms.memdepth / devparms.samplerate) / 2))
+      if(devparms.timebaseoffset <= -(((double)devparms.acquirememdepth / devparms.samplerate) / 2))
       {
-        devparms.timebaseoffset = -(((double)devparms.memdepth / devparms.samplerate) / 2);
+        devparms.timebaseoffset = -(((double)devparms.acquirememdepth / devparms.samplerate) / 2);
       }
     }
     else
@@ -2260,11 +2312,11 @@ void UI_Mainwindow::shift_page_right()
   {
     devparms.timebaseoffset += devparms.timebasescale;
 
-    if(devparms.memdepth > 10)
+    if(devparms.acquirememdepth > 10)
     {
-      if(devparms.timebaseoffset >= (((double)devparms.memdepth / devparms.samplerate) / 2))
+      if(devparms.timebaseoffset >= (((double)devparms.acquirememdepth / devparms.samplerate) / 2))
       {
-        devparms.timebaseoffset = (((double)devparms.memdepth / devparms.samplerate) / 2);
+        devparms.timebaseoffset = (((double)devparms.acquirememdepth / devparms.samplerate) / 2);
       }
     }
     else
@@ -2722,7 +2774,7 @@ void UI_Mainwindow::set_to_factory()
 
   devparms.acquiretype = 0;
 
-  devparms.memdepth = 0;
+  devparms.acquirememdepth = 0;
 
   devparms.triggermode = 0;
 

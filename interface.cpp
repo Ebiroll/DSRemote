@@ -112,9 +112,19 @@ void UI_Mainwindow::navDialChanged(int npos)
 
     devparms.triggerholdoff += (val * mpr);
 
-    if(devparms.triggerholdoff < 1e-7)
+    if(devparms.modelserie == 1)
     {
-      devparms.triggerholdoff = 1e-7;
+      if(devparms.triggerholdoff < 1.7e-8)
+      {
+        devparms.triggerholdoff = 1.6e-8;
+      }
+    }
+    else
+    {
+      if(devparms.triggerholdoff < 1.01e-7)
+      {
+        devparms.triggerholdoff = 1e-7;
+      }
     }
 
     if(devparms.triggerholdoff > 10)
@@ -265,13 +275,27 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
     }
     else
     {
-      if(devparms.triggerholdoff <= 1e-7)
+      if(devparms.modelserie == 1)
       {
-        devparms.triggerholdoff = 1e-7;
+        if(devparms.triggerholdoff < 1.7e-8)
+        {
+          devparms.triggerholdoff = 1.6e-8;
 
-        old_pos = new_pos;
+          old_pos = new_pos;
 
-        return;
+          return;
+        }
+      }
+      else
+      {
+        if(devparms.triggerholdoff <= 1.01e-7)
+        {
+          devparms.triggerholdoff = 1e-7;
+
+          old_pos = new_pos;
+
+          return;
+        }
       }
 
       devparms.triggerholdoff -= get_stepsize_divide_by_1000(devparms.triggerholdoff);
@@ -990,6 +1014,8 @@ void UI_Mainwindow::acqButtonClicked()
         submenuacquisition,
         submenumemdepth;
 
+  QList<QAction *> actionList;
+
   for(chn=0; chn<MAX_CHNS; chn++)
   {
     if(devparms.chandisplay[chn])
@@ -1008,6 +1034,27 @@ void UI_Mainwindow::acqButtonClicked()
   submenuacquisition.addAction("Average", this, SLOT(set_acq_average()));
   submenuacquisition.addAction("Peak Detect",  this, SLOT(set_acq_peak()));
   submenuacquisition.addAction("High Resolution",  this, SLOT(set_acq_hres()));
+  actionList = submenuacquisition.actions();
+  if(devparms.acquiretype == 0)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  else if(devparms.acquiretype == 1)
+    {
+      actionList[1]->setCheckable(true);
+      actionList[1]->setChecked(true);
+    }
+    else if(devparms.acquiretype == 2)
+      {
+        actionList[2]->setCheckable(true);
+        actionList[2]->setChecked(true);
+      }
+      else if(devparms.acquiretype == 3)
+        {
+          actionList[3]->setCheckable(true);
+          actionList[3]->setChecked(true);
+        }
   menu.addMenu(&submenuacquisition);
 
   submenumemdepth.setTitle("Mem Depth");
@@ -1091,6 +1138,74 @@ void UI_Mainwindow::acqButtonClicked()
           submenumemdepth.addAction("6M",   this, SLOT(set_memdepth_6m()));
         }
       }
+  actionList = submenumemdepth.actions();
+  if(devparms.acquirememdepth == 0)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  if(devparms.modelserie != 1)
+  {
+    if((devparms.acquirememdepth == 14000) || (devparms.acquirememdepth == 7000))
+    {
+      actionList[1]->setCheckable(true);
+      actionList[1]->setChecked(true);
+    }
+    else if((devparms.acquirememdepth == 140000) || (devparms.acquirememdepth == 70000))
+      {
+        actionList[2]->setCheckable(true);
+        actionList[2]->setChecked(true);
+      }
+      else if((devparms.acquirememdepth == 1400000) || (devparms.acquirememdepth == 700000))
+        {
+          actionList[3]->setCheckable(true);
+          actionList[3]->setChecked(true);
+        }
+        else if((devparms.acquirememdepth == 14000000) || (devparms.acquirememdepth == 7000000))
+          {
+            actionList[4]->setCheckable(true);
+            actionList[4]->setChecked(true);
+          }
+          else if((devparms.acquirememdepth == 140000000) || (devparms.acquirememdepth == 70000000)  ||
+                  (devparms.acquirememdepth == 56000000) || (devparms.acquirememdepth == 28000000))
+            {
+              actionList[5]->setCheckable(true);
+              actionList[5]->setChecked(true);
+            }
+  }
+  else
+  {
+    if((devparms.acquirememdepth == 12000) || (devparms.acquirememdepth == 6000) ||
+       (devparms.acquirememdepth == 3000))
+    {
+      actionList[1]->setCheckable(true);
+      actionList[1]->setChecked(true);
+    }
+    else if((devparms.acquirememdepth == 120000) || (devparms.acquirememdepth == 60000) ||
+            (devparms.acquirememdepth == 30000))
+      {
+        actionList[2]->setCheckable(true);
+        actionList[2]->setChecked(true);
+      }
+      else if((devparms.acquirememdepth == 1200000) || (devparms.acquirememdepth == 600000) ||
+              (devparms.acquirememdepth == 300000))
+        {
+          actionList[3]->setCheckable(true);
+          actionList[3]->setChecked(true);
+        }
+        else if((devparms.acquirememdepth == 12000000) || (devparms.acquirememdepth == 6000000) ||
+                (devparms.acquirememdepth == 3000000))
+          {
+            actionList[4]->setCheckable(true);
+            actionList[4]->setChecked(true);
+          }
+          else if((devparms.acquirememdepth == 24000000) || (devparms.acquirememdepth == 12000000) ||
+                  (devparms.acquirememdepth == 6000000))
+            {
+              actionList[5]->setCheckable(true);
+              actionList[5]->setChecked(true);
+            }
+  }
   menu.addMenu(&submenumemdepth);
 
   menu.exec(acqButton->mapToGlobal(QPoint(0,0)));
@@ -1383,29 +1498,99 @@ void UI_Mainwindow::dispButtonClicked()
         submenugrid,
         submenugrading;
 
+  QList<QAction *> actionList;
+
   submenutype.setTitle("Type");
   submenutype.addAction("Vectors", this, SLOT(set_grid_type_vectors()));
   submenutype.addAction("Dots",    this, SLOT(set_grid_type_dots()));
+  actionList = submenutype.actions();
+  if(devparms.displaytype == 0)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  else
+  {
+    actionList[1]->setCheckable(true);
+    actionList[1]->setChecked(true);
+  }
   menu.addMenu(&submenutype);
 
   submenugrid.setTitle("Grid");
   submenugrid.addAction("Full", this, SLOT(set_grid_full()));
   submenugrid.addAction("Half", this, SLOT(set_grid_half()));
   submenugrid.addAction("None", this, SLOT(set_grid_none()));
+  actionList = submenugrid.actions();
+  if(devparms.displaygrid == 2)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  else if(devparms.displaygrid == 1)
+    {
+      actionList[1]->setCheckable(true);
+      actionList[1]->setChecked(true);
+    }
+    else if(devparms.displaygrid == 0)
+      {
+        actionList[2]->setCheckable(true);
+        actionList[2]->setChecked(true);
+      }
   menu.addMenu(&submenugrid);
 
   submenugrading.setTitle("Persistence");
   submenugrading.addAction("Minimum",  this, SLOT(set_grading_min()));
-  submenugrading.addAction("0.05",     this, SLOT(set_grading_005()));
+//   submenugrading.addAction("0.05",     this, SLOT(set_grading_005()));
   submenugrading.addAction("0.1",      this, SLOT(set_grading_01()));
   submenugrading.addAction("0.2",      this, SLOT(set_grading_02()));
   submenugrading.addAction("0.5",      this, SLOT(set_grading_05()));
   submenugrading.addAction("1",        this, SLOT(set_grading_1()));
   submenugrading.addAction("2",        this, SLOT(set_grading_2()));
   submenugrading.addAction("5",        this, SLOT(set_grading_5()));
-  submenugrading.addAction("10",       this, SLOT(set_grading_10()));
-  submenugrading.addAction("20",       this, SLOT(set_grading_20()));
+//   submenugrading.addAction("10",       this, SLOT(set_grading_10()));
+//   submenugrading.addAction("20",       this, SLOT(set_grading_20()));
   submenugrading.addAction("Infinite", this, SLOT(set_grading_inf()));
+  actionList = submenugrading.actions();
+  if(devparms.displaygrading == 0)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  else if(devparms.displaygrading == 1)
+    {
+      actionList[1]->setCheckable(true);
+      actionList[1]->setChecked(true);
+    }
+    else if(devparms.displaygrading == 2)
+      {
+        actionList[2]->setCheckable(true);
+        actionList[2]->setChecked(true);
+      }
+      else if(devparms.displaygrading == 5)
+        {
+          actionList[3]->setCheckable(true);
+          actionList[3]->setChecked(true);
+        }
+      else if(devparms.displaygrading == 10)
+        {
+          actionList[4]->setCheckable(true);
+          actionList[4]->setChecked(true);
+        }
+        else if(devparms.displaygrading == 20)
+          {
+            actionList[5]->setCheckable(true);
+            actionList[5]->setChecked(true);
+          }
+          else if(devparms.displaygrading == 50)
+            {
+              actionList[6]->setCheckable(true);
+              actionList[6]->setChecked(true);
+            }
+            else if(devparms.displaygrading == 10000)
+              {
+                actionList[7]->setCheckable(true);
+                actionList[7]->setChecked(true);
+              }
   menu.addMenu(&submenugrading);
 
   menu.exec(dispButton->mapToGlobal(QPoint(0,0)));
@@ -1489,6 +1674,13 @@ void UI_Mainwindow::set_grid_none()
 
 void UI_Mainwindow::set_grading_min()
 {
+  if(devparms.displaygrading == 0)
+  {
+    return;
+  }
+
+  devparms.displaygrading = 0;
+
   statusLabel->setText("Display grading: Minimum");
 
   set_cue_cmd(":DISP:GRAD:TIME MIN");
@@ -1505,6 +1697,13 @@ void UI_Mainwindow::set_grading_005()
 
 void UI_Mainwindow::set_grading_01()
 {
+  if(devparms.displaygrading == 1)
+  {
+    return;
+  }
+
+  devparms.displaygrading = 1;
+
   statusLabel->setText("Display grading: 0.1 Sec.");
 
   set_cue_cmd(":DISP:GRAD:TIME 0.1");
@@ -1513,6 +1712,13 @@ void UI_Mainwindow::set_grading_01()
 
 void UI_Mainwindow::set_grading_02()
 {
+  if(devparms.displaygrading == 2)
+  {
+    return;
+  }
+
+  devparms.displaygrading = 2;
+
   statusLabel->setText("Display grading: 0.2 Sec.");
 
   set_cue_cmd(":DISP:GRAD:TIME 0.2");
@@ -1521,6 +1727,13 @@ void UI_Mainwindow::set_grading_02()
 
 void UI_Mainwindow::set_grading_05()
 {
+  if(devparms.displaygrading == 5)
+  {
+    return;
+  }
+
+  devparms.displaygrading = 5;
+
   statusLabel->setText("Display grading: 0.5 Sec.");
 
   set_cue_cmd(":DISP:GRAD:TIME 0.5");
@@ -1529,6 +1742,13 @@ void UI_Mainwindow::set_grading_05()
 
 void UI_Mainwindow::set_grading_1()
 {
+  if(devparms.displaygrading == 10)
+  {
+    return;
+  }
+
+  devparms.displaygrading = 10;
+
   statusLabel->setText("Display grading: 1 Sec.");
 
   set_cue_cmd(":DISP:GRAD:TIME 1");
@@ -1537,6 +1757,13 @@ void UI_Mainwindow::set_grading_1()
 
 void UI_Mainwindow::set_grading_2()
 {
+  if(devparms.displaygrading == 20)
+  {
+    return;
+  }
+
+  devparms.displaygrading = 20;
+
   statusLabel->setText("Display grading: 2 Sec.");
 
   set_cue_cmd(":DISP:GRAD:TIME 2");
@@ -1545,6 +1772,13 @@ void UI_Mainwindow::set_grading_2()
 
 void UI_Mainwindow::set_grading_5()
 {
+  if(devparms.displaygrading == 50)
+  {
+    return;
+  }
+
+  devparms.displaygrading = 50;
+
   statusLabel->setText("Display grading: 5 Sec.");
 
   set_cue_cmd(":DISP:GRAD:TIME 5");
@@ -1569,6 +1803,13 @@ void UI_Mainwindow::set_grading_20()
 
 void UI_Mainwindow::set_grading_inf()
 {
+  if(devparms.displaygrading == 10000)
+  {
+    return;
+  }
+
+  devparms.displaygrading = 10000;
+
   statusLabel->setText("Display grading: Infinite");
 
   set_cue_cmd(":DISP:GRAD:TIME INF");
@@ -1851,6 +2092,8 @@ void UI_Mainwindow::chan_menu()
         submenucoupling,
         submenuinvert;
 
+  QList<QAction *> actionList;
+
   if((devparms.activechannel < 0) || (devparms.activechannel > MAX_CHNS))
   {
     return;
@@ -1860,17 +2103,66 @@ void UI_Mainwindow::chan_menu()
   submenucoupling.addAction("AC",  this, SLOT(chan_coupling_ac()));
   submenucoupling.addAction("DC",  this, SLOT(chan_coupling_dc()));
   submenucoupling.addAction("GND", this, SLOT(chan_coupling_gnd()));
+  actionList = submenucoupling.actions();
+  if(devparms.chancoupling[devparms.activechannel] == 0)
+  {
+    actionList[2]->setCheckable(true);
+    actionList[2]->setChecked(true);
+  }
+  else if(devparms.chancoupling[devparms.activechannel] == 1)
+    {
+      actionList[1]->setCheckable(true);
+      actionList[1]->setChecked(true);
+    }
+    else if(devparms.chancoupling[devparms.activechannel] == 2)
+      {
+        actionList[0]->setCheckable(true);
+        actionList[0]->setChecked(true);
+      }
   menu.addMenu(&submenucoupling);
 
   submenubwl.setTitle("BWL");
   submenubwl.addAction("Off",    this, SLOT(chan_bwl_off()));
   submenubwl.addAction("20MHz",  this, SLOT(chan_bwl_20()));
-  submenubwl.addAction("250MHz", this, SLOT(chan_bwl_250()));
+  if(devparms.modelserie == 6)
+  {
+    submenubwl.addAction("250MHz", this, SLOT(chan_bwl_250()));
+  }
+  actionList = submenubwl.actions();
+  if(devparms.chanbwlimit[devparms.activechannel] == 0)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  else if(devparms.chanbwlimit[devparms.activechannel] == 20)
+    {
+      actionList[1]->setCheckable(true);
+      actionList[1]->setChecked(true);
+    }
+    else if(devparms.modelserie == 6)
+      {
+        if(devparms.chanbwlimit[devparms.activechannel] == 250)
+        {
+          actionList[2]->setCheckable(true);
+          actionList[2]->setChecked(true);
+        }
+      }
   menu.addMenu(&submenubwl);
 
   submenuinvert.setTitle("Invert");
   submenuinvert.addAction("On",  this, SLOT(chan_invert_on()));
   submenuinvert.addAction("Off", this, SLOT(chan_invert_off()));
+  actionList = submenuinvert.actions();
+  if(devparms.chaninvert[devparms.activechannel] == 1)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  else
+  {
+    actionList[1]->setCheckable(true);
+    actionList[1]->setChecked(true);
+  }
   menu.addMenu(&submenuinvert);
 
   menu.exec(chanMenuButton->mapToGlobal(QPoint(0,0)));
@@ -2138,9 +2430,22 @@ void UI_Mainwindow::horMenuButtonClicked()
   QMenu menu,
         submenudelayed;
 
+  QList<QAction *> actionList;
+
   submenudelayed.setTitle("Delayed");
   submenudelayed.addAction("On",  this, SLOT(horizontal_delayed_on()));
   submenudelayed.addAction("Off", this, SLOT(horizontal_delayed_off()));
+  actionList = submenudelayed.actions();
+  if(devparms.timebasedelayenable == 1)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  else
+  {
+    actionList[1]->setCheckable(true);
+    actionList[1]->setChecked(true);
+  }
   menu.addMenu(&submenudelayed);
 
   menu.exec(horMenuButton->mapToGlobal(QPoint(0,0)));
@@ -2247,8 +2552,12 @@ void UI_Mainwindow::horScaleDialClicked(QPoint)
 
 void UI_Mainwindow::measureButtonClicked()
 {
+  int i;
+
   QMenu menu,
         submenucounter;
+
+  QList<QAction *> actionList;
 
   submenucounter.setTitle("Counter");
   submenucounter.addAction("OFF", this, SLOT(counter_off()));
@@ -2265,7 +2574,17 @@ void UI_Mainwindow::measureButtonClicked()
   {
     submenucounter.addAction("CH4", this, SLOT(counter_ch4()));
   }
+  actionList = submenucounter.actions();
+  for(i=0; i<5; i++)
+  {
+    if(devparms.countersrc == i)
+    {
+      actionList[i]->setCheckable(true);
+      actionList[i]->setChecked(true);
 
+      break;
+    }
+  }
   menu.addMenu(&submenucounter);
 
   menu.exec(measureButton->mapToGlobal(QPoint(0,0)));
@@ -2351,11 +2670,17 @@ void UI_Mainwindow::trigModeButtonClicked()
 
 void UI_Mainwindow::trigMenuButtonClicked()
 {
+  int i;
+
+  char str[512];
+
   QMenu menu,
         submenusource,
         submenuslope,
         submenucoupling,
         submenusetting;
+
+  QList<QAction *> actionList;
 
   submenusource.setTitle("Source");
   submenusource.addAction("CH1", this, SLOT(trigger_source_ch1()));
@@ -2374,23 +2699,59 @@ void UI_Mainwindow::trigMenuButtonClicked()
   submenusource.addAction("EXT", this, SLOT(trigger_source_ext()));
   submenusource.addAction("EXT/ 5", this, SLOT(trigger_source_ext5()));
   submenusource.addAction("AC Line", this, SLOT(trigger_source_acl()));
+  actionList = submenusource.actions();
+  for(i=0; i<7; i++)
+  {
+    if(devparms.triggeredgesource == i)
+    {
+      actionList[i]->setCheckable(true);
+      actionList[i]->setChecked(true);
+
+      break;
+    }
+  }
   menu.addMenu(&submenusource);
 
   submenucoupling.setTitle("Coupling");
-  submenucoupling.addAction("DC", this, SLOT(trigger_coupling_dc()));
   submenucoupling.addAction("AC", this, SLOT(trigger_coupling_ac()));
+  submenucoupling.addAction("DC", this, SLOT(trigger_coupling_dc()));
   submenucoupling.addAction("LF reject", this, SLOT(trigger_coupling_lfreject()));
   submenucoupling.addAction("HF reject", this, SLOT(trigger_coupling_hfreject()));
+  actionList = submenucoupling.actions();
+  for(i=0; i<4; i++)
+  {
+    if(devparms.triggercoupling == i)
+    {
+      actionList[i]->setCheckable(true);
+      actionList[i]->setChecked(true);
+
+      break;
+    }
+  }
   menu.addMenu(&submenucoupling);
 
   submenuslope.setTitle("Slope");
   submenuslope.addAction("Positive", this, SLOT(trigger_slope_pos()));
   submenuslope.addAction("Negative", this, SLOT(trigger_slope_neg()));
   submenuslope.addAction("Rise/Fal", this, SLOT(trigger_slope_rfal()));
+  actionList = submenuslope.actions();
+  for(i=0; i<3; i++)
+  {
+    if(devparms.triggeredgeslope == i)
+    {
+      actionList[i]->setCheckable(true);
+      actionList[i]->setChecked(true);
+
+      break;
+    }
+  }
   menu.addMenu(&submenuslope);
 
   submenusetting.setTitle("Setting");
-  submenusetting.addAction("Holdoff", this, SLOT(trigger_setting_holdoff()));
+  sprintf(str, "Holdoff ");
+  convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 3);
+  strcat(str, "S");
+  submenusetting.addAction(str, this, SLOT(trigger_setting_holdoff()));
   menu.addMenu(&submenusetting);
 
   menu.exec(trigMenuButton->mapToGlobal(QPoint(0,0)));

@@ -189,7 +189,7 @@ void UI_Mainwindow::save_memory_waveform()
   wavbuf[2] = NULL;
   wavbuf[3] = NULL;
 
-  mempnts = devparms.memdepth;
+  mempnts = devparms.acquirememdepth;
 
   smps_per_record = mempnts;
 

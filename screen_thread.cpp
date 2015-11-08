@@ -92,7 +92,7 @@ void screenThread::get_params(struct device_settings *dev_parms)
   dev_parms->triggerstatus = params.triggerstatus;
   dev_parms->triggersweep = params.triggersweep;
   dev_parms->samplerate = params.samplerate;
-  dev_parms->memdepth = params.memdepth;
+  dev_parms->acquirememdepth = params.memdepth;
   dev_parms->counterfreq = params.counterfreq;
   dev_parms->wavebufsz = params.wavebufsz;
   for(i=0; i<MAX_CHNS; i++)

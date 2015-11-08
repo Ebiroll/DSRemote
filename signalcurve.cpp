@@ -159,9 +159,9 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   drawTopLabels(painter);
 
-  if((devparms->memdepth > 1000) && !devparms->timebasedelayenable)
+  if((devparms->acquirememdepth > 1000) && !devparms->timebasedelayenable)
   {
-    tmp = 405 - ((devparms->timebaseoffset / (devparms->memdepth / devparms->samplerate)) * 233);
+    tmp = 405 - ((devparms->timebaseoffset / (devparms->acquirememdepth / devparms->samplerate)) * 233);
   }
   else
   {
@@ -673,9 +673,9 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(200, -1, 85, 20, Qt::AlignCenter, str);
 
-  if(devparms->memdepth)
+  if(devparms->acquirememdepth)
   {
-    convert_to_metric_suffix(str, devparms->memdepth, 1);
+    convert_to_metric_suffix(str, devparms->acquirememdepth, 1);
 
     strcat(str, "pts");
 
@@ -716,9 +716,9 @@ void SignalCurve::drawTopLabels(QPainter *painter)
       painter->fillRect(288 + 233 - x1, 16, x1, 8, QColor(64, 160, 255));
     }
   }
-  else if(devparms->memdepth > 1000)
+  else if(devparms->acquirememdepth > 1000)
   {
-    dtmp1 = (devparms->hordivisions * devparms->timebasescale) / (devparms->memdepth / devparms->samplerate);
+    dtmp1 = (devparms->hordivisions * devparms->timebasescale) / (devparms->acquirememdepth / devparms->samplerate);
 
     dtmp2 = devparms->timebaseoffset / dtmp1;
 
@@ -907,6 +907,11 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
 
       painter->drawText(xpos + 6, ypos + 15, str1);
 
+      if(devparms->chaninvert[chn])
+      {
+        painter->drawLine(xpos + 6, ypos + 3, xpos + 14, ypos + 3);
+      }
+
       path = QPainterPath();
 
       path.addRoundedRect(xpos + 25, ypos, 85, 20, 3, 3);
@@ -962,6 +967,11 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
       painter->setPen(SignalColor[chn]);
 
       painter->drawText(xpos + 6, ypos + 15, str1);
+
+      if(devparms->chaninvert[chn])
+      {
+        painter->drawLine(xpos + 6, ypos + 3, xpos + 14, ypos + 3);
+      }
 
       painter->drawText(xpos + 30, ypos + 1, 85, 20, Qt::AlignCenter, str2);
 

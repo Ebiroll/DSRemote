@@ -33,7 +33,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.31_1510241634"
+#define PROGRAM_VERSION       "0.31_1511081835"
 
 #define MAX_PATHLEN            4096
 
@@ -107,8 +107,6 @@ struct device_settings
 
   int screentimerival;
 
-  double samplerate;            // Samplefrequency
-  int memdepth;                 // Number of waveform points that the oscilloscope can store in a single trigger sample
   int channel_cnt;              // Device has 2 or 4 channels
   int bandwidth;                // Bandwidth in MHz
 
@@ -142,7 +140,7 @@ struct device_settings
   double triggeredgelevel[7];   // Trigger level
   int triggeredgeslope;         // 0=POS, 1=NEG, 2= RFAL
   int triggeredgesource;        // 0=chan1, 1=chan2, 2=chan3, 3=chan4, 4=ext, 5=ext5, 6=acl
-  double triggerholdoff;        // min. is 100nSec
+  double triggerholdoff;        // min. is 16nSec or 100nSec depends on series
   int triggermode;              // 0=edge, 1=pulse, 2=slope, 3=video, 4=pattern, 5=rs232,
                                 // 6=i2c, 7=spi, 8=can, 9=usb
   int triggerstatus;            // 0=td, 1=wait, 2=run, 3=auto, 4=fin, 5=stop
@@ -150,9 +148,13 @@ struct device_settings
 
   int displaygrid;              // 0=none, 1=half, 2=full
   int displaytype;              // 0=vectors, 1=dots
+  int displaygrading;           // 0=minimum, 1=0.1, 2=0.2, 5=0.5, 1=10, 2=20, 5=50, 10000=infinite
 
+  double samplerate;            // Samplefrequency
   int acquiretype;              // 0=normal, 1=average, 2=peak, 3=highres
   int acquireaverages;          // 2, 4, 8, 16, 32, 64, etc. to 8192
+  int acquirememdepth;          // Number of waveform points that the oscilloscope can
+                                //store in a single trigger sample. 0=AUTO
 
   int countersrc;               // 0=off, 1=ch1, 2=ch2, 3=ch3, 4=ch4
   double counterfreq;           // Value of frequency counter
