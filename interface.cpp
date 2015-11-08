@@ -2696,18 +2696,43 @@ void UI_Mainwindow::trigMenuButtonClicked()
   {
     submenusource.addAction("CH4", this, SLOT(trigger_source_ch4()));
   }
-  submenusource.addAction("EXT", this, SLOT(trigger_source_ext()));
-  submenusource.addAction("EXT/ 5", this, SLOT(trigger_source_ext5()));
+  if(devparms.modelserie == 6)
+  {
+    submenusource.addAction("EXT", this, SLOT(trigger_source_ext()));
+    submenusource.addAction("EXT/ 5", this, SLOT(trigger_source_ext5()));
+  }
   submenusource.addAction("AC Line", this, SLOT(trigger_source_acl()));
   actionList = submenusource.actions();
-  for(i=0; i<7; i++)
+  if(devparms.modelserie == 6)
   {
-    if(devparms.triggeredgesource == i)
+    for(i=0; i<7; i++)
     {
-      actionList[i]->setCheckable(true);
-      actionList[i]->setChecked(true);
+      if(devparms.triggeredgesource == i)
+      {
+        actionList[i]->setCheckable(true);
+        actionList[i]->setChecked(true);
 
-      break;
+        break;
+      }
+    }
+  }
+  else
+  {
+    for(i=0; i<4; i++)
+    {
+      if(devparms.triggeredgesource == i)
+      {
+        actionList[i]->setCheckable(true);
+        actionList[i]->setChecked(true);
+
+        break;
+      }
+    }
+
+    if(devparms.triggeredgesource == 6)
+    {
+      actionList[4]->setCheckable(true);
+      actionList[4]->setChecked(true);
     }
   }
   menu.addMenu(&submenusource);
@@ -2824,7 +2849,14 @@ void UI_Mainwindow::trigger_source_acl()
 
   statusLabel->setText("Trigger source AC powerline");
 
-  set_cue_cmd(":TRIG:EDG:SOUR ACL");
+  if(devparms.modelserie == 6)
+  {
+    set_cue_cmd(":TRIG:EDG:SOUR ACL");
+  }
+  else
+  {
+    set_cue_cmd(":TRIG:EDG:SOUR AC");
+  }
 }
 
 
