@@ -677,6 +677,8 @@ void SignalCurve::drawTopLabels(QPainter *painter)
   {
     convert_to_metric_suffix(str, devparms->acquirememdepth, 1);
 
+    remove_trailing_zeros(str);
+
     strcat(str, "pts");
 
     painter->drawText(200, 14, 85, 20, Qt::AlignCenter, str);
