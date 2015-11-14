@@ -315,7 +315,8 @@ void UI_Mainwindow::open_connection()
   connect(trigAdjustDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(trigAdjustDialClicked(QPoint)));
   connect(adjDial,        SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(adjustDialClicked(QPoint)));
 
-  sprintf(str, PROGRAM_NAME " " PROGRAM_VERSION "   %s   %s", devparms.serialnr, devparms.softwvers);
+  sprintf(str, PROGRAM_NAME " " PROGRAM_VERSION "   %s   %s   %s",
+          devparms.serialnr, devparms.softwvers, dev_str);
 
   setWindowTitle(str);
 

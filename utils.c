@@ -1819,6 +1819,54 @@ double round_down_step125(double val)
 }
 
 
+int strtoipaddr(unsigned int *dest, const char *src)
+{
+  int i, err=1;
+
+  unsigned int val;
+
+  char *ptr,
+       str[64];
+
+  if(strlen(src) < 7)
+  {
+    return -1;
+  }
+
+  strncpy(str, src, 64);
+
+  str[63] = 0;
+
+  ptr = strtok(str, ".");
+
+  if(ptr != NULL)
+  {
+    val = atoi(ptr) << 24;
+
+    for(i=0; i<3; i++)
+    {
+      ptr = strtok(NULL, ".");
+
+      if(ptr == NULL)
+      {
+        break;
+      }
+
+      val += atoi(ptr) << (16 - (i * 8));
+    }
+
+    err = 0;
+  }
+
+  if(err)
+  {
+    return -1;
+  }
+
+  *dest = val;
+
+  return 0;
+}
 
 
 

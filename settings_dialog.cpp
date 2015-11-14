@@ -34,11 +34,15 @@
 
 UI_settings_window::UI_settings_window(QWidget *parnt)
 {
+  int err;
+
+  unsigned int ip_addr;
+
+  char dev_str[128];
+
   QSettings settings;
 
   mainwindow = (UI_Mainwindow *)parnt;
-
-  char dev_str[128];
 
   setMinimumSize(QSize(490, 200));
   setMaximumSize(QSize(490, 200));
@@ -74,16 +78,55 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   comboBox1->addItem("/dev/usbtmc8");
   comboBox1->addItem("/dev/usbtmc9");
 
-  ipLineEdit = new QLineEdit(this);
-  ipLineEdit->setGeometry(200, 65, 110, 25);
-  ipLineEdit->setInputMask("000.000.000.000;_");
+  ipSpinbox1 = new QSpinBox(this);
+  ipSpinbox1->setGeometry(180, 65, 35, 25);
+  ipSpinbox1->setRange(0, 255);
+  ipSpinbox1->setSingleStep(1);
+  ipSpinbox1->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  ipSpinbox1->setAlignment(Qt::AlignHCenter);
+
+  ipSpinbox2 = new QSpinBox(this);
+  ipSpinbox2->setGeometry(220, 65, 35, 25);
+  ipSpinbox2->setRange(0, 255);
+  ipSpinbox2->setSingleStep(1);
+  ipSpinbox2->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  ipSpinbox2->setAlignment(Qt::AlignHCenter);
+
+  ipSpinbox3 = new QSpinBox(this);
+  ipSpinbox3->setGeometry(260, 65, 35, 25);
+  ipSpinbox3->setRange(0, 255);
+  ipSpinbox3->setSingleStep(1);
+  ipSpinbox3->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  ipSpinbox3->setAlignment(Qt::AlignHCenter);
+
+  ipSpinbox4 = new QSpinBox(this);
+  ipSpinbox4->setGeometry(300, 65, 35, 25);
+  ipSpinbox4->setRange(0, 255);
+  ipSpinbox4->setSingleStep(1);
+  ipSpinbox4->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  ipSpinbox4->setAlignment(Qt::AlignHCenter);
+
+  err = 1;
+
   if(settings.contains("connection/ip"))
   {
-    ipLineEdit->setText(settings.value("connection/ip").toString());
+    if(strtoipaddr(&ip_addr, settings.value("connection/ip").toString().toLatin1().data()) == 0)
+    {
+      ipSpinbox1->setValue((ip_addr >> 24) & 0xff);
+      ipSpinbox2->setValue((ip_addr >> 16) & 0xff);
+      ipSpinbox3->setValue((ip_addr >> 8) & 0xff);
+      ipSpinbox4->setValue(ip_addr & 0xff);
+
+      err = 0;
+    }
   }
-  else
+
+  if(err)
   {
-    ipLineEdit->setText("192.168.001.088");
+    ipSpinbox1->setValue(192);
+    ipSpinbox2->setValue(168);
+    ipSpinbox3->setValue(1);
+    ipSpinbox4->setValue(88);
   }
 
   refreshLabel = new QLabel(this);
@@ -105,7 +148,9 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   cancelButton->setGeometry(200, 155, 100, 25);
   cancelButton->setText("Cancel");
 
-  strcpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data());
+  strncpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data(), 128);
+
+  dev_str[127] = 0;
 
   if(!strcmp(dev_str, ""))
   {
@@ -118,7 +163,10 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   {
     usbRadioButton->setEnabled(false);
     lanRadioButton->setEnabled(false);
-    ipLineEdit->setEnabled(false);
+    ipSpinbox1->setEnabled(false);
+    ipSpinbox2->setEnabled(false);
+    ipSpinbox3->setEnabled(false);
+    ipSpinbox4->setEnabled(false);
     comboBox1->setEnabled(false);
     applyButton->setEnabled(false);
   }
@@ -164,7 +212,10 @@ void UI_settings_window::applyButtonClicked()
 
   settings.setValue("connection/device", dev_str);
 
-  settings.setValue("connection/ip", ipLineEdit->text());
+  sprintf(dev_str, "%i.%i.%i.%i",
+          ipSpinbox1->value(), ipSpinbox2->value(), ipSpinbox3->value(), ipSpinbox4->value());
+
+  settings.setValue("connection/ip", dev_str);
 
   close();
 }

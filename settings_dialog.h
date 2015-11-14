@@ -40,7 +40,6 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QSettings>
-#include <QLineEdit>
 #include <QRadioButton>
 #include <QSpinBox>
 
@@ -69,9 +68,11 @@ QRadioButton *usbRadioButton,
 
 QComboBox    *comboBox1;
 
-QLineEdit    *ipLineEdit;
-
-QSpinBox     *refreshSpinbox;
+QSpinBox     *refreshSpinbox,
+             *ipSpinbox1,
+             *ipSpinbox2,
+             *ipSpinbox3,
+             *ipSpinbox4;
 
 QLabel       *refreshLabel;
 
