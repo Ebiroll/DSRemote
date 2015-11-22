@@ -109,20 +109,37 @@ void UI_Mainwindow::open_connection()
       goto OUT_ERROR;
     }
 
+    int cf = 0;
+
     for(i=0; i<len; i++)
     {
+      if(dev_str[i] == '.')
+      {
+        cf = 0;
+      }
+
       if(dev_str[i] == '0')
       {
-        if((dev_str[i+1] != 0) && (dev_str[i+1] != '.'))
+        if(cf == 0)
         {
-          for(j=i; j<len; j++)
+          if((dev_str[i+1] != 0) && (dev_str[i+1] != '.'))
           {
-            dev_str[j] = dev_str[j+1];
+            for(j=i; j<len; j++)
+            {
+              dev_str[j] = dev_str[j+1];
+            }
+
+            i--;
+
+            len--;
           }
-
-          i--;
-
-          len--;
+        }
+      }
+      else
+      {
+        if(dev_str[i] != '.')
+        {
+          cf = 1;
         }
       }
     }

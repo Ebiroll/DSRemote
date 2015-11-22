@@ -54,6 +54,8 @@ UI_Mainwindow::UI_Mainwindow()
 
   setlocale(LC_NUMERIC, "C");
 
+  QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
+
   QCoreApplication::setOrganizationName("TvB");
   QCoreApplication::setOrganizationDomain("teuniz.net");
   QCoreApplication::setApplicationName(PROGRAM_NAME);
