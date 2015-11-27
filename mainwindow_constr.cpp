@@ -54,8 +54,6 @@ UI_Mainwindow::UI_Mainwindow()
 
   setlocale(LC_NUMERIC, "C");
 
-  QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
-
   QCoreApplication::setOrganizationName("TvB");
   QCoreApplication::setOrganizationDomain("teuniz.net");
   QCoreApplication::setApplicationName(PROGRAM_NAME);
@@ -77,7 +75,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   if((devparms.screentimerival < 50) || (devparms.screentimerival > 2000))
   {
-    devparms.screentimerival = 500;
+    devparms.screentimerival = 50;
 
     settings.setValue("gui/refresh", devparms.screentimerival);
   }
