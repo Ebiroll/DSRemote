@@ -2,11 +2,11 @@
 contains(QT_MAJOR_VERSION, 4) {
 
 LIST = 0 1 2 3 4 5 6
-for(a, LIST):contains(QT_MINOR_VERSION, $$a):error("you are using an old version of Qt")
+for(a, LIST):contains(QT_MINOR_VERSION, $$a):error("This project needs Qt4 version >= 4.7.1 or Qt5 version >= 5.5.1")
 
 contains(QT_MINOR_VERSION, 7) {
   LIST = 0
-  for(a, LIST):contains(QT_PATCH_VERSION, $$a):error("you are using an old version of Qt")
+  for(a, LIST):contains(QT_PATCH_VERSION, $$a):error("This project needs Qt4 version >= 4.7.1 or Qt5 version >= 5.5.1")
 }
 }
 
@@ -14,11 +14,11 @@ contains(QT_MINOR_VERSION, 7) {
 contains(QT_MAJOR_VERSION, 5) {
 
 LIST = 0 1 2 3 4
-for(a, LIST):contains(QT_MINOR_VERSION, $$a):error("you are using an old version of Qt")
+for(a, LIST):contains(QT_MINOR_VERSION, $$a):error("This project needs Qt4 version >= 4.7.1 or Qt5 version >= 5.5.1")
 
 contains(QT_MINOR_VERSION, 5) {
   LIST = 0
-  for(a, LIST):contains(QT_PATCH_VERSION, $$a):error("you are using an old version of Qt")
+  for(a, LIST):contains(QT_PATCH_VERSION, $$a):error("This project needs Qt4 version >= 4.7.1 or Qt5 version >= 5.5.1")
 }
 }
 
