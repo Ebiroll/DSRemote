@@ -44,8 +44,8 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
 
   mainwindow = (UI_Mainwindow *)parnt;
 
-  setMinimumSize(QSize(490, 200));
-  setMaximumSize(QSize(490, 200));
+  setMinimumSize(500, 500);
+  setMaximumSize(500, 500);
   setWindowTitle("Settings");
   setModal(true);
 
@@ -59,14 +59,14 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
 
   lanRadioButton = new QRadioButton("LAN", this);
   lanRadioButton->setAutoExclusive(true);
-  lanRadioButton->setGeometry(220, 20, 110, 25);
+  lanRadioButton->setGeometry(40, 70, 110, 25);
   if(mainwindow->devparms.connectiontype == 1)
   {
     lanRadioButton->setChecked(true);
   }
 
   comboBox1 = new QComboBox(this);
-  comboBox1->setGeometry(20, 65, 110, 25);
+  comboBox1->setGeometry(180, 20, 110, 25);
   comboBox1->addItem("/dev/usbtmc0");
   comboBox1->addItem("/dev/usbtmc1");
   comboBox1->addItem("/dev/usbtmc2");
@@ -79,28 +79,28 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   comboBox1->addItem("/dev/usbtmc9");
 
   ipSpinbox1 = new QSpinBox(this);
-  ipSpinbox1->setGeometry(180, 65, 35, 25);
+  ipSpinbox1->setGeometry(180, 70, 35, 25);
   ipSpinbox1->setRange(0, 255);
   ipSpinbox1->setSingleStep(1);
   ipSpinbox1->setButtonSymbols(QAbstractSpinBox::NoButtons);
   ipSpinbox1->setAlignment(Qt::AlignHCenter);
 
   ipSpinbox2 = new QSpinBox(this);
-  ipSpinbox2->setGeometry(220, 65, 35, 25);
+  ipSpinbox2->setGeometry(220, 70, 35, 25);
   ipSpinbox2->setRange(0, 255);
   ipSpinbox2->setSingleStep(1);
   ipSpinbox2->setButtonSymbols(QAbstractSpinBox::NoButtons);
   ipSpinbox2->setAlignment(Qt::AlignHCenter);
 
   ipSpinbox3 = new QSpinBox(this);
-  ipSpinbox3->setGeometry(260, 65, 35, 25);
+  ipSpinbox3->setGeometry(260, 70, 35, 25);
   ipSpinbox3->setRange(0, 255);
   ipSpinbox3->setSingleStep(1);
   ipSpinbox3->setButtonSymbols(QAbstractSpinBox::NoButtons);
   ipSpinbox3->setAlignment(Qt::AlignHCenter);
 
   ipSpinbox4 = new QSpinBox(this);
-  ipSpinbox4->setGeometry(300, 65, 35, 25);
+  ipSpinbox4->setGeometry(300, 70, 35, 25);
   ipSpinbox4->setRange(0, 255);
   ipSpinbox4->setSingleStep(1);
   ipSpinbox4->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -126,26 +126,42 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
     ipSpinbox1->setValue(192);
     ipSpinbox2->setValue(168);
     ipSpinbox3->setValue(1);
-    ipSpinbox4->setValue(88);
+    ipSpinbox4->setValue(100);
   }
 
   refreshLabel = new QLabel(this);
-  refreshLabel->setGeometry(370, 20, 120, 35);
+  refreshLabel->setGeometry(40, 120, 120, 35);
   refreshLabel->setText("Screen update\n interval");
 
   refreshSpinbox = new QSpinBox(this);
-  refreshSpinbox->setGeometry(370, 65, 100, 25);
+  refreshSpinbox->setGeometry(180, 120, 100, 25);
   refreshSpinbox->setSuffix(" mS");
   refreshSpinbox->setRange(50, 2000);
   refreshSpinbox->setSingleStep(10);
   refreshSpinbox->setValue(mainwindow->devparms.screentimerival);
 
+  invScrShtLabel = new QLabel(this);
+  invScrShtLabel->setGeometry(40, 170, 120, 35);
+  invScrShtLabel->setText("Screenshot invert\n colors");
+
+  invScrShtCheckbox = new QCheckBox(this);
+  invScrShtCheckbox->setGeometry(180, 170, 120, 35);
+  invScrShtCheckbox->setTristate(false);
+  if(mainwindow->devparms.screenshot_inv)
+  {
+    invScrShtCheckbox->setCheckState(Qt::Checked);
+  }
+  else
+  {
+    invScrShtCheckbox->setCheckState(Qt::Unchecked);
+  }
+
   applyButton = new QPushButton(this);
-  applyButton->setGeometry(20, 155, 100, 25);
+  applyButton->setGeometry(40, 450, 100, 25);
   applyButton->setText("Apply");
 
   cancelButton = new QPushButton(this);
-  cancelButton->setGeometry(200, 155, 100, 25);
+  cancelButton->setGeometry(250, 450, 100, 25);
   cancelButton->setText("Cancel");
 
   strncpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data(), 128);
@@ -175,8 +191,9 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
     QObject::connect(applyButton, SIGNAL(clicked()), this, SLOT(applyButtonClicked()));
   }
 
-  QObject::connect(cancelButton,   SIGNAL(clicked()),         this, SLOT(close()));
-  QObject::connect(refreshSpinbox, SIGNAL(valueChanged(int)), this, SLOT(refreshSpinboxChanged(int)));
+  QObject::connect(cancelButton,      SIGNAL(clicked()),         this, SLOT(close()));
+  QObject::connect(refreshSpinbox,    SIGNAL(valueChanged(int)), this, SLOT(refreshSpinboxChanged(int)));
+  QObject::connect(invScrShtCheckbox, SIGNAL(stateChanged(int)), this, SLOT(invScrShtCheckboxChanged(int)));
 
   exec();
 }
@@ -217,6 +234,19 @@ void UI_settings_window::applyButtonClicked()
 
   settings.setValue("connection/ip", dev_str);
 
+  if(invScrShtCheckbox->checkState() == Qt::Checked)
+  {
+    mainwindow->devparms.screenshot_inv = 1;
+
+    settings.setValue("screenshot/inverted", 1);
+  }
+  else
+  {
+    mainwindow->devparms.screenshot_inv = 0;
+
+    settings.setValue("screenshot/inverted", 0);
+  }
+
   close();
 }
 
@@ -234,6 +264,36 @@ void UI_settings_window::refreshSpinboxChanged(int value)
     mainwindow->scrn_timer->start(value);
   }
 }
+
+
+void UI_settings_window::invScrShtCheckboxChanged(int state)
+{
+  QSettings settings;
+
+  if(state == Qt::Checked)
+  {
+    mainwindow->devparms.screenshot_inv = 1;
+  }
+  else
+  {
+    mainwindow->devparms.screenshot_inv = 0;
+  }
+
+  settings.setValue("screenshot/inverted", mainwindow->devparms.screenshot_inv);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -39,6 +39,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QSettings>
 #include <QRadioButton>
 #include <QSpinBox>
@@ -74,7 +75,10 @@ QSpinBox     *refreshSpinbox,
              *ipSpinbox3,
              *ipSpinbox4;
 
-QLabel       *refreshLabel;
+QLabel       *refreshLabel,
+             *invScrShtLabel;
+
+QCheckBox    *invScrShtCheckbox;
 
 UI_Mainwindow *mainwindow;
 
@@ -82,6 +86,7 @@ private slots:
 
 void applyButtonClicked();
 void refreshSpinboxChanged(int);
+void invScrShtCheckboxChanged(int);
 
 };
 

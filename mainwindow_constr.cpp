@@ -71,13 +71,28 @@ UI_Mainwindow::UI_Mainwindow()
     devparms.chanscale[i] = 1;
   }
 
-  devparms.screentimerival = settings.value("gui/refresh").toInt();
+  devparms.screentimerival = settings.value("gui/refresh", 50).toInt();
 
   if((devparms.screentimerival < 50) || (devparms.screentimerival > 2000))
   {
     devparms.screentimerival = 50;
 
     settings.setValue("gui/refresh", devparms.screentimerival);
+  }
+
+  devparms.screenshot_inv = settings.value("screenshot/inverted", 0).toInt();
+
+  if(devparms.screenshot_inv)
+  {
+    devparms.screenshot_inv = 1;
+
+    settings.setValue("screenshot/inverted", devparms.screenshot_inv);
+  }
+  else
+  {
+    devparms.screenshot_inv = 0;
+
+    settings.setValue("screenshot/inverted", devparms.screenshot_inv);
   }
 
   devparms.displaygrid = 2;

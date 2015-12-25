@@ -45,7 +45,7 @@
 #include <QFileDialog>
 #include <QAction>
 #include <QActionGroup>
-#include <QPixmap>
+#include <QImage>
 #include <QSplashScreen>
 #include <QTimer>
 #include <QDesktopServices>
@@ -196,7 +196,7 @@ private:
 
   QString def_stylesh;
 
-  QPixmap screenXpm;
+  QImage screenXpm;
 
   QAction *former_page_act,
           *shift_page_left_act,

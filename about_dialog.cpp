@@ -45,7 +45,7 @@ UI_Aboutwindow::UI_Aboutwindow()
 
   AboutDialog = new QDialog;
 
-  AboutDialog->setMinimumSize(QSize(640, 480));
+  AboutDialog->setMinimumSize(640, 480);
   AboutDialog->setGeometry(300, 250, 640, 480);
   AboutDialog->setWindowTitle("About");
   AboutDialog->setModal(true);

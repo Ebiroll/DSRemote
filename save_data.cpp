@@ -111,6 +111,11 @@ void UI_Mainwindow::save_screenshot()
       painter.end();
     }
 
+  if(devparms.screenshot_inv)
+  {
+    screenXpm.invertPixels(QImage::InvertRgb);
+  }
+
   opath[0] = 0;
   if(recent_savedir[0]!=0)
   {

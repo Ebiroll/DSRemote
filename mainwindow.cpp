@@ -61,7 +61,7 @@ void UI_Mainwindow::open_connection()
     return;
   }
 
-  strcpy(str, settings.value("connection/type").toString().toLatin1().data());
+  strcpy(str, settings.value("connection/type", "USB").toString().toLatin1().data());
 
   if(!strcmp(str, "LAN"))
   {
@@ -74,7 +74,7 @@ void UI_Mainwindow::open_connection()
 
   if(devparms.connectiontype == 0)  // USB
   {
-    strcpy(dev_str, settings.value("connection/device").toString().toLatin1().data());
+    strcpy(dev_str, settings.value("connection/device", "/dev/usbtmc0").toString().toLatin1().data());
 
     if(!strcmp(dev_str, ""))
     {
@@ -93,7 +93,7 @@ void UI_Mainwindow::open_connection()
 
   if(devparms.connectiontype == 1)  // LAN
   {
-    strcpy(dev_str, settings.value("connection/ip").toString().toLatin1().data());
+    strcpy(dev_str, settings.value("connection/ip", "192.168.1.100").toString().toLatin1().data());
 
     if(!strcmp(dev_str, ""))
     {
