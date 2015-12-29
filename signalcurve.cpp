@@ -55,6 +55,11 @@ SignalCurve::SignalCurve(QWidget *w_parent) : QWidget(w_parent)
 
   trig_stat_timer = new QTimer(this);
 
+#if QT_VERSION >= 0x050000
+  trig_line_timer->setTimerType(Qt::PreciseTimer);
+  trig_stat_timer->setTimerType(Qt::PreciseTimer);
+#endif
+
   bufsize = 0;
   bordersize = 60;
 
@@ -126,6 +131,9 @@ void SignalCurve::paintEvent(QPaintEvent *)
   if(updates_enabled == true)
   {
     QPainter paint(this);
+#if QT_VERSION >= 0x050000
+    paint.setRenderHint(QPainter::Qt4CompatiblePainting, true);
+#endif
 
     drawWidget(&paint, width(), height());
 

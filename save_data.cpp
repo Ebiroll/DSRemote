@@ -38,6 +38,9 @@ void UI_Mainwindow::save_screenshot()
        opath[MAX_PATHLEN];
 
   QPainter painter;
+#if QT_VERSION >= 0x050000
+  painter.setRenderHint(QPainter::Qt4CompatiblePainting, true);
+#endif
 
   QPainterPath path;
 

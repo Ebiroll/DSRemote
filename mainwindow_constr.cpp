@@ -455,6 +455,19 @@ UI_Mainwindow::UI_Mainwindow()
   vertScaleDial_timer = new QTimer(this);
   vertScaleDial_timer->setSingleShot(true);
 
+#if QT_VERSION >= 0x050000
+  scrn_timer->setTimerType(Qt::PreciseTimer);
+  adjdial_timer->setTimerType(Qt::PreciseTimer);
+  navDial_timer->setTimerType(Qt::PreciseTimer);
+  label_timer->setTimerType(Qt::PreciseTimer);
+  test_timer->setTimerType(Qt::PreciseTimer);
+  horPosDial_timer->setTimerType(Qt::PreciseTimer);
+  trigAdjDial_timer->setTimerType(Qt::PreciseTimer);
+  vertOffsDial_timer->setTimerType(Qt::PreciseTimer);
+  horScaleDial_timer->setTimerType(Qt::PreciseTimer);
+  vertScaleDial_timer->setTimerType(Qt::PreciseTimer);
+#endif
+
   connect(scrn_timer,          SIGNAL(timeout()),        this, SLOT(scrn_timer_handler()));
   connect(scrn_thread,         SIGNAL(finished()),       this, SLOT(screenUpdate()));
   connect(adjdial_timer,       SIGNAL(timeout()),        this, SLOT(adjdial_timer_handler()));
