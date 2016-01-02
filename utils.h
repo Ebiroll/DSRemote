@@ -3,7 +3,7 @@
 *
 * Author: Teunis van Beelen
 *
-* Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Teunis van Beelen
+* Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 Teunis van Beelen
 *
 * Email: teuniz@gmail.com
 *
@@ -86,7 +86,10 @@ void asciitohex(char *, const char *);  /* destination must have double the size
 void asciitobin(char *, const char *);  /* destination must have eight times the size of source! */
 void hextobin(char *, const char *);    /* destination must have four times the size of source! */
 
+/* Converts a double to Giga/Mega/Kilo/milli/micro/etc. */
+/* int is number of decimals. Result is written into the string argument */
 int convert_to_metric_suffix(char *, double, int);
+
 double round_up_step125(double);                  /* Rounds the value up to 1-2-5 steps */
 double round_down_step125(double);                /* Rounds the value down to 1-2-5 steps */
 

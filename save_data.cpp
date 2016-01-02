@@ -3,7 +3,7 @@
 *
 * Author: Teunis van Beelen
 *
-* Copyright (C) 2015 Teunis van Beelen
+* Copyright (C) 2015, 2016 Teunis van Beelen
 *
 * Email: teuniz@gmail.com
 *
@@ -401,7 +401,7 @@ void UI_Mainwindow::save_memory_waveform()
           break;
         }
 
-        wavbuf[chn][bytes_rcvd + k] = (int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn];
+        wavbuf[chn][bytes_rcvd + k] = ((int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn]) << 5;
       }
 
       bytes_rcvd += n;
@@ -514,14 +514,14 @@ void UI_Mainwindow::save_memory_waveform()
     edf_set_digital_minimum(hdl, j, -32768);
     if(devparms.chanscale[chn] > 2)
     {
-      edf_set_physical_maximum(hdl, j, yinc[chn] * 32767);
-      edf_set_physical_minimum(hdl, j, yinc[chn] * -32768);
+      edf_set_physical_maximum(hdl, j, yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, yinc[chn] * -32768.0 / 32.0);
       edf_set_physical_dimension(hdl, j, "V");
     }
     else
     {
-      edf_set_physical_maximum(hdl, j, 1000 * yinc[chn] * 32767);
-      edf_set_physical_minimum(hdl, j, 1000 * yinc[chn] * -32768);
+      edf_set_physical_maximum(hdl, j, 1000.0 * yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, 1000.0 * yinc[chn] * -32768.0 / 32.0);
       edf_set_physical_dimension(hdl, j, "mV");
     }
     sprintf(str, "CHAN%i", chn + 1);
@@ -831,7 +831,7 @@ void UI_Mainwindow::save_screen_waveform()
 
     for(i=0; i<n; i++)
     {
-      wavbuf[chn][i] = (int)(((unsigned char *)device->buf)[i]) - yref[chn] - yor[chn];
+      wavbuf[chn][i] = ((int)(((unsigned char *)device->buf)[i]) - yref[chn] - yor[chn]) << 5;
     }
   }
 
@@ -879,14 +879,14 @@ void UI_Mainwindow::save_screen_waveform()
     edf_set_digital_minimum(hdl, j, -32768);
     if(devparms.chanscale[chn] > 2)
     {
-      edf_set_physical_maximum(hdl, j, yinc[chn] * 32767);
-      edf_set_physical_minimum(hdl, j, yinc[chn] * -32768);
+      edf_set_physical_maximum(hdl, j, yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, yinc[chn] * -32768.0 / 32.0);
       edf_set_physical_dimension(hdl, j, "V");
     }
     else
     {
-      edf_set_physical_maximum(hdl, j, 1000 * yinc[chn] * 32767);
-      edf_set_physical_minimum(hdl, j, 1000 * yinc[chn] * -32768);
+      edf_set_physical_maximum(hdl, j, 1000.0 * yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, 1000.0 * yinc[chn] * -32768.0 / 32.0);
       edf_set_physical_dimension(hdl, j, "mV");
     }
     sprintf(str, "CHAN%i", chn + 1);
