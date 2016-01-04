@@ -1723,6 +1723,38 @@ int UI_Mainwindow::get_device_settings()
     devparms.math_fft_unit = 1;
   }
 
+  usleep(TMC_GDS_DELAY);
+
+  if(tmc_write(":MATH:FFT:HSC?") != 14)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  devparms.math_fft_hscale = atof(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(tmc_write(":MATH:FFT:HCEN?") != 15)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  devparms.math_fft_hcenter = atof(device->buf);
+
   QApplication::restoreOverrideCursor();
 
   return 0;

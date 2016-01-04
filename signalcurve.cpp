@@ -152,7 +152,8 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   double h_step=0.0,
          step,
-         step2;
+         step2,
+         fft_h_offset=0.0;
 
 //  clk_start = clock();
 
@@ -382,9 +383,22 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
       h_step = (double)curve_w / (double)devparms->fftbufsz;
 
+      if(devparms->timebasedelayenable)
+      {
+        h_step *= (100.0 / devparms->timebasedelayscale) / devparms->math_fft_hscale;
+      }
+      else
+      {
+        h_step *= (100.0 / devparms->timebasescale) / devparms->math_fft_hscale;
+      }
+
+      h_step /= 24.0;
+
       fft_v_sense = v_sense * 35;
 
       fft_v_offset = curve_h * 0.75;
+
+      fft_h_offset = (curve_w / 2) - ((devparms->math_fft_hcenter / devparms->math_fft_hscale) * curve_w / devparms->hordivisions);
 
       painter->setPen(QPen(QBrush(QColor(128, 0, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 
@@ -392,10 +406,10 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
       {
         if(devparms->fftbufsz < (curve_w / 2))
         {
-          painter->drawLine(i * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
+          painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
           if(i)
           {
-            painter->drawLine(i * h_step, (devparms->fftbuf_out[i - 1] * fft_v_sense) + fft_v_offset, i * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
+            painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i - 1] * fft_v_sense) + fft_v_offset, i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
           }
         }
         else
@@ -404,29 +418,33 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
           {
             if(devparms->displaytype)
             {
-              painter->drawPoint(i * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
+              painter->drawPoint(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
             }
             else
             {
-              painter->drawLine(i * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step, (devparms->fftbuf_out[i + 1] * fft_v_sense) + fft_v_offset);
+              painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i + 1] * fft_v_sense) + fft_v_offset);
             }
           }
         }
       }
 
-      sprintf(str, "FFT: CH%i ", devparms->math_fft_src + 1);
+      sprintf(str, "FFT: CH%i  ", devparms->math_fft_src + 1);
+
+      convert_to_metric_suffix(str + strlen(str), 10, 2);
+
+      strcat(str, "dBV  ");
+
+      convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hscale, 2);
+
+      strcat(str, "Hz/Div  ");
 
       if(devparms->timebasedelayenable)
       {
-        convert_to_metric_suffix(str + strlen(str),
-                                (devparms->fftbufsz * 2) / (devparms->timebasedelayscale * devparms->hordivisions),
-                                0);
+        convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasedelayscale, 0);
       }
       else
       {
-        convert_to_metric_suffix(str + strlen(str),
-                                (devparms->fftbufsz * 2) / (devparms->timebasescale * devparms->hordivisions),
-                                0);
+        convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasescale, 0);
       }
 
       strcat(str, "Sa/s");
@@ -741,9 +759,22 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
     h_step = (double)curve_w / (double)devparms->fftbufsz;
 
+    if(devparms->timebasedelayenable)
+    {
+      h_step *= (100.0 / devparms->timebasedelayscale) / devparms->math_fft_hscale;
+    }
+    else
+    {
+      h_step *= (100.0 / devparms->timebasescale) / devparms->math_fft_hscale;
+    }
+
+    h_step /= 24.0;
+
     fft_v_sense = v_sense * 35;
 
     fft_v_offset = curve_h * 0.75;
+
+    fft_h_offset = (curve_w / 2) - ((devparms->math_fft_hcenter / devparms->math_fft_hscale) * curve_w / devparms->hordivisions);
 
     painter->setPen(QPen(QBrush(QColor(128, 0, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 
@@ -751,10 +782,10 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     {
       if(devparms->fftbufsz < (curve_w / 2))
       {
-        painter->drawLine(i * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
+        painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
         if(i)
         {
-          painter->drawLine(i * h_step, (devparms->fftbuf_out[i - 1] * fft_v_sense) + fft_v_offset, i * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
+          painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i - 1] * fft_v_sense) + fft_v_offset, i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
         }
       }
       else
@@ -763,29 +794,37 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
         {
           if(devparms->displaytype)
           {
-            painter->drawPoint(i * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
+            painter->drawPoint(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
           }
           else
           {
-            painter->drawLine(i * h_step, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step, (devparms->fftbuf_out[i + 1] * fft_v_sense) + fft_v_offset);
+            painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i + 1] * fft_v_sense) + fft_v_offset);
           }
         }
       }
     }
 
-    sprintf(str, "FFT: CH%i ", devparms->math_fft_src + 1);
+    sprintf(str, "FFT: CH%i  ", devparms->math_fft_src + 1);
+
+    convert_to_metric_suffix(str + strlen(str), 10, 2);
+
+    strcat(str, "dBV  ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hscale, 2);
+
+    strcat(str, "Hz/Div  Center ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hcenter, 1);
+
+    strcat(str, "Hz  ");
 
     if(devparms->timebasedelayenable)
     {
-      convert_to_metric_suffix(str + strlen(str),
-                              (devparms->fftbufsz * 2) / (devparms->timebasedelayscale * devparms->hordivisions),
-                              0);
+      convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasedelayscale, 0);
     }
     else
     {
-      convert_to_metric_suffix(str + strlen(str),
-                              (devparms->fftbufsz * 2) / (devparms->timebasescale * devparms->hordivisions),
-                              0);
+      convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasescale, 0);
     }
 
     strcat(str, "Sa/s");

@@ -396,6 +396,18 @@ private slots:
   void select_fft_ch2();
   void select_fft_ch3();
   void select_fft_ch4();
+  void select_fft_hzdiv_20();
+  void select_fft_hzdiv_40();
+  void select_fft_hzdiv_100();
+  void select_fft_hzdiv_200();
+  void select_fft_ctr_5();
+  void select_fft_ctr_6();
+  void select_fft_ctr_7();
+  void select_fft_ctr_8();
+  void select_fft_ctr_9();
+  void select_fft_ctr_10();
+  void select_fft_ctr_11();
+  void select_fft_ctr_12();
 
 protected:
   void closeEvent(QCloseEvent *);

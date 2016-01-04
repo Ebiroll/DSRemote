@@ -2171,8 +2171,15 @@ void UI_Mainwindow::chan_menu()
 
 void UI_Mainwindow::math_menu()
 {
+  char str[1024];
+
+  double val;
+
   QMenu menu,
-        submenufft;
+        submenufft,
+        submenufftctr,
+        submenuffthzdiv,
+        submenufftsrc;
 
   QList<QAction *> actionList;
 
@@ -2181,6 +2188,97 @@ void UI_Mainwindow::math_menu()
     return;
   }
 
+  if(devparms.timebasedelayenable)
+  {
+    val = 100.0 / devparms.timebasedelayscale;
+  }
+  else
+  {
+    val = 100.0 / devparms.timebasescale;
+  }
+
+  submenufftctr.setTitle("Center");
+  convert_to_metric_suffix(str, devparms.math_fft_hscale * 5.0 , 1);
+  strcat(str, "Hz");
+  submenufftctr.addAction(str, this, SLOT(select_fft_ctr_5()));
+  convert_to_metric_suffix(str, devparms.math_fft_hscale * 6.0 , 1);
+  strcat(str, "Hz");
+  submenufftctr.addAction(str, this, SLOT(select_fft_ctr_6()));
+  convert_to_metric_suffix(str, devparms.math_fft_hscale * 7.0 , 1);
+  strcat(str, "Hz");
+  submenufftctr.addAction(str, this, SLOT(select_fft_ctr_7()));
+  convert_to_metric_suffix(str, devparms.math_fft_hscale * 8.0 , 1);
+  strcat(str, "Hz");
+  submenufftctr.addAction(str, this, SLOT(select_fft_ctr_8()));
+  if((devparms.math_fft_hscale * 9.0) < (val * 0.40001))
+  {
+    convert_to_metric_suffix(str, devparms.math_fft_hscale * 9.0 , 1);
+    strcat(str, "Hz");
+    submenufftctr.addAction(str, this, SLOT(select_fft_ctr_9()));
+    if((devparms.math_fft_hscale * 10.0) < (val * 0.40001))
+    {
+      convert_to_metric_suffix(str, devparms.math_fft_hscale * 10.0 , 1);
+      strcat(str, "Hz");
+      submenufftctr.addAction(str, this, SLOT(select_fft_ctr_10()));
+      if((devparms.math_fft_hscale * 11.0) < (val * 0.40001))
+      {
+        convert_to_metric_suffix(str, devparms.math_fft_hscale * 11.0 , 1);
+        strcat(str, "Hz");
+        submenufftctr.addAction(str, this, SLOT(select_fft_ctr_11()));
+        if((devparms.math_fft_hscale * 12.0) < (val * 0.40001))
+        {
+          convert_to_metric_suffix(str, devparms.math_fft_hscale * 12.0 , 1);
+          strcat(str, "Hz");
+          submenufftctr.addAction(str, this, SLOT(select_fft_ctr_12()));
+        }
+      }
+    }
+  }
+
+  submenuffthzdiv.setTitle("Hz/Div");
+  convert_to_metric_suffix(str, val / 20.0 , 2);
+  strcat(str, "Hz/Div");
+  submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_20()));
+  convert_to_metric_suffix(str, val / 40.0 , 2);
+  strcat(str, "Hz/Div");
+  submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_40()));
+  convert_to_metric_suffix(str, val / 100.0 , 2);
+  strcat(str, "Hz/Div");
+  submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_100()));
+  convert_to_metric_suffix(str, val / 200.0 , 2);
+  strcat(str, "Hz/Div");
+  submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
+
+  submenufftsrc.setTitle("Source");
+  submenufftsrc.addAction("CH1",  this, SLOT(select_fft_ch1()));
+  submenufftsrc.addAction("CH2",  this, SLOT(select_fft_ch2()));
+  if(devparms.channel_cnt > 2)
+  {
+    submenufftsrc.addAction("CH3",  this, SLOT(select_fft_ch3()));
+    submenufftsrc.addAction("CH4",  this, SLOT(select_fft_ch4()));
+  }
+  actionList = submenufftsrc.actions();
+  if(devparms.math_fft_src == 0)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  else if(devparms.math_fft_src == 1)
+    {
+      actionList[1]->setCheckable(true);
+      actionList[1]->setChecked(true);
+    }
+    else if(devparms.math_fft_src == 2)
+      {
+        actionList[2]->setCheckable(true);
+        actionList[2]->setChecked(true);
+      }
+      else if(devparms.math_fft_src == 3)
+        {
+          actionList[3]->setCheckable(true);
+          actionList[3]->setChecked(true);
+        }
+
   submenufft.setTitle("FFT");
   submenufft.addAction("On",   this, SLOT(toggle_fft()));
   submenufft.addAction("Off",  this, SLOT(toggle_fft()));
@@ -2188,13 +2286,9 @@ void UI_Mainwindow::math_menu()
   submenufft.addAction("Half", this, SLOT(toggle_fft_split()));
   submenufft.addAction("Vrms", this, SLOT(toggle_fft_unit()));
   submenufft.addAction("dBV",  this, SLOT(toggle_fft_unit()));
-  submenufft.addAction("CH1",  this, SLOT(select_fft_ch1()));
-  submenufft.addAction("CH2",  this, SLOT(select_fft_ch2()));
-  if(devparms.channel_cnt > 2)
-  {
-    submenufft.addAction("CH3",  this, SLOT(select_fft_ch3()));
-    submenufft.addAction("CH4",  this, SLOT(select_fft_ch4()));
-  }
+  submenufft.addMenu(&submenufftsrc);
+  submenufft.addMenu(&submenufftctr);
+  submenufft.addMenu(&submenuffthzdiv);
   actionList = submenufft.actions();
   if(devparms.math_fft == 1)
   {
@@ -2226,26 +2320,6 @@ void UI_Mainwindow::math_menu()
     actionList[5]->setCheckable(true);
     actionList[5]->setChecked(true);
   }
-  if(devparms.math_fft_src == 0)
-  {
-    actionList[6]->setCheckable(true);
-    actionList[6]->setChecked(true);
-  }
-  else if(devparms.math_fft_src == 1)
-    {
-      actionList[7]->setCheckable(true);
-      actionList[7]->setChecked(true);
-    }
-    else if(devparms.math_fft_src == 2)
-      {
-        actionList[8]->setCheckable(true);
-        actionList[8]->setChecked(true);
-      }
-      else if(devparms.math_fft_src == 3)
-        {
-          actionList[9]->setCheckable(true);
-          actionList[9]->setChecked(true);
-        }
 
   menu.addMenu(&submenufft);
 
@@ -3162,6 +3236,289 @@ void UI_Mainwindow::select_fft_ch4()
   statusLabel->setText("FFT CH4");
 }
 
+
+void UI_Mainwindow::select_fft_hzdiv_20()
+{
+  char str[512];
+
+  double val;
+
+  if(devparms.timebasedelayenable)
+  {
+    val = (100.0 / devparms.timebasedelayscale) / 20.0;
+  }
+  else
+  {
+    val = (100.0 / devparms.timebasescale) / 20.0;
+  }
+
+  sprintf(str, ":MATH:FFT:HSC %e", val);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hscale = val;
+
+  strcpy(str, "FFT: ");
+
+  convert_to_metric_suffix(str + strlen(str), val, 2);
+
+  strcat(str, "Hz/Div");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_hzdiv_40()
+{
+  char str[512];
+
+  double val;
+
+  if(devparms.timebasedelayenable)
+  {
+    val = (100.0 / devparms.timebasedelayscale) / 40.0;
+  }
+  else
+  {
+    val = (100.0 / devparms.timebasescale) / 40.0;
+  }
+
+  sprintf(str, ":MATH:FFT:HSC %e", val);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hscale = val;
+
+  strcpy(str, "FFT: ");
+
+  convert_to_metric_suffix(str + strlen(str), val, 2);
+
+  strcat(str, "Hz/Div");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_hzdiv_100()
+{
+  char str[512];
+
+  double val;
+
+  if(devparms.timebasedelayenable)
+  {
+    val = (100.0 / devparms.timebasedelayscale) / 100.0;
+  }
+  else
+  {
+    val = (100.0 / devparms.timebasescale) / 100.0;
+  }
+
+  sprintf(str, ":MATH:FFT:HSC %e", val);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hscale = val;
+
+  strcpy(str, "FFT: ");
+
+  convert_to_metric_suffix(str + strlen(str), val, 2);
+
+  strcat(str, "Hz/Div");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_hzdiv_200()
+{
+  char str[512];
+
+  double val;
+
+  if(devparms.timebasedelayenable)
+  {
+    val = (100.0 / devparms.timebasedelayscale) / 200.0;
+  }
+  else
+  {
+    val = (100.0 / devparms.timebasescale) / 200.0;
+  }
+
+  sprintf(str, ":MATH:FFT:HSC %e", val);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hscale = val;
+
+  strcpy(str, "FFT: ");
+
+  convert_to_metric_suffix(str + strlen(str), val, 2);
+
+  strcat(str, "Hz/Div");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_ctr_5()
+{
+  char str[512];
+
+  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 5.0);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hcenter = devparms.math_fft_hscale * 5.0;
+
+  strcpy(str, "FFT center: ");
+
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 5.0, 1);
+
+  strcat(str, "Hz");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_ctr_6()
+{
+  char str[512];
+
+  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 6.0);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hcenter = devparms.math_fft_hscale * 6.0;
+
+  strcpy(str, "FFT center: ");
+
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 6.0, 1);
+
+  strcat(str, "Hz");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_ctr_7()
+{
+  char str[512];
+
+  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 7.0);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hcenter = devparms.math_fft_hscale * 7.0;
+
+  strcpy(str, "FFT center: ");
+
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 7.0, 1);
+
+  strcat(str, "Hz");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_ctr_8()
+{
+  char str[512];
+
+  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 8.0);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hcenter = devparms.math_fft_hscale * 8.0;
+
+  strcpy(str, "FFT center: ");
+
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 8.0, 1);
+
+  strcat(str, "Hz");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_ctr_9()
+{
+  char str[512];
+
+  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 9.0);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hcenter = devparms.math_fft_hscale * 9.0;
+
+  strcpy(str, "FFT center: ");
+
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 9.0, 1);
+
+  strcat(str, "Hz");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_ctr_10()
+{
+  char str[512];
+
+  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 10.0);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hcenter = devparms.math_fft_hscale * 10.0;
+
+  strcpy(str, "FFT center: ");
+
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 10.0, 1);
+
+  strcat(str, "Hz");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_ctr_11()
+{
+  char str[512];
+
+  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 11.0);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hcenter = devparms.math_fft_hscale * 11.0;
+
+  strcpy(str, "FFT center: ");
+
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale *11.0, 1);
+
+  strcat(str, "Hz");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_ctr_12()
+{
+  char str[512];
+
+  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 12.0);
+
+  set_cue_cmd(str);
+
+  devparms.math_fft_hcenter = devparms.math_fft_hscale * 12.0;
+
+  strcpy(str, "FFT center: ");
+
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 12.0, 1);
+
+  strcat(str, "Hz");
+
+  statusLabel->setText(str);
+}
 
 
 
