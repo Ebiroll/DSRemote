@@ -127,6 +127,11 @@ void screenThread::get_params(struct device_settings *dev_parms)
     dev_parms->timebasedelayoffset = params.timebasedelayoffset;
     dev_parms->timebasedelayscale = params.timebasedelayscale;
   }
+  if(dev_parms->thread_job == TMC_THRD_JOB_FFTHZDIV)
+  {
+    dev_parms->math_fft_hscale = params.math_fft_hscale;
+    dev_parms->math_fft_hcenter = params.math_fft_hcenter;
+  }
   if(params.debug_str[0])
   {
     params.debug_str[1023] = 0;
@@ -385,6 +390,51 @@ void screenThread::run()
 
         params.job = TMC_THRD_JOB_TIMDELAY;
       }
+
+    if(params.math_fft)
+    {
+      if((!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":TIM:SCAL ", 10)) ||
+         (!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":MATH:OPER FFT", 14)))
+      {
+        usleep(TMC_GDS_DELAY);
+
+        if(tmc_write(":MATH:FFT:HSC?") != 14)
+        {
+          printf("Can not write to device.\n");
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+
+        if(tmc_read() < 1)
+        {
+          printf("Can not read from device.\n");
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+
+        params.math_fft_hscale = atof(device->buf);
+
+        usleep(TMC_GDS_DELAY);
+
+        if(tmc_write(":MATH:FFT:HCEN?") != 15)
+        {
+          printf("Can not write to device.\n");
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+
+        if(tmc_read() < 1)
+        {
+          printf("Can not read from device.\n");
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+
+        params.math_fft_hcenter = atof(device->buf);
+
+        params.job = TMC_THRD_JOB_FFTHZDIV;
+      }
+    }
 
     params.cmd_cue_idx_out++;
 

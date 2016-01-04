@@ -90,8 +90,8 @@ void hextobin(char *, const char *);    /* destination must have four times the 
 /* int is number of decimals. Result is written into the string argument */
 int convert_to_metric_suffix(char *, double, int);
 
-double round_up_step125(double);                  /* Rounds the value up to 1-2-5 steps */
-double round_down_step125(double);                /* Rounds the value down to 1-2-5 steps */
+double round_up_step125(double, double *);      /* Rounds the value up to 1-2-5 steps */
+double round_down_step125(double, double *);    /* Rounds the value down to 1-2-5 steps */
 
 int strtoipaddr(unsigned int *, const char *);  /* convert a string "192.168.1.12" to an integer */
 

@@ -548,11 +548,11 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
 
     if(dir)
     {
-      devparms.timebasedelayscale = round_up_step125(devparms.timebasedelayscale);
+      devparms.timebasedelayscale = round_up_step125(devparms.timebasedelayscale, NULL);
     }
     else
     {
-      devparms.timebasedelayscale = round_down_step125(devparms.timebasedelayscale);
+      devparms.timebasedelayscale = round_down_step125(devparms.timebasedelayscale, NULL);
     }
 
     strcpy(str, "Delayed timebase: ");
@@ -622,11 +622,11 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
 
     if(dir)
     {
-      devparms.timebasescale = round_up_step125(devparms.timebasescale);
+      devparms.timebasescale = round_up_step125(devparms.timebasescale, NULL);
     }
     else
     {
-      devparms.timebasescale = round_down_step125(devparms.timebasescale);
+      devparms.timebasescale = round_down_step125(devparms.timebasescale, NULL);
     }
 
     strcpy(str, "Timebase: ");
@@ -829,7 +829,7 @@ void UI_Mainwindow::vertOffsetDialChanged(int new_pos)
     }
   }
 
-  val = round_up_step125(devparms.chanscale[chn]) / 100;
+  val = round_up_step125(devparms.chanscale[chn], NULL) / 100;
 
   if(dir)
   {
@@ -957,11 +957,11 @@ void UI_Mainwindow::vertScaleDialChanged(int new_pos)
 
   if(dir || devparms.chanvernier[chn])
   {
-    val = round_up_step125(devparms.chanscale[chn]);
+    val = round_up_step125(devparms.chanscale[chn], NULL);
   }
   else
   {
-    val = round_down_step125(devparms.chanscale[chn]);
+    val = round_down_step125(devparms.chanscale[chn], NULL);
   }
 
   if(devparms.chanvernier[chn])

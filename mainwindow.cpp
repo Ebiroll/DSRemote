@@ -2514,7 +2514,7 @@ void UI_Mainwindow::zoom_in()
       }
     }
 
-    devparms.timebasedelayscale = round_down_step125(devparms.timebasedelayscale);
+    devparms.timebasedelayscale = round_down_step125(devparms.timebasedelayscale, NULL);
 
     strcpy(str, "Delayed timebase: ");
 
@@ -2561,7 +2561,7 @@ void UI_Mainwindow::zoom_in()
       }
     }
 
-    devparms.timebasescale = round_down_step125(devparms.timebasescale);
+    devparms.timebasescale = round_down_step125(devparms.timebasescale, NULL);
 
     strcpy(str, "Timebase: ");
 
@@ -2605,7 +2605,7 @@ void UI_Mainwindow::zoom_out()
       return;
     }
 
-    devparms.timebasedelayscale = round_up_step125(devparms.timebasedelayscale);
+    devparms.timebasedelayscale = round_up_step125(devparms.timebasedelayscale, NULL);
 
     strcpy(str, "Delayed timebase: ");
 
@@ -2628,7 +2628,7 @@ void UI_Mainwindow::zoom_out()
       return;
     }
 
-    devparms.timebasescale = round_up_step125(devparms.timebasescale);
+    devparms.timebasescale = round_up_step125(devparms.timebasescale, NULL);
 
     strcpy(str, "Timebase: ");
 
@@ -2671,7 +2671,7 @@ void UI_Mainwindow::chan_scale_plus()
 
   ltmp = devparms.chanscale[chn];
 
-  val = round_up_step125(devparms.chanscale[chn]);
+  val = round_up_step125(devparms.chanscale[chn], NULL);
 
   if(devparms.chanvernier[chn])
   {
@@ -2810,11 +2810,11 @@ void UI_Mainwindow::chan_scale_minus()
 
   if(devparms.chanvernier[chn])
   {
-    val = round_up_step125(devparms.chanscale[chn]);
+    val = round_up_step125(devparms.chanscale[chn], NULL);
   }
   else
   {
-    val = round_down_step125(devparms.chanscale[chn]);
+    val = round_down_step125(devparms.chanscale[chn], NULL);
   }
 
   if(devparms.chanvernier[chn])

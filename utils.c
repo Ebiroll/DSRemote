@@ -1599,7 +1599,7 @@ void hextobin(char *dest, const char *str)
 }
 
 
-double round_up_step125(double val)
+double round_up_step125(double val, double *ratio)
 {
   int i, exp=0;
 
@@ -1624,14 +1624,29 @@ double round_up_step125(double val)
   if(val > 4.999)
   {
     ltmp = 10;
+
+    if(ratio != NULL)
+    {
+      *ratio = 2;
+    }
   }
   else if(val > 1.999)
     {
       ltmp = 5;
+
+      if(ratio != NULL)
+      {
+        *ratio = 2.5;
+      }
     }
     else
     {
       ltmp = 2;
+
+      if(ratio != NULL)
+      {
+        *ratio = 2;
+      }
     }
 
   for(i=0; i<exp; i++)
@@ -1653,7 +1668,7 @@ double round_up_step125(double val)
 }
 
 
-double round_down_step125(double val)
+double round_down_step125(double val, double *ratio)
 {
   int i, exp=0;
 
@@ -1678,18 +1693,38 @@ double round_down_step125(double val)
   if(val < 1.001)
   {
     ltmp = 0.5;
+
+    if(ratio != NULL)
+    {
+      *ratio = 2;
+    }
   }
   else if(val < 2.001)
     {
       ltmp = 1;
+
+      if(ratio != NULL)
+      {
+        *ratio = 2;
+      }
     }
     else if(val < 5.001)
       {
         ltmp = 2;
+
+        if(ratio != NULL)
+        {
+          *ratio = 2.5;
+        }
       }
       else
       {
         ltmp = 5;
+
+        if(ratio != NULL)
+        {
+          *ratio = 2;
+        }
       }
 
   for(i=0; i<exp; i++)

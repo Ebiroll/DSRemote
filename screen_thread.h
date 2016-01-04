@@ -91,6 +91,8 @@ private:
     int math_fft_src;
     int math_fft;
     int math_fft_unit;
+    double math_fft_hscale;
+    double math_fft_hcenter;
     double *fftbuf_in;
     double *fftbuf_out;
     int fftbufsz;

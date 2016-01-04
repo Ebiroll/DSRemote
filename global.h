@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.31_1601041900"
+#define PROGRAM_VERSION       "0.31_1601042038"
 
 #define MAX_PATHLEN            4096
 
@@ -77,6 +77,7 @@
 #define TMC_THRD_JOB_NONE         0
 #define TMC_THRD_JOB_TRIGEDGELEV  1
 #define TMC_THRD_JOB_TIMDELAY     2
+#define TMC_THRD_JOB_FFTHZDIV     3
 
 #define TMC_DIAL_TIMER_DELAY    300
 
