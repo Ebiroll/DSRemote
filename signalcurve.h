@@ -83,7 +83,7 @@ public:
   void setRasterColor(QColor);
   void setTextColor(QColor);
   void setBorderSize(int);
-  void drawCurve(struct device_settings *, struct tmcdev *, int);
+  void drawCurve(struct device_settings *, struct tmcdev *);
   void clear();
   void setUpdatesEnabled(bool);
   void setTrigLineVisible(void);
@@ -112,7 +112,9 @@ private:
 
   QFont smallfont;
 
-  double v_sense;
+  double v_sense,
+         fft_v_sense,
+         fft_v_offset;
 
   int bufsize,
       bordersize,

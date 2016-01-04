@@ -54,6 +54,10 @@ HEADERS += signalcurve.h
 HEADERS += settings_dialog.h
 HEADERS += screen_thread.h
 
+HEADERS += third_party/kiss_fft/kiss_fft.h
+HEADERS += third_party/kiss_fft/_kiss_fft_guts.h
+HEADERS += third_party/kiss_fft/kiss_fftr.h
+
 SOURCES += main.cpp
 SOURCES += mainwindow.cpp
 SOURCES += mainwindow_constr.cpp
@@ -70,6 +74,9 @@ SOURCES += edflib.c
 SOURCES += signalcurve.cpp
 SOURCES += settings_dialog.cpp
 SOURCES += screen_thread.cpp
+
+SOURCES += third_party/kiss_fft/kiss_fft.c
+SOURCES += third_party/kiss_fft/kiss_fftr.c
 
 RESOURCES = images.qrc
 

@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h>
 
 #include <QObject>
 #include <QThread>
@@ -42,6 +43,8 @@
 #include "utils.h"
 #include "connection.h"
 #include "tmc_dev.h"
+
+#include "third_party/kiss_fft/kiss_fftr.h"
 
 
 
@@ -84,6 +87,15 @@ private:
     double triggeredgelevel;
     double timebasedelayoffset;
     double timebasedelayscale;
+
+    int math_fft_src;
+    int math_fft;
+    int math_fft_unit;
+    double *fftbuf_in;
+    double *fftbuf_out;
+    int fftbufsz;
+    kiss_fftr_cfg k_cfg;
+    kiss_fft_cpx *kiss_fftbuf;
 
     char debug_str[1024];
   } params;

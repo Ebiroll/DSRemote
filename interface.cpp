@@ -2169,6 +2169,90 @@ void UI_Mainwindow::chan_menu()
 }
 
 
+void UI_Mainwindow::math_menu()
+{
+  QMenu menu,
+        submenufft;
+
+  QList<QAction *> actionList;
+
+  if((devparms.activechannel < 0) || (devparms.activechannel > MAX_CHNS))
+  {
+    return;
+  }
+
+  submenufft.setTitle("FFT");
+  submenufft.addAction("On",   this, SLOT(toggle_fft()));
+  submenufft.addAction("Off",  this, SLOT(toggle_fft()));
+  submenufft.addAction("Full", this, SLOT(toggle_fft_split()));
+  submenufft.addAction("Half", this, SLOT(toggle_fft_split()));
+  submenufft.addAction("Vrms", this, SLOT(toggle_fft_unit()));
+  submenufft.addAction("dBV",  this, SLOT(toggle_fft_unit()));
+  submenufft.addAction("CH1",  this, SLOT(select_fft_ch1()));
+  submenufft.addAction("CH2",  this, SLOT(select_fft_ch2()));
+  if(devparms.channel_cnt > 2)
+  {
+    submenufft.addAction("CH3",  this, SLOT(select_fft_ch3()));
+    submenufft.addAction("CH4",  this, SLOT(select_fft_ch4()));
+  }
+  actionList = submenufft.actions();
+  if(devparms.math_fft == 1)
+  {
+    actionList[0]->setCheckable(true);
+    actionList[0]->setChecked(true);
+  }
+  else
+  {
+    actionList[1]->setCheckable(true);
+    actionList[1]->setChecked(true);
+  }
+  if(devparms.math_fft_split == 0)
+  {
+    actionList[2]->setCheckable(true);
+    actionList[2]->setChecked(true);
+  }
+  else
+  {
+    actionList[3]->setCheckable(true);
+    actionList[3]->setChecked(true);
+  }
+  if(devparms.math_fft_unit == 0)
+  {
+    actionList[4]->setCheckable(true);
+    actionList[4]->setChecked(true);
+  }
+  else
+  {
+    actionList[5]->setCheckable(true);
+    actionList[5]->setChecked(true);
+  }
+  if(devparms.math_fft_src == 0)
+  {
+    actionList[6]->setCheckable(true);
+    actionList[6]->setChecked(true);
+  }
+  else if(devparms.math_fft_src == 1)
+    {
+      actionList[7]->setCheckable(true);
+      actionList[7]->setChecked(true);
+    }
+    else if(devparms.math_fft_src == 2)
+      {
+        actionList[8]->setCheckable(true);
+        actionList[8]->setChecked(true);
+      }
+      else if(devparms.math_fft_src == 3)
+        {
+          actionList[9]->setCheckable(true);
+          actionList[9]->setChecked(true);
+        }
+
+  menu.addMenu(&submenufft);
+
+  menu.exec(mathMenuButton->mapToGlobal(QPoint(0,0)));
+}
+
+
 void UI_Mainwindow::chan_coupling_ac()
 {
   char str[128];
@@ -2982,6 +3066,101 @@ void UI_Mainwindow::trigAdjustDialClicked(QPoint)
 }
 
 
+void UI_Mainwindow::toggle_fft()
+{
+  if(devparms.math_fft == 1)
+  {
+    devparms.math_fft = 0;
+
+    set_cue_cmd(":MATH:DISP OFF");
+
+    statusLabel->setText("Math display off");
+  }
+  else
+  {
+    set_cue_cmd(":MATH:OPER FFT");
+
+    set_cue_cmd(":MATH:DISP ON");
+
+    devparms.math_fft = 1;
+
+    statusLabel->setText("FFT on");
+  }
+}
+
+
+void UI_Mainwindow::toggle_fft_split()
+{
+  if(devparms.math_fft_split == 1)
+  {
+    devparms.math_fft_split = 0;
+
+    set_cue_cmd(":MATH:FFT:SPL OFF");
+
+    statusLabel->setText("FFT full");
+  }
+  else
+  {
+    set_cue_cmd(":MATH:FFT:SPL ON");
+
+    devparms.math_fft_split = 1;
+
+    statusLabel->setText("FFT half");
+  }
+}
+
+
+void UI_Mainwindow::toggle_fft_unit()
+{
+  if(devparms.math_fft_unit == 1)
+  {
+    devparms.math_fft_unit = 0;
+
+    set_cue_cmd(":MATH:FFT:UNIT VRMS");
+
+    statusLabel->setText("FFT unit Vrms");
+  }
+  else
+  {
+    set_cue_cmd(":MATH:FFT:UNIT DB");
+
+    devparms.math_fft_unit = 1;
+
+    statusLabel->setText("FFT unit dBV");
+  }
+}
+
+
+void UI_Mainwindow::select_fft_ch1()
+{
+  devparms.math_fft_src = 0;
+
+  statusLabel->setText("FFT CH1");
+}
+
+
+void UI_Mainwindow::select_fft_ch2()
+{
+  devparms.math_fft_src = 1;
+
+  statusLabel->setText("FFT CH2");
+}
+
+
+void UI_Mainwindow::select_fft_ch3()
+{
+  devparms.math_fft_src = 2;
+
+  statusLabel->setText("FFT CH3");
+}
+
+
+void UI_Mainwindow::select_fft_ch4()
+{
+  devparms.math_fft_src = 3;
+
+  statusLabel->setText("FFT CH4");
+}
 
 
 

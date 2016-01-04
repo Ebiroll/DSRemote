@@ -31,9 +31,11 @@
 
 #include <QMutex>
 
+#include "third_party/kiss_fft/kiss_fftr.h"
+
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.31_1601021654"
+#define PROGRAM_VERSION       "0.31_1601041416"
 
 #define MAX_PATHLEN            4096
 
@@ -45,6 +47,8 @@
 #define SCRN_SHOT_BMP_SZ    1152054
 
 #define WAVFRM_MAX_BUFSZ  (1024 * 1024 * 2)
+
+#define FFT_MAX_BUFSZ          4096
 
 #define ADJ_DIAL_FUNC_NONE        0
 #define ADJ_DIAL_FUNC_HOLDOFF     1
@@ -181,6 +185,17 @@ struct device_settings
 
   int cmd_cue_idx_in;
   int cmd_cue_idx_out;
+
+  int math_fft_src;             // 0=ch1, 1=ch2, 2=ch3, 3=ch4
+  int math_fft;                 // 0=off, 1=on
+  int math_fft_split;           // 0=off, 1=on
+  int math_fft_unit;            // 0=VRMS, 1=DB
+  double *fftbuf_in;
+  double *fftbuf_out;
+  int fftbufsz;
+  kiss_fftr_cfg k_cfg;
+  kiss_fft_cpx *kiss_fftbuf;
+  double fft_v_sense;
 };
 
 

@@ -29,6 +29,9 @@
 #include "screen_thread.h"
 
 
+#define SPECT_LOG_MINIMUM (0.000001)
+#define SPECT_LOG_MINIMUM_LOG (-5)
+
 
 void screenThread::set_device(struct tmcdev *tmdev)
 {
@@ -80,6 +83,14 @@ void screenThread::set_params(struct device_settings *dev_parms)
   params.chandisplay[3] = deviceparms->chandisplay[3];
   params.countersrc = deviceparms->countersrc;
   params.cmd_cue_idx_in = deviceparms->cmd_cue_idx_in;
+  params.math_fft_src = deviceparms->math_fft_src;
+  params.math_fft = deviceparms->math_fft;
+  params.math_fft_unit = deviceparms->math_fft_unit;
+  params.fftbuf_in = deviceparms->fftbuf_in;
+  params.fftbuf_out = deviceparms->fftbuf_out;
+  params.fftbufsz = deviceparms->fftbufsz;
+  params.k_cfg = deviceparms->k_cfg;
+  params.kiss_fftbuf = deviceparms->kiss_fftbuf;
   params.debug_str[0] = 0;
 }
 
@@ -273,7 +284,7 @@ OUT_ERROR:
 
 void screenThread::run()
 {
-  int i, j, n=0, chns=0, line, cmd_sent=0;
+  int i, j, k, n=0, chns=0, line, cmd_sent=0;
 
   char str[128];
 
@@ -532,6 +543,37 @@ void screenThread::run()
       for(j=0; j<n; j++)
       {
         params.wavebuf[i][j] = (int)(((unsigned char *)device->buf)[j]) - 127;
+      }
+
+      if((n == (params.fftbufsz * 2)) && (params.math_fft == 1) && (i == params.math_fft_src))
+      {
+        for(j=0; j<n; j++)
+        {
+          params.fftbuf_in[j] = params.wavebuf[i][j];
+        }
+
+        kiss_fftr(params.k_cfg, params.fftbuf_in, params.kiss_fftbuf);
+
+        for(k=0; k<params.fftbufsz; k++)
+        {
+          params.fftbuf_out[k] = (((params.kiss_fftbuf[k].r * params.kiss_fftbuf[k].r) +
+                     (params.kiss_fftbuf[k].i * params.kiss_fftbuf[k].i)) / params.fftbufsz);
+
+          if(params.math_fft_unit)  // dBV
+          {
+            if(params.fftbuf_out[k] < SPECT_LOG_MINIMUM)
+            {
+              params.fftbuf_out[k] = SPECT_LOG_MINIMUM;
+            }
+
+            params.fftbuf_out[k] = log10(params.fftbuf_out[k]);
+
+            if(params.fftbuf_out[k] < SPECT_LOG_MINIMUM_LOG)
+            {
+              params.fftbuf_out[k] = SPECT_LOG_MINIMUM_LOG;
+            }
+          }
+        }
       }
     }
 

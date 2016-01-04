@@ -62,14 +62,24 @@ UI_Mainwindow::UI_Mainwindow()
 
   memset(&devparms, 0, sizeof(struct device_settings));
 
-  devparms.screenshot_buf = (char *)malloc(1024 * 1024 * 2);
+  devparms.screenshot_buf = (char *)malloc(WAVFRM_MAX_BUFSZ);
 
   for(i=0; i<MAX_CHNS; i++)
   {
-    devparms.wavebuf[i] = (short *)malloc(WAVFRM_MAX_BUFSZ);
+    devparms.wavebuf[i] = (short *)malloc(WAVFRM_MAX_BUFSZ * sizeof(short));
 
     devparms.chanscale[i] = 1;
   }
+
+  devparms.fftbuf_in = (double *)malloc(FFT_MAX_BUFSZ * sizeof(double));
+
+  devparms.fftbuf_out = (double *)malloc(FFT_MAX_BUFSZ * sizeof(double));
+
+  devparms.kiss_fftbuf = (kiss_fft_cpx *)malloc(FFT_MAX_BUFSZ * sizeof(kiss_fft_cpx));
+
+  devparms.k_cfg = NULL;
+
+  devparms.fft_v_sense = 1.0;
 
   devparms.screentimerival = settings.value("gui/refresh", 50).toInt();
 
@@ -300,12 +310,15 @@ UI_Mainwindow::UI_Mainwindow()
   vertOffsetDial->setMaximum(100);
   vertOffsetDial->setMinimum(0);
   vertOffsetDial->setContextMenuPolicy(Qt::CustomContextMenu);
+  mathMenuButton = new QPushButton(verticalGrpBox);
+  mathMenuButton->setGeometry(75, 110, 40, 18);
+  mathMenuButton->setText("Math");
   vertScaleLabel = new QLabel(verticalGrpBox);
-  vertScaleLabel->setGeometry(80, 103, 40, 18);
+  vertScaleLabel->setGeometry(80, 143, 40, 18);
   vertScaleLabel->setStyleSheet("font: 7pt;");
   vertScaleLabel->setText("Scale");
   vertScaleDial = new QDial(verticalGrpBox);
-  vertScaleDial->setGeometry(70, 120, 50, 50);
+  vertScaleDial->setGeometry(70, 160, 50, 50);
   vertScaleDial->setWrapping(true);
   vertScaleDial->setNotchesVisible(true);
   vertScaleDial->setSingleStep(1);
@@ -542,6 +555,12 @@ UI_Mainwindow::~UI_Mainwindow()
   {
     free(devparms.wavebuf[i]);
   }
+
+  free(devparms.fftbuf_in);
+
+  free(devparms.fftbuf_out);
+
+  free(devparms.kiss_fftbuf);
 }
 
 

@@ -291,6 +291,14 @@ void UI_Mainwindow::open_connection()
   devparms.cmd_cue_idx_in = 0;
   devparms.cmd_cue_idx_out = 0;
 
+  devparms.fftbufsz = devparms.hordivisions * 50;
+
+  if(devparms.k_cfg != NULL)
+  {
+    free(devparms.k_cfg);
+  }
+  devparms.k_cfg = kiss_fftr_alloc(devparms.fftbufsz * 2, 0, NULL, NULL);
+
   connect(adjDial,          SIGNAL(valueChanged(int)), this, SLOT(adjDialChanged(int)));
   connect(trigAdjustDial,   SIGNAL(valueChanged(int)), this, SLOT(trigAdjustDialChanged(int)));
   connect(horScaleDial,     SIGNAL(valueChanged(int)), this, SLOT(horScaleDialChanged(int)));
@@ -304,6 +312,7 @@ void UI_Mainwindow::open_connection()
   connect(ch3Button,        SIGNAL(clicked()),      this, SLOT(ch3ButtonClicked()));
   connect(ch4Button,        SIGNAL(clicked()),      this, SLOT(ch4ButtonClicked()));
   connect(chanMenuButton,   SIGNAL(clicked()),      this, SLOT(chan_menu()));
+  connect(mathMenuButton,   SIGNAL(clicked()),      this, SLOT(math_menu()));
   connect(waveForm,         SIGNAL(chan1Clicked()), this, SLOT(ch1ButtonClicked()));
   connect(waveForm,         SIGNAL(chan2Clicked()), this, SLOT(ch2ButtonClicked()));
   connect(waveForm,         SIGNAL(chan3Clicked()), this, SLOT(ch3ButtonClicked()));
@@ -414,6 +423,8 @@ void UI_Mainwindow::close_connection()
   disconnect(ch2Button,        SIGNAL(clicked()),     this, SLOT(ch2ButtonClicked()));
   disconnect(ch3Button,        SIGNAL(clicked()),     this, SLOT(ch3ButtonClicked()));
   disconnect(ch4Button,        SIGNAL(clicked()),     this, SLOT(ch4ButtonClicked()));
+  disconnect(chanMenuButton,   SIGNAL(clicked()),      this, SLOT(chan_menu()));
+  disconnect(mathMenuButton,   SIGNAL(clicked()),      this, SLOT(math_menu()));
   disconnect(waveForm,         SIGNAL(chan1Clicked()), this, SLOT(ch1ButtonClicked()));
   disconnect(waveForm,         SIGNAL(chan2Clicked()), this, SLOT(ch2ButtonClicked()));
   disconnect(waveForm,         SIGNAL(chan3Clicked()), this, SLOT(ch3ButtonClicked()));
@@ -449,6 +460,13 @@ void UI_Mainwindow::close_connection()
   tmc_close();
 
   device = NULL;
+
+  if(devparms.k_cfg != NULL)
+  {
+    free(devparms.k_cfg);
+
+    devparms.k_cfg = NULL;
+  }
 
   statusLabel->setText("Disconnected");
 }
@@ -1642,6 +1660,68 @@ int UI_Mainwindow::get_device_settings()
                   line = __LINE__;
                   goto OUT_ERROR;
                 }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(tmc_write(":MATH:FFT:SPL?") != 14)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  devparms.math_fft_split = atoi(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(tmc_write(":MATH:OPER?") != 11)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "FFT"))
+  {
+    devparms.math_fft = 1;
+  }
+  else
+  {
+    devparms.math_fft = 0;
+  }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(tmc_write(":MATH:FFT:UNIT?") != 15)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "VRMS"))
+  {
+    devparms.math_fft_unit = 0;
+  }
+  else
+  {
+    devparms.math_fft_unit = 1;
+  }
 
   QApplication::restoreOverrideCursor();
 
@@ -3010,7 +3090,7 @@ void UI_Mainwindow::screenUpdate()
 
   if(devparms.triggerstatus != 1)  // Don't plot waveform data when triggerstatus is "wait"
   {
-    waveForm->drawCurve(&devparms, device, devparms.wavebufsz);
+    waveForm->drawCurve(&devparms, device);
   }
   else
   {

@@ -84,6 +84,7 @@
 #include "settings_dialog.h"
 #include "screen_thread.h"
 
+#include "third_party/kiss_fft/kiss_fftr.h"
 
 
 class SignalCurve;
@@ -184,7 +185,8 @@ private:
               *playpauseButton,
               *stopButton,
               *recordButton,
-              *measureButton;
+              *measureButton,
+              *mathMenuButton;
 
   QDial       *adjDial,
               *horScaleDial,
@@ -339,6 +341,7 @@ private slots:
   void chan_invert_off();
 
   void chan_menu();
+  void math_menu();
 
   void set_acq_normal();
   void set_acq_average();
@@ -385,6 +388,14 @@ private slots:
   void shift_trace_down();
 
   void set_to_factory();
+
+  void toggle_fft();
+  void toggle_fft_split();
+  void toggle_fft_unit();
+  void select_fft_ch1();
+  void select_fft_ch2();
+  void select_fft_ch3();
+  void select_fft_ch4();
 
 protected:
   void closeEvent(QCloseEvent *);
