@@ -404,7 +404,7 @@ void screenThread::run()
       if((!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":TIM:SCAL ", 10)) ||
          (!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":MATH:OPER FFT", 14)))
       {
-        usleep(TMC_GDS_DELAY);
+        usleep(TMC_GDS_DELAY * 50);
 
         if(tmc_write(":MATH:FFT:HSC?") != 14)
         {
