@@ -83,6 +83,10 @@ SignalCurve::SignalCurve(QWidget *w_parent) : QWidget(w_parent)
 
   trig_pos_arrow_moving = 0;
 
+  fft_arrow_pos = 0;
+
+  fft_arrow_moving = 0;
+
   trig_line_visible = 0;
 
   trig_stat_flash = 0;
@@ -438,7 +442,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   {
     if(devparms->triggeredgesource < 4)
     {
-      trig_level_arrow_pos =  (curve_h / 2) - ((devparms->triggeredgelevel[devparms->triggeredgesource] + devparms->chanoffset[devparms->triggeredgesource]) / ((devparms->chanscale[devparms->triggeredgesource] * 8) / curve_h));
+      trig_level_arrow_pos = (curve_h / 2) - ((devparms->triggeredgelevel[devparms->triggeredgesource] + devparms->chanoffset[devparms->triggeredgesource]) / ((devparms->chanscale[devparms->triggeredgesource] * 8) / curve_h));
 
       if(trig_level_arrow_pos < 0)
       {
@@ -563,6 +567,13 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   if((devparms->math_fft == 1) && (devparms->math_fft_split == 1))
   {
     drawFFT(painter, curve_h_backup, curve_w_backup);
+
+    if(label_active == LABEL_ACTIVE_FFT)
+    {
+      sprintf(str, "%.1fdB", devparms->fft_voffset);
+
+      paintLabel(painter, 20, curve_h * 1.85 - 50.0, 100, 20, str, QColor(128, 0, 255));
+    }
   }
 
 //   clk_end = clock();
@@ -702,6 +713,12 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
         painter->drawLine(0, step2, 8, step2);
       }
     }
+
+/////////////////////////////////// FFT: draw the arrow ///////////////////////////////////////////
+
+    fft_arrow_pos = (curve_h / 2.0) - ((curve_h / 80.0) * devparms->fft_voffset);
+
+    drawArrow(painter, 0, fft_arrow_pos, 0, QColor(128, 0, 255), 'M');
   }
 
 /////////////////////////////////// FFT: draw the curve ///////////////////////////////////////////
@@ -723,8 +740,6 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
     }
 
     h_step /= 24.0;
-
-    devparms->fft_voffset = 20;
 
     fft_v_sense = curve_h / -8.0;
 
@@ -762,7 +777,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
 
     sprintf(str, "FFT: CH%i  ", devparms->math_fft_src + 1);
 
-    convert_to_metric_suffix(str + strlen(str), 10, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms->fft_vscale, 2);
 
     strcat(str, "dBV/Div  Center ");
 
@@ -1521,11 +1536,6 @@ void SignalCurve::mousePressEvent(QMouseEvent *press_event)
       m_x,
       m_y;
 
-  if(devparms->math_fft && devparms->math_fft_split)
-  {
-    return;
-  }
-
   setFocus(Qt::MouseFocusReason);
 
   w = width() - (2 * bordersize);
@@ -1534,14 +1544,36 @@ void SignalCurve::mousePressEvent(QMouseEvent *press_event)
   m_x = press_event->x() - bordersize;
   m_y = press_event->y() - bordersize;
 
-  if((devparms == NULL) || (!devparms->connected))
+  if(devparms == NULL)
   {
+    return;
+  }
+
+  if(!devparms->connected)
+  {
+    return;
+  }
+
+  if(devparms->math_fft && devparms->math_fft_split)
+  {
+    m_y -= ((h / 3) + 15);
+
+    if((m_x > -26) && (m_x < 0) && (m_y > (fft_arrow_pos - 7)) && (m_y < (fft_arrow_pos + 7)))
+    {
+      fft_arrow_moving = 1;
+      use_move_events = 1;
+      setMouseTracking(true);
+      mouse_old_x = m_x;
+      mouse_old_y = m_y;
+      mainwindow->scrn_timer->stop();
+    }
+
     return;
   }
 
 //  printf("m_x: %i   m_y: %i   trig_pos_arrow_pos: %i\n",m_x, m_y, trig_pos_arrow_pos);
 
-  if(press_event->button()==Qt::LeftButton)
+  if(press_event->button() == Qt::LeftButton)
   {
     if(m_y > (h + 12))
     {
@@ -1643,8 +1675,29 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
   mouse_x = release_event->x() - bordersize;
   mouse_y = release_event->y() - bordersize;
 
-  if((devparms == NULL) || (!devparms->connected))
+  if(devparms == NULL)
   {
+    return;
+  }
+
+  if(!devparms->connected)
+  {
+    return;
+  }
+
+  if(devparms->math_fft && devparms->math_fft_split)
+  {
+    fft_arrow_moving = 0;
+    use_move_events = 0;
+    setMouseTracking(false);
+
+    if(devparms->screenupdates_on == 1)
+    {
+      mainwindow->scrn_timer->start(devparms->screentimerival);
+    }
+
+    update();
+
     return;
   }
 
@@ -1835,7 +1888,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
 void SignalCurve::mouseMoveEvent(QMouseEvent *move_event)
 {
-  int chn;
+  int chn, h_fft, a_pos;
 
   double dtmp;
 
@@ -1847,8 +1900,45 @@ void SignalCurve::mouseMoveEvent(QMouseEvent *move_event)
   mouse_x = move_event->x() - bordersize;
   mouse_y = move_event->y() - bordersize;
 
-  if((devparms == NULL) || (!devparms->connected))
+  if(devparms == NULL)
   {
+    return;
+  }
+
+  if(!devparms->connected)
+  {
+    return;
+  }
+
+  if(devparms->math_fft && devparms->math_fft_split)
+  {
+    mouse_y -= ((h / 3) + 15);
+
+    h_fft = h * 0.64;
+
+    if(fft_arrow_moving)
+    {
+      a_pos = mouse_y;
+
+      if(a_pos < 0)
+      {
+        a_pos = 0;
+      }
+
+      if(a_pos > (h * 0.64))
+      {
+        a_pos = (h * 0.64);
+      }
+
+      devparms->fft_voffset = ((h_fft / 2) - a_pos) * (devparms->fft_vscale * 8.0 / h_fft);
+
+      label_active = LABEL_ACTIVE_FFT;
+
+      mainwindow->label_timer->start(LABEL_TIMER_IVAL);
+    }
+
+    update();
+
     return;
   }
 

@@ -79,8 +79,6 @@ UI_Mainwindow::UI_Mainwindow()
 
   devparms.k_cfg = NULL;
 
-  devparms.fft_vscale = 10.0;
-
   devparms.screentimerival = settings.value("gui/refresh", 50).toInt();
 
   if((devparms.screentimerival < 50) || (devparms.screentimerival > 2000))
@@ -114,6 +112,10 @@ UI_Mainwindow::UI_Mainwindow()
   devparms.hordivisions = 14;
 
   devparms.current_screen_sf = 1;
+
+  devparms.fft_vscale = 10.0;
+
+  devparms.fft_voffset = 20.0;
 
   strcpy(devparms.modelname, "-----");
 

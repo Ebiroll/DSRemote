@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.31_1601051103"
+#define PROGRAM_VERSION       "0.31_1601051712"
 
 #define MAX_PATHLEN            4096
 
@@ -65,6 +65,7 @@
 #define LABEL_ACTIVE_CHAN3        3
 #define LABEL_ACTIVE_CHAN4        4
 #define LABEL_ACTIVE_TRIG         5
+#define LABEL_ACTIVE_FFT          6
 
 #define TMC_GDS_DELAY         10000
 

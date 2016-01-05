@@ -131,6 +131,8 @@ private:
       trig_level_arrow_pos,
       trig_pos_arrow_pos,
       trig_stat_flash,
+      fft_arrow_pos,
+      fft_arrow_moving,
       mouse_x,
       mouse_y,
       mouse_old_x,
