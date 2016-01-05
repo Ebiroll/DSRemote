@@ -77,6 +77,7 @@ void screenThread::set_params(struct device_settings *dev_parms)
 {
   deviceparms = dev_parms;
   params.connected = deviceparms->connected;
+  params.modelserie = deviceparms->modelserie;
   params.chandisplay[0] = deviceparms->chandisplay[0];
   params.chandisplay[1] = deviceparms->chandisplay[1];
   params.chandisplay[2] = deviceparms->chandisplay[2];
@@ -604,7 +605,14 @@ void screenThread::run()
 
       if((n == (params.fftbufsz * 2)) && (params.math_fft == 1) && (i == params.math_fft_src))
       {
-        y_incr = params.chanscale[i] / 25.0;
+        if(params.modelserie == 6)
+        {
+          y_incr = params.chanscale[i] / 32.0;
+        }
+        else
+        {
+          y_incr = params.chanscale[i] / 25.0;
+        }
 
         binsz = (double)params.current_screen_sf / (params.fftbufsz * 2.0);
 

@@ -68,6 +68,7 @@ private:
 
   struct {
     int connected;
+    int modelserie;
     int chandisplay[MAX_CHNS];
     double chanscale[MAX_CHNS];
     int triggerstatus;
