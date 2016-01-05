@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.31_1601042038"
+#define PROGRAM_VERSION       "0.31_1601051056"
 
 #define MAX_PATHLEN            4096
 
@@ -198,7 +198,10 @@ struct device_settings
   kiss_fft_cpx *kiss_fftbuf;
   double math_fft_hscale;
   double math_fft_hcenter;
-  double fft_v_sense;
+  double fft_vscale;
+  double fft_voffset;
+
+  int current_screen_sf;
 };
 
 

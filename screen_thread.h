@@ -69,6 +69,7 @@ private:
   struct {
     int connected;
     int chandisplay[MAX_CHNS];
+    double chanscale[MAX_CHNS];
     int triggerstatus;
     int triggersweep;
     double samplerate;
@@ -98,6 +99,8 @@ private:
     int fftbufsz;
     kiss_fftr_cfg k_cfg;
     kiss_fft_cpx *kiss_fftbuf;
+
+    int current_screen_sf;
 
     char debug_str[1024];
   } params;

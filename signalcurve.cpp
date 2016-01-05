@@ -64,8 +64,6 @@ SignalCurve::SignalCurve(QWidget *w_parent) : QWidget(w_parent)
   bordersize = 60;
 
   v_sense = 1;
-  fft_v_sense = 1;
-  fft_v_offset = 0;
 
   mouse_x = 0;
   mouse_y = 0;
@@ -152,8 +150,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   double h_step=0.0,
          step,
-         step2,
-         fft_h_offset=0.0;
+         step2;
 
 //  clk_start = clock();
 
@@ -376,91 +373,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   if((devparms->math_fft == 1) && (devparms->math_fft_split == 0))
   {
-    if((devparms->fftbufsz > 32) && devparms->chandisplay[devparms->math_fft_src])
-    {
-      painter->setClipping(true);
-      painter->setClipRegion(QRegion(0, 0, curve_w, curve_h), Qt::ReplaceClip);
-
-      h_step = (double)curve_w / (double)devparms->fftbufsz;
-
-      if(devparms->timebasedelayenable)
-      {
-        h_step *= (100.0 / devparms->timebasedelayscale) / devparms->math_fft_hscale;
-      }
-      else
-      {
-        h_step *= (100.0 / devparms->timebasescale) / devparms->math_fft_hscale;
-      }
-
-      h_step /= 24.0;
-
-      fft_v_sense = v_sense * 35;
-
-      fft_v_offset = curve_h * 0.75;
-
-      fft_h_offset = (curve_w / 2) - ((devparms->math_fft_hcenter / devparms->math_fft_hscale) * curve_w / devparms->hordivisions);
-
-      painter->setPen(QPen(QBrush(QColor(128, 0, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
-
-      for(i=0; i<devparms->fftbufsz; i++)
-      {
-        if(devparms->fftbufsz < (curve_w / 2))
-        {
-          painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
-          if(i)
-          {
-            painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i - 1] * fft_v_sense) + fft_v_offset, i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
-          }
-        }
-        else
-        {
-          if(i < (devparms->fftbufsz - 1))
-          {
-            if(devparms->displaytype)
-            {
-              painter->drawPoint(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
-            }
-            else
-            {
-              painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i + 1] * fft_v_sense) + fft_v_offset);
-            }
-          }
-        }
-      }
-
-      sprintf(str, "FFT: CH%i  ", devparms->math_fft_src + 1);
-
-      convert_to_metric_suffix(str + strlen(str), 10, 2);
-
-      strcat(str, "dBV  ");
-
-      convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hscale, 2);
-
-      strcat(str, "Hz/Div  ");
-
-      if(devparms->timebasedelayenable)
-      {
-        convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasedelayscale, 0);
-      }
-      else
-      {
-        convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasescale, 0);
-      }
-
-      strcat(str, "Sa/s");
-
-      painter->drawText(15, curve_h - 15, str);
-
-      painter->setClipping(false);
-    }
-    else
-    {
-      painter->setPen(QPen(QBrush(QColor(128, 0, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
-
-      sprintf(str, "FFT: CH%i Data Invalid!", devparms->math_fft_src + 1);
-
-      painter->drawText(15, curve_h - 15, str);
-    }
+    drawFFT(painter, curve_h_backup, curve_w_backup);
   }
 
 /////////////////////////////////// draw the curve ///////////////////////////////////////////
@@ -647,106 +560,147 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
             paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[3]);
           }
 
-  if((devparms->math_fft == 0) || (devparms->math_fft_split == 0))
+  if((devparms->math_fft == 1) && (devparms->math_fft_split == 1))
   {
-    return;
+    drawFFT(painter, curve_h_backup, curve_w_backup);
   }
+
+//   clk_end = clock();
+//
+//   cpu_time_used += ((double) (clk_end - clk_start)) / CLOCKS_PER_SEC;
+//
+//   scr_update_cntr++;
+//
+//   if(!(scr_update_cntr % 50))
+//   {
+//     printf("CPU time used: %f\n", cpu_time_used / 50);
+//
+//     cpu_time_used = 0;
+//   }
+}
+
+
+void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
+{
+  int i, small_rulers, curve_w, curve_h;
+
+  char str[1024];
+
+  double h_step=0.0,
+         step,
+         step2,
+         fft_h_offset=0.0;
+
+  small_rulers = 5 * devparms->hordivisions;
 
 /////////////////////////////////// FFT: translate coordinates, draw and fill a rectangle ///////////////////////////////////////////
 
-  painter->resetTransform();
+  if(devparms->math_fft_split == 0)
+  {
+    curve_w = curve_w_b - (bordersize * 2);
 
-  painter->translate(bordersize, bordersize + curve_h + 15);
+    curve_h = curve_h_b - (bordersize * 2);
+  }
+  else
+  {
+    curve_h = curve_h_b - (bordersize * 2);
 
-  curve_w = curve_w_backup - (bordersize * 2);
+    curve_h /= 3;
 
-  curve_h = curve_h_backup - (bordersize * 2);
+    painter->resetTransform();
 
-  curve_h *= 0.64;
+    painter->translate(bordersize, bordersize + curve_h + 15);
+
+    curve_w = curve_w_b - (bordersize * 2);
+
+    curve_h = curve_h_b - (bordersize * 2);
+
+    curve_h *= 0.64;
 
 /////////////////////////////////// FFT: draw the rasters ///////////////////////////////////////////
 
-  painter->setPen(RasterColor);
+    painter->setPen(RasterColor);
 
-  painter->drawRect (0, 0, curve_w - 1, curve_h - 1);
-
-  if(devparms->displaygrid)
-  {
-    painter->setPen(QPen(QBrush(RasterColor, Qt::SolidPattern), tracewidth, Qt::DotLine, Qt::SquareCap, Qt::BevelJoin));
-
-    if(devparms->displaygrid == 2)
-    {
-      step = (double)curve_w / (double)devparms->hordivisions;
-
-      for(i=1; i<devparms->hordivisions; i++)
-      {
-        painter->drawLine(step * i, curve_h - 1, step * i, 0);
-      }
-
-      step = curve_h / 8.0;
-
-      for(i=1; i<8; i++)
-      {
-        painter->drawLine(0, step * i, curve_w - 1, step * i);
-      }
-    }
-    else
-    {
-      painter->drawLine(curve_w / 2, curve_h - 1, curve_w / 2, 0);
-
-      painter->drawLine(0, curve_h / 2, curve_w - 1, curve_h / 2);
-    }
-  }
-
-  painter->setPen(RasterColor);
-
-  step = (double)curve_w / (double)small_rulers;
-
-  for(i=1; i<small_rulers; i++)
-  {
-    step2 = step * i;
+    painter->drawRect (0, 0, curve_w - 1, curve_h - 1);
 
     if(devparms->displaygrid)
     {
-      painter->drawLine(step2, curve_h / 2 + 2, step2, curve_h / 2 - 2);
+      painter->setPen(QPen(QBrush(RasterColor, Qt::SolidPattern), tracewidth, Qt::DotLine, Qt::SquareCap, Qt::BevelJoin));
+
+      if(devparms->displaygrid == 2)
+      {
+        step = (double)curve_w / (double)devparms->hordivisions;
+
+        for(i=1; i<devparms->hordivisions; i++)
+        {
+          painter->drawLine(step * i, curve_h - 1, step * i, 0);
+        }
+
+        step = curve_h / 8.0;
+
+        for(i=1; i<8; i++)
+        {
+          painter->drawLine(0, step * i, curve_w - 1, step * i);
+        }
+      }
+      else
+      {
+        painter->drawLine(curve_w / 2, curve_h - 1, curve_w / 2, 0);
+
+        painter->drawLine(0, curve_h / 2, curve_w - 1, curve_h / 2);
+      }
     }
 
-    if(i % 5)
-    {
-      painter->drawLine(step2, curve_h - 1, step2, curve_h - 5);
+    painter->setPen(RasterColor);
 
-      painter->drawLine(step2, 0, step2, 4);
+    step = (double)curve_w / (double)small_rulers;
+
+    for(i=1; i<small_rulers; i++)
+    {
+      step2 = step * i;
+
+      if(devparms->displaygrid)
+      {
+        painter->drawLine(step2, curve_h / 2 + 2, step2, curve_h / 2 - 2);
+      }
+
+      if(i % 5)
+      {
+        painter->drawLine(step2, curve_h - 1, step2, curve_h - 5);
+
+        painter->drawLine(step2, 0, step2, 4);
+      }
+      else
+      {
+        painter->drawLine(step2, curve_h - 1, step2, curve_h - 9);
+
+        painter->drawLine(step2, 0, step2, 8);
+      }
     }
-    else
+
+    step = curve_h / 40.0;
+
+    for(i=1; i<40; i++)
     {
-      painter->drawLine(step2, curve_h - 1, step2, curve_h - 9);
+      step2 = step * i;
 
-      painter->drawLine(step2, 0, step2, 8);
-    }
-  }
+      if(devparms->displaygrid)
+      {
+        painter->drawLine(curve_w / 2 + 2, step2, curve_w / 2  - 2, step2);
+      }
 
-  step = curve_h / 40.0;
+      if(i % 5)
+      {
+        painter->drawLine(curve_w - 1, step2, curve_w - 5, step2);
 
-  for(i=1; i<40; i++)
-  {
-    step2 = step * i;
+        painter->drawLine(0, step2, 4, step2);
+      }
+      else
+      {
+        painter->drawLine(curve_w - 1, step2, curve_w - 9, step2);
 
-    if(devparms->displaygrid)
-    {
-      painter->drawLine(curve_w / 2 + 2, step2, curve_w / 2  - 2, step2);
-    }
-
-    if(i % 5)
-    {
-      painter->drawLine(curve_w - 1, step2, curve_w - 5, step2);
-
-      painter->drawLine(0, step2, 4, step2);
-    }
-    else
-    {
-      painter->drawLine(curve_w - 1, step2, curve_w - 9, step2);
-
-      painter->drawLine(0, step2, 8, step2);
+        painter->drawLine(0, step2, 8, step2);
+      }
     }
   }
 
@@ -770,9 +724,11 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
     h_step /= 24.0;
 
-    fft_v_sense = v_sense * 35;
+    devparms->fft_voffset = 20;
 
-    fft_v_offset = curve_h * 0.75;
+    fft_v_sense = curve_h / -8.0;
+
+    fft_v_offset = (curve_h / 2.0) - ((curve_h / 80.0) * devparms->fft_voffset);
 
     fft_h_offset = (curve_w / 2) - ((devparms->math_fft_hcenter / devparms->math_fft_hscale) * curve_w / devparms->hordivisions);
 
@@ -808,15 +764,15 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
     convert_to_metric_suffix(str + strlen(str), 10, 2);
 
-    strcat(str, "dBV  ");
-
-    convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hscale, 2);
-
-    strcat(str, "Hz/Div  Center ");
+    strcat(str, "dBV/Div  Center ");
 
     convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hcenter, 1);
 
     strcat(str, "Hz  ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hscale, 2);
+
+    strcat(str, "Hz/Div  ");
 
     if(devparms->timebasedelayenable)
     {
@@ -841,19 +797,6 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
     painter->drawText(15, 30, str);
   }
-
-//   clk_end = clock();
-//
-//   cpu_time_used += ((double) (clk_end - clk_start)) / CLOCKS_PER_SEC;
-//
-//   scr_update_cntr++;
-//
-//   if(!(scr_update_cntr % 50))
-//   {
-//     printf("CPU time used: %f\n", cpu_time_used / 50);
-//
-//     cpu_time_used = 0;
-//   }
 }
 
 

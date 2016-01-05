@@ -555,6 +555,8 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
       devparms.timebasedelayscale = round_down_step125(devparms.timebasedelayscale, NULL);
     }
 
+    devparms.current_screen_sf = 100.0 / devparms.timebasedelayscale;
+
     strcpy(str, "Delayed timebase: ");
 
     convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
@@ -628,6 +630,8 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
     {
       devparms.timebasescale = round_down_step125(devparms.timebasescale, NULL);
     }
+
+    devparms.current_screen_sf = 100.0 / devparms.timebasescale;
 
     strcpy(str, "Timebase: ");
 
@@ -2280,12 +2284,12 @@ void UI_Mainwindow::math_menu()
         }
 
   submenufft.setTitle("FFT");
-  submenufft.addAction("On",   this, SLOT(toggle_fft()));
-  submenufft.addAction("Off",  this, SLOT(toggle_fft()));
-  submenufft.addAction("Full", this, SLOT(toggle_fft_split()));
-  submenufft.addAction("Half", this, SLOT(toggle_fft_split()));
-  submenufft.addAction("Vrms", this, SLOT(toggle_fft_unit()));
-  submenufft.addAction("dBV",  this, SLOT(toggle_fft_unit()));
+  submenufft.addAction("On",     this, SLOT(toggle_fft()));
+  submenufft.addAction("Off",    this, SLOT(toggle_fft()));
+  submenufft.addAction("Full",   this, SLOT(toggle_fft_split()));
+  submenufft.addAction("Half",   this, SLOT(toggle_fft_split()));
+  submenufft.addAction("Vrms",   this, SLOT(toggle_fft_unit()));
+  submenufft.addAction("dB/dBm", this, SLOT(toggle_fft_unit()));
   submenufft.addMenu(&submenufftsrc);
   submenufft.addMenu(&submenufftctr);
   submenufft.addMenu(&submenuffthzdiv);
@@ -3200,7 +3204,7 @@ void UI_Mainwindow::toggle_fft_unit()
 
     devparms.math_fft_unit = 1;
 
-    statusLabel->setText("FFT unit dBV");
+    statusLabel->setText("FFT unit dB");
   }
 }
 

@@ -262,6 +262,15 @@ void UI_Mainwindow::open_connection()
     goto OUT_ERROR;
   }
 
+  if(devparms.timebasedelayenable)
+  {
+    devparms.current_screen_sf = 100.0 / devparms.timebasedelayscale;
+  }
+  else
+  {
+    devparms.current_screen_sf = 100.0 / devparms.timebasescale;
+  }
+
   if(devparms.modelserie == 1)
   {
     trig50pctButton->setEnabled(false);
@@ -2516,6 +2525,8 @@ void UI_Mainwindow::zoom_in()
 
     devparms.timebasedelayscale = round_down_step125(devparms.timebasedelayscale, NULL);
 
+    devparms.current_screen_sf = 100.0 / devparms.timebasedelayscale;
+
     strcpy(str, "Delayed timebase: ");
 
     convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
@@ -2563,6 +2574,8 @@ void UI_Mainwindow::zoom_in()
 
     devparms.timebasescale = round_down_step125(devparms.timebasescale, NULL);
 
+    devparms.current_screen_sf = 100.0 / devparms.timebasescale;
+
     strcpy(str, "Timebase: ");
 
     convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2);
@@ -2607,6 +2620,8 @@ void UI_Mainwindow::zoom_out()
 
     devparms.timebasedelayscale = round_up_step125(devparms.timebasedelayscale, NULL);
 
+    devparms.current_screen_sf = 100.0 / devparms.timebasedelayscale;
+
     strcpy(str, "Delayed timebase: ");
 
     convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
@@ -2629,6 +2644,8 @@ void UI_Mainwindow::zoom_out()
     }
 
     devparms.timebasescale = round_up_step125(devparms.timebasescale, NULL);
+
+    devparms.current_screen_sf = 100.0 / devparms.timebasescale;
 
     strcpy(str, "Timebase: ");
 

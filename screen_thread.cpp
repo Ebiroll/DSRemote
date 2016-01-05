@@ -29,8 +29,8 @@
 #include "screen_thread.h"
 
 
-#define SPECT_LOG_MINIMUM (0.000001)
-#define SPECT_LOG_MINIMUM_LOG (-5)
+#define SPECT_LOG_MINIMUM (0.00000001)
+#define SPECT_LOG_MINIMUM_LOG (-8)
 
 
 void screenThread::set_device(struct tmcdev *tmdev)
@@ -81,6 +81,10 @@ void screenThread::set_params(struct device_settings *dev_parms)
   params.chandisplay[1] = deviceparms->chandisplay[1];
   params.chandisplay[2] = deviceparms->chandisplay[2];
   params.chandisplay[3] = deviceparms->chandisplay[3];
+  params.chanscale[0] = deviceparms->chanscale[0];
+  params.chanscale[1] = deviceparms->chanscale[1];
+  params.chanscale[2] = deviceparms->chanscale[2];
+  params.chanscale[3] = deviceparms->chanscale[3];
   params.countersrc = deviceparms->countersrc;
   params.cmd_cue_idx_in = deviceparms->cmd_cue_idx_in;
   params.math_fft_src = deviceparms->math_fft_src;
@@ -91,6 +95,7 @@ void screenThread::set_params(struct device_settings *dev_parms)
   params.fftbufsz = deviceparms->fftbufsz;
   params.k_cfg = deviceparms->k_cfg;
   params.kiss_fftbuf = deviceparms->kiss_fftbuf;
+  params.current_screen_sf = deviceparms->current_screen_sf;
   params.debug_str[0] = 0;
 }
 
@@ -292,6 +297,8 @@ void screenThread::run()
   int i, j, k, n=0, chns=0, line, cmd_sent=0;
 
   char str[128];
+
+  double y_incr, binsz;
 
   params.error_stat = 0;
 
@@ -597,9 +604,13 @@ void screenThread::run()
 
       if((n == (params.fftbufsz * 2)) && (params.math_fft == 1) && (i == params.math_fft_src))
       {
+        y_incr = params.chanscale[i] / 25.0;
+
+        binsz = (double)params.current_screen_sf / (params.fftbufsz * 2.0);
+
         for(j=0; j<n; j++)
         {
-          params.fftbuf_in[j] = params.wavebuf[i][j];
+          params.fftbuf_in[j] = params.wavebuf[i][j] * y_incr;
         }
 
         kiss_fftr(params.k_cfg, params.fftbuf_in, params.kiss_fftbuf);
@@ -609,7 +620,16 @@ void screenThread::run()
           params.fftbuf_out[k] = (((params.kiss_fftbuf[k].r * params.kiss_fftbuf[k].r) +
                      (params.kiss_fftbuf[k].i * params.kiss_fftbuf[k].i)) / params.fftbufsz);
 
-          if(params.math_fft_unit)  // dBV
+          params.fftbuf_out[k] /= params.current_screen_sf;
+
+          if(k==0)  // DC!
+          {
+            params.fftbuf_out[k] /= 2.0;
+          }
+
+          params.fftbuf_out[k] *= binsz;
+
+          if(params.math_fft_unit)  // dBm
           {
             if(params.fftbuf_out[k] < SPECT_LOG_MINIMUM)
             {
@@ -622,6 +642,10 @@ void screenThread::run()
             {
               params.fftbuf_out[k] = SPECT_LOG_MINIMUM_LOG;
             }
+          }
+          else  // Vrms
+          {
+            params.fftbuf_out[k] = sqrt(params.fftbuf_out[k]);
           }
         }
       }
