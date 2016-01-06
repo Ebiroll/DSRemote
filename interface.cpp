@@ -2183,7 +2183,8 @@ void UI_Mainwindow::math_menu()
         submenufft,
         submenufftctr,
         submenuffthzdiv,
-        submenufftsrc;
+        submenufftsrc,
+        submenufftvscale;
 
   QList<QAction *> actionList;
 
@@ -2253,6 +2254,12 @@ void UI_Mainwindow::math_menu()
   strcat(str, "Hz/Div");
   submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
 
+  submenufftvscale.setTitle("Scale");
+  submenufftvscale.addAction("2dB/Div",  this, SLOT(select_fft_vscale2()));
+  submenufftvscale.addAction("5dB/Div",  this, SLOT(select_fft_vscale5()));
+  submenufftvscale.addAction("10dB/Div",  this, SLOT(select_fft_vscale10()));
+  submenufftvscale.addAction("20dB/Div",  this, SLOT(select_fft_vscale20()));
+
   submenufftsrc.setTitle("Source");
   submenufftsrc.addAction("CH1",  this, SLOT(select_fft_ch1()));
   submenufftsrc.addAction("CH2",  this, SLOT(select_fft_ch2()));
@@ -2293,6 +2300,7 @@ void UI_Mainwindow::math_menu()
   submenufft.addMenu(&submenufftsrc);
   submenufft.addMenu(&submenufftctr);
   submenufft.addMenu(&submenuffthzdiv);
+  submenufft.addMenu(&submenufftvscale);
   actionList = submenufft.actions();
   if(devparms.math_fft == 1)
   {
@@ -3192,19 +3200,27 @@ void UI_Mainwindow::toggle_fft_unit()
 {
   if(devparms.math_fft_unit == 1)
   {
+    devparms.fft_vscale = 0.5;
+
+    devparms.fft_voffset = -2.0;
+
     devparms.math_fft_unit = 0;
 
     set_cue_cmd(":MATH:FFT:UNIT VRMS");
 
-    statusLabel->setText("FFT unit Vrms");
+    statusLabel->setText("FFT unit: Vrms");
   }
   else
   {
+    devparms.fft_vscale = 10.0;
+
+    devparms.fft_voffset = 20.0;
+
     set_cue_cmd(":MATH:FFT:UNIT DB");
 
     devparms.math_fft_unit = 1;
 
-    statusLabel->setText("FFT unit dB");
+    statusLabel->setText("FFT unit: dB");
   }
 }
 
@@ -3213,7 +3229,7 @@ void UI_Mainwindow::select_fft_ch1()
 {
   devparms.math_fft_src = 0;
 
-  statusLabel->setText("FFT CH1");
+  statusLabel->setText("FFT source: CH1");
 }
 
 
@@ -3221,7 +3237,7 @@ void UI_Mainwindow::select_fft_ch2()
 {
   devparms.math_fft_src = 1;
 
-  statusLabel->setText("FFT CH2");
+  statusLabel->setText("FFT source: CH2");
 }
 
 
@@ -3229,7 +3245,7 @@ void UI_Mainwindow::select_fft_ch3()
 {
   devparms.math_fft_src = 2;
 
-  statusLabel->setText("FFT CH3");
+  statusLabel->setText("FFT source: CH3");
 }
 
 
@@ -3237,7 +3253,7 @@ void UI_Mainwindow::select_fft_ch4()
 {
   devparms.math_fft_src = 3;
 
-  statusLabel->setText("FFT CH4");
+  statusLabel->setText("FFT source: CH4");
 }
 
 
@@ -3524,6 +3540,77 @@ void UI_Mainwindow::select_fft_ctr_12()
   statusLabel->setText(str);
 }
 
+
+void UI_Mainwindow::select_fft_vscale2()
+{
+  devparms.fft_vscale = 2.0;
+
+  if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
+  {
+    devparms.fft_voffset = (devparms.fft_vscale * 4.0);
+  }
+
+  if(devparms.fft_voffset < (devparms.fft_vscale * -4.0))
+  {
+    devparms.fft_voffset = (devparms.fft_vscale * -4.0);
+  }
+
+  statusLabel->setText("FFT scale: 2dB/Div");
+}
+
+
+void UI_Mainwindow::select_fft_vscale5()
+{
+  devparms.fft_vscale = 5.0;
+
+  if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
+  {
+    devparms.fft_voffset = (devparms.fft_vscale * 4.0);
+  }
+
+  if(devparms.fft_voffset < (devparms.fft_vscale * -4.0))
+  {
+    devparms.fft_voffset = (devparms.fft_vscale * -4.0);
+  }
+
+  statusLabel->setText("FFT scale: 5dB/Div");
+}
+
+
+void UI_Mainwindow::select_fft_vscale10()
+{
+  devparms.fft_vscale = 10.0;
+
+  if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
+  {
+    devparms.fft_voffset = (devparms.fft_vscale * 4.0);
+  }
+
+  if(devparms.fft_voffset < (devparms.fft_vscale * -4.0))
+  {
+    devparms.fft_voffset = (devparms.fft_vscale * -4.0);
+  }
+
+  statusLabel->setText("FFT scale: 10dB/Div");
+}
+
+
+void UI_Mainwindow::select_fft_vscale20()
+{
+  devparms.fft_vscale = 20.0;
+
+  if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
+  {
+    devparms.fft_voffset = (devparms.fft_vscale * 4.0);
+  }
+
+  if(devparms.fft_voffset < (devparms.fft_vscale * -4.0))
+  {
+    devparms.fft_voffset = (devparms.fft_vscale * -4.0);
+  }
+
+  statusLabel->setText("FFT scale: 20dB/Div");
+}
 
 
 

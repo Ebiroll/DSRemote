@@ -1744,10 +1744,18 @@ int UI_Mainwindow::get_device_settings()
 
   if(!strcmp(device->buf, "VRMS"))
   {
+    devparms.fft_vscale = 0.5;
+
+    devparms.fft_voffset = -2.0;
+
     devparms.math_fft_unit = 0;
   }
   else
   {
+    devparms.fft_vscale = 10.0;
+
+    devparms.fft_voffset = 20.0;
+
     devparms.math_fft_unit = 1;
   }
 
@@ -2760,9 +2768,9 @@ void UI_Mainwindow::shift_trace_up()
   {
     devparms.fft_voffset += devparms.fft_vscale;
 
-    if(devparms.fft_voffset > 40.0)
+    if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
     {
-      devparms.fft_voffset = 40.0;
+      devparms.fft_voffset = (devparms.fft_vscale * 4.0);
     }
 
     waveForm->label_active = LABEL_ACTIVE_FFT;
@@ -2828,9 +2836,9 @@ void UI_Mainwindow::shift_trace_down()
   {
     devparms.fft_voffset -= devparms.fft_vscale;
 
-    if(devparms.fft_voffset < -40.0)
+    if(devparms.fft_voffset < (devparms.fft_vscale * -4.0))
     {
-      devparms.fft_voffset = -40.0;
+      devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
     waveForm->label_active = LABEL_ACTIVE_FFT;

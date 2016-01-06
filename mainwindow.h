@@ -408,6 +408,10 @@ private slots:
   void select_fft_ctr_10();
   void select_fft_ctr_11();
   void select_fft_ctr_12();
+  void select_fft_vscale2();
+  void select_fft_vscale5();
+  void select_fft_vscale10();
+  void select_fft_vscale20();
 
 protected:
   void closeEvent(QCloseEvent *);

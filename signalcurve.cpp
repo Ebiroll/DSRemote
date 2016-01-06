@@ -716,7 +716,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
 
 /////////////////////////////////// FFT: draw the arrow ///////////////////////////////////////////
 
-    fft_arrow_pos = (curve_h / 2.0) - ((curve_h / 80.0) * devparms->fft_voffset);
+    fft_arrow_pos = (curve_h / 2.0) - (((double)curve_h / (8.0 * devparms->fft_vscale)) * devparms->fft_voffset);
 
     drawArrow(painter, 0, fft_arrow_pos, 0, QColor(128, 0, 255), 'M');
   }
@@ -743,7 +743,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
 
     fft_v_sense = curve_h / (-0.8 * devparms->fft_vscale);
 
-    fft_v_offset = (curve_h / 2.0) - ((curve_h / 80.0) * devparms->fft_voffset);
+    fft_v_offset = (curve_h / 2.0) - (((double)curve_h / (8.0 * devparms->fft_vscale)) * devparms->fft_voffset);
 
     fft_h_offset = (curve_w / 2) - ((devparms->math_fft_hcenter / devparms->math_fft_hscale) * curve_w / devparms->hordivisions);
 
