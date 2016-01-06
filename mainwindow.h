@@ -412,6 +412,15 @@ private slots:
   void select_fft_vscale5();
   void select_fft_vscale10();
   void select_fft_vscale20();
+  void select_fft_voffsetp4();
+  void select_fft_voffsetp3();
+  void select_fft_voffsetp2();
+  void select_fft_voffsetp1();
+  void select_fft_voffset0();
+  void select_fft_voffsetm1();
+  void select_fft_voffsetm2();
+  void select_fft_voffsetm3();
+  void select_fft_voffsetm4();
 
 protected:
   void closeEvent(QCloseEvent *);

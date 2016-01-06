@@ -572,7 +572,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     {
       sprintf(str, "%.1fdB", devparms->fft_voffset);
 
-      paintLabel(painter, 20, curve_h * 1.85 - 50.0, 100, 20, str, QColor(128, 0, 255));
+      paintLabel(painter, 20, curve_h * 1.85 - 50.0, 100, 20, str, QColor(128, 64, 255));
     }
   }
 
@@ -718,7 +718,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
 
     fft_arrow_pos = (curve_h / 2.0) - (((double)curve_h / (8.0 * devparms->fft_vscale)) * devparms->fft_voffset);
 
-    drawArrow(painter, 0, fft_arrow_pos, 0, QColor(128, 0, 255), 'M');
+    drawArrow(painter, 0, fft_arrow_pos, 0, QColor(128, 64, 255), 'M');
   }
 
 /////////////////////////////////// FFT: draw the curve ///////////////////////////////////////////
@@ -747,7 +747,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
 
     fft_h_offset = (curve_w / 2) - ((devparms->math_fft_hcenter / devparms->math_fft_hscale) * curve_w / devparms->hordivisions);
 
-    painter->setPen(QPen(QBrush(QColor(128, 0, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+    painter->setPen(QPen(QBrush(QColor(128, 64, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 
     for(i=0; i<devparms->fftbufsz; i++)
     {
@@ -775,19 +775,19 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
       }
     }
 
-    sprintf(str, "FFT: CH%i  ", devparms->math_fft_src + 1);
+    sprintf(str, "FFT:  CH%i  ", devparms->math_fft_src + 1);
 
     convert_to_metric_suffix(str + strlen(str), devparms->fft_vscale, 2);
 
-    strcat(str, "dBV/Div  Center ");
+    strcat(str, "dBV/Div   Center ");
 
     convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hcenter, 1);
 
-    strcat(str, "Hz  ");
+    strcat(str, "Hz   ");
 
     convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hscale, 2);
 
-    strcat(str, "Hz/Div  ");
+    strcat(str, "Hz/Div   ");
 
     if(devparms->timebasedelayenable)
     {
@@ -806,7 +806,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
   }
   else
   {
-    painter->setPen(QPen(QBrush(QColor(128, 0, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+    painter->setPen(QPen(QBrush(QColor(128, 64, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 
     sprintf(str, "FFT: CH%i Data Invalid!", devparms->math_fft_src + 1);
 

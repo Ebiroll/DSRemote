@@ -2244,7 +2244,17 @@ void UI_Mainwindow::former_page()
 {
   char str[256];
 
-  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.activechannel < 0)
   {
     return;
   }
@@ -2311,7 +2321,17 @@ void UI_Mainwindow::next_page()
 {
   char str[256];
 
-  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.activechannel < 0)
   {
     return;
   }
@@ -2378,7 +2398,22 @@ void UI_Mainwindow::shift_page_left()
 {
   char str[256];
 
-  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.math_fft && devparms.math_fft_split)
+  {
+    return;
+  }
+
+  if(devparms.activechannel < 0)
   {
     return;
   }
@@ -2445,7 +2480,22 @@ void UI_Mainwindow::shift_page_right()
 {
   char str[256];
 
-  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.math_fft && devparms.math_fft_split)
+  {
+    return;
+  }
+
+  if(devparms.activechannel < 0)
   {
     return;
   }
@@ -2699,7 +2749,48 @@ void UI_Mainwindow::chan_scale_plus()
 
   char str[512];
 
-  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.math_fft && devparms.math_fft_split)
+  {
+    if(devparms.math_fft_unit == 1)
+    {
+      devparms.fft_vscale = round_up_step125(devparms.fft_vscale, NULL);
+
+      if(devparms.fft_vscale > 20.0)
+      {
+        devparms.fft_vscale = 20.0;
+      }
+
+      sprintf(str, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
+
+      statusLabel->setText(str);
+    }
+
+    if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
+    {
+      devparms.fft_voffset = (devparms.fft_vscale * 4.0);
+    }
+
+    if(devparms.fft_voffset < (devparms.fft_vscale * -4.0))
+    {
+      devparms.fft_voffset = (devparms.fft_vscale * -4.0);
+    }
+
+    waveForm->update();
+
+    return;
+  }
+
+  if(devparms.activechannel < 0)
   {
     return;
   }
@@ -2773,6 +2864,10 @@ void UI_Mainwindow::shift_trace_up()
       devparms.fft_voffset = (devparms.fft_vscale * 4.0);
     }
 
+    sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+    statusLabel->setText(str);
+
     waveForm->label_active = LABEL_ACTIVE_FFT;
 
     label_timer->start(LABEL_TIMER_IVAL);
@@ -2841,6 +2936,10 @@ void UI_Mainwindow::shift_trace_down()
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
+    sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+    statusLabel->setText(str);
+
     waveForm->label_active = LABEL_ACTIVE_FFT;
 
     label_timer->start(LABEL_TIMER_IVAL);
@@ -2892,7 +2991,48 @@ void UI_Mainwindow::chan_scale_minus()
 
   char str[512];
 
-  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.math_fft && devparms.math_fft_split)
+  {
+    if(devparms.math_fft_unit == 1)
+    {
+      devparms.fft_vscale = round_down_step125(devparms.fft_vscale, NULL);
+
+      if(devparms.fft_vscale < 2.0)
+      {
+        devparms.fft_vscale = 2.0;
+      }
+
+      sprintf(str, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
+
+      statusLabel->setText(str);
+    }
+
+    if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
+    {
+      devparms.fft_voffset = (devparms.fft_vscale * 4.0);
+    }
+
+    if(devparms.fft_voffset < (devparms.fft_vscale * -4.0))
+    {
+      devparms.fft_voffset = (devparms.fft_vscale * -4.0);
+    }
+
+    waveForm->update();
+
+    return;
+  }
+
+  if(devparms.activechannel < 0)
   {
     return;
   }

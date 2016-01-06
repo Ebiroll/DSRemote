@@ -2184,7 +2184,8 @@ void UI_Mainwindow::math_menu()
         submenufftctr,
         submenuffthzdiv,
         submenufftsrc,
-        submenufftvscale;
+        submenufftvscale,
+        submenufftoffset;
 
   QList<QAction *> actionList;
 
@@ -2254,6 +2255,26 @@ void UI_Mainwindow::math_menu()
   strcat(str, "Hz/Div");
   submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
 
+  submenufftoffset.setTitle("Offset");
+  sprintf(str, "%+.0fdB", devparms.fft_vscale * 4.0);
+  submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp4()));
+  sprintf(str, "%+.0fdB", devparms.fft_vscale * 3.0);
+  submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp3()));
+  sprintf(str, "%+.0fdB", devparms.fft_vscale * 2.0);
+  submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp2()));
+  sprintf(str, "%+.0fdB", devparms.fft_vscale);
+  submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp1()));
+  strcpy(str, "0dB");
+  submenufftoffset.addAction(str, this, SLOT(select_fft_voffset0()));
+  sprintf(str, "%.0fdB", devparms.fft_vscale * -1.0);
+  submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm1()));
+  sprintf(str, "%.0fdB", devparms.fft_vscale * -2.0);
+  submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm2()));
+  sprintf(str, "%.0fdB", devparms.fft_vscale * -3.0);
+  submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm3()));
+  sprintf(str, "%.0fdB", devparms.fft_vscale * -4.0);
+  submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm4()));
+
   submenufftvscale.setTitle("Scale");
   submenufftvscale.addAction("2dB/Div",  this, SLOT(select_fft_vscale2()));
   submenufftvscale.addAction("5dB/Div",  this, SLOT(select_fft_vscale5()));
@@ -2300,6 +2321,7 @@ void UI_Mainwindow::math_menu()
   submenufft.addMenu(&submenufftsrc);
   submenufft.addMenu(&submenufftctr);
   submenufft.addMenu(&submenuffthzdiv);
+  submenufft.addMenu(&submenufftoffset);
   submenufft.addMenu(&submenufftvscale);
   actionList = submenufft.actions();
   if(devparms.math_fft == 1)
@@ -3611,6 +3633,115 @@ void UI_Mainwindow::select_fft_vscale20()
 
   statusLabel->setText("FFT scale: 20dB/Div");
 }
+
+
+void UI_Mainwindow::select_fft_voffsetp4()
+{
+  char str[512];
+
+  devparms.fft_voffset = devparms.fft_vscale * 4.0;
+
+  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_voffsetp3()
+{
+  char str[512];
+
+  devparms.fft_voffset = devparms.fft_vscale * 3.0;
+
+  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_voffsetp2()
+{
+  char str[512];
+
+  devparms.fft_voffset = devparms.fft_vscale * 2.0;
+
+  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_voffsetp1()
+{
+  char str[512];
+
+  devparms.fft_voffset = devparms.fft_vscale;
+
+  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_voffset0()
+{
+  char str[512];
+
+  devparms.fft_voffset = 0.0;
+
+  sprintf(str, "FFT offset: %.0fdB", devparms.fft_voffset);
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_voffsetm1()
+{
+  char str[512];
+
+  devparms.fft_voffset = devparms.fft_vscale * -1.0;
+
+  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_voffsetm2()
+{
+  char str[512];
+
+  devparms.fft_voffset = devparms.fft_vscale * -2.0;
+
+  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_voffsetm3()
+{
+  char str[512];
+
+  devparms.fft_voffset = devparms.fft_vscale * -3.0;
+
+  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_voffsetm4()
+{
+  char str[512];
+
+  devparms.fft_voffset = devparms.fft_vscale * -4.0;
+
+  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+
+  statusLabel->setText(str);
+}
+
 
 
 
