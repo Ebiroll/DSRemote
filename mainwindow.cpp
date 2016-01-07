@@ -1672,10 +1672,21 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(tmc_write(":MATH:FFT:SPL?") != 14)
+  if(devparms.modelserie == 6)
   {
-    line = __LINE__;
-    goto OUT_ERROR;
+    if(tmc_write(":CALC:FFT:SPL?") != 14)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":MATH:FFT:SPL?") != 14)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
   }
 
   if(tmc_read() < 1)
@@ -1688,31 +1699,9 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(tmc_write(":MATH:DISP?") != 11)
+  if(devparms.modelserie == 6)
   {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.math_fft = atoi(device->buf);
-
-  if(devparms.math_fft == 1)
-  {
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":MATH:OPER?") != 11)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
+    if(tmc_write(":CALC:MODE?") != 11)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -1727,13 +1716,66 @@ int UI_Mainwindow::get_device_settings()
       devparms.math_fft = 0;
     }
   }
+  else
+  {
+    if(tmc_write(":MATH:DISP?") != 11)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    devparms.math_fft = atoi(device->buf);
+
+    if(devparms.math_fft == 1)
+    {
+      usleep(TMC_GDS_DELAY);
+
+      if(tmc_write(":MATH:OPER?") != 11)
+      {
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+
+      if(tmc_read() < 1)
+      {
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+
+      if(!strcmp(device->buf, "FFT"))
+      {
+        devparms.math_fft = 1;
+      }
+      else
+      {
+        devparms.math_fft = 0;
+      }
+    }
+  }
 
   usleep(TMC_GDS_DELAY);
 
-  if(tmc_write(":MATH:FFT:UNIT?") != 15)
+  if(devparms.modelserie == 6)
   {
-    line = __LINE__;
-    goto OUT_ERROR;
+    if(tmc_write(":CALC:FFT:VSM?") != 14)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":MATH:FFT:UNIT?") != 15)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
   }
 
   if(tmc_read() < 1)
@@ -1761,10 +1803,21 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(tmc_write(":MATH:FFT:HSC?") != 14)
+  if(devparms.modelserie == 6)
   {
-    line = __LINE__;
-    goto OUT_ERROR;
+    if(tmc_write(":CALC:FFT:SOUR?") != 15)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":MATH:FFT:SOUR1?") != 16)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
   }
 
   if(tmc_read() < 1)
@@ -1773,14 +1826,89 @@ int UI_Mainwindow::get_device_settings()
     goto OUT_ERROR;
   }
 
-  devparms.math_fft_hscale = atof(device->buf);
+  if(!strcmp(device->buf, "CHAN1"))
+  {
+    devparms.math_fft_src = 0;
+  }
+  else if(!strcmp(device->buf, "CHAN2"))
+    {
+      devparms.math_fft_src = 1;
+    }
+    else if(!strcmp(device->buf, "CHAN3"))
+      {
+        devparms.math_fft_src = 2;
+      }
+      else if(!strcmp(device->buf, "CHAN4"))
+        {
+          devparms.math_fft_src = 3;
+        }
 
   usleep(TMC_GDS_DELAY);
 
-  if(tmc_write(":MATH:FFT:HCEN?") != 15)
+  devparms.current_screen_sf = 100.0 / devparms.timebasedelayscale;
+
+  if(devparms.modelserie == 6)
   {
-    line = __LINE__;
-    goto OUT_ERROR;
+    if(tmc_write(":CALC:FFT:HSC?") != 14)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    switch(atoi(device->buf))
+    {
+//       case  0: devparms.math_fft_hscale = devparms.current_screen_sf / 80.0;
+//                break;
+      case  1: devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
+               break;
+      case  2: devparms.math_fft_hscale = devparms.current_screen_sf / 80.0;
+               break;
+      case  3: devparms.math_fft_hscale = devparms.current_screen_sf / 200.0;
+               break;
+      default: devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
+               break;
+    }
+  }
+  else
+  {
+    if(tmc_write(":MATH:FFT:HSC?") != 14)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    devparms.math_fft_hscale = atof(device->buf);
+  }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms.modelserie == 6)
+  {
+    if(tmc_write(":CALC:FFT:HCEN?") != 15)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":MATH:FFT:HCEN?") != 15)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
   }
 
   if(tmc_read() < 1)

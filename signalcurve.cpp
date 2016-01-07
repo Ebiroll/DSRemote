@@ -739,7 +739,14 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
       h_step *= (100.0 / devparms->timebasescale) / devparms->math_fft_hscale;
     }
 
-    h_step /= 24.0;
+    if(devparms->modelserie == 6)
+    {
+      h_step /= 28.0;
+    }
+    else
+    {
+      h_step /= 24.0;
+    }
 
     fft_v_sense = curve_h / (-0.8 * devparms->fft_vscale);
 

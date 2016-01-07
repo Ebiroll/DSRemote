@@ -402,33 +402,76 @@ void screenThread::run()
     if(params.math_fft)
     {
       if((!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":TIM:SCAL ", 10)) ||
-         (!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":MATH:OPER FFT", 14)))
+         (!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":MATH:OPER FFT", 14)) ||
+         (!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":CALC:MODE FFT", 14)))
       {
         usleep(TMC_GDS_DELAY * 50);
 
-        if(tmc_write(":MATH:FFT:HSC?") != 14)
+        if(params.modelserie == 6)
         {
-          printf("Can not write to device.\n");
-          line = __LINE__;
-          goto OUT_ERROR;
-        }
+          if(tmc_write(":CALC:FFT:HSC?") != 14)
+          {
+            line = __LINE__;
+            goto OUT_ERROR;
+          }
 
-        if(tmc_read() < 1)
+          if(tmc_read() < 1)
+          {
+            line = __LINE__;
+            goto OUT_ERROR;
+          }
+
+          switch(atoi(device->buf))
+          {
+//             case  0: params.math_fft_hscale = params.current_screen_sf / 80.0;
+//                     break;
+            case  1: params.math_fft_hscale = params.current_screen_sf / 40.0;
+                    break;
+            case  2: params.math_fft_hscale = params.current_screen_sf / 80.0;
+                    break;
+            case  3: params.math_fft_hscale = params.current_screen_sf / 200.0;
+                    break;
+            default: params.math_fft_hscale = params.current_screen_sf / 40.0;
+                    break;
+          }
+        }
+        else
         {
-          printf("Can not read from device.\n");
-          line = __LINE__;
-          goto OUT_ERROR;
-        }
+          if(tmc_write(":MATH:FFT:HSC?") != 14)
+          {
+            printf("Can not write to device.\n");
+            line = __LINE__;
+            goto OUT_ERROR;
+          }
 
-        params.math_fft_hscale = atof(device->buf);
+          if(tmc_read() < 1)
+          {
+            printf("Can not read from device.\n");
+            line = __LINE__;
+            goto OUT_ERROR;
+          }
+
+          params.math_fft_hscale = atof(device->buf);
+        }
 
         usleep(TMC_GDS_DELAY);
 
-        if(tmc_write(":MATH:FFT:HCEN?") != 15)
+        if(params.modelserie == 6)
         {
-          printf("Can not write to device.\n");
-          line = __LINE__;
-          goto OUT_ERROR;
+          if(tmc_write(":CALC:FFT:HCEN?") != 15)
+          {
+            line = __LINE__;
+            goto OUT_ERROR;
+          }
+        }
+        else
+        {
+          if(tmc_write(":MATH:FFT:HCEN?") != 15)
+          {
+            printf("Can not write to device.\n");
+            line = __LINE__;
+            goto OUT_ERROR;
+          }
         }
 
         if(tmc_read() < 1)

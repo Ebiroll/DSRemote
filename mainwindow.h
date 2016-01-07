@@ -398,6 +398,7 @@ private slots:
   void select_fft_ch4();
   void select_fft_hzdiv_20();
   void select_fft_hzdiv_40();
+  void select_fft_hzdiv_80();
   void select_fft_hzdiv_100();
   void select_fft_hzdiv_200();
   void select_fft_ctr_5();

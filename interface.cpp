@@ -2242,18 +2242,33 @@ void UI_Mainwindow::math_menu()
   }
 
   submenuffthzdiv.setTitle("Hz/Div");
-  convert_to_metric_suffix(str, val / 20.0 , 2);
-  strcat(str, "Hz/Div");
-  submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_20()));
-  convert_to_metric_suffix(str, val / 40.0 , 2);
-  strcat(str, "Hz/Div");
-  submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_40()));
-  convert_to_metric_suffix(str, val / 100.0 , 2);
-  strcat(str, "Hz/Div");
-  submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_100()));
-  convert_to_metric_suffix(str, val / 200.0 , 2);
-  strcat(str, "Hz/Div");
-  submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
+  if(devparms.modelserie == 6)
+  {
+    convert_to_metric_suffix(str, val / 40.0 , 2);
+    strcat(str, "Hz/Div");
+    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_40()));
+    convert_to_metric_suffix(str, val / 80.0 , 2);
+    strcat(str, "Hz/Div");
+    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_80()));
+    convert_to_metric_suffix(str, val / 200.0 , 2);
+    strcat(str, "Hz/Div");
+    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
+  }
+  else
+  {
+    convert_to_metric_suffix(str, val / 20.0 , 2);
+    strcat(str, "Hz/Div");
+    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_20()));
+    convert_to_metric_suffix(str, val / 40.0 , 2);
+    strcat(str, "Hz/Div");
+    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_40()));
+    convert_to_metric_suffix(str, val / 100.0 , 2);
+    strcat(str, "Hz/Div");
+    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_100()));
+    convert_to_metric_suffix(str, val / 200.0 , 2);
+    strcat(str, "Hz/Div");
+    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
+  }
 
   submenufftoffset.setTitle("Offset");
   sprintf(str, "%+.0fdB", devparms.fft_vscale * 4.0);
@@ -3180,15 +3195,29 @@ void UI_Mainwindow::toggle_fft()
   {
     devparms.math_fft = 0;
 
-    set_cue_cmd(":MATH:DISP OFF");
+    if(devparms.modelserie == 6)
+    {
+      set_cue_cmd(":CALC:MODE OFF");
+    }
+    else
+    {
+      set_cue_cmd(":MATH:DISP OFF");
+    }
 
     statusLabel->setText("Math display off");
   }
   else
   {
-    set_cue_cmd(":MATH:OPER FFT");
+    if(devparms.modelserie == 6)
+    {
+      set_cue_cmd(":CALC:MODE FFT");
+    }
+    else
+    {
+      set_cue_cmd(":MATH:OPER FFT");
 
-    set_cue_cmd(":MATH:DISP ON");
+      set_cue_cmd(":MATH:DISP ON");
+    }
 
     devparms.math_fft = 1;
 
@@ -3205,7 +3234,7 @@ void UI_Mainwindow::toggle_fft_split()
 
     set_cue_cmd(":MATH:FFT:SPL OFF");
 
-    statusLabel->setText("FFT full");
+    statusLabel->setText("FFT fullscreen");
   }
   else
   {
@@ -3213,7 +3242,7 @@ void UI_Mainwindow::toggle_fft_split()
 
     devparms.math_fft_split = 1;
 
-    statusLabel->setText("FFT half");
+    statusLabel->setText("FFT splitscreen");
   }
 }
 
@@ -3228,7 +3257,14 @@ void UI_Mainwindow::toggle_fft_unit()
 
     devparms.math_fft_unit = 0;
 
-    set_cue_cmd(":MATH:FFT:UNIT VRMS");
+    if(devparms.modelserie == 6)
+    {
+      set_cue_cmd(":CALC:FFT:VSM VRMS");
+    }
+    else
+    {
+      set_cue_cmd(":MATH:FFT:UNIT VRMS");
+    }
 
     statusLabel->setText("FFT unit: Vrms");
   }
@@ -3238,7 +3274,14 @@ void UI_Mainwindow::toggle_fft_unit()
 
     devparms.fft_voffset = 20.0;
 
-    set_cue_cmd(":MATH:FFT:UNIT DB");
+    if(devparms.modelserie == 6)
+    {
+      set_cue_cmd(":CALC:FFT:VSM DBVR");
+    }
+    else
+    {
+     set_cue_cmd(":MATH:FFT:UNIT DB");
+    }
 
     devparms.math_fft_unit = 1;
 
@@ -3285,6 +3328,11 @@ void UI_Mainwindow::select_fft_hzdiv_20()
 
   double val;
 
+  if(devparms.modelserie == 6)
+  {
+    return;
+  }
+
   if(devparms.timebasedelayenable)
   {
     val = (100.0 / devparms.timebasedelayscale) / 20.0;
@@ -3295,8 +3343,6 @@ void UI_Mainwindow::select_fft_hzdiv_20()
   }
 
   sprintf(str, ":MATH:FFT:HSC %e", val);
-
-  set_cue_cmd(str);
 
   devparms.math_fft_hscale = val;
 
@@ -3325,9 +3371,50 @@ void UI_Mainwindow::select_fft_hzdiv_40()
     val = (100.0 / devparms.timebasescale) / 40.0;
   }
 
-  sprintf(str, ":MATH:FFT:HSC %e", val);
+  if(devparms.modelserie == 6)
+  {
+    set_cue_cmd(":CALC:FFT:HSC 1");
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HSC %e", val);
 
-  set_cue_cmd(str);
+    set_cue_cmd(str);
+  }
+
+  devparms.math_fft_hscale = val;
+
+  strcpy(str, "FFT: ");
+
+  convert_to_metric_suffix(str + strlen(str), val, 2);
+
+  strcat(str, "Hz/Div");
+
+  statusLabel->setText(str);
+}
+
+
+void UI_Mainwindow::select_fft_hzdiv_80()
+{
+  char str[512];
+
+  double val;
+
+  if(devparms.modelserie != 6)
+  {
+    return;
+  }
+
+  if(devparms.timebasedelayenable)
+  {
+    val = (100.0 / devparms.timebasedelayscale) / 80.0;
+  }
+  else
+  {
+    val = (100.0 / devparms.timebasescale) / 80.0;
+  }
+
+  set_cue_cmd(":CALC:FFT:HSC 2");
 
   devparms.math_fft_hscale = val;
 
@@ -3346,6 +3433,11 @@ void UI_Mainwindow::select_fft_hzdiv_100()
   char str[512];
 
   double val;
+
+  if(devparms.modelserie == 6)
+  {
+    return;
+  }
 
   if(devparms.timebasedelayenable)
   {
@@ -3387,9 +3479,16 @@ void UI_Mainwindow::select_fft_hzdiv_200()
     val = (100.0 / devparms.timebasescale) / 200.0;
   }
 
-  sprintf(str, ":MATH:FFT:HSC %e", val);
+  if(devparms.modelserie == 6)
+  {
+    set_cue_cmd(":CALC:FFT:HSC 3");
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HSC %e", val);
 
-  set_cue_cmd(str);
+    set_cue_cmd(str);
+  }
 
   devparms.math_fft_hscale = val;
 
@@ -3407,7 +3506,14 @@ void UI_Mainwindow::select_fft_ctr_5()
 {
   char str[512];
 
-  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 5.0);
+  if(devparms.modelserie == 6)
+  {
+    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 5.0);
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 5.0);
+  }
 
   set_cue_cmd(str);
 
@@ -3427,7 +3533,14 @@ void UI_Mainwindow::select_fft_ctr_6()
 {
   char str[512];
 
-  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 6.0);
+  if(devparms.modelserie == 6)
+  {
+    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 6.0);
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 6.0);
+  }
 
   set_cue_cmd(str);
 
@@ -3447,7 +3560,14 @@ void UI_Mainwindow::select_fft_ctr_7()
 {
   char str[512];
 
-  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 7.0);
+  if(devparms.modelserie == 6)
+  {
+    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 7.0);
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 7.0);
+  }
 
   set_cue_cmd(str);
 
@@ -3467,7 +3587,14 @@ void UI_Mainwindow::select_fft_ctr_8()
 {
   char str[512];
 
-  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 8.0);
+  if(devparms.modelserie == 6)
+  {
+    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 8.0);
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 8.0);
+  }
 
   set_cue_cmd(str);
 
@@ -3487,7 +3614,14 @@ void UI_Mainwindow::select_fft_ctr_9()
 {
   char str[512];
 
-  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 9.0);
+  if(devparms.modelserie == 6)
+  {
+    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 9.0);
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 9.0);
+  }
 
   set_cue_cmd(str);
 
@@ -3507,7 +3641,14 @@ void UI_Mainwindow::select_fft_ctr_10()
 {
   char str[512];
 
-  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 10.0);
+  if(devparms.modelserie == 6)
+  {
+    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 10.0);
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 10.0);
+  }
 
   set_cue_cmd(str);
 
@@ -3527,7 +3668,14 @@ void UI_Mainwindow::select_fft_ctr_11()
 {
   char str[512];
 
-  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 11.0);
+  if(devparms.modelserie == 6)
+  {
+    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 11.0);
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 11.0);
+  }
 
   set_cue_cmd(str);
 
@@ -3547,7 +3695,14 @@ void UI_Mainwindow::select_fft_ctr_12()
 {
   char str[512];
 
-  sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 12.0);
+  if(devparms.modelserie == 6)
+  {
+    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 12.0);
+  }
+  else
+  {
+    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 12.0);
+  }
 
   set_cue_cmd(str);
 
