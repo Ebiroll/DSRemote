@@ -3344,6 +3344,8 @@ void UI_Mainwindow::select_fft_hzdiv_20()
 
   sprintf(str, ":MATH:FFT:HSC %e", val);
 
+  set_cue_cmd(str);
+
   devparms.math_fft_hscale = val;
 
   strcpy(str, "FFT: ");
