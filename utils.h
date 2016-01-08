@@ -95,6 +95,8 @@ double round_down_step125(double, double *);    /* Rounds the value down to 1-2-
 
 int strtoipaddr(unsigned int *, const char *);  /* convert a string "192.168.1.12" to an integer */
 
+int dblcmp(double, double);  /* returns 0 when equal */
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

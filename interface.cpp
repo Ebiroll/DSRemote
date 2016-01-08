@@ -1834,6 +1834,7 @@ void UI_Mainwindow::helpButtonClicked()
 void UI_Mainwindow::show_howto_operate()
 {
   QMessageBox msgBox;
+  msgBox.setStandardButtons(QMessageBox::Close);
   msgBox.setText(
     "Use the mousewheel to change the dials. In order to simulate a push on a dial,"
     "click on it with the right mouse button.\n"
@@ -3348,7 +3349,7 @@ void UI_Mainwindow::select_fft_hzdiv_20()
 
   devparms.math_fft_hscale = val;
 
-  strcpy(str, "FFT: ");
+  strcpy(str, "FFT scale: ");
 
   convert_to_metric_suffix(str + strlen(str), val, 2);
 
@@ -3386,7 +3387,7 @@ void UI_Mainwindow::select_fft_hzdiv_40()
 
   devparms.math_fft_hscale = val;
 
-  strcpy(str, "FFT: ");
+  strcpy(str, "FFT scale: ");
 
   convert_to_metric_suffix(str + strlen(str), val, 2);
 
@@ -3420,7 +3421,7 @@ void UI_Mainwindow::select_fft_hzdiv_80()
 
   devparms.math_fft_hscale = val;
 
-  strcpy(str, "FFT: ");
+  strcpy(str, "FFT scale: ");
 
   convert_to_metric_suffix(str + strlen(str), val, 2);
 
@@ -3456,7 +3457,7 @@ void UI_Mainwindow::select_fft_hzdiv_100()
 
   devparms.math_fft_hscale = val;
 
-  strcpy(str, "FFT: ");
+  strcpy(str, "FFT scale: ");
 
   convert_to_metric_suffix(str + strlen(str), val, 2);
 
@@ -3494,7 +3495,7 @@ void UI_Mainwindow::select_fft_hzdiv_200()
 
   devparms.math_fft_hscale = val;
 
-  strcpy(str, "FFT: ");
+  strcpy(str, "FFT scale: ");
 
   convert_to_metric_suffix(str + strlen(str), val, 2);
 

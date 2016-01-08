@@ -1904,6 +1904,24 @@ int strtoipaddr(unsigned int *dest, const char *src)
 }
 
 
+int dblcmp(double val1, double val2)
+{
+  double diff = val1 - val2;
+
+  if(diff > 1e-9)
+  {
+    return 1;
+  }
+  else if(-diff > 1e-9)
+    {
+      return -1;
+    }
+    else
+    {
+      return 0;
+    }
+}
+
 
 
 

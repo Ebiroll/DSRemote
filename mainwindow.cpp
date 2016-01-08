@@ -2538,6 +2538,34 @@ void UI_Mainwindow::shift_page_left()
 
   if(devparms.math_fft && devparms.math_fft_split)
   {
+    devparms.math_fft_hcenter -= devparms.math_fft_hscale;
+
+    if(devparms.math_fft_hcenter <= 0.0)
+    {
+      devparms.math_fft_hcenter = 0.0;
+    }
+
+    if(devparms.modelserie == 6)
+    {
+      sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
+    }
+    else
+    {
+      sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hcenter);
+    }
+
+    set_cue_cmd(str);
+
+    strcpy(str, "FFT center: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hcenter, 0);
+
+    strcat(str, "Hz");
+
+    statusLabel->setText(str);
+
+    waveForm->update();
+
     return;
   }
 
@@ -2620,6 +2648,34 @@ void UI_Mainwindow::shift_page_right()
 
   if(devparms.math_fft && devparms.math_fft_split)
   {
+    devparms.math_fft_hcenter += devparms.math_fft_hscale;
+
+    if(devparms.math_fft_hcenter >= (devparms.current_screen_sf * 0.4))
+    {
+      devparms.math_fft_hcenter = devparms.current_screen_sf * 0.4;
+    }
+
+    if(devparms.modelserie == 6)
+    {
+      sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
+    }
+    else
+    {
+      sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hcenter);
+    }
+
+    set_cue_cmd(str);
+
+    strcpy(str, "FFT center: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hcenter, 0);
+
+    strcat(str, "Hz");
+
+    statusLabel->setText(str);
+
+    waveForm->update();
+
     return;
   }
 
@@ -2690,7 +2746,59 @@ void UI_Mainwindow::zoom_in()
 {
   char str[256];
 
-  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.math_fft && devparms.math_fft_split)
+  {
+    if(devparms.modelserie == 6)
+    {
+      return;
+    }
+
+    if(!dblcmp(devparms.math_fft_hscale, devparms.current_screen_sf / 200.0))
+    {
+      return;
+    }
+
+    if(!dblcmp(devparms.math_fft_hscale, devparms.current_screen_sf / 20.0))
+    {
+      devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
+    }
+    else if(!dblcmp(devparms.math_fft_hscale, devparms.current_screen_sf / 40.0))
+      {
+        devparms.math_fft_hscale = devparms.current_screen_sf / 100.0;
+      }
+      else
+      {
+        devparms.math_fft_hscale = devparms.current_screen_sf / 200.0;
+      }
+
+    sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
+
+    set_cue_cmd(str);
+
+    strcpy(str, "FFT scale: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale, 0);
+
+    strcat(str, "Hz/Div");
+
+    statusLabel->setText(str);
+
+    waveForm->update();
+
+    return;
+  }
+
+  if(devparms.activechannel < 0)
   {
     return;
   }
@@ -2802,7 +2910,59 @@ void UI_Mainwindow::zoom_out()
 {
   char str[256];
 
-  if((device == NULL) || (!devparms.connected) || (devparms.activechannel < 0))
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.math_fft && devparms.math_fft_split)
+  {
+    if(devparms.modelserie == 6)
+    {
+      return;
+    }
+
+    if(!dblcmp(devparms.math_fft_hscale, devparms.current_screen_sf / 20.0))
+    {
+      return;
+    }
+
+    if(!dblcmp(devparms.math_fft_hscale, devparms.current_screen_sf / 200.0))
+    {
+      devparms.math_fft_hscale = devparms.current_screen_sf / 100.0;
+    }
+    else if(!dblcmp(devparms.math_fft_hscale, devparms.current_screen_sf / 100.0))
+      {
+        devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
+      }
+      else
+      {
+        devparms.math_fft_hscale = devparms.current_screen_sf / 20.0;
+      }
+
+    sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
+
+    set_cue_cmd(str);
+
+    strcpy(str, "FFT scale: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale, 0);
+
+    strcat(str, "Hz/Div");
+
+    statusLabel->setText(str);
+
+    waveForm->update();
+
+    return;
+  }
+
+  if(devparms.activechannel < 0)
   {
     return;
   }
