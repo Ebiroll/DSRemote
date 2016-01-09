@@ -3293,6 +3293,11 @@ void UI_Mainwindow::toggle_fft_unit()
 
 void UI_Mainwindow::select_fft_ch1()
 {
+  if(devparms.modelserie != 6)
+  {
+    set_cue_cmd(":MATH:SOUR1 CHAN1");
+  }
+
   devparms.math_fft_src = 0;
 
   statusLabel->setText("FFT source: CH1");
@@ -3301,6 +3306,11 @@ void UI_Mainwindow::select_fft_ch1()
 
 void UI_Mainwindow::select_fft_ch2()
 {
+  if(devparms.modelserie != 6)
+  {
+    set_cue_cmd(":MATH:SOUR1 CHAN2");
+  }
+
   devparms.math_fft_src = 1;
 
   statusLabel->setText("FFT source: CH2");
@@ -3309,6 +3319,11 @@ void UI_Mainwindow::select_fft_ch2()
 
 void UI_Mainwindow::select_fft_ch3()
 {
+  if(devparms.modelserie != 6)
+  {
+    set_cue_cmd(":MATH:SOUR1 CHAN3");
+  }
+
   devparms.math_fft_src = 2;
 
   statusLabel->setText("FFT source: CH3");
@@ -3317,6 +3332,11 @@ void UI_Mainwindow::select_fft_ch3()
 
 void UI_Mainwindow::select_fft_ch4()
 {
+  if(devparms.modelserie != 6)
+  {
+    set_cue_cmd(":MATH:SOUR1 CHAN4");
+  }
+
   devparms.math_fft_src = 3;
 
   statusLabel->setText("FFT source: CH4");
@@ -3723,6 +3743,8 @@ void UI_Mainwindow::select_fft_ctr_12()
 
 void UI_Mainwindow::select_fft_vscale2()
 {
+  char str[512];
+
   devparms.fft_vscale = 2.0;
 
   if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
@@ -3735,12 +3757,23 @@ void UI_Mainwindow::select_fft_vscale2()
     devparms.fft_voffset = (devparms.fft_vscale * -4.0);
   }
 
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+
+    set_cue_cmd(str);
+  }
+
   statusLabel->setText("FFT scale: 2dB/Div");
+
+  waveForm->update();
 }
 
 
 void UI_Mainwindow::select_fft_vscale5()
 {
+  char str[512];
+
   devparms.fft_vscale = 5.0;
 
   if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
@@ -3753,12 +3786,23 @@ void UI_Mainwindow::select_fft_vscale5()
     devparms.fft_voffset = (devparms.fft_vscale * -4.0);
   }
 
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+
+    set_cue_cmd(str);
+  }
+
   statusLabel->setText("FFT scale: 5dB/Div");
+
+  waveForm->update();
 }
 
 
 void UI_Mainwindow::select_fft_vscale10()
 {
+  char str[512];
+
   devparms.fft_vscale = 10.0;
 
   if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
@@ -3771,12 +3815,23 @@ void UI_Mainwindow::select_fft_vscale10()
     devparms.fft_voffset = (devparms.fft_vscale * -4.0);
   }
 
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+
+    set_cue_cmd(str);
+  }
+
   statusLabel->setText("FFT scale: 10dB/Div");
+
+  waveForm->update();
 }
 
 
 void UI_Mainwindow::select_fft_vscale20()
 {
+  char str[512];
+
   devparms.fft_vscale = 20.0;
 
   if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
@@ -3789,7 +3844,16 @@ void UI_Mainwindow::select_fft_vscale20()
     devparms.fft_voffset = (devparms.fft_vscale * -4.0);
   }
 
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+
+    set_cue_cmd(str);
+  }
+
   statusLabel->setText("FFT scale: 20dB/Div");
+
+  waveForm->update();
 }
 
 
@@ -3799,9 +3863,22 @@ void UI_Mainwindow::select_fft_voffsetp4()
 
   devparms.fft_voffset = devparms.fft_vscale * 4.0;
 
-  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+  }
+
+  sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
   statusLabel->setText(str);
+
+  waveForm->label_active = LABEL_ACTIVE_FFT;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  waveForm->update();
 }
 
 
@@ -3811,9 +3888,22 @@ void UI_Mainwindow::select_fft_voffsetp3()
 
   devparms.fft_voffset = devparms.fft_vscale * 3.0;
 
-  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+  }
+
+  sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
   statusLabel->setText(str);
+
+  waveForm->label_active = LABEL_ACTIVE_FFT;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  waveForm->update();
 }
 
 
@@ -3823,9 +3913,22 @@ void UI_Mainwindow::select_fft_voffsetp2()
 
   devparms.fft_voffset = devparms.fft_vscale * 2.0;
 
-  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+  }
+
+  sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
   statusLabel->setText(str);
+
+  waveForm->label_active = LABEL_ACTIVE_FFT;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  waveForm->update();
 }
 
 
@@ -3835,9 +3938,22 @@ void UI_Mainwindow::select_fft_voffsetp1()
 
   devparms.fft_voffset = devparms.fft_vscale;
 
-  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+  }
+
+  sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
   statusLabel->setText(str);
+
+  waveForm->label_active = LABEL_ACTIVE_FFT;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  waveForm->update();
 }
 
 
@@ -3847,9 +3963,22 @@ void UI_Mainwindow::select_fft_voffset0()
 
   devparms.fft_voffset = 0.0;
 
-  sprintf(str, "FFT offset: %.0fdB", devparms.fft_voffset);
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+  }
+
+  sprintf(str, "FFT position: %.0fdB", devparms.fft_voffset);
 
   statusLabel->setText(str);
+
+  waveForm->label_active = LABEL_ACTIVE_FFT;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  waveForm->update();
 }
 
 
@@ -3859,9 +3988,22 @@ void UI_Mainwindow::select_fft_voffsetm1()
 
   devparms.fft_voffset = devparms.fft_vscale * -1.0;
 
-  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+  }
+
+  sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
   statusLabel->setText(str);
+
+  waveForm->label_active = LABEL_ACTIVE_FFT;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  waveForm->update();
 }
 
 
@@ -3871,9 +4013,22 @@ void UI_Mainwindow::select_fft_voffsetm2()
 
   devparms.fft_voffset = devparms.fft_vscale * -2.0;
 
-  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+  }
+
+  sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
   statusLabel->setText(str);
+
+  waveForm->label_active = LABEL_ACTIVE_FFT;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  waveForm->update();
 }
 
 
@@ -3883,9 +4038,22 @@ void UI_Mainwindow::select_fft_voffsetm3()
 
   devparms.fft_voffset = devparms.fft_vscale * -3.0;
 
-  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+  }
+
+  sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
   statusLabel->setText(str);
+
+  waveForm->label_active = LABEL_ACTIVE_FFT;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  waveForm->update();
 }
 
 
@@ -3895,9 +4063,22 @@ void UI_Mainwindow::select_fft_voffsetm4()
 
   devparms.fft_voffset = devparms.fft_vscale * -4.0;
 
-  sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+  if(devparms.modelserie != 6)
+  {
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+  }
+
+  sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
   statusLabel->setText(str);
+
+  waveForm->label_active = LABEL_ACTIVE_FFT;
+
+  label_timer->start(LABEL_TIMER_IVAL);
+
+  waveForm->update();
 }
 
 

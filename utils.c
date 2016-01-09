@@ -1906,13 +1906,13 @@ int strtoipaddr(unsigned int *dest, const char *src)
 
 int dblcmp(double val1, double val2)
 {
-  double diff = val1 - val2;
+  long double diff = (long double)val1 - (long double)val2;
 
-  if(diff > 1e-9)
+  if(diff > 1e-13)
   {
     return 1;
   }
-  else if(-diff > 1e-9)
+  else if(-diff > 1e-13)
     {
       return -1;
     }

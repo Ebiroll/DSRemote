@@ -1842,6 +1842,10 @@ int UI_Mainwindow::get_device_settings()
         {
           devparms.math_fft_src = 3;
         }
+        else
+        {
+          devparms.math_fft_src = 0;
+        }
 
   usleep(TMC_GDS_DELAY);
 
@@ -1918,6 +1922,25 @@ int UI_Mainwindow::get_device_settings()
   }
 
   devparms.math_fft_hcenter = atof(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms.modelserie != 6)
+  {
+    if(tmc_write(":MATH:OFFS?") != 11)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    devparms.fft_voffset = atof(device->buf);
+  }
 
   QApplication::restoreOverrideCursor();
 
@@ -2756,6 +2779,11 @@ void UI_Mainwindow::zoom_in()
     return;
   }
 
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
   if(devparms.math_fft && devparms.math_fft_split)
   {
     if(devparms.modelserie == 6)
@@ -2920,6 +2948,11 @@ void UI_Mainwindow::zoom_out()
     return;
   }
 
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
   if(devparms.math_fft && devparms.math_fft_split)
   {
     if(devparms.modelserie == 6)
@@ -2959,11 +2992,6 @@ void UI_Mainwindow::zoom_out()
 
     waveForm->update();
 
-    return;
-  }
-
-  if(devparms.activechannel < 0)
-  {
     return;
   }
 
@@ -3047,6 +3075,11 @@ void UI_Mainwindow::chan_scale_plus()
     return;
   }
 
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
   if(devparms.math_fft && devparms.math_fft_split)
   {
     if(devparms.math_fft_unit == 1)
@@ -3057,10 +3090,6 @@ void UI_Mainwindow::chan_scale_plus()
       {
         devparms.fft_vscale = 20.0;
       }
-
-      sprintf(str, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
-
-      statusLabel->setText(str);
     }
 
     if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
@@ -3073,13 +3102,19 @@ void UI_Mainwindow::chan_scale_plus()
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
+    if(devparms.modelserie != 6)
+    {
+      sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+
+      set_cue_cmd(str);
+    }
+
+    sprintf(str, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
+
+    statusLabel->setText(str);
+
     waveForm->update();
 
-    return;
-  }
-
-  if(devparms.activechannel < 0)
-  {
     return;
   }
 
@@ -3143,6 +3178,11 @@ void UI_Mainwindow::shift_trace_up()
     return;
   }
 
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
   if(devparms.math_fft && devparms.math_fft_split)
   {
     devparms.fft_voffset += devparms.fft_vscale;
@@ -3152,7 +3192,14 @@ void UI_Mainwindow::shift_trace_up()
       devparms.fft_voffset = (devparms.fft_vscale * 4.0);
     }
 
-    sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+    if(devparms.modelserie != 6)
+    {
+      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+      set_cue_cmd(str);
+    }
+
+    sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
     statusLabel->setText(str);
 
@@ -3162,11 +3209,6 @@ void UI_Mainwindow::shift_trace_up()
 
     waveForm->update();
 
-    return;
-  }
-
-  if(devparms.activechannel < 0)
-  {
     return;
   }
 
@@ -3215,6 +3257,11 @@ void UI_Mainwindow::shift_trace_down()
     return;
   }
 
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
   if(devparms.math_fft && devparms.math_fft_split)
   {
     devparms.fft_voffset -= devparms.fft_vscale;
@@ -3224,7 +3271,14 @@ void UI_Mainwindow::shift_trace_down()
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
-    sprintf(str, "FFT offset: %+.0fdB", devparms.fft_voffset);
+    if(devparms.modelserie != 6)
+    {
+      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+      set_cue_cmd(str);
+    }
+
+    sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
 
     statusLabel->setText(str);
 
@@ -3234,11 +3288,6 @@ void UI_Mainwindow::shift_trace_down()
 
     waveForm->update();
 
-    return;
-  }
-
-  if(devparms.activechannel < 0)
-  {
     return;
   }
 
@@ -3289,6 +3338,11 @@ void UI_Mainwindow::chan_scale_minus()
     return;
   }
 
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
   if(devparms.math_fft && devparms.math_fft_split)
   {
     if(devparms.math_fft_unit == 1)
@@ -3299,10 +3353,6 @@ void UI_Mainwindow::chan_scale_minus()
       {
         devparms.fft_vscale = 2.0;
       }
-
-      sprintf(str, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
-
-      statusLabel->setText(str);
     }
 
     if(devparms.fft_voffset > (devparms.fft_vscale * 4.0))
@@ -3315,13 +3365,19 @@ void UI_Mainwindow::chan_scale_minus()
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
+    if(devparms.modelserie != 6)
+    {
+      sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+
+      set_cue_cmd(str);
+    }
+
+    sprintf(str, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
+
+    statusLabel->setText(str);
+
     waveForm->update();
 
-    return;
-  }
-
-  if(devparms.activechannel < 0)
-  {
     return;
   }
 

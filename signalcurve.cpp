@@ -570,7 +570,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
     if(label_active == LABEL_ACTIVE_FFT)
     {
-      sprintf(str, "%.1fdB", devparms->fft_voffset);
+      sprintf(str, "POS: %.1fdB", devparms->fft_voffset);
 
       paintLabel(painter, 20, curve_h * 1.85 - 50.0, 100, 20, str, QColor(128, 64, 255));
     }
@@ -1702,6 +1702,17 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
     {
       mainwindow->scrn_timer->start(devparms->screentimerival);
     }
+
+    if(devparms->modelserie != 6)
+    {
+      sprintf(str, ":MATH:OFFS %e", devparms->fft_voffset);
+
+      mainwindow->set_cue_cmd(str);
+    }
+
+    sprintf(str, "FFT position: %+.0fdB", devparms->fft_voffset);
+
+    mainwindow->statusLabel->setText(str);
 
     update();
 
