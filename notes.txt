@@ -117,10 +117,11 @@ What's implemented so far:
 - Set to factory settings
 
 - FFT
-  When you change the vertical scale setting of the FFT, the scope will not be updated automatically,
-  because there's no TMC command available to do this...?!
-  Also, due to a bug in the firmware of the scope, the parameters "Center" and "Hz/Div" are not updated
-  correctly when you change the horizontal timebase. A workaround is to disable and enable the FFT again.
+  The sample data used to do the FFT, is used from the trace, not the deep memory data.
+  It's not possible to remotely do an FFT with the deep memory data in "real time".
+  Due to a bug in the firmware of the scope, the parameters "Center" and "Hz/Div" are not updated
+  correctly on the scope itself when you change the horizontal timebase.
+  A workaround is to disable and enable the FFT again.
 
 
 

@@ -570,7 +570,18 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
     if(label_active == LABEL_ACTIVE_FFT)
     {
-      sprintf(str, "POS: %.1fdB", devparms->fft_voffset);
+      if(devparms->math_fft_unit == 0)
+      {
+        strcpy(str, "POS: ");
+
+        convert_to_metric_suffix(str + strlen(str), devparms->fft_voffset, 1);
+
+        strcat(str, "V");
+      }
+      else
+      {
+        sprintf(str, "POS: %.1fdB", devparms->fft_voffset);
+      }
 
       paintLabel(painter, 20, curve_h * 1.85 - 50.0, 100, 20, str, QColor(128, 64, 255));
     }
@@ -786,7 +797,14 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
 
     convert_to_metric_suffix(str + strlen(str), devparms->fft_vscale, 2);
 
-    strcat(str, "dBV/Div   Center ");
+    if(devparms->math_fft_unit == 0)
+    {
+      strcat(str, "V/Div   Center ");
+    }
+    else
+    {
+      strcat(str, "dBV/Div   Center ");
+    }
 
     convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hcenter, 1);
 
@@ -1710,7 +1728,18 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
       mainwindow->set_cue_cmd(str);
     }
 
-    sprintf(str, "FFT position: %+.0fdB", devparms->fft_voffset);
+    if(devparms->math_fft_unit == 0)
+    {
+      strcpy(str, "FFT position: ");
+
+      convert_to_metric_suffix(str + strlen(str), devparms->fft_voffset, 1);
+
+      strcat(str, "V/Div");
+    }
+    else
+    {
+      sprintf(str, "FFT position: %+.0fdB", devparms->fft_voffset);
+    }
 
     mainwindow->statusLabel->setText(str);
 
