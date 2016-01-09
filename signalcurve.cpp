@@ -734,7 +734,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
 
 /////////////////////////////////// FFT: draw the curve ///////////////////////////////////////////
 
-  if((devparms->fftbufsz > 32) && devparms->chandisplay[devparms->math_fft_src])
+  if((devparms->fftbufsz > 32) && devparms->chandisplay[devparms->math_fft_src] && (bufsize > 32))
   {
     painter->setClipping(true);
     painter->setClipRegion(QRegion(0, 0, curve_w, curve_h), Qt::ReplaceClip);

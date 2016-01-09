@@ -3365,7 +3365,7 @@ void UI_Mainwindow::select_fft_ch1()
 {
   if(devparms.modelserie != 6)
   {
-    set_cue_cmd(":MATH:SOUR1 CHAN1");
+    set_cue_cmd(":MATH:FFT:SOUR CHAN1");
   }
 
   devparms.math_fft_src = 0;
@@ -3378,7 +3378,7 @@ void UI_Mainwindow::select_fft_ch2()
 {
   if(devparms.modelserie != 6)
   {
-    set_cue_cmd(":MATH:SOUR1 CHAN2");
+    set_cue_cmd(":MATH:FFT:SOUR CHAN2");
   }
 
   devparms.math_fft_src = 1;
@@ -3391,7 +3391,7 @@ void UI_Mainwindow::select_fft_ch3()
 {
   if(devparms.modelserie != 6)
   {
-    set_cue_cmd(":MATH:SOUR1 CHAN3");
+    set_cue_cmd(":MATH:FFT:SOUR CHAN3");
   }
 
   devparms.math_fft_src = 2;
@@ -3404,7 +3404,7 @@ void UI_Mainwindow::select_fft_ch4()
 {
   if(devparms.modelserie != 6)
   {
-    set_cue_cmd(":MATH:SOUR1 CHAN4");
+    set_cue_cmd(":MATH:FFT:SOUR CHAN4");
   }
 
   devparms.math_fft_src = 3;
