@@ -1,4 +1,11 @@
 
+DSRemote 0.32
+-------------
+
+Added support for FFT.
+
+
+
 DSRemote 0.31
 -------------
 
