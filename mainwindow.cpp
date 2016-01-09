@@ -466,6 +466,10 @@ void UI_Mainwindow::close_connection()
 
   scrn_thread->set_device(NULL);
 
+  devparms.math_fft = 0;
+
+  devparms.math_fft_split = 0;
+
   waveForm->clear();
 
   tmc_close();
