@@ -1819,7 +1819,7 @@ int UI_Mainwindow::get_device_settings()
   }
   else
   {
-    if(tmc_write(":MATH:SOUR1?") != 12)
+    if(tmc_write(":MATH:FFT:SOUR?") != 15)
     {
       line = __LINE__;
       goto OUT_ERROR;
