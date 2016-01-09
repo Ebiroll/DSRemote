@@ -3298,9 +3298,9 @@ void UI_Mainwindow::toggle_fft_unit()
 
   if(devparms.math_fft_unit == 1)
   {
-    devparms.fft_vscale = 0.5;
+    devparms.fft_vscale = 1.0;
 
-    devparms.fft_voffset = -2.0;
+    devparms.fft_voffset = 0.0;
 
     devparms.math_fft_unit = 0;
 
@@ -3312,6 +3312,10 @@ void UI_Mainwindow::toggle_fft_unit()
     {
       set_cue_cmd(":MATH:FFT:UNIT VRMS");
     }
+
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
 
     sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
 
@@ -3329,6 +3333,8 @@ void UI_Mainwindow::toggle_fft_unit()
 
     devparms.fft_voffset = 20.0;
 
+    devparms.math_fft_unit = 1;
+
     if(devparms.modelserie == 6)
     {
       set_cue_cmd(":CALC:FFT:VSM DBVR");
@@ -3338,6 +3344,10 @@ void UI_Mainwindow::toggle_fft_unit()
      set_cue_cmd(":MATH:FFT:UNIT DB");
     }
 
+    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+    set_cue_cmd(str);
+
     sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
 
     set_cue_cmd(str);
@@ -3345,8 +3355,6 @@ void UI_Mainwindow::toggle_fft_unit()
     sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
 
     set_cue_cmd(str);
-
-    devparms.math_fft_unit = 1;
 
     statusLabel->setText("FFT unit: dB");
   }

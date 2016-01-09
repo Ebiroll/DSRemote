@@ -352,6 +352,8 @@ void UI_Mainwindow::open_connection()
 
   sprintf(str, PROGRAM_NAME " " PROGRAM_VERSION "   %s   %s   %s",
           devparms.serialnr, devparms.softwvers, dev_str);
+//   sprintf(str, PROGRAM_NAME " " PROGRAM_VERSION "   %s   %s",
+//           devparms.softwvers, dev_str);
 
   setWindowTitle(str);
 
@@ -3235,9 +3237,9 @@ void UI_Mainwindow::chan_scale_minus()
     }
     else
     {
-      if(devparms.fft_vscale < 2.0)
+      if(devparms.fft_vscale < 1.0)
       {
-        devparms.fft_vscale = 2.0;
+        devparms.fft_vscale = 1.0;
       }
     }
 

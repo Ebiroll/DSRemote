@@ -759,9 +759,9 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
       h_step /= 24.0;
     }
 
-    fft_v_sense = curve_h / (-0.8 * devparms->fft_vscale);
+    fft_v_sense = (double)curve_h / (-8.0 * devparms->fft_vscale);
 
-    fft_v_offset = (curve_h / 2.0) - (((double)curve_h / (8.0 * devparms->fft_vscale)) * devparms->fft_voffset);
+    fft_v_offset = (curve_h / 2.0) + (fft_v_sense * devparms->fft_voffset);
 
     fft_h_offset = (curve_w / 2) - ((devparms->math_fft_hcenter / devparms->math_fft_hscale) * curve_w / devparms->hordivisions);
 

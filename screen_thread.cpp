@@ -30,7 +30,7 @@
 
 
 #define SPECT_LOG_MINIMUM (0.00000001)
-#define SPECT_LOG_MINIMUM_LOG (-8)
+#define SPECT_LOG_MINIMUM_LOG (-80)
 
 
 void screenThread::set_device(struct tmcdev *tmdev)
@@ -686,8 +686,8 @@ void screenThread::run()
             {
               params.fftbuf_out[k] = SPECT_LOG_MINIMUM;
             }
-
-            params.fftbuf_out[k] = log10(params.fftbuf_out[k]);
+            // convert to deciBel's, not to Bel's!
+            params.fftbuf_out[k] = log10(params.fftbuf_out[k]) * 10.0;
 
             if(params.fftbuf_out[k] < SPECT_LOG_MINIMUM_LOG)
             {
