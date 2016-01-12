@@ -2243,20 +2243,20 @@ void UI_Mainwindow::math_menu()
   }
 
   submenuffthzdiv.setTitle("Hz/Div");
-  if(devparms.modelserie == 6)
-  {
-    convert_to_metric_suffix(str, val / 40.0 , 2);
-    strcat(str, "Hz/Div");
-    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_40()));
-    convert_to_metric_suffix(str, val / 80.0 , 2);
-    strcat(str, "Hz/Div");
-    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_80()));
-    convert_to_metric_suffix(str, val / 200.0 , 2);
-    strcat(str, "Hz/Div");
-    submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
-  }
-  else
-  {
+//   if(devparms.modelserie == 6)
+//   {
+//     convert_to_metric_suffix(str, val / 40.0 , 2);
+//     strcat(str, "Hz/Div");
+//     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_40()));
+//     convert_to_metric_suffix(str, val / 80.0 , 2);
+//     strcat(str, "Hz/Div");
+//     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_80()));
+//     convert_to_metric_suffix(str, val / 200.0 , 2);
+//     strcat(str, "Hz/Div");
+//     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
+//   }
+//   else
+//   {
     convert_to_metric_suffix(str, val / 20.0 , 2);
     strcat(str, "Hz/Div");
     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_20()));
@@ -2269,7 +2269,7 @@ void UI_Mainwindow::math_menu()
     convert_to_metric_suffix(str, val / 200.0 , 2);
     strcat(str, "Hz/Div");
     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
-  }
+//  }
 
   submenufftoffset.setTitle("Offset");
   if(devparms.math_fft_unit == 0)
@@ -3415,179 +3415,61 @@ void UI_Mainwindow::select_fft_ch4()
 
 void UI_Mainwindow::select_fft_hzdiv_20()
 {
-  char str[512];
-
-  double val;
-
-  if(devparms.modelserie == 6)
-  {
-    return;
-  }
-
-  if(devparms.timebasedelayenable)
-  {
-    val = (100.0 / devparms.timebasedelayscale) / 20.0;
-  }
-  else
-  {
-    val = (100.0 / devparms.timebasescale) / 20.0;
-  }
-
-  sprintf(str, ":MATH:FFT:HSC %e", val);
-
-  set_cue_cmd(str);
-
-  devparms.math_fft_hscale = val;
-
-  strcpy(str, "FFT scale: ");
-
-  convert_to_metric_suffix(str + strlen(str), val, 2);
-
-  strcat(str, "Hz/Div");
-
-  statusLabel->setText(str);
+  set_fft_hzdiv(20.0);
 }
 
 
 void UI_Mainwindow::select_fft_hzdiv_40()
 {
-  char str[512];
-
-  double val;
-
-  if(devparms.timebasedelayenable)
-  {
-    val = (100.0 / devparms.timebasedelayscale) / 40.0;
-  }
-  else
-  {
-    val = (100.0 / devparms.timebasescale) / 40.0;
-  }
-
-  if(devparms.modelserie == 6)
-  {
-    set_cue_cmd(":CALC:FFT:HSC 1");
-  }
-  else
-  {
-    sprintf(str, ":MATH:FFT:HSC %e", val);
-
-    set_cue_cmd(str);
-  }
-
-  devparms.math_fft_hscale = val;
-
-  strcpy(str, "FFT scale: ");
-
-  convert_to_metric_suffix(str + strlen(str), val, 2);
-
-  strcat(str, "Hz/Div");
-
-  statusLabel->setText(str);
+  set_fft_hzdiv(40.0);
 }
 
 
 void UI_Mainwindow::select_fft_hzdiv_80()
 {
-  char str[512];
-
-  double val;
-
-  if(devparms.modelserie != 6)
-  {
-    return;
-  }
-
-  if(devparms.timebasedelayenable)
-  {
-    val = (100.0 / devparms.timebasedelayscale) / 80.0;
-  }
-  else
-  {
-    val = (100.0 / devparms.timebasescale) / 80.0;
-  }
-
-  set_cue_cmd(":CALC:FFT:HSC 2");
-
-  devparms.math_fft_hscale = val;
-
-  strcpy(str, "FFT scale: ");
-
-  convert_to_metric_suffix(str + strlen(str), val, 2);
-
-  strcat(str, "Hz/Div");
-
-  statusLabel->setText(str);
+  set_fft_hzdiv(80.0);
 }
 
 
 void UI_Mainwindow::select_fft_hzdiv_100()
 {
-  char str[512];
-
-  double val;
-
-  if(devparms.modelserie == 6)
-  {
-    return;
-  }
-
-  if(devparms.timebasedelayenable)
-  {
-    val = (100.0 / devparms.timebasedelayscale) / 100.0;
-  }
-  else
-  {
-    val = (100.0 / devparms.timebasescale) / 100.0;
-  }
-
-  sprintf(str, ":MATH:FFT:HSC %e", val);
-
-  set_cue_cmd(str);
-
-  devparms.math_fft_hscale = val;
-
-  strcpy(str, "FFT scale: ");
-
-  convert_to_metric_suffix(str + strlen(str), val, 2);
-
-  strcat(str, "Hz/Div");
-
-  statusLabel->setText(str);
+  set_fft_hzdiv(100.0);
 }
 
 
 void UI_Mainwindow::select_fft_hzdiv_200()
 {
-  char str[512];
+  set_fft_hzdiv(200.0);
+}
 
-  double val;
+
+void UI_Mainwindow::set_fft_hzdiv(double val)
+{
+  char str[512];
 
   if(devparms.timebasedelayenable)
   {
-    val = (100.0 / devparms.timebasedelayscale) / 200.0;
+    devparms.math_fft_hscale = (100.0 / devparms.timebasedelayscale) / val;
   }
   else
   {
-    val = (100.0 / devparms.timebasescale) / 200.0;
+    devparms.math_fft_hscale = (100.0 / devparms.timebasescale) / val;
   }
 
   if(devparms.modelserie == 6)
   {
-    set_cue_cmd(":CALC:FFT:HSC 3");
+    sprintf(str, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HSC %e", val);
-
-    set_cue_cmd(str);
+    sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
   }
 
-  devparms.math_fft_hscale = val;
+  set_cue_cmd(str);
 
   strcpy(str, "FFT scale: ");
 
-  convert_to_metric_suffix(str + strlen(str), val, 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale, 2);
 
   strcat(str, "Hz/Div");
 

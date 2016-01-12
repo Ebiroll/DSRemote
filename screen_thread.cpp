@@ -405,34 +405,14 @@ void screenThread::run()
          (!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":MATH:OPER FFT", 14)) ||
          (!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":CALC:MODE FFT", 14)))
       {
-        usleep(TMC_GDS_DELAY * 50);
+        usleep(TMC_GDS_DELAY * 10);
 
         if(params.modelserie == 6)
         {
-          if(tmc_write(":CALC:FFT:HSC?") != 14)
+          if(tmc_write(":CALC:FFT:HSP?") != 14)
           {
             line = __LINE__;
             goto OUT_ERROR;
-          }
-
-          if(tmc_read() < 1)
-          {
-            line = __LINE__;
-            goto OUT_ERROR;
-          }
-
-          switch(atoi(device->buf))
-          {
-//             case  0: params.math_fft_hscale = params.current_screen_sf / 80.0;
-//                     break;
-            case  1: params.math_fft_hscale = params.current_screen_sf / 40.0;
-                    break;
-            case  2: params.math_fft_hscale = params.current_screen_sf / 80.0;
-                    break;
-            case  3: params.math_fft_hscale = params.current_screen_sf / 200.0;
-                    break;
-            default: params.math_fft_hscale = params.current_screen_sf / 40.0;
-                    break;
           }
         }
         else
@@ -443,16 +423,16 @@ void screenThread::run()
             line = __LINE__;
             goto OUT_ERROR;
           }
-
-          if(tmc_read() < 1)
-          {
-            printf("Can not read from device.\n");
-            line = __LINE__;
-            goto OUT_ERROR;
-          }
-
-          params.math_fft_hscale = atof(device->buf);
         }
+
+        if(tmc_read() < 1)
+        {
+          printf("Can not read from device.\n");
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+
+        params.math_fft_hscale = atof(device->buf);
 
         usleep(TMC_GDS_DELAY);
 

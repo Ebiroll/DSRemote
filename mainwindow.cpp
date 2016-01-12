@@ -1865,7 +1865,7 @@ int UI_Mainwindow::get_device_settings()
 
   if(devparms.modelserie == 6)
   {
-    if(tmc_write(":CALC:FFT:HSC?") != 14)
+    if(tmc_write(":CALC:FFT:HSP?") != 14)
     {
       line = __LINE__;
       goto OUT_ERROR;
@@ -1877,19 +1877,33 @@ int UI_Mainwindow::get_device_settings()
       goto OUT_ERROR;
     }
 
-    switch(atoi(device->buf))
-    {
-//       case  0: devparms.math_fft_hscale = devparms.current_screen_sf / 80.0;
+    devparms.math_fft_hscale = atof(device->buf);
+
+//     if(tmc_write(":CALC:FFT:HSC?") != 14)
+//     {
+//       line = __LINE__;
+//       goto OUT_ERROR;
+//     }
+//
+//     if(tmc_read() < 1)
+//     {
+//       line = __LINE__;
+//       goto OUT_ERROR;
+//     }
+//
+//     switch(atoi(device->buf))
+//     {
+// //       case  0: devparms.math_fft_hscale = devparms.current_screen_sf / 80.0;
+// //                break;
+//       case  1: devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
 //                break;
-      case  1: devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
-               break;
-      case  2: devparms.math_fft_hscale = devparms.current_screen_sf / 80.0;
-               break;
-      case  3: devparms.math_fft_hscale = devparms.current_screen_sf / 200.0;
-               break;
-      default: devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
-               break;
-    }
+//       case  2: devparms.math_fft_hscale = devparms.current_screen_sf / 80.0;
+//                break;
+//       case  3: devparms.math_fft_hscale = devparms.current_screen_sf / 200.0;
+//                break;
+//       default: devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
+//                break;
+//     }
   }
   else
   {
@@ -2856,11 +2870,6 @@ void UI_Mainwindow::zoom_in()
 
   if(devparms.math_fft && devparms.math_fft_split)
   {
-    if(devparms.modelserie == 6)
-    {
-      return;
-    }
-
     if(!dblcmp(devparms.math_fft_hscale, devparms.current_screen_sf / 200.0))
     {
       return;
@@ -2879,7 +2888,14 @@ void UI_Mainwindow::zoom_in()
         devparms.math_fft_hscale = devparms.current_screen_sf / 200.0;
       }
 
-    sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
+    if(devparms.modelserie == 6)
+    {
+      sprintf(str, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
+    }
+    else
+    {
+      sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
+    }
 
     set_cue_cmd(str);
 
@@ -3025,11 +3041,6 @@ void UI_Mainwindow::zoom_out()
 
   if(devparms.math_fft && devparms.math_fft_split)
   {
-    if(devparms.modelserie == 6)
-    {
-      return;
-    }
-
     if(!dblcmp(devparms.math_fft_hscale, devparms.current_screen_sf / 20.0))
     {
       return;
@@ -3048,7 +3059,14 @@ void UI_Mainwindow::zoom_out()
         devparms.math_fft_hscale = devparms.current_screen_sf / 20.0;
       }
 
-    sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
+    if(devparms.modelserie == 6)
+    {
+      sprintf(str, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
+    }
+    else
+    {
+      sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
+    }
 
     set_cue_cmd(str);
 

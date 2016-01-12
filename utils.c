@@ -1761,49 +1761,49 @@ int convert_to_metric_suffix(char *buf, double value, int decimals)
       ltmp = value;
   }
 
-  if(ltmp >= 1e12 && ltmp < 1e15)
+  if(ltmp > 0.999999e12 && ltmp < 0.999999e15)
   {
       ltmp = ltmp / 1e12;
 
       suffix = 'T';
   }
-  else if(ltmp >= 1e9 && ltmp < 1e12)
+  else if(ltmp > 0.999999e9)
     {
         ltmp = ltmp / 1e9;
 
         suffix = 'G';
     }
-    else if(ltmp >= 1e6 && ltmp < 1e9)
+    else if(ltmp > 0.999999e6)
       {
           ltmp = ltmp / 1e6;
 
           suffix = 'M';
       }
-      else if(ltmp >= 1e3 && ltmp < 1e6)
+      else if(ltmp > 0.999999e3)
         {
           ltmp /= 1e3;
 
           suffix = 'K';
         }
-        else if(ltmp >= 1e-3 && ltmp < 1)
+        else if(ltmp > 0.999999e-3 && ltmp < 0.999999)
           {
             ltmp *= 1e3;
 
             suffix = 'm';
           }
-          else if( ltmp >= 1e-6 && ltmp < 1e-3)
+          else if( ltmp > 0.999999e-6 && ltmp < 0.999999e-3)
             {
               ltmp *= 1e6;
 
               suffix = 'u';
             }
-            else if(ltmp >= 1e-9 && ltmp < 1e-6)
+            else if(ltmp > 0.999999e-9 && ltmp < 0.999999e-6)
               {
                 ltmp *= 1e9;
 
                 suffix = 'n';
               }
-              else if(ltmp >= 1e-12 && ltmp < 1e-9)
+              else if(ltmp > 0.999999e-12 && ltmp < 0.999999e-9)
                 {
                   ltmp *= 1e12;
 

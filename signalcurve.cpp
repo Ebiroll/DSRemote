@@ -770,32 +770,27 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
 
     fft_h_offset = (curve_w / 2) - ((devparms->math_fft_hcenter / devparms->math_fft_hscale) * curve_w / devparms->hordivisions);
 
+//     fft_smpls_onscreen = (double)devparms->fftbufsz * ((devparms->math_fft_hscale * devparms->hordivisions) / (double)devparms->current_screen_sf);
+
     painter->setPen(QPen(QBrush(QColor(128, 64, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 
-    for(i=0; i<devparms->fftbufsz; i++)
+    for(i=0; i<(devparms->fftbufsz - 1); i++)
     {
-      if(devparms->fftbufsz < (curve_w / 2))
-      {
-        painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
-        if(i)
-        {
-          painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i - 1] * fft_v_sense) + fft_v_offset, i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
-        }
-      }
-      else
-      {
-        if(i < (devparms->fftbufsz - 1))
-        {
-          if(devparms->displaytype)
-          {
-            painter->drawPoint(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
-          }
-          else
-          {
-            painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i + 1] * fft_v_sense) + fft_v_offset);
-          }
-        }
-      }
+//       if(fft_smpls_onscreen < (curve_w / 2))
+//       {
+//         painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
+//         if(i)
+//         {
+//           painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i - 1] * fft_v_sense) + fft_v_offset, i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset);
+//         }
+//       }
+//       else
+//       {
+//         if(i < (devparms->fftbufsz - 1))
+//         {
+          painter->drawLine(i * h_step + fft_h_offset, (devparms->fftbuf_out[i] * fft_v_sense) + fft_v_offset, (i + 1) * h_step + fft_h_offset, (devparms->fftbuf_out[i + 1] * fft_v_sense) + fft_v_offset);
+//          }
+//       }
     }
 
     sprintf(str, "FFT:  CH%i  ", devparms->math_fft_src + 1);

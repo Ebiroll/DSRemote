@@ -401,6 +401,7 @@ private slots:
   void select_fft_hzdiv_80();
   void select_fft_hzdiv_100();
   void select_fft_hzdiv_200();
+  void set_fft_hzdiv(double);
   void select_fft_ctr_5();
   void select_fft_ctr_6();
   void select_fft_ctr_7();
