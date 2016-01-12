@@ -1713,6 +1713,12 @@ int UI_Mainwindow::get_device_settings()
       goto OUT_ERROR;
     }
 
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
     if(!strcmp(device->buf, "FFT"))
     {
       devparms.math_fft = 1;
@@ -1855,7 +1861,7 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  devparms.current_screen_sf = 100.0 / devparms.timebasedelayscale;
+  devparms.current_screen_sf = 100.0 / devparms.timebasescale;
 
   if(devparms.modelserie == 6)
   {
@@ -1931,7 +1937,23 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(devparms.modelserie != 6)
+  if(devparms.modelserie == 6)
+  {
+    if(tmc_write(":CALC:FFT:VOFF?") != 15)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    devparms.fft_voffset = atof(device->buf);
+  }
+  else
   {
     if(tmc_write(":MATH:OFFS?") != 11)
     {
@@ -1950,7 +1972,30 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(devparms.modelserie != 6)
+  if(devparms.modelserie == 6)
+  {
+    if(tmc_write(":CALC:FFT:VSC?") != 14)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(devparms.math_fft_unit == 1)
+    {
+      devparms.fft_vscale = atof(device->buf);
+    }
+    else
+    {
+      devparms.fft_vscale = atof(device->buf) * devparms.chanscale[devparms.math_fft_src];
+    }
+  }
+  else
   {
     if(tmc_write(":MATH:SCAL?") != 11)
     {
@@ -3134,7 +3179,22 @@ void UI_Mainwindow::chan_scale_plus()
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
-    if(devparms.modelserie != 6)
+    if(devparms.modelserie == 6)
+    {
+      if(devparms.math_fft_unit == 1)
+      {
+        sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale);
+
+        set_cue_cmd(str);
+      }
+      else
+      {
+        sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale / devparms.chanscale[devparms.math_fft_src]);
+
+        set_cue_cmd(str);
+      }
+    }
+    else
     {
       sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
 
@@ -3257,7 +3317,22 @@ void UI_Mainwindow::chan_scale_minus()
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
-    if(devparms.modelserie != 6)
+    if(devparms.modelserie == 6)
+    {
+      if(devparms.math_fft_unit == 1)
+      {
+        sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale);
+
+        set_cue_cmd(str);
+      }
+      else
+      {
+        sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale / devparms.chanscale[devparms.math_fft_src]);
+
+        set_cue_cmd(str);
+      }
+    }
+    else
     {
       sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
 
@@ -3365,7 +3440,13 @@ void UI_Mainwindow::shift_trace_up()
       devparms.fft_voffset = (devparms.fft_vscale * 4.0);
     }
 
-    if(devparms.modelserie != 6)
+    if(devparms.modelserie == 6)
+    {
+      sprintf(str, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
+
+      set_cue_cmd(str);
+    }
+    else
     {
       sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
 
@@ -3455,7 +3536,13 @@ void UI_Mainwindow::shift_trace_down()
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
-    if(devparms.modelserie != 6)
+    if(devparms.modelserie == 6)
+    {
+      sprintf(str, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
+
+      set_cue_cmd(str);
+    }
+    else
     {
       sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
 
