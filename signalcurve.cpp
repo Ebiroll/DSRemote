@@ -218,6 +218,11 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     drawChanLabel(painter, 8 + (i * 125), curve_h - 25, i);
   }
 
+  if(devparms->connected && devparms->fps_on)
+  {
+    drawfpsLabel(painter, curve_w - 80, curve_h - 11);
+  }
+
 /////////////////////////////////// translate coordinates, draw and fill a rectangle ///////////////////////////////////////////
 
   painter->translate(bordersize, bordersize);
@@ -1175,6 +1180,22 @@ void SignalCurve::drawTopLabels(QPainter *painter)
   painter->setPen(Qt::black);
 
   painter->drawText(725, 8, 15, 15, Qt::AlignCenter, str);
+}
+
+
+void SignalCurve::drawfpsLabel(QPainter *painter, int xpos, int ypos)
+{
+  char str[256];
+
+  if(devparms->fps == 0)  return;
+
+  painter->setPen(Qt::red);
+
+  sprintf(str, "%.1f fps", 10.0 / devparms->fps);
+
+  painter->drawText(xpos, ypos, str);
+
+  devparms->fps = 0;
 }
 
 

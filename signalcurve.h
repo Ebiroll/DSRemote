@@ -152,6 +152,7 @@ private:
   void paintLabel(QPainter *, int, int, int, int, const char *, QColor);
   void paintCounterLabel(QPainter *, int, int);
   void drawFFT(QPainter *, int, int);
+  void drawfpsLabel(QPainter *, int, int);
 
   struct device_settings *devparms;
 

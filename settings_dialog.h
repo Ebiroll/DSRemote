@@ -76,9 +76,11 @@ QSpinBox     *refreshSpinbox,
              *ipSpinbox4;
 
 QLabel       *refreshLabel,
-             *invScrShtLabel;
+             *invScrShtLabel,
+             *showfpsLabel;
 
-QCheckBox    *invScrShtCheckbox;
+QCheckBox    *invScrShtCheckbox,
+             *showfpsCheckbox;
 
 UI_Mainwindow *mainwindow;
 
@@ -87,6 +89,7 @@ private slots:
 void applyButtonClicked();
 void refreshSpinboxChanged(int);
 void invScrShtCheckboxChanged(int);
+void showfpsCheckboxChanged(int);
 
 };
 

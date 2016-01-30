@@ -156,6 +156,22 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
     invScrShtCheckbox->setCheckState(Qt::Unchecked);
   }
 
+  showfpsLabel = new QLabel(this);
+  showfpsLabel->setGeometry(40, 220, 120, 35);
+  showfpsLabel->setText("Show frames\n per second");
+
+  showfpsCheckbox = new QCheckBox(this);
+  showfpsCheckbox->setGeometry(180, 220, 120, 35);
+  showfpsCheckbox->setTristate(false);
+  if(mainwindow->devparms.fps_on)
+  {
+    showfpsCheckbox->setCheckState(Qt::Checked);
+  }
+  else
+  {
+    showfpsCheckbox->setCheckState(Qt::Unchecked);
+  }
+
   applyButton = new QPushButton(this);
   applyButton->setGeometry(40, 450, 100, 25);
   applyButton->setText("Apply");
@@ -194,6 +210,7 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   QObject::connect(cancelButton,      SIGNAL(clicked()),         this, SLOT(close()));
   QObject::connect(refreshSpinbox,    SIGNAL(valueChanged(int)), this, SLOT(refreshSpinboxChanged(int)));
   QObject::connect(invScrShtCheckbox, SIGNAL(stateChanged(int)), this, SLOT(invScrShtCheckboxChanged(int)));
+  QObject::connect(showfpsCheckbox,   SIGNAL(stateChanged(int)), this, SLOT(showfpsCheckboxChanged(int)));
 
   exec();
 }
@@ -247,6 +264,19 @@ void UI_settings_window::applyButtonClicked()
     settings.setValue("screenshot/inverted", 0);
   }
 
+  if(showfpsCheckbox->checkState() == Qt::Checked)
+  {
+    mainwindow->devparms.fps_on = 1;
+
+    settings.setValue("gui/fps_on", 1);
+  }
+  else
+  {
+    mainwindow->devparms.fps_on = 0;
+
+    settings.setValue("gui/fps_on", 0);
+  }
+
   close();
 }
 
@@ -280,6 +310,23 @@ void UI_settings_window::invScrShtCheckboxChanged(int state)
   }
 
   settings.setValue("screenshot/inverted", mainwindow->devparms.screenshot_inv);
+}
+
+
+void UI_settings_window::showfpsCheckboxChanged(int state)
+{
+  QSettings settings;
+
+  if(state == Qt::Checked)
+  {
+    mainwindow->devparms.fps_on = 1;
+  }
+  else
+  {
+    mainwindow->devparms.fps_on = 0;
+  }
+
+  settings.setValue("gui/show_fps", mainwindow->devparms.fps_on);
 }
 
 

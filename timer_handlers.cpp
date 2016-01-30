@@ -219,6 +219,11 @@ void UI_Mainwindow::vertScaleDial_timer_handler()
 }
 
 
+void UI_Mainwindow::fps_timer_handler()
+{
+  devparms.fps++;
+}
+
 
 
 
