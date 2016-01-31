@@ -1854,6 +1854,8 @@ void UI_Mainwindow::show_howto_operate()
     "Zoom Out (increase timebase): Ctl-\n"
     "Increase vertical scale: -\n"
     "Decrease vertical scale: +\n"
+    "Press '1' to select or deselect channel 1\n"
+    "Press '2' to select or deselect channel 2, etc.\n"
     );
 
   msgBox.exec();
@@ -1954,6 +1956,11 @@ void UI_Mainwindow::ch1ButtonClicked()
 
 void UI_Mainwindow::ch2ButtonClicked()
 {
+  if(devparms.channel_cnt < 2)
+  {
+    return;
+  }
+
   if(devparms.chandisplay[1])
   {
     if(devparms.activechannel == 1)
@@ -2000,6 +2007,11 @@ void UI_Mainwindow::ch2ButtonClicked()
 
 void UI_Mainwindow::ch3ButtonClicked()
 {
+  if(devparms.channel_cnt < 3)
+  {
+    return;
+  }
+
   if(devparms.chandisplay[2])
   {
     if(devparms.activechannel == 2)
@@ -2046,6 +2058,11 @@ void UI_Mainwindow::ch3ButtonClicked()
 
 void UI_Mainwindow::ch4ButtonClicked()
 {
+  if(devparms.channel_cnt < 4)
+  {
+    return;
+  }
+
   if(devparms.chandisplay[3])
   {
     if(devparms.activechannel == 3)

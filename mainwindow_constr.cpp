@@ -103,19 +103,19 @@ UI_Mainwindow::UI_Mainwindow()
     settings.setValue("screenshot/inverted", devparms.screenshot_inv);
   }
 
-  devparms.fps_on = settings.value("gui/fps_on", 0).toInt();
+  devparms.fps_on = settings.value("gui/show_fps", 0).toInt();
 
   if(devparms.fps_on)
   {
     devparms.fps_on = 1;
 
-    settings.setValue("gui/fps_on", devparms.fps_on);
+    settings.setValue("gui/show_fps", devparms.fps_on);
   }
   else
   {
     devparms.fps_on = 0;
 
-    settings.setValue("gui/fps_on", devparms.fps_on);
+    settings.setValue("gui/show_fps", devparms.fps_on);
   }
 
   devparms.displaygrid = 2;
@@ -445,6 +445,22 @@ UI_Mainwindow::UI_Mainwindow()
   chan_scale_minus_act->setShortcut(Qt::Key_Plus);
   connect(chan_scale_minus_act, SIGNAL(triggered()), this, SLOT(chan_scale_minus()));
   addAction(chan_scale_minus_act);
+
+  select_chan1_act = new QAction(this);
+  select_chan1_act->setShortcut(QKeySequence("1"));
+  addAction(select_chan1_act);
+
+  select_chan2_act = new QAction(this);
+  select_chan2_act->setShortcut(QKeySequence("2"));
+  addAction(select_chan2_act);
+
+  select_chan3_act = new QAction(this);
+  select_chan3_act->setShortcut(QKeySequence("3"));
+  addAction(select_chan3_act);
+
+  select_chan4_act = new QAction(this);
+  select_chan4_act->setShortcut(QKeySequence("4"));
+  addAction(select_chan4_act);
 
   DPRwidget->setEnabled(false);
 

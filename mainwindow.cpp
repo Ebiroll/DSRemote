@@ -343,6 +343,11 @@ void UI_Mainwindow::open_connection()
   connect(helpButton,       SIGNAL(clicked()),      this, SLOT(helpButtonClicked()));
   connect(measureButton,    SIGNAL(clicked()),      this, SLOT(measureButtonClicked()));
 
+  connect(select_chan1_act, SIGNAL(triggered()),    this, SLOT(ch1ButtonClicked()));
+  connect(select_chan2_act, SIGNAL(triggered()),    this, SLOT(ch2ButtonClicked()));
+  connect(select_chan3_act, SIGNAL(triggered()),    this, SLOT(ch3ButtonClicked()));
+  connect(select_chan4_act, SIGNAL(triggered()),    this, SLOT(ch4ButtonClicked()));
+
   connect(horPosDial,     SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(horPosDialClicked(QPoint)));
   connect(vertOffsetDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(vertOffsetDialClicked(QPoint)));
   connect(horScaleDial,   SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(horScaleDialClicked(QPoint)));
@@ -462,6 +467,11 @@ void UI_Mainwindow::close_connection()
   disconnect(utilButton,       SIGNAL(clicked()),     this, SLOT(utilButtonClicked()));
   disconnect(helpButton,       SIGNAL(clicked()),     this, SLOT(helpButtonClicked()));
   disconnect(measureButton,    SIGNAL(clicked()),     this, SLOT(measureButtonClicked()));
+
+  disconnect(select_chan1_act, SIGNAL(triggered()),    this, SLOT(ch1ButtonClicked()));
+  disconnect(select_chan2_act, SIGNAL(triggered()),    this, SLOT(ch2ButtonClicked()));
+  disconnect(select_chan3_act, SIGNAL(triggered()),    this, SLOT(ch3ButtonClicked()));
+  disconnect(select_chan4_act, SIGNAL(triggered()),    this, SLOT(ch4ButtonClicked()));
 
   disconnect(horPosDial,     SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(horPosDialClicked(QPoint)));
   disconnect(vertOffsetDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(vertOffsetDialClicked(QPoint)));

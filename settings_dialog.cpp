@@ -268,13 +268,13 @@ void UI_settings_window::applyButtonClicked()
   {
     mainwindow->devparms.fps_on = 1;
 
-    settings.setValue("gui/fps_on", 1);
+    settings.setValue("gui/show_fps", 1);
   }
   else
   {
     mainwindow->devparms.fps_on = 0;
 
-    settings.setValue("gui/fps_on", 0);
+    settings.setValue("gui/show_fps", 0);
   }
 
   close();
