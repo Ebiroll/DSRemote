@@ -29,6 +29,9 @@
 
 #include "signalcurve.h"
 
+#include "time.h"
+
+
 
 SignalCurve::SignalCurve(QWidget *w_parent) : QWidget(w_parent)
 {
@@ -218,7 +221,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     drawChanLabel(painter, 8 + (i * 125), curve_h - 25, i);
   }
 
-  if(devparms->connected && devparms->fps_on)
+  if(devparms->connected && devparms->show_fps)
   {
     drawfpsLabel(painter, curve_w - 80, curve_h - 11);
   }
@@ -1187,15 +1190,26 @@ void SignalCurve::drawfpsLabel(QPainter *painter, int xpos, int ypos)
 {
   char str[256];
 
-  if(devparms->fps == 0)  return;
+  static struct timespec tp1, tp2;
 
   painter->setPen(Qt::red);
 
-  sprintf(str, "%.1f fps", 10.0 / devparms->fps);
+  clock_gettime(CLOCK_REALTIME, &tp1);
+
+  if(tp1.tv_nsec >= tp2.tv_nsec)
+  {
+    sprintf(str, "%04.1f fps", 1.0 / ((tp1.tv_sec - tp2.tv_sec) + ((tp1.tv_nsec - tp2.tv_nsec) / 1e9)));
+  }
+  else
+  {
+    sprintf(str, "%04.1f fps", 1.0 / ((tp1.tv_sec - tp2.tv_sec - 1) + ((tp1.tv_nsec - tp2.tv_nsec + 1000000000) / 1e9)));
+  }
 
   painter->drawText(xpos, ypos, str);
 
-  devparms->fps = 0;
+  tp2.tv_sec = tp1.tv_sec;
+
+  tp2.tv_nsec = tp1.tv_nsec;
 }
 
 

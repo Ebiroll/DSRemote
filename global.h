@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.32_1601312112"
+#define PROGRAM_VERSION       "0.32_1602011306"
 
 #define MAX_PATHLEN            4096
 
@@ -204,8 +204,7 @@ struct device_settings
 
   int current_screen_sf;
 
-  int fps;
-  int fps_on;
+  int show_fps;
 };
 
 

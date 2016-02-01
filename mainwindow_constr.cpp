@@ -103,19 +103,19 @@ UI_Mainwindow::UI_Mainwindow()
     settings.setValue("screenshot/inverted", devparms.screenshot_inv);
   }
 
-  devparms.fps_on = settings.value("gui/show_fps", 0).toInt();
+  devparms.show_fps = settings.value("gui/show_fps", 0).toInt();
 
-  if(devparms.fps_on)
+  if(devparms.show_fps)
   {
-    devparms.fps_on = 1;
+    devparms.show_fps = 1;
 
-    settings.setValue("gui/show_fps", devparms.fps_on);
+    settings.setValue("gui/show_fps", devparms.show_fps);
   }
   else
   {
-    devparms.fps_on = 0;
+    devparms.show_fps = 0;
 
-    settings.setValue("gui/show_fps", devparms.fps_on);
+    settings.setValue("gui/show_fps", devparms.show_fps);
   }
 
   devparms.displaygrid = 2;
@@ -502,7 +502,6 @@ UI_Mainwindow::UI_Mainwindow()
   horScaleDial_timer->setSingleShot(true);
   vertScaleDial_timer = new QTimer(this);
   vertScaleDial_timer->setSingleShot(true);
-  fps_timer = new QTimer(this);
 
 #if QT_VERSION >= 0x050000
   scrn_timer->setTimerType(Qt::PreciseTimer);
@@ -515,7 +514,6 @@ UI_Mainwindow::UI_Mainwindow()
   vertOffsDial_timer->setTimerType(Qt::PreciseTimer);
   horScaleDial_timer->setTimerType(Qt::PreciseTimer);
   vertScaleDial_timer->setTimerType(Qt::PreciseTimer);
-  fps_timer->setTimerType(Qt::PreciseTimer);
 #endif
 
   connect(scrn_timer,          SIGNAL(timeout()),        this, SLOT(scrn_timer_handler()));
@@ -530,7 +528,6 @@ UI_Mainwindow::UI_Mainwindow()
   connect(vertOffsDial_timer,  SIGNAL(timeout()),        this, SLOT(vertOffsDial_timer_handler()));
   connect(horScaleDial_timer,  SIGNAL(timeout()),        this, SLOT(horScaleDial_timer_handler()));
   connect(vertScaleDial_timer, SIGNAL(timeout()),        this, SLOT(vertScaleDial_timer_handler()));
-  connect(fps_timer,           SIGNAL(timeout()),        this, SLOT(fps_timer_handler()));
 
 ///// TEST /////////////////////////////////////
 //   DPRwidget->setEnabled(true);

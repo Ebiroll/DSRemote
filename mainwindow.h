@@ -137,7 +137,6 @@ private:
                *vertOffsDial_timer,
                *horScaleDial_timer,
                *vertScaleDial_timer,
-               *fps_timer,
                *test_timer;
 
   QStatusBar   *statusBar;
@@ -242,7 +241,6 @@ private slots:
   void vertOffsDial_timer_handler();
   void horScaleDial_timer_handler();
   void vertScaleDial_timer_handler();
-  void fps_timer_handler();
 
   void show_about_dialog();
   void show_howto_operate();

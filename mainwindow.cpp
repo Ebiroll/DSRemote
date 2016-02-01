@@ -378,10 +378,6 @@ void UI_Mainwindow::open_connection()
 
   scrn_timer->start(devparms.screentimerival);
 
-  fps_timer->start(100);
-
-  devparms.fps = 0;
-
   return;
 
 OUT_ERROR:
@@ -408,8 +404,6 @@ void UI_Mainwindow::close_connection()
   scrn_timer->stop();
 
   adjdial_timer->stop();
-
-  fps_timer->stop();
 
   devparms.connected = 0;
 
@@ -498,8 +492,6 @@ void UI_Mainwindow::close_connection()
 
     devparms.k_cfg = NULL;
   }
-
-  devparms.fps = 0;
 
   statusLabel->setText("Disconnected");
 }

@@ -163,7 +163,7 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   showfpsCheckbox = new QCheckBox(this);
   showfpsCheckbox->setGeometry(180, 220, 120, 35);
   showfpsCheckbox->setTristate(false);
-  if(mainwindow->devparms.fps_on)
+  if(mainwindow->devparms.show_fps)
   {
     showfpsCheckbox->setCheckState(Qt::Checked);
   }
@@ -266,13 +266,13 @@ void UI_settings_window::applyButtonClicked()
 
   if(showfpsCheckbox->checkState() == Qt::Checked)
   {
-    mainwindow->devparms.fps_on = 1;
+    mainwindow->devparms.show_fps = 1;
 
     settings.setValue("gui/show_fps", 1);
   }
   else
   {
-    mainwindow->devparms.fps_on = 0;
+    mainwindow->devparms.show_fps = 0;
 
     settings.setValue("gui/show_fps", 0);
   }
@@ -319,14 +319,14 @@ void UI_settings_window::showfpsCheckboxChanged(int state)
 
   if(state == Qt::Checked)
   {
-    mainwindow->devparms.fps_on = 1;
+    mainwindow->devparms.show_fps = 1;
   }
   else
   {
-    mainwindow->devparms.fps_on = 0;
+    mainwindow->devparms.show_fps = 0;
   }
 
-  settings.setValue("gui/show_fps", mainwindow->devparms.fps_on);
+  settings.setValue("gui/show_fps", mainwindow->devparms.show_fps);
 }
 
 
