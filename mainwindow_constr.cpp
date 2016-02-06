@@ -462,6 +462,10 @@ UI_Mainwindow::UI_Mainwindow()
   select_chan4_act->setShortcut(QKeySequence("4"));
   addAction(select_chan4_act);
 
+  toggle_fft_act = new QAction(this);
+  toggle_fft_act->setShortcut(QKeySequence("f"));
+  addAction(toggle_fft_act);
+
   DPRwidget->setEnabled(false);
 
   recent_dir[0] = 0;

@@ -214,7 +214,8 @@ private:
           *select_chan1_act,
           *select_chan2_act,
           *select_chan3_act,
-          *select_chan4_act;
+          *select_chan4_act,
+          *toggle_fft_act;
 
   struct tmcdev *device;
 

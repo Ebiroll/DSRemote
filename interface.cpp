@@ -1856,6 +1856,7 @@ void UI_Mainwindow::show_howto_operate()
     "Decrease vertical scale: +\n"
     "Press '1' to select or deselect channel 1\n"
     "Press '2' to select or deselect channel 2, etc.\n"
+    "Press 'f' to toggle FFT.\n"
     );
 
   msgBox.exec();

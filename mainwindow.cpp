@@ -347,6 +347,7 @@ void UI_Mainwindow::open_connection()
   connect(select_chan2_act, SIGNAL(triggered()),    this, SLOT(ch2ButtonClicked()));
   connect(select_chan3_act, SIGNAL(triggered()),    this, SLOT(ch3ButtonClicked()));
   connect(select_chan4_act, SIGNAL(triggered()),    this, SLOT(ch4ButtonClicked()));
+  connect(toggle_fft_act,   SIGNAL(triggered()),    this, SLOT(toggle_fft()));
 
   connect(horPosDial,     SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(horPosDialClicked(QPoint)));
   connect(vertOffsetDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(vertOffsetDialClicked(QPoint)));
@@ -466,6 +467,7 @@ void UI_Mainwindow::close_connection()
   disconnect(select_chan2_act, SIGNAL(triggered()),    this, SLOT(ch2ButtonClicked()));
   disconnect(select_chan3_act, SIGNAL(triggered()),    this, SLOT(ch3ButtonClicked()));
   disconnect(select_chan4_act, SIGNAL(triggered()),    this, SLOT(ch4ButtonClicked()));
+  disconnect(toggle_fft_act,   SIGNAL(triggered()),    this, SLOT(toggle_fft()));
 
   disconnect(horPosDial,     SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(horPosDialClicked(QPoint)));
   disconnect(vertOffsetDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(vertOffsetDialClicked(QPoint)));

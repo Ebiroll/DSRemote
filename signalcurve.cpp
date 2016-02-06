@@ -1207,9 +1207,7 @@ void SignalCurve::drawfpsLabel(QPainter *painter, int xpos, int ypos)
 
   painter->drawText(xpos, ypos, str);
 
-  tp2.tv_sec = tp1.tv_sec;
-
-  tp2.tv_nsec = tp1.tv_nsec;
+  tp2 = tp1;
 }
 
 
