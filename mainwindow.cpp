@@ -3470,6 +3470,11 @@ void UI_Mainwindow::shift_trace_up()
       devparms.fft_voffset = (devparms.fft_vscale * 4.0);
     }
 
+    if(devparms.math_fft_unit && (devparms.fft_vscale > 9.9))
+    {
+      devparms.fft_voffset = nearbyint(devparms.fft_voffset);
+    }
+
     if(devparms.modelserie == 6)
     {
       sprintf(str, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
@@ -3564,6 +3569,18 @@ void UI_Mainwindow::shift_trace_down()
     if(devparms.fft_voffset < (devparms.fft_vscale * -4.0))
     {
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
+    }
+
+    if(devparms.math_fft_unit)
+    {
+      if(devparms.fft_vscale > 9.0)
+      {
+        devparms.fft_voffset = nearbyint(devparms.fft_voffset);
+      }
+      else
+      {
+        devparms.fft_voffset = nearbyint(devparms.fft_voffset * 10.0) / 10.0;
+      }
     }
 
     if(devparms.modelserie == 6)

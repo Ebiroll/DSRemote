@@ -1745,38 +1745,51 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
   if(devparms->math_fft && devparms->math_fft_split)
   {
-    fft_arrow_moving = 0;
     use_move_events = 0;
     setMouseTracking(false);
 
-    if(devparms->screenupdates_on == 1)
+    if(fft_arrow_moving)
     {
-      mainwindow->scrn_timer->start(devparms->screentimerival);
+      fft_arrow_moving = 0;
+
+      if(devparms->screenupdates_on == 1)
+      {
+        mainwindow->scrn_timer->start(devparms->screentimerival);
+      }
+
+      if(devparms->fft_vscale > 9.0)
+      {
+        devparms->fft_voffset = nearbyint(devparms->fft_voffset);
+      }
+      else
+      {
+        devparms->fft_voffset = nearbyint(devparms->fft_voffset * 10.0) / 10.0;
+      }
+
+      if(devparms->modelserie != 6)
+      {
+        sprintf(str, ":MATH:OFFS %e", devparms->fft_voffset);
+
+        mainwindow->set_cue_cmd(str);
+      }
+
+      if(devparms->math_fft_unit == 0)
+      {
+        strcpy(str, "FFT position: ");
+
+        convert_to_metric_suffix(str + strlen(str), devparms->fft_voffset, 1);
+
+        strcat(str, "V/Div");
+      }
+      else
+      {
+        sprintf(str, "FFT position: %+.0fdB", devparms->fft_voffset);
+      }
+
+      mainwindow->statusLabel->setText(str);
+
+      update();
     }
-
-    if(devparms->modelserie != 6)
-    {
-      sprintf(str, ":MATH:OFFS %e", devparms->fft_voffset);
-
-      mainwindow->set_cue_cmd(str);
-    }
-
-    if(devparms->math_fft_unit == 0)
-    {
-      strcpy(str, "FFT position: ");
-
-      convert_to_metric_suffix(str + strlen(str), devparms->fft_voffset, 1);
-
-      strcat(str, "V/Div");
-    }
-    else
-    {
-      sprintf(str, "FFT position: %+.0fdB", devparms->fft_voffset);
-    }
-
-    mainwindow->statusLabel->setText(str);
-
-    update();
 
     return;
   }
