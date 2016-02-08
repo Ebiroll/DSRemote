@@ -500,10 +500,6 @@ void UI_Mainwindow::save_memory_waveform()
     goto OUT_ERROR;
   }
 
-
-printf("smps_per_record: %i   datrecs: %i    rec_len: %lli\n", smps_per_record, datrecs, rec_len);
-
-
   j = 0;
 
   for(chn=0; chn<MAX_CHNS; chn++)
