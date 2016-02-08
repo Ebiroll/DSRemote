@@ -3792,6 +3792,58 @@ int edf_set_number_of_annotation_signals(int handle, int annot_signals)
 }
 
 
+int edf_set_datarecord_us_duration(int handle, int duration)
+{
+  if(handle<0)
+  {
+    return(-1);
+  }
+
+  if(handle>=EDFLIB_MAXFILES)
+  {
+    return(-1);
+  }
+
+  if(hdrlist[handle]==NULL)
+  {
+    return(-1);
+  }
+
+  if(!(hdrlist[handle]->writemode))
+  {
+    return(-1);
+  }
+
+  if(hdrlist[handle]->datarecords)
+  {
+    return(-1);
+  }
+
+  if((duration < 1) || (duration > 6000000))
+  {
+    return(-1);
+  }
+
+  hdrlist[handle]->long_data_record_duration = (long long)duration * 10LL;
+
+  if(hdrlist[handle]->long_data_record_duration < (EDFLIB_TIME_DIMENSION * 10LL))
+  {
+    hdrlist[handle]->long_data_record_duration /= 10LL;
+
+    hdrlist[handle]->long_data_record_duration *= 10LL;
+  }
+  else
+  {
+    hdrlist[handle]->long_data_record_duration /= 100LL;
+
+    hdrlist[handle]->long_data_record_duration *= 100LL;
+  }
+
+  hdrlist[handle]->data_record_duration = ((double)(hdrlist[handle]->long_data_record_duration)) / EDFLIB_TIME_DIMENSION;
+
+  return(0);
+}
+
 int edf_set_datarecord_duration(int handle, int duration)
 {
   if(handle<0)

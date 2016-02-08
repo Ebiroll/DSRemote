@@ -494,11 +494,15 @@ void UI_Mainwindow::save_memory_waveform()
     goto OUT_ERROR;
   }
 
-  if(edf_set_datarecord_duration(hdl, (rec_len / 100LL) / datrecs))
+  if(edf_set_datarecord_us_duration(hdl, (rec_len / 10LL) / datrecs))
   {
     strcpy(str, "Can not set datarecord duration of EDF file.");
     goto OUT_ERROR;
   }
+
+
+printf("smps_per_record: %i   datrecs: %i    rec_len: %lli\n", smps_per_record, datrecs, rec_len);
+
 
   j = 0;
 
