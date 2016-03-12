@@ -433,6 +433,8 @@ private slots:
   void select_fft_voffsetm4();
   void set_fft_voffset();
 
+  void updateLabels();
+
 protected:
   void closeEvent(QCloseEvent *);
 

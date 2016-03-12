@@ -218,7 +218,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   for(i=0; i<devparms->channel_cnt; i++)
   {
-    drawChanLabel(painter, 8 + (i * 125), curve_h - 25, i);
+    drawChanLabel(painter, 8 + (i * 130), curve_h - 25, i);
   }
 
   if(devparms->connected && devparms->show_fps)
@@ -1230,6 +1230,11 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
 
   strcat(str2, "V");
 
+  if(devparms->chanbwlimit[chn])
+  {
+    strcat(str2, " B");
+  }
+
   if(devparms->chandisplay[chn])
   {
     if(chn == devparms->activechannel)
@@ -1249,20 +1254,15 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
 
       path = QPainterPath();
 
-      path.addRoundedRect(xpos + 25, ypos, 85, 20, 3, 3);
+      path.addRoundedRect(xpos + 25, ypos, 90, 20, 3, 3);
 
       painter->fillPath(path, Qt::black);
 
       painter->setPen(SignalColor[chn]);
 
-      painter->drawRoundedRect(xpos + 25, ypos, 85, 20, 3, 3);
+      painter->drawRoundedRect(xpos + 25, ypos, 90, 20, 3, 3);
 
-      painter->drawText(xpos + 30, ypos + 1, 85, 20, Qt::AlignCenter, str2);
-
-      if(devparms->chanbwlimit[chn])
-      {
-        painter->drawText(xpos + 90, ypos + 1, 20, 20, Qt::AlignCenter, "B");
-      }
+      painter->drawText(xpos + 35, ypos + 1, 90, 20, Qt::AlignCenter, str2);
 
       if(devparms->chancoupling[chn] == 0)
       {
@@ -1308,12 +1308,7 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
         painter->drawLine(xpos + 6, ypos + 3, xpos + 14, ypos + 3);
       }
 
-      painter->drawText(xpos + 30, ypos + 1, 85, 20, Qt::AlignCenter, str2);
-
-      if(devparms->chanbwlimit[chn])
-      {
-        painter->drawText(xpos + 90, ypos + 1, 20, 20, Qt::AlignCenter, "B");
-      }
+      painter->drawText(xpos + 35, ypos + 1, 90, 20, Qt::AlignCenter, str2);
 
       if(devparms->chancoupling[chn] == 0)
       {

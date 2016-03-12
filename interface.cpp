@@ -2452,6 +2452,8 @@ void UI_Mainwindow::chan_coupling_ac()
   sprintf(str, ":CHAN%i:COUP AC", devparms.activechannel + 1);
 
   set_cue_cmd(str);
+
+  updateLabels();
 }
 
 
@@ -2468,6 +2470,8 @@ void UI_Mainwindow::chan_coupling_dc()
   sprintf(str, ":CHAN%i:COUP DC", devparms.activechannel + 1);
 
   set_cue_cmd(str);
+
+  updateLabels();
 }
 
 
@@ -2484,6 +2488,8 @@ void UI_Mainwindow::chan_coupling_gnd()
   sprintf(str, ":CHAN%i:COUP GND", devparms.activechannel + 1);
 
   set_cue_cmd(str);
+
+  updateLabels();
 }
 
 
@@ -2500,6 +2506,8 @@ void UI_Mainwindow::chan_bwl_off()
   sprintf(str, ":CHAN%i:BWL OFF", devparms.activechannel + 1);
 
   set_cue_cmd(str);
+
+  updateLabels();
 }
 
 
@@ -2516,6 +2524,8 @@ void UI_Mainwindow::chan_bwl_20()
   sprintf(str, ":CHAN%i:BWL 20M", devparms.activechannel + 1);
 
   set_cue_cmd(str);
+
+  updateLabels();
 }
 
 
@@ -2532,6 +2542,48 @@ void UI_Mainwindow::chan_bwl_250()
   sprintf(str, ":CHAN%i:BWL 250M", devparms.activechannel + 1);
 
   set_cue_cmd(str);
+
+  updateLabels();
+}
+
+
+void UI_Mainwindow::updateLabels()
+{
+  int chn;
+
+  char str[128];
+
+  for(chn=0; chn<devparms.channel_cnt; chn++)
+  {
+    str[0] = 0;
+
+    if(devparms.chancoupling[chn] == 2)
+    {
+      strcat(str, "AC");
+    }
+
+    if(devparms.chanimpedance[chn])
+    {
+      strcat(str, " 50");
+    }
+
+    if(devparms.chanbwlimit[chn])
+    {
+      strcat(str, " BW");
+    }
+
+    switch(chn)
+    {
+      case 0: ch1InputLabel->setText(str);
+              break;
+      case 1: ch2InputLabel->setText(str);
+              break;
+      case 2: ch3InputLabel->setText(str);
+              break;
+      case 3: ch4InputLabel->setText(str);
+              break;
+    }
+  }
 }
 
 
