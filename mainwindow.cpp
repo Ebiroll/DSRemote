@@ -152,7 +152,8 @@ void UI_Mainwindow::open_connection()
     }
   }
 
-  if(tmc_write("*IDN?") != 5)
+//  if(tmc_write("*IDN?") != 5)
+  if(tmc_write("*IDN?;:SYST:ERR?") != 16)  // This is a fix for the broken *IDN? command
   {
     sprintf(str, "Can not write to device %s", dev_str);
     goto OUT_ERROR;
@@ -227,6 +228,18 @@ void UI_Mainwindow::open_connection()
   }
 
   strcpy(devparms.softwvers, ptr);
+
+  for(i=0; ; i++)
+  {
+    if(devparms.softwvers[i] == 0)  break;
+
+    if(devparms.softwvers[i] == ';')
+    {
+      devparms.softwvers[i] = 0;
+
+      break;
+    }
+  }
 
   if((devparms.modelserie != 6) &&
      (devparms.modelserie != 1))
