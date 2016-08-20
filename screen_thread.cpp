@@ -407,7 +407,7 @@ void screenThread::run()
       {
         usleep(TMC_GDS_DELAY * 10);
 
-        if(params.modelserie == 6)
+        if(params.modelserie != 1)
         {
           if(tmc_write(":CALC:FFT:HSP?") != 14)
           {
@@ -436,7 +436,7 @@ void screenThread::run()
 
         usleep(TMC_GDS_DELAY);
 
-        if(params.modelserie == 6)
+        if(params.modelserie != 1)
         {
           if(tmc_write(":CALC:FFT:HCEN?") != 15)
           {

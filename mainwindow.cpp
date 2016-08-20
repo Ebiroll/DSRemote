@@ -1671,7 +1671,7 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie != 1)
   {
     if(tmc_write(":CALC:FFT:SPL?") != 14)
     {
@@ -1698,7 +1698,7 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie != 1)
   {
     if(tmc_write(":CALC:MODE?") != 11)
     {
@@ -1766,7 +1766,7 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie != 1)
   {
     if(tmc_write(":CALC:FFT:VSM?") != 14)
     {
@@ -1808,7 +1808,7 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie != 1)
   {
     if(tmc_write(":CALC:FFT:SOUR?") != 15)
     {
@@ -1856,7 +1856,7 @@ int UI_Mainwindow::get_device_settings()
 
   devparms.current_screen_sf = 100.0 / devparms.timebasescale;
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie != 1)
   {
     if(tmc_write(":CALC:FFT:HSP?") != 14)
     {
@@ -1917,7 +1917,7 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie != 1)
   {
     if(tmc_write(":CALC:FFT:HCEN?") != 15)
     {
@@ -1944,7 +1944,7 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie != 1)
   {
     if(tmc_write(":CALC:FFT:VOFF?") != 15)
     {
@@ -1979,7 +1979,7 @@ int UI_Mainwindow::get_device_settings()
 
   usleep(TMC_GDS_DELAY);
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie != 1)
   {
     if(tmc_write(":CALC:FFT:VSC?") != 14)
     {
@@ -2647,7 +2647,7 @@ void UI_Mainwindow::shift_page_left()
       devparms.math_fft_hcenter = 0.0;
     }
 
-    if(devparms.modelserie == 6)
+    if(devparms.modelserie != 1)
     {
       sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
     }
@@ -2757,7 +2757,7 @@ void UI_Mainwindow::shift_page_right()
       devparms.math_fft_hcenter = devparms.current_screen_sf * 0.4;
     }
 
-    if(devparms.modelserie == 6)
+    if(devparms.modelserie != 1)
     {
       sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
     }
@@ -2883,7 +2883,7 @@ void UI_Mainwindow::zoom_in()
         devparms.math_fft_hscale = devparms.current_screen_sf / 200.0;
       }
 
-    if(devparms.modelserie == 6)
+    if(devparms.modelserie != 1)
     {
       sprintf(str, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
     }
@@ -3054,7 +3054,7 @@ void UI_Mainwindow::zoom_out()
         devparms.math_fft_hscale = devparms.current_screen_sf / 20.0;
       }
 
-    if(devparms.modelserie == 6)
+    if(devparms.modelserie != 1)
     {
       sprintf(str, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
     }
@@ -3192,7 +3192,7 @@ void UI_Mainwindow::chan_scale_plus()
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
-    if(devparms.modelserie == 6)
+    if(devparms.modelserie != 1)
     {
       if(devparms.math_fft_unit == 1)
       {
@@ -3330,7 +3330,7 @@ void UI_Mainwindow::chan_scale_minus()
       devparms.fft_voffset = (devparms.fft_vscale * -4.0);
     }
 
-    if(devparms.modelserie == 6)
+    if(devparms.modelserie != 1)
     {
       if(devparms.math_fft_unit == 1)
       {
@@ -3458,7 +3458,7 @@ void UI_Mainwindow::shift_trace_up()
       devparms.fft_voffset = nearbyint(devparms.fft_voffset);
     }
 
-    if(devparms.modelserie == 6)
+    if(devparms.modelserie != 1)
     {
       sprintf(str, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
 
@@ -3566,7 +3566,7 @@ void UI_Mainwindow::shift_trace_down()
       }
     }
 
-    if(devparms.modelserie == 6)
+    if(devparms.modelserie != 1)
     {
       sprintf(str, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
 
