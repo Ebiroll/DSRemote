@@ -1347,8 +1347,8 @@ int UI_Mainwindow::get_device_settings()
           else if(!strcmp(device->buf, "EXT5"))
             {
               devparms.triggeredgesource = 5;
-            }
-            else if(!strcmp(device->buf, "ACL"))
+            }  // DS1000Z: "AC", DS6000: "ACL" !!
+            else if((!strcmp(device->buf, "AC")) || (!strcmp(device->buf, "ACL")))
               {
                 devparms.triggeredgesource = 6;
               }
