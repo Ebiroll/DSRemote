@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.32_1609121952"
+#define PROGRAM_VERSION       "0.32_1609122201"
 
 #define MAX_PATHLEN            4096
 
@@ -129,12 +129,12 @@ struct device_settings
 
   double timebaseoffset;        // Main timebase offset in Sec
                                 // MemDepth/SamplingRate to 1s (when TimeScale < 20ms)
-                                // MemDepth/SamplingRate to 10×TimeScale (when TimeScale >=20ms)
+                                // MemDepth/SamplingRate to 10xTimeScale (when TimeScale >=20ms)
   double timebasescale;         // Main timebase scale in Sec/div, 500pSec to 50Sec
 
   int timebasedelayenable;      // 1=on, 0=off
   double timebasedelayoffset;   //
-  double timebasedelayscale;    //  (1 × 50 / sample rate) × 1 / 40  in seconds
+  double timebasedelayscale;    //  (1 x 50 / sample rate) x 1 / 40  in seconds
   int timebasehrefmode;         // 0=center, 1=tpos, 2=user
   int timebasehrefpos;
   int timebasemode;             // 0=MAIN, 1=XY, 2=ROLL
