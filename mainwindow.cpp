@@ -152,8 +152,8 @@ void UI_Mainwindow::open_connection()
     }
   }
 
-//  if(tmc_write("*IDN?") != 5)
-  if(tmc_write("*IDN?;:SYST:ERR?") != 16)  // This is a fix for the broken *IDN? command
+  if(tmc_write("*IDN?") != 5)
+//  if(tmc_write("*IDN?;:SYST:ERR?") != 16)  // This is a fix for the broken *IDN? command in older fw version
   {
     sprintf(str, "Can not write to device %s", dev_str);
     goto OUT_ERROR;
