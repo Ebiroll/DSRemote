@@ -37,11 +37,11 @@ Reading a screenshot in BMP format is slow, approx. 3 seconds.
 You need to add an udev rule. See readme_usbtmc_driver.txt for how to do that.
 
 
-DS1054Z: (softversion 00.04.03.SP1, boardversion 0.1.1)
+DS1054Z: (softversion 00.04.04.SP1, boardversion 0.1.1)
 =======
 
 USB connection: high speed (480 Mbit)
-Reading screen data is slow, maximum 7 waveforms per second with one channel.
+Reading screen data is slow, maximum 4 waveforms per second with one channel.
 With all four channels active, downloading the screen waveform data is really slow.
 Reading a screenshot in BMP format is faster, less than one second.
 It's plug and play, no need to add an udev rule.

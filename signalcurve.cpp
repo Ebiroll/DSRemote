@@ -80,6 +80,10 @@ SignalCurve::SignalCurve(QWidget *w_parent) : QWidget(w_parent)
     chan_arrow_moving[i] = 0;
 
     chan_arrow_pos[i] = 127;
+
+    chan_tmp_y_pixel_offset[i] = 0;
+
+    chan_tmp_old_y_pixel_offset[i] = 0;
   }
 
   trig_level_arrow_moving = 0;
@@ -410,10 +414,16 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
       {
         if(bufsize < (curve_w / 2))
         {
-          painter->drawLine(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2), (i + 1) * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
+          painter->drawLine(i * h_step,
+                            (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn],
+                            (i + 1) * h_step,
+                            (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn]);
           if(i)
           {
-            painter->drawLine(i * h_step, (devparms->wavebuf[chn][i - 1] * v_sense) + (curve_h / 2), i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
+            painter->drawLine(i * h_step,
+                              (devparms->wavebuf[chn][i - 1] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn],
+                              i * h_step,
+                              (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn]);
           }
         }
         else
@@ -422,11 +432,15 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
           {
             if(devparms->displaytype)
             {
-              painter->drawPoint(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2));
+              painter->drawPoint(i * h_step,
+                                 (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn]);
             }
             else
             {
-              painter->drawLine(i * h_step, (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2), (i + 1) * h_step, (devparms->wavebuf[chn][i + 1] * v_sense) + (curve_h / 2));
+              painter->drawLine(i * h_step,
+                                (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn],
+                                (i + 1) * h_step,
+                                (devparms->wavebuf[chn][i + 1] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn]);
             }
           }
         }
@@ -1700,6 +1714,7 @@ void SignalCurve::mousePressEvent(QMouseEvent *press_event)
             setMouseTracking(true);
             mouse_old_x = m_x;
             mouse_old_y = m_y;
+            chan_tmp_old_y_pixel_offset[chn] = m_y;
 
             break;
           }
@@ -1951,6 +1966,10 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
           devparms->activechannel = chn;
 
+          chan_tmp_y_pixel_offset[chn] = 0;
+
+          chan_tmp_old_y_pixel_offset[chn] = 0;
+
           break;
         }
       }
@@ -2093,6 +2112,10 @@ void SignalCurve::mouseMoveEvent(QMouseEvent *move_event)
           }
 
           devparms->chanoffset[chn] = ((h / 2) - chan_arrow_pos[chn]) * ((devparms->chanscale[chn] * 8) / h);
+
+//          chan_tmp_y_pixel_offset[chn] = (h / 2) - chan_arrow_pos[chn];
+
+          chan_tmp_y_pixel_offset[chn] = chan_tmp_old_y_pixel_offset[chn] - chan_arrow_pos[chn];
 
           dtmp = devparms->chanoffset[chn] / (devparms->chanscale[chn] / 50);
 

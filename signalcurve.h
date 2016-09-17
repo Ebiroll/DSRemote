@@ -128,6 +128,8 @@ private:
       trig_pos_arrow_moving,
       use_move_events,
       chan_arrow_pos[MAX_CHNS],
+      chan_tmp_y_pixel_offset[MAX_CHNS],
+      chan_tmp_old_y_pixel_offset[MAX_CHNS],
       trig_level_arrow_pos,
       trig_pos_arrow_pos,
       trig_stat_flash,
