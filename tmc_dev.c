@@ -133,8 +133,8 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
 
   strcat(buf, "\n");
 
-  if(!(!strncmp(buf, ":TRIG:STAT?", 11) ||
-       !strncmp(buf, ":TRIG:SWE?", 10) ||
+  if(!(!strncmp(buf, ":TRIG:STAT?", 11) ||  /* don't print these commands to the console */
+       !strncmp(buf, ":TRIG:SWE?", 10) ||   /* because they are used repeatedly */
        !strncmp(buf, ":WAV:DATA?", 10) ||
        !strncmp(buf, ":WAV:MODE NORM", 14) ||
        !strncmp(buf, ":WAV:FORM BYTE", 14) ||

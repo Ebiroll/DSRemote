@@ -41,6 +41,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stropts.h>
+#include <netinet/tcp.h>
 
 #include "tmc_dev.h"
 #include "utils.h"
@@ -113,8 +114,15 @@ struct tmcdev * tmclan_open(const char *ip_address)
     return NULL;
   }
 
-  FD_ZERO(&tcp_fds);                      /* clear file descriptor pool       */
-  FD_SET(sockfd, &tcp_fds);               /* add our filedescriptor to pool   */
+  int tcp_nodelay = 1;  /* turn NODELAY on */
+
+  if(setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (void *)&tcp_nodelay, sizeof tcp_nodelay) == -1)
+  {
+    return NULL;
+  }
+
+  FD_ZERO(&tcp_fds);         /* clear file descriptor pool     */
+  FD_SET(sockfd, &tcp_fds);  /* add our filedescriptor to pool */
 
   timeout.tv_sec = 0;
   timeout.tv_usec = TMC_LAN_TIMEOUT;
@@ -214,8 +222,8 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
 
   strcat(buf, "\n");
 
-  if(!(!strncmp(buf, ":TRIG:STAT?", 11) ||
-      !strncmp(buf, ":TRIG:SWE?", 10) ||
+  if(!(!strncmp(buf, ":TRIG:STAT?", 11) ||  /* don't print these commands to the console */
+      !strncmp(buf, ":TRIG:SWE?", 10) ||    /* because they are used repeatedly */
       !strncmp(buf, ":WAV:DATA?", 10) ||
       !strncmp(buf, ":WAV:MODE NORM", 14) ||
       !strncmp(buf, ":WAV:FORM BYTE", 14) ||
