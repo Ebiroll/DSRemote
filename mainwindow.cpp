@@ -968,9 +968,9 @@ int UI_Mainwindow::get_device_settings()
       line = __LINE__;
       goto OUT_ERROR;
     }
-  }
 
-  devparms.timebasehrefpos = atoi(device->buf);
+    devparms.timebasehrefpos = atoi(device->buf);
+  }
 
   usleep(TMC_GDS_DELAY);
 
