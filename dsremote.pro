@@ -53,6 +53,8 @@ HEADERS += edflib.h
 HEADERS += signalcurve.h
 HEADERS += settings_dialog.h
 HEADERS += screen_thread.h
+HEADERS += lan_connect_thread.h
+HEADERS += read_settings_thread.h
 
 HEADERS += third_party/kiss_fft/kiss_fft.h
 HEADERS += third_party/kiss_fft/_kiss_fft_guts.h
@@ -74,6 +76,8 @@ SOURCES += edflib.c
 SOURCES += signalcurve.cpp
 SOURCES += settings_dialog.cpp
 SOURCES += screen_thread.cpp
+SOURCES += lan_connect_thread.cpp
+SOURCES += read_settings_thread.cpp
 
 SOURCES += third_party/kiss_fft/kiss_fft.c
 SOURCES += third_party/kiss_fft/kiss_fftr.c

@@ -84,6 +84,8 @@
 #include "signalcurve.h"
 #include "settings_dialog.h"
 #include "screen_thread.h"
+#include "lan_connect_thread.h"
+#include "read_settings_thread.h"
 
 #include "third_party/kiss_fft/kiss_fftr.h"
 
@@ -120,7 +122,7 @@ public:
   QTimer       *scrn_timer,
                *label_timer;
 
-  screenThread *scrn_thread;
+  screen_thread *scrn_thread;
 
 private:
 

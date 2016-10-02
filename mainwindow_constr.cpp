@@ -136,7 +136,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   devparms.mutexx = new QMutex();
 
-  scrn_thread = new screenThread;
+  scrn_thread = new screen_thread;
   scrn_thread->set_device(NULL);
 
   menubar = menuBar();

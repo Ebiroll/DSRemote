@@ -44,12 +44,16 @@ void UI_Mainwindow::open_connection()
 {
   int i, j, n, len;
 
-  char str[1024] = {""},
+  char str[4096] = {""},
        dev_str[256] = {""},
        resp_str[1024] = {""},
        *ptr;
 
   QSettings settings;
+
+  QMessageBox msgBox;
+
+  lan_connect_thread lan_cn_thrd;
 
   if(device != NULL)
   {
@@ -87,7 +91,7 @@ void UI_Mainwindow::open_connection()
     if(device == NULL)
     {
       sprintf(str, "Can not open device %s", dev_str);
-      goto OUT_ERROR;
+      goto OC_OUT_ERROR;
     }
   }
 
@@ -98,7 +102,7 @@ void UI_Mainwindow::open_connection()
     if(!strcmp(dev_str, ""))
     {
       sprintf(str, "No IP address set");
-      goto OUT_ERROR;
+      goto OC_OUT_ERROR;
     }
 
     len = strlen(dev_str);
@@ -106,7 +110,7 @@ void UI_Mainwindow::open_connection()
     if(len < 7)
     {
       sprintf(str, "No IP address set");
-      goto OUT_ERROR;
+      goto OC_OUT_ERROR;
     }
 
     int cf = 0;
@@ -144,11 +148,37 @@ void UI_Mainwindow::open_connection()
       }
     }
 
-    device = tmc_open_lan(dev_str);
+    statusLabel->setText("Trying to connect...");
+
+    lan_cn_thrd.set_device_address(dev_str);
+    lan_cn_thrd.start();
+
+    sprintf(str, "Trying to connect to %s", dev_str);
+
+    msgBox.setIcon(QMessageBox::NoIcon);
+    msgBox.setText(str);
+    msgBox.addButton("Abort", QMessageBox::RejectRole);
+
+    connect(&lan_cn_thrd, SIGNAL(finished()), &msgBox, SLOT(accept()));
+
+    if(msgBox.exec() != QDialog::Accepted)
+    {
+      statusLabel->setText("Connection aborted");
+      lan_cn_thrd.terminate();
+      lan_cn_thrd.wait(20000);
+      sprintf(str, "Connection aborted");
+      disconnect(&lan_cn_thrd, 0, 0, 0);
+      goto OC_OUT_ERROR;
+    }
+
+    disconnect(&lan_cn_thrd, 0, 0, 0);
+
+    device = lan_cn_thrd.get_device();
     if(device == NULL)
     {
+      statusLabel->setText("Connection failed");
       sprintf(str, "Can not open connection to %s", dev_str);
-      goto OUT_ERROR;
+      goto OC_OUT_ERROR;
     }
   }
 
@@ -156,7 +186,7 @@ void UI_Mainwindow::open_connection()
 //  if(tmc_write("*IDN?;:SYST:ERR?") != 16)  // This is a fix for the broken *IDN? command in older fw version
   {
     sprintf(str, "Can not write to device %s", dev_str);
-    goto OUT_ERROR;
+    goto OC_OUT_ERROR;
   }
 
   n = tmc_read();
@@ -164,7 +194,7 @@ void UI_Mainwindow::open_connection()
   if(n < 0)
   {
     sprintf(str, "Can not read from device %s", dev_str);
-    goto OUT_ERROR;
+    goto OC_OUT_ERROR;
   }
 
   devparms.channel_cnt = 0;
@@ -182,14 +212,14 @@ void UI_Mainwindow::open_connection()
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
     str[1023] = 0;
-    goto OUT_ERROR;
+    goto OC_OUT_ERROR;
   }
 
   if(strcmp(ptr, "RIGOL TECHNOLOGIES"))
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
     str[1023] = 0;
-    goto OUT_ERROR;
+    goto OC_OUT_ERROR;
   }
 
   ptr = strtok(NULL, ",");
@@ -197,7 +227,7 @@ void UI_Mainwindow::open_connection()
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
     str[1023] = 0;
-    goto OUT_ERROR;
+    goto OC_OUT_ERROR;
   }
 
   get_device_model(ptr);
@@ -206,7 +236,7 @@ void UI_Mainwindow::open_connection()
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
     str[1023] = 0;
-    goto OUT_ERROR;
+    goto OC_OUT_ERROR;
   }
 
   ptr = strtok(NULL, ",");
@@ -214,7 +244,7 @@ void UI_Mainwindow::open_connection()
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
     str[1023] = 0;
-    goto OUT_ERROR;
+    goto OC_OUT_ERROR;
   }
 
   strcpy(devparms.serialnr, ptr);
@@ -224,7 +254,7 @@ void UI_Mainwindow::open_connection()
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
     str[1023] = 0;
-    goto OUT_ERROR;
+    goto OC_OUT_ERROR;
   }
 
   strcpy(devparms.softwvers, ptr);
@@ -244,7 +274,6 @@ void UI_Mainwindow::open_connection()
   if((devparms.modelserie != 6) &&
      (devparms.modelserie != 1))
   {
-    QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setText("Unsupported device detected.");
     msgBox.setInformativeText("This software has not been tested with your device.\n"
@@ -267,12 +296,11 @@ void UI_Mainwindow::open_connection()
     }
   }
 
-  statusLabel->setText("Reading settings from device...");
-
   if(get_device_settings())
   {
-    strcpy(str, "Can not read settings from device");
-    goto OUT_ERROR;
+    strcpy(str, "Can not read device settings");
+
+    goto OC_OUT_ERROR;
   }
 
   if(devparms.timebasedelayenable)
@@ -394,7 +422,7 @@ void UI_Mainwindow::open_connection()
 
   return;
 
-OUT_ERROR:
+OC_OUT_ERROR:
 
   statusLabel->setText("Disconnected");
 
@@ -542,103 +570,64 @@ void UI_Mainwindow::closeEvent(QCloseEvent *cl_event)
 
 int UI_Mainwindow::get_device_settings()
 {
-  int chn, line;
+  int chn;
 
-  char str[512];
+  char str[4096] = {""};
 
-  devparms.activechannel = -1;
+  statusLabel->setText("Reading settings from device...");
 
-  QApplication::setOverrideCursor(Qt::WaitCursor);
+  read_settings_thread rd_set_thrd;
+  rd_set_thrd.set_device(device);
+  rd_set_thrd.set_devparm_ptr(&devparms);
+  rd_set_thrd.start();
 
-  qApp->processEvents();
+  QMessageBox msgBox;
+  msgBox.setIcon(QMessageBox::NoIcon);
+  msgBox.setText("Reading settings from device...");
+  msgBox.addButton("Abort", QMessageBox::RejectRole);
+
+  connect(&rd_set_thrd, SIGNAL(finished()), &msgBox, SLOT(accept()));
+
+  if(msgBox.exec() != QDialog::Accepted)
+  {
+    statusLabel->setText("Reading settings aborted");
+    rd_set_thrd.terminate();
+    rd_set_thrd.wait(20000);
+    sprintf(str, "Reading settings aborted");
+    disconnect(&rd_set_thrd, 0, 0, 0);
+    return -1;
+  }
+
+  disconnect(&rd_set_thrd, 0, 0, 0);
+
+  if(rd_set_thrd.get_error_num() != 0)
+  {
+    statusLabel->setText("Error while reading settings");
+    rd_set_thrd.get_error_str(str);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.setText(str);
+    msgBox.exec();
+    strcpy(str, "Can not read settings from device");
+    return -1;
+  }
 
   for(chn=0; chn<devparms.channel_cnt; chn++)
   {
-    sprintf(str, ":CHAN%i:BWL?", chn + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 11)
+    if(devparms.chandisplay[chn] == 1)
     {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "20M"))
-    {
-      devparms.chanbwlimit[chn] = 20;
-    }
-    else if(!strcmp(device->buf, "250M"))
+      switch(chn)
       {
-        devparms.chanbwlimit[chn] = 250;
+        case 0: ch1Button->setStyleSheet("background: #FFFF33;");
+                break;
+        case 1: ch2Button->setStyleSheet("background: #33FFFF;");
+                break;
+        case 2: ch3Button->setStyleSheet("background: #FF33FF;");
+                break;
+        case 3: ch4Button->setStyleSheet("background: #0080FF;");
+                break;
       }
-      else if(!strcmp(device->buf, "OFF"))
-        {
-          devparms.chanbwlimit[chn] = 0;
-        }
-        else
-        {
-          line = __LINE__;
-          goto OUT_ERROR;
-        }
-
-    sprintf(str, ":CHAN%i:COUP?", chn + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 12)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
     }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "AC"))
-    {
-      devparms.chancoupling[chn] = 2;
-    }
-    else if(!strcmp(device->buf, "DC"))
-      {
-        devparms.chancoupling[chn] = 1;
-      }
-      else if(!strcmp(device->buf, "GND"))
-        {
-          devparms.chancoupling[chn] = 0;
-        }
-        else
-        {
-          line = __LINE__;
-          goto OUT_ERROR;
-        }
-
-    sprintf(str, ":CHAN%i:DISP?", chn + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 12)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "0"))
+    else
     {
       switch(chn)
       {
@@ -651,1393 +640,31 @@ int UI_Mainwindow::get_device_settings()
         case 3: ch4Button->setStyleSheet(def_stylesh);
                 break;
       }
-
-      devparms.chandisplay[chn] = 0;
     }
-    else if(!strcmp(device->buf, "1"))
-      {
-        switch(chn)
-        {
-          case 0: ch1Button->setStyleSheet("background: #FFFF33;");
-                  break;
-          case 1: ch2Button->setStyleSheet("background: #33FFFF;");
-                  break;
-          case 2: ch3Button->setStyleSheet("background: #FF33FF;");
-                  break;
-          case 3: ch4Button->setStyleSheet("background: #0080FF;");
-                  break;
-        }
-
-        devparms.chandisplay[chn] = 1;
-
-        if(devparms.activechannel == -1)
-        {
-          devparms.activechannel = chn;
-        }
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-    if(devparms.modelserie != 1)
-    {
-      sprintf(str, ":CHAN%i:IMP?", chn + 1);
-
-      usleep(TMC_GDS_DELAY);
-
-      if(tmc_write(str) != 11)
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-      if(tmc_read() < 1)
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-      if(!strcmp(device->buf, "OMEG"))
-      {
-        devparms.chanimpedance[chn] = 0;
-      }
-      else if(!strcmp(device->buf, "FIFT"))
-        {
-          devparms.chanimpedance[chn] = 1;
-        }
-        else
-        {
-          line = __LINE__;
-          goto OUT_ERROR;
-        }
-    }
-
-    sprintf(str, ":CHAN%i:INV?", chn + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 11)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "0"))
-    {
-      devparms.chaninvert[chn] = 0;
-    }
-    else if(!strcmp(device->buf, "1"))
-      {
-        devparms.chaninvert[chn] = 1;
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-    sprintf(str, ":CHAN%i:OFFS?", chn + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 12)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.chanoffset[chn] = atof(device->buf);
-
-    sprintf(str, ":CHAN%i:PROB?", chn + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 12)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.chanprobe[chn] = atof(device->buf);
-
-    sprintf(str, ":CHAN%i:SCAL?", chn + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 12)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.chanscale[chn] = atof(device->buf);
-
-    sprintf(str, ":CHAN%i:VERN?", chn + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 12)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "0"))
-    {
-      devparms.chanvernier[chn] = 0;
-    }
-    else if(!strcmp(device->buf, "1"))
-      {
-        devparms.chanvernier[chn] = 1;
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
   }
 
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TIM:OFFS?") != 10)
+  if(devparms.triggersweep == 0)
   {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.timebaseoffset = atof(device->buf);
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TIM:SCAL?") != 10)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.timebasescale = atof(device->buf);
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TIM:DEL:ENAB?") != 14)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "0"))
-  {
-    devparms.timebasedelayenable = 0;
-  }
-  else if(!strcmp(device->buf, "1"))
-    {
-      devparms.timebasedelayenable = 1;
-    }
-    else
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TIM:DEL:OFFS?") != 14)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.timebasedelayoffset = atof(device->buf);
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TIM:DEL:SCAL?") != 14)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.timebasedelayscale = atof(device->buf);
-
-  if(devparms.modelserie != 1)
-  {
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":TIM:HREF:MODE?") != 15)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "CENT"))
-    {
-      devparms.timebasehrefmode = 0;
-    }
-    else if(!strcmp(device->buf, "TPOS"))
-      {
-        devparms.timebasehrefmode = 1;
-      }
-      else if(!strcmp(device->buf, "USER"))
-        {
-          devparms.timebasehrefmode = 2;
-        }
-        else
-        {
-          line = __LINE__;
-          goto OUT_ERROR;
-        }
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":TIM:HREF:POS?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.timebasehrefpos = atoi(device->buf);
-  }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TIM:MODE?") != 10)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "MAIN"))
-  {
-    devparms.timebasemode = 0;
-  }
-  else if(!strcmp(device->buf, "XY"))
-    {
-      devparms.timebasemode = 1;
-    }
-    else if(!strcmp(device->buf, "ROLL"))
-      {
-        devparms.timebasemode = 2;
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-  if(devparms.modelserie != 1)
-  {
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":TIM:VERN?") != 10)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "0"))
-    {
-      devparms.timebasevernier = 0;
-    }
-    else if(!strcmp(device->buf, "1"))
-      {
-        devparms.timebasevernier = 1;
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-  }
-
-  if((devparms.modelserie != 1) && (devparms.modelserie != 2))
-  {
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":TIM:XY1:DISP?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "0"))
-    {
-      devparms.timebasexy1display = 0;
-    }
-    else if(!strcmp(device->buf, "1"))
-      {
-        devparms.timebasexy1display = 1;
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":TIM:XY2:DISP?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "0"))
-    {
-      devparms.timebasexy2display = 0;
-    }
-    else if(!strcmp(device->buf, "1"))
-      {
-        devparms.timebasexy2display = 1;
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-  }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TRIG:COUP?") != 11)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "AC"))
-  {
-    devparms.triggercoupling = 0;
-  }
-  else if(!strcmp(device->buf, "DC"))
-    {
-      devparms.triggercoupling = 1;
-    }
-    else if(!strcmp(device->buf, "LFR"))
-      {
-        devparms.triggercoupling = 2;
-      }
-      else if(!strcmp(device->buf, "HFR"))
-        {
-          devparms.triggercoupling = 3;
-        }
-        else
-        {
-          line = __LINE__;
-          goto OUT_ERROR;
-        }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TRIG:SWE?") != 10)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "AUTO"))
-  {
-    devparms.triggersweep = 0;
-
     trigModeAutoLed->setValue(true);
     trigModeNormLed->setValue(false);
     trigModeSingLed->setValue(false);
   }
-  else if(!strcmp(device->buf, "NORM"))
+  else if(devparms.triggersweep == 1)
     {
-      devparms.triggersweep = 1;
-
       trigModeAutoLed->setValue(false);
       trigModeNormLed->setValue(true);
       trigModeSingLed->setValue(false);
     }
-    else if(!strcmp(device->buf, "SING"))
+    else if(devparms.triggersweep == 2)
       {
-        devparms.triggersweep = 2;
-
         trigModeAutoLed->setValue(false);
         trigModeNormLed->setValue(false);
         trigModeSingLed->setValue(true);
       }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TRIG:MODE?") != 11)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "EDGE"))
-  {
-    devparms.triggermode = 0;
-  }
-  else if(!strcmp(device->buf, "PULS"))
-    {
-      devparms.triggermode = 1;
-    }
-    else if(!strcmp(device->buf, "SLOP"))
-      {
-        devparms.triggermode = 2;
-      }
-      else if(!strcmp(device->buf, "VID"))
-        {
-          devparms.triggermode = 3;
-        }
-        else if(!strcmp(device->buf, "PATT"))
-          {
-            devparms.triggermode = 4;
-          }
-          else if(!strcmp(device->buf, "RS232"))
-            {
-              devparms.triggermode = 5;
-            }
-            else if(!strcmp(device->buf, "IIC"))
-              {
-                devparms.triggermode = 6;
-              }
-              else if(!strcmp(device->buf, "SPI"))
-                {
-                  devparms.triggermode = 7;
-                }
-                else if(!strcmp(device->buf, "CAN"))
-                  {
-                    devparms.triggermode = 8;
-                  }
-                  else if(!strcmp(device->buf, "USB"))
-                    {
-                      devparms.triggermode = 9;
-                    }
-                    else
-                    {
-                      line = __LINE__;
-                      goto OUT_ERROR;
-                    }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TRIG:STAT?") != 11)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "TD"))
-  {
-    devparms.triggerstatus = 0;
-  }
-  else if(!strcmp(device->buf, "WAIT"))
-    {
-      devparms.triggerstatus = 1;
-    }
-    else if(!strcmp(device->buf, "RUN"))
-      {
-        devparms.triggerstatus = 2;
-      }
-      else if(!strcmp(device->buf, "AUTO"))
-        {
-          devparms.triggerstatus = 3;
-        }
-        else if(!strcmp(device->buf, "FIN"))
-          {
-            devparms.triggerstatus = 4;
-          }
-          else if(!strcmp(device->buf, "STOP"))
-            {
-              devparms.triggerstatus = 5;
-            }
-            else
-            {
-              line = __LINE__;
-              goto OUT_ERROR;
-            }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TRIG:EDG:SLOP?") != 15)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "POS"))
-  {
-    devparms.triggeredgeslope = 0;
-  }
-  else if(!strcmp(device->buf, "NEG"))
-    {
-      devparms.triggeredgeslope = 1;
-    }
-    else if(!strcmp(device->buf, "RFAL"))
-      {
-        devparms.triggeredgeslope = 2;
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TRIG:EDG:SOUR?") != 15)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "CHAN1"))
-  {
-    devparms.triggeredgesource = 0;
-  }
-  else if(!strcmp(device->buf, "CHAN2"))
-    {
-      devparms.triggeredgesource = 1;
-    }
-    else if(!strcmp(device->buf, "CHAN3"))
-      {
-        devparms.triggeredgesource = 2;
-      }
-      else if(!strcmp(device->buf, "CHAN4"))
-        {
-          devparms.triggeredgesource = 3;
-        }
-        else if(!strcmp(device->buf, "EXT"))
-          {
-            devparms.triggeredgesource = 4;
-          }
-          else if(!strcmp(device->buf, "EXT5"))
-            {
-              devparms.triggeredgesource = 5;
-            }  // DS1000Z: "AC", DS6000: "ACL" !!
-            else if((!strcmp(device->buf, "AC")) || (!strcmp(device->buf, "ACL")))
-              {
-                devparms.triggeredgesource = 6;
-              }
-              else
-              {
-                line = __LINE__;
-                goto OUT_ERROR;
-              }
-
-  for(chn=0; chn<devparms.channel_cnt; chn++)
-  {
-    sprintf(str, ":TRIG:EDG:SOUR CHAN%i", chn + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 20)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":TRIG:EDG:LEV?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.triggeredgelevel[chn] = atof(device->buf);
-  }
-
-  if(devparms.triggeredgesource < 4)
-  {
-    sprintf(str, ":TRIG:EDG:SOUR CHAN%i", devparms.triggeredgesource + 1);
-
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(str) != 20)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-
-  if(devparms.triggeredgesource== 4)
-  {
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":TRIG:EDG:SOUR EXT") != 18)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-
-  if(devparms.triggeredgesource== 5)
-  {
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":TRIG:EDG:SOUR EXT5") != 19)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-
-  if(devparms.triggeredgesource== 6)
-  {
-    usleep(TMC_GDS_DELAY);
-
-    if(tmc_write(":TRIG:EDG:SOUR AC") != 17)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":TRIG:HOLD?") != 11)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.triggerholdoff = atof(device->buf);
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":ACQ:SRAT?") != 10)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.samplerate = atof(device->buf);
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":DISP:GRID?") != 11)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "NONE"))
-  {
-    devparms.displaygrid = 0;
-  }
-  else if(!strcmp(device->buf, "HALF"))
-    {
-      devparms.displaygrid = 1;
-    }
-    else if(!strcmp(device->buf, "FULL"))
-      {
-        devparms.displaygrid = 2;
-      }
-      else
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":MEAS:COUN:SOUR?") != 16)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "OFF"))
-  {
-    devparms.countersrc = 0;
-  }
-  else if(!strcmp(device->buf, "CHAN1"))
-    {
-      devparms.countersrc = 1;
-    }
-    else if(!strcmp(device->buf, "CHAN2"))
-      {
-        devparms.countersrc = 2;
-      }
-      else if(!strcmp(device->buf, "CHAN3"))
-        {
-          devparms.countersrc = 3;
-        }
-        else if(!strcmp(device->buf, "CHAN4"))
-          {
-            devparms.countersrc = 4;
-          }
-          else
-          {
-            line = __LINE__;
-            goto OUT_ERROR;
-          }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":DISP:TYPE?") != 11)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "VECT"))
-  {
-    devparms.displaytype = 0;
-  }
-  else if(!strcmp(device->buf, "DOTS"))
-    {
-      devparms.displaytype = 1;
-    }
-    else
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":ACQ:TYPE?") != 10)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "NORM"))
-  {
-    devparms.acquiretype = 0;
-  }
-  else if(!strcmp(device->buf, "AVER"))
-    {
-      devparms.acquiretype = 1;
-    }
-    else if(!strcmp(device->buf, "PEAK"))
-      {
-        devparms.acquiretype = 2;
-      }
-      else if(!strcmp(device->buf, "HRES"))
-        {
-          devparms.acquiretype = 3;
-        }
-        else
-        {
-          line = __LINE__;
-          goto OUT_ERROR;
-        }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":ACQ:AVER?") != 10)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.acquireaverages = atoi(device->buf);
-
-  usleep(TMC_GDS_DELAY);
-
-  if(tmc_write(":DISP:GRAD:TIME?") != 16)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "MIN"))
-  {
-    devparms.displaygrading = 0;
-  }
-  else if(!strcmp(device->buf, "0.1"))
-    {
-      devparms.displaygrading = 1;
-    }
-    else if(!strcmp(device->buf, "0.2"))
-      {
-        devparms.displaygrading = 2;
-      }
-      else if(!strcmp(device->buf, "0.5"))
-        {
-          devparms.displaygrading = 5;
-        }
-        else if(!strcmp(device->buf, "1"))
-          {
-            devparms.displaygrading = 10;
-          }
-          else if(!strcmp(device->buf, "2"))
-            {
-              devparms.displaygrading = 20;
-            }
-            else if(!strcmp(device->buf, "5"))
-              {
-                devparms.displaygrading = 50;
-              }
-              else if(!strcmp(device->buf, "INF"))
-                {
-                  devparms.displaygrading = 10000;
-                }
-                else
-                {
-                  line = __LINE__;
-                  goto OUT_ERROR;
-                }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(devparms.modelserie != 1)
-  {
-    if(tmc_write(":CALC:FFT:SPL?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-  else
-  {
-    if(tmc_write(":MATH:FFT:SPL?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.math_fft_split = atoi(device->buf);
-
-  usleep(TMC_GDS_DELAY);
-
-  if(devparms.modelserie != 1)
-  {
-    if(tmc_write(":CALC:MODE?") != 11)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(!strcmp(device->buf, "FFT"))
-    {
-      devparms.math_fft = 1;
-    }
-    else
-    {
-      devparms.math_fft = 0;
-    }
-  }
-  else
-  {
-    if(tmc_write(":MATH:DISP?") != 11)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.math_fft = atoi(device->buf);
-
-    if(devparms.math_fft == 1)
-    {
-      usleep(TMC_GDS_DELAY);
-
-      if(tmc_write(":MATH:OPER?") != 11)
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-      if(tmc_read() < 1)
-      {
-        line = __LINE__;
-        goto OUT_ERROR;
-      }
-
-      if(!strcmp(device->buf, "FFT"))
-      {
-        devparms.math_fft = 1;
-      }
-      else
-      {
-        devparms.math_fft = 0;
-      }
-    }
-  }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(devparms.modelserie != 1)
-  {
-    if(tmc_write(":CALC:FFT:VSM?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-  else
-  {
-    if(tmc_write(":MATH:FFT:UNIT?") != 15)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "VRMS"))
-  {
-    devparms.fft_vscale = 0.5;
-
-    devparms.fft_voffset = -2.0;
-
-    devparms.math_fft_unit = 0;
-  }
-  else
-  {
-    devparms.fft_vscale = 10.0;
-
-    devparms.fft_voffset = 20.0;
-
-    devparms.math_fft_unit = 1;
-  }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(devparms.modelserie != 1)
-  {
-    if(tmc_write(":CALC:FFT:SOUR?") != 15)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-  else
-  {
-    if(tmc_write(":MATH:FFT:SOUR?") != 15)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  if(!strcmp(device->buf, "CHAN1"))
-  {
-    devparms.math_fft_src = 0;
-  }
-  else if(!strcmp(device->buf, "CHAN2"))
-    {
-      devparms.math_fft_src = 1;
-    }
-    else if(!strcmp(device->buf, "CHAN3"))
-      {
-        devparms.math_fft_src = 2;
-      }
-      else if(!strcmp(device->buf, "CHAN4"))
-        {
-          devparms.math_fft_src = 3;
-        }
-        else
-        {
-          devparms.math_fft_src = 0;
-        }
-
-  usleep(TMC_GDS_DELAY);
-
-  devparms.current_screen_sf = 100.0 / devparms.timebasescale;
-
-  if(devparms.modelserie != 1)
-  {
-    if(tmc_write(":CALC:FFT:HSP?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.math_fft_hscale = atof(device->buf);
-
-//     if(tmc_write(":CALC:FFT:HSC?") != 14)
-//     {
-//       line = __LINE__;
-//       goto OUT_ERROR;
-//     }
-//
-//     if(tmc_read() < 1)
-//     {
-//       line = __LINE__;
-//       goto OUT_ERROR;
-//     }
-//
-//     switch(atoi(device->buf))
-//     {
-// //       case  0: devparms.math_fft_hscale = devparms.current_screen_sf / 80.0;
-// //                break;
-//       case  1: devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
-//                break;
-//       case  2: devparms.math_fft_hscale = devparms.current_screen_sf / 80.0;
-//                break;
-//       case  3: devparms.math_fft_hscale = devparms.current_screen_sf / 200.0;
-//                break;
-//       default: devparms.math_fft_hscale = devparms.current_screen_sf / 40.0;
-//                break;
-//     }
-  }
-  else
-  {
-    if(tmc_write(":MATH:FFT:HSC?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.math_fft_hscale = atof(device->buf);
-  }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(devparms.modelserie != 1)
-  {
-    if(tmc_write(":CALC:FFT:HCEN?") != 15)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-  else
-  {
-    if(tmc_write(":MATH:FFT:HCEN?") != 15)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-  }
-
-  if(tmc_read() < 1)
-  {
-    line = __LINE__;
-    goto OUT_ERROR;
-  }
-
-  devparms.math_fft_hcenter = atof(device->buf);
-
-  usleep(TMC_GDS_DELAY);
-
-  if(devparms.modelserie != 1)
-  {
-    if(tmc_write(":CALC:FFT:VOFF?") != 15)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.fft_voffset = atof(device->buf);
-  }
-  else
-  {
-    if(tmc_write(":MATH:OFFS?") != 11)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.fft_voffset = atof(device->buf);
-  }
-
-  usleep(TMC_GDS_DELAY);
-
-  if(devparms.modelserie != 1)
-  {
-    if(tmc_write(":CALC:FFT:VSC?") != 14)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(devparms.math_fft_unit == 1)
-    {
-      devparms.fft_vscale = atof(device->buf);
-    }
-    else
-    {
-      devparms.fft_vscale = atof(device->buf) * devparms.chanscale[devparms.math_fft_src];
-    }
-  }
-  else
-  {
-    if(tmc_write(":MATH:SCAL?") != 11)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    if(tmc_read() < 1)
-    {
-      line = __LINE__;
-      goto OUT_ERROR;
-    }
-
-    devparms.fft_vscale = atof(device->buf);
-  }
 
   updateLabels();
 
-  QApplication::restoreOverrideCursor();
-
   return 0;
-
-OUT_ERROR:
-
-  QApplication::restoreOverrideCursor();
-
-  sprintf(str, "An error occurred while reading settings from device.\n"
-               "File %s line %i", __FILE__, line);
-
-  QMessageBox msgBox;
-  msgBox.setIcon(QMessageBox::Critical);
-  msgBox.setText(str);
-  msgBox.exec();
-
-  return -1;
 }
 
 

@@ -3,7 +3,7 @@
 *
 * Author: Teunis van Beelen
 *
-* Copyright (C) 2015, 2016 Teunis van Beelen
+* Copyright (C) 2016 Teunis van Beelen
 *
 * Email: teuniz@gmail.com
 *
@@ -26,15 +26,14 @@
 */
 
 
-#ifndef DEF_SCREEN_THREAD_H
-#define DEF_SCREEN_THREAD_H
+#ifndef DEF_READ_SETTINGS_THREAD_H
+#define DEF_READ_SETTINGS_THREAD_H
 
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <math.h>
 
 #include <QObject>
 #include <QThread>
@@ -44,80 +43,55 @@
 #include "connection.h"
 #include "tmc_dev.h"
 
-#include "third_party/kiss_fft/kiss_fftr.h"
 
 
-
-class screen_thread : public QThread
+class read_settings_thread : public QThread
 {
   Q_OBJECT
 
 public:
 
-  screen_thread();
-  ~screen_thread();
-
-  int h_busy;
+  read_settings_thread();
 
   void set_device(struct tmcdev *);
-
-  void set_params(struct device_settings *);
-  void get_params(struct device_settings *);
+  void set_devparm_ptr(struct device_settings *);
+  int get_error_num(void);
+  void get_error_str(char *);
 
 private:
 
-  struct {
-    int connected;
-    int modelserie;
-    int chandisplay[MAX_CHNS];
-    double chanscale[MAX_CHNS];
-    int triggerstatus;
-    int triggersweep;
-    double samplerate;
-    int memdepth;
-    int countersrc;
-    double counterfreq;
-    int wavebufsz;
-    short *wavebuf[MAX_CHNS];
-    int error_stat;
-    int error_line;
-    int cmd_cue_idx_in;
-    int cmd_cue_idx_out;
-    int result;
-    int job;
-
-    double triggeredgelevel;
-    double timebasedelayoffset;
-    double timebasedelayscale;
-
-    int math_fft_src;
-    int math_fft;
-    int math_fft_unit;
-    double math_fft_hscale;
-    double math_fft_hcenter;
-    double *fftbuf_in;
-    double *fftbuf_out;
-    int fftbufsz;
-    kiss_fftr_cfg k_cfg;
-    kiss_fft_cpx *kiss_fftbuf;
-
-    int current_screen_sf;
-
-    char debug_str[1024];
-  } params;
-
   struct tmcdev *device;
+  struct device_settings *devparms;
 
-  struct device_settings *deviceparms;
+  char err_str[4096];
+
+  int err_num;
 
   void run();
-
-  int get_devicestatus();
-
 };
 
 
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

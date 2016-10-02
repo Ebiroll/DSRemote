@@ -33,7 +33,7 @@
 #define SPECT_LOG_MINIMUM_LOG (-80)
 
 
-void screenThread::set_device(struct tmcdev *tmdev)
+void screen_thread::set_device(struct tmcdev *tmdev)
 {
   params.cmd_cue_idx_in = 0;
   params.cmd_cue_idx_out = 0;
@@ -43,7 +43,7 @@ void screenThread::set_device(struct tmcdev *tmdev)
 }
 
 
-screenThread::screenThread()
+screen_thread::screen_thread()
 {
   int i;
 
@@ -62,7 +62,7 @@ screenThread::screenThread()
 }
 
 
-screenThread::~screenThread()
+screen_thread::~screen_thread()
 {
   int i;
 
@@ -73,7 +73,7 @@ screenThread::~screenThread()
 }
 
 
-void screenThread::set_params(struct device_settings *dev_parms)
+void screen_thread::set_params(struct device_settings *dev_parms)
 {
   deviceparms = dev_parms;
   params.connected = deviceparms->connected;
@@ -101,7 +101,7 @@ void screenThread::set_params(struct device_settings *dev_parms)
 }
 
 
-void screenThread::get_params(struct device_settings *dev_parms)
+void screen_thread::get_params(struct device_settings *dev_parms)
 {
   int i;
 
@@ -147,7 +147,7 @@ void screenThread::get_params(struct device_settings *dev_parms)
 }
 
 
-int screenThread::get_devicestatus()
+int screen_thread::get_devicestatus()
 {
   int line;
 
@@ -293,7 +293,7 @@ OUT_ERROR:
 }
 
 
-void screenThread::run()
+void screen_thread::run()
 {
   int i, j, k, n=0, chns=0, line, cmd_sent=0;
 
