@@ -58,7 +58,7 @@ UI_Aboutwindow::UI_Aboutwindow()
   textedit1->setPlainText(
         "\n " PROGRAM_NAME " " PROGRAM_VERSION "\n"
         "\n This program is made by Teunis van Beelen.\n"
-        "\n Copyright (C) 2015 Teunis van Beelen.\n"
+        "\n Copyright (C) 2015, 2016 Teunis van Beelen.\n"
         "\n Email: teuniz@gmail.com\n"
         "\n Disclaimer:\n"
         " Despite this software is intend to be useful, there is no warranty, use this software at your own risk!\n");
