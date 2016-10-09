@@ -2283,11 +2283,7 @@ void UI_Mainwindow::set_to_factory()
 
   scrn_thread->wait();
 
-  qApp->processEvents();
-
   tmc_write("*RST");
-
-  qApp->processEvents();
 
   devparms.timebasescale = 1e-6;
 
@@ -2355,25 +2351,19 @@ void UI_Mainwindow::set_to_factory()
 
   waveForm->update();
 
-  QApplication::setOverrideCursor(Qt::WaitCursor);
+  QMessageBox msgBox;
+  msgBox.setText("Restoring the instrument to the default state.\n"
+                 "Please wait...");
 
-  qApp->processEvents();
+  QTimer t_rst_1;
+  t_rst_1.setSingleShot(true);
+#if QT_VERSION >= 0x050000
+  t_rst_1.setTimerType(Qt::PreciseTimer);
+#endif
+  connect(&t_rst_1, SIGNAL(timeout()), &msgBox, SLOT(accept()));
+  t_rst_1.start(9000);
 
-  for(i=0; i<50; i++)
-  {
-    qApp->processEvents();
-
-    usleep(500000);
-
-    tmc_write("*OPC?");
-
-    tmc_read();
-
-    if(device->buf[0] == '1')
-    {
-      break;
-    }
-  }
+  msgBox.exec();
 
   if(devparms.modelserie == 6)
   {
@@ -2386,8 +2376,6 @@ void UI_Mainwindow::set_to_factory()
       usleep(20000);
     }
   }
-
-  QApplication::restoreOverrideCursor();
 
   scrn_timer->start(devparms.screentimerival);
 }
