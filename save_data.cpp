@@ -55,14 +55,27 @@ void UI_Mainwindow::save_screenshot()
 
   tmc_write(":DISP:DATA?");
 
-  QApplication::setOverrideCursor(Qt::WaitCursor);
+  save_data_thread get_data_thrd(0);
 
-  qApp->processEvents();
+  QMessageBox w_msg_box;
+  w_msg_box.setIcon(QMessageBox::NoIcon);
+  w_msg_box.setText("Downloading data...");
+  w_msg_box.setStandardButtons(QMessageBox::Abort);
 
-  n = tmc_read();
+  connect(&get_data_thrd, SIGNAL(finished()), &w_msg_box, SLOT(accept()));
 
-  QApplication::restoreOverrideCursor();
+  get_data_thrd.start();
 
+  if(w_msg_box.exec() != QDialog::Accepted)
+  {
+    disconnect(&get_data_thrd, 0, 0, 0);
+    strcpy(str, "Aborted by user.");
+    goto OUT_ERROR;
+  }
+
+  disconnect(&get_data_thrd, 0, 0, 0);
+
+  n = get_data_thrd.get_num_bytes_rcvd();
   if(n < 0)
   {
     strcpy(str, "Can not read from device.");
@@ -150,6 +163,13 @@ void UI_Mainwindow::save_screenshot()
 
 OUT_ERROR:
 
+  if(get_data_thrd.isFinished() != true)
+  {
+    connect(&get_data_thrd, SIGNAL(finished()), &w_msg_box, SLOT(accept()));
+    w_msg_box.setText("Waiting for thread to finish, please wait...");
+    w_msg_box.exec();
+  }
+
   scrn_timer->start(devparms.screentimerival);
 
   QMessageBox msgBox;
@@ -183,6 +203,10 @@ void UI_Mainwindow::save_memory_waveform()
 
   double yinc[MAX_CHNS];
 
+  QEventLoop ev_loop;
+
+  save_data_thread get_data_thrd(0);
+
   if(device == NULL)
   {
     return;
@@ -203,7 +227,9 @@ void UI_Mainwindow::save_memory_waveform()
 
   QProgressDialog progress("Downloading data...", "Abort", 0, mempnts, this);
   progress.setWindowModality(Qt::WindowModal);
-  progress.setMinimumDuration(100);
+  progress.setMinimumDuration(0);
+
+  connect(&get_data_thrd, SIGNAL(finished()), &ev_loop, SLOT(quit()));
 
   statusLabel->setText("Downloading data...");
 
@@ -335,8 +361,6 @@ void UI_Mainwindow::save_memory_waveform()
     {
       progress.setValue(bytes_rcvd);
 
-      qApp->processEvents();
-
       if(progress.wasCanceled())
       {
         strcpy(str, "Canceled");
@@ -366,8 +390,11 @@ void UI_Mainwindow::save_memory_waveform()
 
       tmc_write(":WAV:DATA?");
 
-      n = tmc_read();
+      get_data_thrd.start();
 
+      ev_loop.exec();
+
+      n = get_data_thrd.get_num_bytes_rcvd();
       if(n < 0)
       {
         sprintf(str, "Can not read from device.  line %i file %s", __LINE__, __FILE__);
@@ -551,6 +578,8 @@ void UI_Mainwindow::save_memory_waveform()
 
 OUT_NORMAL:
 
+  disconnect(&get_data_thrd, 0, 0, 0);
+
   if(hdl >= 0)
   {
     edfclose_file(hdl);
@@ -567,6 +596,8 @@ OUT_NORMAL:
 
 OUT_ERROR:
 
+  disconnect(&get_data_thrd, 0, 0, 0);
+
   progress.reset();
 
   statusLabel->setText("Downloading aborted");
@@ -574,6 +605,18 @@ OUT_ERROR:
   if(hdl >= 0)
   {
     edfclose_file(hdl);
+  }
+
+  if(get_data_thrd.isRunning() == true)
+  {
+    QMessageBox w_msg_box;
+    w_msg_box.setIcon(QMessageBox::NoIcon);
+    w_msg_box.setText("Waiting for thread to finish, please wait...");
+    w_msg_box.setStandardButtons(QMessageBox::Abort);
+
+    connect(&get_data_thrd, SIGNAL(finished()), &w_msg_box, SLOT(accept()));
+
+    w_msg_box.exec();
   }
 
   if(progress.wasCanceled() == false)
@@ -687,6 +730,13 @@ void UI_Mainwindow::save_screen_waveform()
   wavbuf[1] = NULL;
   wavbuf[2] = NULL;
   wavbuf[3] = NULL;
+
+  save_data_thread get_data_thrd(0);
+
+  QMessageBox w_msg_box;
+  w_msg_box.setIcon(QMessageBox::NoIcon);
+  w_msg_box.setText("Downloading data...");
+  w_msg_box.setStandardButtons(QMessageBox::Abort);
 
   scrn_timer->stop();
 
@@ -803,14 +853,20 @@ void UI_Mainwindow::save_screen_waveform()
 
     tmc_write(":WAV:DATA?");
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    connect(&get_data_thrd, SIGNAL(finished()), &w_msg_box, SLOT(accept()));
 
-    qApp->processEvents();
+    get_data_thrd.start();
 
-    n = tmc_read();
+    if(w_msg_box.exec() != QDialog::Accepted)
+    {
+      disconnect(&get_data_thrd, 0, 0, 0);
+      strcpy(str, "Aborted by user.");
+      goto OUT_ERROR;
+    }
 
-    QApplication::restoreOverrideCursor();
+    disconnect(&get_data_thrd, 0, 0, 0);
 
+    n = get_data_thrd.get_num_bytes_rcvd();
     if(n < 0)
     {
       strcpy(str, "Can not read from device.");
@@ -928,6 +984,13 @@ OUT_NORMAL:
   return;
 
 OUT_ERROR:
+
+  if(get_data_thrd.isFinished() != true)
+  {
+    connect(&get_data_thrd, SIGNAL(finished()), &w_msg_box, SLOT(accept()));
+    w_msg_box.setText("Waiting for thread to finish, please wait...");
+    w_msg_box.exec();
+  }
 
   QMessageBox msgBox;
   msgBox.setIcon(QMessageBox::Critical);

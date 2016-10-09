@@ -64,6 +64,7 @@
 #include <QProcess>
 #include <QProgressDialog>
 #include <QKeySequence>
+#include <QEventLoop>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -86,6 +87,7 @@
 #include "screen_thread.h"
 #include "lan_connect_thread.h"
 #include "read_settings_thread.h"
+#include "save_data_thread.h"
 
 #include "third_party/kiss_fft/kiss_fftr.h"
 
