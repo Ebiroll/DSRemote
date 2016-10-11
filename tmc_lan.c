@@ -242,6 +242,8 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
 
   if(n != (len + 1))
   {
+    printf("tmclan error: device write error");
+
     return -1;
   }
 
@@ -253,7 +255,7 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
 
       if(tmclan_send("*OPC?\n") != 6)
       {
-        printf("tmcdev error: device write error");
+        printf("tmclan error: device write error");
 
         return -1;
       }
@@ -262,7 +264,7 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
 
       if(n < 0)
       {
-        printf("tmcdev error: device read error");
+        printf("tmclan error: device read error");
 
         return -1;
       }
