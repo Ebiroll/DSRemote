@@ -236,6 +236,8 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
     printf("tmc_lan write: %s", buf);
   }
 
+  if(!strncmp(buf, "*RST", 4))  qry = 1;
+
   n = tmclan_send(buf);
 
   if(n != (len + 1))

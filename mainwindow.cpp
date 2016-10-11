@@ -574,7 +574,7 @@ int UI_Mainwindow::get_device_settings()
 
   char str[4096] = {""};
 
-  statusLabel->setText("Reading settings from device...");
+  statusLabel->setText("Reading instrument settings...");
 
   read_settings_thread rd_set_thrd;
   rd_set_thrd.set_device(device);
@@ -583,7 +583,7 @@ int UI_Mainwindow::get_device_settings()
 
   QMessageBox msgBox;
   msgBox.setIcon(QMessageBox::NoIcon);
-  msgBox.setText("Reading settings from device...");
+  msgBox.setText("Reading instrument settings...");
   msgBox.addButton("Abort", QMessageBox::RejectRole);
 
   connect(&rd_set_thrd, SIGNAL(finished()), &msgBox, SLOT(accept()));
