@@ -39,6 +39,8 @@ lan_connect_thread::lan_connect_thread()
 
 void lan_connect_thread::run()
 {
+  msleep(300);
+
   if(dev_str[0] == 0) return;
 
   device = tmc_open_lan(dev_str);

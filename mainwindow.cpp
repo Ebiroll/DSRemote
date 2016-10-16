@@ -150,16 +150,15 @@ void UI_Mainwindow::open_connection()
 
     statusLabel->setText("Trying to connect...");
 
-    lan_cn_thrd.set_device_address(dev_str);
-    lan_cn_thrd.start();
-
     sprintf(str, "Trying to connect to %s", dev_str);
 
     msgBox.setIcon(QMessageBox::NoIcon);
     msgBox.setText(str);
     msgBox.addButton("Abort", QMessageBox::RejectRole);
 
+    lan_cn_thrd.set_device_address(dev_str);
     connect(&lan_cn_thrd, SIGNAL(finished()), &msgBox, SLOT(accept()));
+    lan_cn_thrd.start();
 
     if(msgBox.exec() != QDialog::Accepted)
     {

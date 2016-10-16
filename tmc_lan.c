@@ -155,6 +155,8 @@ struct tmcdev * tmclan_open(const char *ip_address)
   {
     close(sockfd);
     sockfd = -1;
+    free(tmc_device);
+    tmc_device = NULL;
     return NULL;
   }
 
