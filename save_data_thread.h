@@ -53,20 +53,28 @@ class save_data_thread : public QThread
 
 public:
 
-  save_data_thread(int, int hdl_s=-1);
+  save_data_thread(int);
 
   int get_error_num(void);
   void get_error_str(char *);
   int get_num_bytes_rcvd(void);
+  void init_save_memory_edf_file(struct device_settings *devp, int,
+                                 int, int, short **wav);
 
 private:
 
   int job,
       err_num,
       n_bytes_rcvd,
-      hdl;
+      hdl,
+      datrecs,
+      smps_per_record;
 
   char err_str[4096];
+
+  struct device_settings *devparms;
+
+  short **wavbuf;
 
   void run();
 

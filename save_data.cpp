@@ -192,12 +192,13 @@ void UI_Mainwindow::save_memory_waveform()
       yor[MAX_CHNS],
       smps_per_record,
       datrecs=1,
-      empty_buf;
+      empty_buf,
+      ret_stat;
 
-  char str[128],
+  char str[256],
        opath[MAX_PATHLEN];
 
-  short *wavbuf[4];
+  short *wavbuf[MAX_CHNS];
 
   long long rec_len=0LL;
 
@@ -205,7 +206,11 @@ void UI_Mainwindow::save_memory_waveform()
 
   QEventLoop ev_loop;
 
+  QMessageBox wi_msg_box;
+
   save_data_thread get_data_thrd(0);
+
+  save_data_thread sav_data_thrd(1);
 
   if(device == NULL)
   {
@@ -216,10 +221,10 @@ void UI_Mainwindow::save_memory_waveform()
 
   scrn_thread->wait();
 
-  wavbuf[0] = NULL;
-  wavbuf[1] = NULL;
-  wavbuf[2] = NULL;
-  wavbuf[3] = NULL;
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    wavbuf[i] = NULL;
+  }
 
   mempnts = devparms.acquirememdepth;
 
@@ -521,6 +526,8 @@ void UI_Mainwindow::save_memory_waveform()
     goto OUT_ERROR;
   }
 
+  statusLabel->setText("Saving EDF file...");
+
   if(edf_set_datarecord_us_duration(hdl, (rec_len / 10LL) / datrecs))
   {
     strcpy(str, "Can not set datarecord duration of EDF file.");
@@ -559,26 +566,36 @@ void UI_Mainwindow::save_memory_waveform()
 
   edf_set_equipment(hdl, devparms.modelname);
 
-  for(i=0; i<datrecs; i++)
-  {
-    for(chn=0; chn<MAX_CHNS; chn++)
-    {
-      if(!devparms.chandisplay[chn])
-      {
-        continue;
-      }
+  sav_data_thrd.init_save_memory_edf_file(&devparms, hdl, datrecs, smps_per_record, wavbuf);
 
-      if(edfwrite_digital_short_samples(hdl, wavbuf[chn] + (i * smps_per_record)))
-      {
-        strcpy(str, "A write error occurred.");
-        goto OUT_ERROR;
-      }
-    }
+  connect(&sav_data_thrd, SIGNAL(finished()), &ev_loop, SLOT(quit()));
+
+  wi_msg_box.setIcon(QMessageBox::NoIcon);
+  wi_msg_box.setText("Saving EDF file ...");
+  wi_msg_box.setStandardButtons(QMessageBox::Abort);
+
+  connect(&sav_data_thrd, SIGNAL(finished()), &wi_msg_box, SLOT(accept()));
+
+  sav_data_thrd.start();
+
+  ret_stat = wi_msg_box.exec();
+
+  if(ret_stat != QDialog::Accepted)
+  {
+    strcpy(str, "Saving EDF file aborted.");
+    goto OUT_ERROR;
+  }
+
+  if(sav_data_thrd.get_error_num())
+  {
+    sav_data_thrd.get_error_str(str);
+    goto OUT_ERROR;
   }
 
 OUT_NORMAL:
 
   disconnect(&get_data_thrd, 0, 0, 0);
+  disconnect(&sav_data_thrd, 0, 0, 0);
 
   if(hdl >= 0)
   {
@@ -588,6 +605,7 @@ OUT_NORMAL:
   for(chn=0; chn<MAX_CHNS; chn++)
   {
     free(wavbuf[chn]);
+    wavbuf[chn] = NULL;
   }
 
   scrn_timer->start(devparms.screentimerival);
@@ -597,15 +615,11 @@ OUT_NORMAL:
 OUT_ERROR:
 
   disconnect(&get_data_thrd, 0, 0, 0);
+  disconnect(&sav_data_thrd, 0, 0, 0);
 
   progress.reset();
 
   statusLabel->setText("Downloading aborted");
-
-  if(hdl >= 0)
-  {
-    edfclose_file(hdl);
-  }
 
   if(get_data_thrd.isRunning() == true)
   {
@@ -617,6 +631,11 @@ OUT_ERROR:
     connect(&get_data_thrd, SIGNAL(finished()), &w_msg_box, SLOT(accept()));
 
     w_msg_box.exec();
+  }
+
+  if(hdl >= 0)
+  {
+    edfclose_file(hdl);
   }
 
   if(progress.wasCanceled() == false)
@@ -657,6 +676,7 @@ OUT_ERROR:
   for(chn=0; chn<MAX_CHNS; chn++)
   {
     free(wavbuf[chn]);
+    wavbuf[chn] = NULL;
   }
 
   scrn_timer->start(devparms.screentimerival);
@@ -715,7 +735,7 @@ void UI_Mainwindow::save_screen_waveform()
   char str[128],
        opath[MAX_PATHLEN];
 
-  short *wavbuf[4];
+  short *wavbuf[MAX_CHNS];
 
   long long rec_len=0LL;
 
@@ -726,10 +746,10 @@ void UI_Mainwindow::save_screen_waveform()
     return;
   }
 
-  wavbuf[0] = NULL;
-  wavbuf[1] = NULL;
-  wavbuf[2] = NULL;
-  wavbuf[3] = NULL;
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    wavbuf[i] = NULL;
+  }
 
   save_data_thread get_data_thrd(0);
 
@@ -977,6 +997,7 @@ OUT_NORMAL:
   for(chn=0; chn<MAX_CHNS; chn++)
   {
     free(wavbuf[chn]);
+    wavbuf[chn] = NULL;
   }
 
   scrn_timer->start(devparms.screentimerival);
@@ -1005,6 +1026,7 @@ OUT_ERROR:
   for(chn=0; chn<MAX_CHNS; chn++)
   {
     free(wavbuf[chn]);
+    wavbuf[chn] = NULL;
   }
 
   scrn_timer->start(devparms.screentimerival);

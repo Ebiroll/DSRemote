@@ -32,17 +32,23 @@
 
 
 
-save_data_thread::save_data_thread(int job_s, int hdl_s)
+save_data_thread::save_data_thread(int job_s)
 {
   job = job_s;
 
-  hdl = hdl_s;
+  hdl = -1;
 
   err_num = -1;
 
   err_str[0] = 0;
 
   n_bytes_rcvd = -1;
+
+  devparms = NULL;
+
+  datrecs = 0;
+
+  smps_per_record = 0;
 }
 
 
@@ -82,14 +88,79 @@ void save_data_thread::run()
 
 void save_data_thread::read_data(void)
 {
+  msleep(100);
+
   n_bytes_rcvd = tmc_read();
 
   err_num = 0;
 }
 
 
+void save_data_thread::init_save_memory_edf_file(struct device_settings *devp, int hdl_s,
+                                                 int records, int smpls,
+                                                 short **wav)
+{
+  datrecs = records;
+
+  devparms = devp;
+
+  smps_per_record = smpls;
+
+  wavbuf = wav;
+
+  hdl = hdl_s;
+}
+
+
 void save_data_thread::save_memory_edf_file(void)
 {
+  int i, chn;
+
+  if(devparms == NULL)
+  {
+    strcpy(err_str, "save_memory_edf_file(): Invalid devparms pointer.");
+
+    err_num = 1;
+
+    msleep(200);
+
+    return;
+  }
+
+  if(hdl < 0)
+  {
+    strcpy(err_str, "save_memory_edf_file(): Invalid handel.");
+
+    err_num = 2;
+
+    msleep(200);
+
+    return;
+  }
+
+  msleep(100);
+
+  for(i=0; i<datrecs; i++)
+  {
+    for(chn=0; chn<MAX_CHNS; chn++)
+    {
+      if(!devparms->chandisplay[chn])
+      {
+        continue;
+      }
+
+      if(edfwrite_digital_short_samples(hdl, wavbuf[chn] + (i * smps_per_record)))
+      {
+        strcpy(err_str, "A file write error occurred.");
+
+        err_num = 3;
+
+        return;
+      }
+    }
+  }
+
+  err_num = 0;
 }
 
 
