@@ -56,6 +56,7 @@ HEADERS += screen_thread.h
 HEADERS += lan_connect_thread.h
 HEADERS += read_settings_thread.h
 HEADERS += save_data_thread.h
+HEADERS += decode_dialog.h
 
 HEADERS += third_party/kiss_fft/kiss_fft.h
 HEADERS += third_party/kiss_fft/_kiss_fft_guts.h
@@ -80,6 +81,7 @@ SOURCES += screen_thread.cpp
 SOURCES += lan_connect_thread.cpp
 SOURCES += read_settings_thread.cpp
 SOURCES += save_data_thread.cpp
+SOURCES += decode_dialog.cpp
 
 SOURCES += third_party/kiss_fft/kiss_fft.c
 SOURCES += third_party/kiss_fft/kiss_fftr.c

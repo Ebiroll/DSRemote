@@ -574,6 +574,9 @@ UI_Mainwindow::UI_Mainwindow()
 
 
   show();
+
+//   UI_decoder_window wi(this);
+//   wi.exec();
 }
 
 

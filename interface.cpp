@@ -2435,6 +2435,8 @@ void UI_Mainwindow::math_menu()
 
   menu.addMenu(&submenufft);
 
+  menu.addAction("Decode", this, SLOT(show_decode_window()));
+
   menu.exec(mathMenuButton->mapToGlobal(QPoint(0,0)));
 }
 
@@ -3983,6 +3985,14 @@ void UI_Mainwindow::set_fft_voffset()
 
   waveForm->update();
 }
+
+
+void UI_Mainwindow::show_decode_window()
+{
+  UI_decoder_window w(this);
+}
+
+
 
 
 

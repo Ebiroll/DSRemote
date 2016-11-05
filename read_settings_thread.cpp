@@ -1510,6 +1510,960 @@ void read_settings_thread::run()
     devparms->fft_vscale = atof(device->buf);
   }
 
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:MODE?") != 11)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:MODE?") != 11)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "PAR"))
+  {
+    devparms->math_decode_mode = 0;
+  }
+  else if(!strcmp(device->buf, "UART"))
+    {
+      devparms->math_decode_mode = 1;
+    }
+    else if(!strcmp(device->buf, "RS232"))
+      {
+        devparms->math_decode_mode = 1;
+      }
+      else if(!strcmp(device->buf, "SPI"))
+        {
+          devparms->math_decode_mode = 2;
+        }
+        else if(!strcmp(device->buf, "IIC"))
+          {
+            devparms->math_decode_mode = 3;
+          }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:DISP?") != 11)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:DISP?") != 11)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_display = atoi(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:FORM?") != 11)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:FORM?") != 11)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "HEX"))
+  {
+    devparms->math_decode_format = 0;
+  }
+  else if(!strcmp(device->buf, "ASC"))
+    {
+      devparms->math_decode_format = 1;
+    }
+    else if(!strcmp(device->buf, "DEC"))
+      {
+        devparms->math_decode_format = 2;
+      }
+      else if(!strcmp(device->buf, "BIN"))
+        {
+          devparms->math_decode_format = 3;
+        }
+        else if(!strcmp(device->buf, "LINE"))
+          {
+            devparms->math_decode_format = 4;
+          }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:IIC:OFFS?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:POS?") != 10)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_pos = atoi(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:MISO:THR?") != 19)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:THRE:CHAN1?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_threshold[0] = atof(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:MOSI:THR?") != 19)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:THRE:CHAN2?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_threshold[1] = atof(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:SCLK:THR?") != 19)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:THRE:CHAN3?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_threshold[2] = atof(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:SS:THR?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:THRE:CHAN4?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_threshold[3] = atof(device->buf);
+
+  if(devparms->modelserie != 6)
+  {
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":DEC1:THRE:AUTO?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->math_decode_threshold_auto = atoi(device->buf);
+  }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:RS232:RX?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:UART:RX?") != 14)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "CHAN1"))
+  {
+    devparms->math_decode_uart_rx = 1;
+  }
+  else if(!strcmp(device->buf, "CHAN2"))
+    {
+      devparms->math_decode_uart_rx = 2;
+    }
+    else if(!strcmp(device->buf, "CHAN3"))
+      {
+        devparms->math_decode_uart_rx = 3;
+      }
+      else if(!strcmp(device->buf, "CHAN4"))
+        {
+          devparms->math_decode_uart_rx = 4;
+        }
+        else if(!strcmp(device->buf, "OFF"))
+          {
+            devparms->math_decode_uart_rx = 0;
+          }
+          else
+          {
+            devparms->math_decode_uart_rx = 0;
+          }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:RS232:TX?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:UART:TX?") != 14)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "CHAN1"))
+  {
+    devparms->math_decode_uart_tx = 1;
+  }
+  else if(!strcmp(device->buf, "CHAN2"))
+    {
+      devparms->math_decode_uart_tx = 2;
+    }
+    else if(!strcmp(device->buf, "CHAN3"))
+      {
+        devparms->math_decode_uart_tx = 3;
+      }
+      else if(!strcmp(device->buf, "CHAN4"))
+        {
+          devparms->math_decode_uart_tx = 4;
+        }
+        else if(!strcmp(device->buf, "OFF"))
+          {
+            devparms->math_decode_uart_tx = 0;
+          }
+          else
+          {
+            devparms->math_decode_uart_tx = 0;
+          }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:RS232:POL?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:UART:POL?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "POS"))
+  {
+    devparms->math_decode_uart_pol = 1;
+  }
+  else if(!strcmp(device->buf, "NEG"))
+    {
+      devparms->math_decode_uart_pol = 0;
+    }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:RS232:END?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:UART:END?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "MSB"))
+  {
+    devparms->math_decode_uart_pol = 1;
+  }
+  else if(!strcmp(device->buf, "LSB"))
+    {
+      devparms->math_decode_uart_pol = 0;
+    }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:RS232:BAUD?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:UART:BAUD?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_uart_baud = atoi(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:RS232:DBIT?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:UART:WIDT?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_uart_width = atoi(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:RS232:SBIT?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:UART:STOP?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_uart_stop = atoi(device->buf);
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:RS232:PAR?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:UART:PAR?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "ODD"))
+  {
+    devparms->math_decode_uart_par = 1;
+  }
+  else if(!strcmp(device->buf, "EVEN"))
+    {
+      devparms->math_decode_uart_par = 2;
+    }
+    else if(!strcmp(device->buf, "NONE"))
+      {
+        devparms->math_decode_uart_par = 0;
+      }
+      else
+      {
+        devparms->math_decode_uart_par = 0;
+      }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:SCLK:SOUR?") != 20)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:SPI:CLK?") != 14)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "CHAN1"))
+  {
+    devparms->math_decode_spi_clk = 1;
+  }
+  else if(!strcmp(device->buf, "CHAN2"))
+    {
+      devparms->math_decode_spi_clk = 2;
+    }
+    else if(!strcmp(device->buf, "CHAN3"))
+      {
+        devparms->math_decode_spi_clk = 3;
+      }
+      else if(!strcmp(device->buf, "CHAN4"))
+        {
+          devparms->math_decode_spi_clk = 4;
+        }
+        else if(!strcmp(device->buf, "OFF"))
+          {
+            devparms->math_decode_spi_clk = 0;
+          }
+          else
+          {
+            devparms->math_decode_spi_clk = 0;
+          }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:MISO:SOUR?") != 20)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:SPI:MISO?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "CHAN1"))
+  {
+    devparms->math_decode_spi_miso = 1;
+  }
+  else if(!strcmp(device->buf, "CHAN2"))
+    {
+      devparms->math_decode_spi_miso = 2;
+    }
+    else if(!strcmp(device->buf, "CHAN3"))
+      {
+        devparms->math_decode_spi_miso = 3;
+      }
+      else if(!strcmp(device->buf, "CHAN4"))
+        {
+          devparms->math_decode_spi_miso = 4;
+        }
+        else if(!strcmp(device->buf, "OFF"))
+          {
+            devparms->math_decode_spi_miso = 0;
+          }
+          else
+          {
+            devparms->math_decode_spi_miso = 0;
+          }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:MOSI:SOUR?") != 20)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:SPI:MOSI?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "CHAN1"))
+  {
+    devparms->math_decode_spi_mosi = 1;
+  }
+  else if(!strcmp(device->buf, "CHAN2"))
+    {
+      devparms->math_decode_spi_mosi = 2;
+    }
+    else if(!strcmp(device->buf, "CHAN3"))
+      {
+        devparms->math_decode_spi_mosi = 3;
+      }
+      else if(!strcmp(device->buf, "CHAN4"))
+        {
+          devparms->math_decode_spi_mosi = 4;
+        }
+        else if(!strcmp(device->buf, "OFF"))
+          {
+            devparms->math_decode_spi_mosi = 0;
+          }
+          else
+          {
+            devparms->math_decode_spi_mosi = 0;
+          }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:SS:SOUR?") != 18)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:SPI:CS?") != 13)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "CHAN1"))
+  {
+    devparms->math_decode_spi_cs = 1;
+  }
+  else if(!strcmp(device->buf, "CHAN2"))
+    {
+      devparms->math_decode_spi_cs = 2;
+    }
+    else if(!strcmp(device->buf, "CHAN3"))
+      {
+        devparms->math_decode_spi_cs = 3;
+      }
+      else if(!strcmp(device->buf, "CHAN4"))
+        {
+          devparms->math_decode_spi_cs = 4;
+        }
+        else if(!strcmp(device->buf, "OFF"))
+          {
+            devparms->math_decode_spi_cs = 0;
+          }
+          else
+          {
+            devparms->math_decode_spi_cs = 0;
+          }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:SS:POL?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:SPI:SEL?") != 14)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "NCS"))
+  {
+    devparms->math_decode_spi_select = 0;
+  }
+  else if(!strcmp(device->buf, "CS"))
+    {
+      devparms->math_decode_spi_select = 1;
+    }
+    else if(!strcmp(device->buf, "NEG"))
+    {
+      devparms->math_decode_spi_select = 0;
+    }
+    else if(!strcmp(device->buf, "POS"))
+      {
+        devparms->math_decode_spi_select = 1;
+      }
+
+  if(devparms->modelserie != 6)
+  {
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":DEC1:SPI:MODE?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(!strcmp(device->buf, "TIM"))
+    {
+      devparms->math_decode_spi_mode = 0;
+    }
+    else if(!strcmp(device->buf, "CS"))
+      {
+        devparms->math_decode_spi_mode = 1;
+      }
+  }
+
+  if(devparms->modelserie != 6)
+  {
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":DEC1:SPI:TIM?") != 14)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->math_decode_spi_timeout = atof(device->buf);
+  }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:MOSI:POL?") != 19)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:SPI:POL?") != 14)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "NEG"))
+  {
+    devparms->math_decode_spi_pol = 0;
+  }
+  else if(!strcmp(device->buf, "POS"))
+    {
+      devparms->math_decode_spi_pol = 1;
+    }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:SCLK:SLOP?") != 20)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:SPI:EDGE?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "NEG"))
+  {
+    devparms->math_decode_spi_edge = 0;
+  }
+  else if(!strcmp(device->buf, "POS"))
+    {
+      devparms->math_decode_spi_edge = 1;
+    }
+    else if(!strcmp(device->buf, "FALL"))
+      {
+        devparms->math_decode_spi_edge = 0;
+      }
+      else if(!strcmp(device->buf, "RISE"))
+        {
+          devparms->math_decode_spi_edge = 1;
+        }
+
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:DBIT?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:SPI:WIDT?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  devparms->math_decode_spi_width = atoi(device->buf);
+
   err_num = 0;
 
   return;

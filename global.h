@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.32_1610311104"
+#define PROGRAM_VERSION       "0.33_1611051503"
 
 #define MAX_PATHLEN            4096
 
@@ -164,6 +164,42 @@ struct device_settings
 
   int countersrc;               // 0=off, 1=ch1, 2=ch2, 3=ch3, 4=ch4
   double counterfreq;           // Value of frequency counter
+
+  int math_decode_display;      // 0=off, 1=on
+  int math_decode_mode;         // 0=par, 1=uart, 2=spi, 3=iic
+  int math_decode_format;       // 0=hex, 1=ascii, 2=dec, 3=bin, 4=line
+  int math_decode_pos;          // vertical position of the decode trace,
+                                // the screen is divided into 400 parts vertically which
+                                // are marked as 0 to 400 from top to bottom respectively
+                                // the range of <pos> is from 50 to 350
+  double math_decode_threshold[MAX_CHNS];  // threshold of decode channel 1 (SPI:MISO for modelserie 6)
+                                           // threshold of decode channel 2 (SPI:MOSI for modelserie 6)
+                                           // threshold of decode channel 3 (SPI:SCLK for modelserie 6)
+                                           // threshold of decode channel 4 (SPI:SS for modelserie 6)
+                                           // (-4 x VerticalScale - VerticalOffset) to
+                                           // (4 x VerticalScale - VerticalOffset)
+  int math_decode_threshold_auto;  // 0=off, 1=on
+
+  int math_decode_spi_clk;      // channel (0=off)
+  int math_decode_spi_miso;     // channel (0=off)
+  int math_decode_spi_mosi;     // channel (0=off)
+  int math_decode_spi_cs;       // channel (0=off)
+  int math_decode_spi_select;   // select cs level, 0=low, 1=high
+  int math_decode_spi_mode;     // frame mode, 0=timeout, 1=cs (chip select)
+  double math_decode_spi_timeout;  // timeout
+  int math_decode_spi_pol;      // polarity of serial data line, 0=negative, 1=positive
+  int math_decode_spi_edge;     // edge, 0=falling edge of clock, 1=rising edge of clock
+  int math_decode_spi_end;      // endian, 0=lsb, 1=msb
+  int math_decode_spi_width;    // databits, 8-32
+
+  int math_decode_uart_tx;      // channel (0=off)
+  int math_decode_uart_rx;      // channel (0=off)
+  int math_decode_uart_pol;     // polarity, 0=negative, 1=positive
+  int math_decode_uart_end;     // endian, 0=lsb, 1=msb
+  int math_decode_uart_baud;    // baudrate
+  int math_decode_uart_width;   // databits, 5-8
+  int math_decode_uart_stop;    // stopbits, 0=1, 1=1.5, 2=2
+  int math_decode_uart_par;     // parity, 0=none, 1=odd, 2=even
 
   char *screenshot_buf;
   short *wavebuf[MAX_CHNS];

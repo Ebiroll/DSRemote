@@ -88,6 +88,7 @@
 #include "lan_connect_thread.h"
 #include "read_settings_thread.h"
 #include "save_data_thread.h"
+#include "decode_dialog.h"
 
 #include "third_party/kiss_fft/kiss_fftr.h"
 
@@ -436,6 +437,8 @@ private slots:
   void select_fft_voffsetm3();
   void select_fft_voffsetm4();
   void set_fft_voffset();
+
+  void show_decode_window();
 
   void updateLabels();
 
