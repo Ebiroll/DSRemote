@@ -158,6 +158,22 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   spi_select_combobox->addItem("High");
   spi_select_combobox->setCurrentIndex(devparms->math_decode_spi_select);
 
+  spi_format_label = new QLabel(tab_spi);
+  spi_format_label->setGeometry(270, 160, 100, 25);
+  spi_format_label->setText("Format");
+
+  spi_format_combobox = new QComboBox(tab_spi);
+  spi_format_combobox->setGeometry(370, 160, 100, 25);
+  spi_format_combobox->addItem("Hexadecimal");
+  spi_format_combobox->addItem("ASCII");
+  spi_format_combobox->addItem("Decimal");
+  spi_format_combobox->addItem("Binary");
+  if(devparms->modelserie != 6)
+  {
+    spi_format_combobox->addItem("Line");
+  }
+  spi_format_combobox->setCurrentIndex(devparms->math_decode_format);
+
   spi_mode_label = new QLabel(tab_spi);
   spi_mode_label->setGeometry(10, 195, 100, 25);
   spi_mode_label->setText("Mode");
@@ -264,6 +280,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   connect(spi_cs_threshold_dspinbox,   SIGNAL(editingFinished()),        this, SLOT(spi_cs_threshold_dspinbox_changed()));
 
   connect(spi_width_spinbox,           SIGNAL(editingFinished()),        this, SLOT(spi_width_spinbox_changed()));
+  connect(spi_trace_pos_spinbox,       SIGNAL(editingFinished()),        this, SLOT(spi_trace_pos_spinbox_changed()));
 
   connect(tabholder,                   SIGNAL(currentChanged(int)),      this, SLOT(tabholder_index_changed(int)));
 
@@ -272,6 +289,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   connect(spi_polarity_combobox,       SIGNAL(currentIndexChanged(int)), this, SLOT(spi_polarity_combobox_clicked(int)));
   connect(spi_edge_combobox,           SIGNAL(currentIndexChanged(int)), this, SLOT(spi_edge_combobox_clicked(int)));
   connect(spi_endian_combobox,         SIGNAL(currentIndexChanged(int)), this, SLOT(spi_endian_combobox_clicked(int)));
+  connect(spi_format_combobox,         SIGNAL(currentIndexChanged(int)), this, SLOT(spi_format_combobox_clicked(int)));
 
   connect(close_button,                SIGNAL(clicked()),                this, SLOT(accept()));
   connect(toggle_decode_button,        SIGNAL(clicked()),                this, SLOT(toggle_decode()));
@@ -293,6 +311,25 @@ void UI_decoder_window::spi_width_spinbox_changed()
   else
   {
     sprintf(str, ":DEC1:SPI:WIDT %i", devparms->math_decode_spi_width);
+  }
+
+  mainwindow->set_cue_cmd(str);
+}
+
+
+void UI_decoder_window::spi_trace_pos_spinbox_changed()
+{
+  char str[256];
+
+  devparms->math_decode_pos = spi_trace_pos_spinbox->value();
+
+  if(devparms->modelserie == 6)
+  {
+//     sprintf(str, ":BUS1:SPI:OFFS %i", devparms->math_decode_pos);  :FIXME
+  }
+  else
+  {
+    sprintf(str, ":DEC1:POS %i", devparms->math_decode_pos);
   }
 
   mainwindow->set_cue_cmd(str);
@@ -431,6 +468,55 @@ void UI_decoder_window::spi_endian_combobox_clicked(int idx)
     {
       mainwindow->set_cue_cmd(":DEC1:SPI:END MSB");
     }
+  }
+}
+
+
+void UI_decoder_window::spi_format_combobox_clicked(int idx)
+{
+  devparms->math_decode_format = idx;
+
+  if(devparms->modelserie == 6)
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":BUS1:FORM HEX");
+    }
+    else if(idx == 1)
+      {
+        mainwindow->set_cue_cmd(":BUS1:FORM ASC");
+      }
+      else if(idx == 2)
+        {
+          mainwindow->set_cue_cmd(":BUS1:FORM DEC");
+        }
+        else if(idx == 3)
+          {
+            mainwindow->set_cue_cmd(":BUS1:FORM BIN");
+          }
+  }
+  else
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":DEC1:FORM HEX");
+    }
+    else if(idx == 1)
+      {
+        mainwindow->set_cue_cmd(":DEC1:FORM ASC");
+      }
+      else if(idx == 2)
+        {
+          mainwindow->set_cue_cmd(":DEC1:FORM DEC");
+        }
+        else if(idx == 3)
+          {
+            mainwindow->set_cue_cmd(":DEC1:FORM BIN");
+          }
+          else if(idx == 4)
+            {
+              mainwindow->set_cue_cmd(":DEC1:FORM LINE");
+            }
   }
 }
 

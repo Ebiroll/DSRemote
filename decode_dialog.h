@@ -88,7 +88,8 @@ private:
          *spi_mosi_threshold_label,
          *spi_miso_threshold_label,
          *spi_cs_threshold_label,
-         *spi_trace_pos_label;
+         *spi_trace_pos_label,
+         *spi_format_label;
 
   QComboBox *spi_clk_src_combobox,
             *spi_mosi_src_combobox,
@@ -99,7 +100,8 @@ private:
             *spi_polarity_combobox,
             *spi_edge_combobox,
             *spi_endian_combobox,
-            *spi_threshold_auto_combobox;
+            *spi_threshold_auto_combobox,
+            *spi_format_combobox;
 
   QSpinBox *spi_width_spinbox,
            *spi_trace_pos_spinbox;
@@ -130,7 +132,9 @@ private slots:
   void spi_edge_combobox_clicked(int);
   void spi_endian_combobox_clicked(int);
   void spi_width_spinbox_changed();
+  void spi_trace_pos_spinbox_changed();
   void toggle_decode();
+  void spi_format_combobox_clicked(int);
 
 };
 
