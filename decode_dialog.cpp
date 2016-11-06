@@ -255,10 +255,14 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   {
     toggle_decode_button->setText("Start Decoding");
   }
+  toggle_decode_button->setAutoDefault(false);
+  toggle_decode_button->setDefault(false);
 
   close_button = new QPushButton(this);
   close_button->setGeometry(570, 475, 100, 25);
   close_button->setText("Close");
+  close_button->setAutoDefault(false);
+  close_button->setDefault(false);
 
   tabholder->addTab(tab_par, "Parallel");
   tabholder->addTab(tab_uart, "UART");
@@ -291,7 +295,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   connect(spi_endian_combobox,         SIGNAL(currentIndexChanged(int)), this, SLOT(spi_endian_combobox_clicked(int)));
   connect(spi_format_combobox,         SIGNAL(currentIndexChanged(int)), this, SLOT(spi_format_combobox_clicked(int)));
 
-  connect(close_button,                SIGNAL(clicked()),                this, SLOT(accept()));
+  connect(close_button,                SIGNAL(clicked()),                this, SLOT(close()));
   connect(toggle_decode_button,        SIGNAL(clicked()),                this, SLOT(toggle_decode()));
 
   exec();
