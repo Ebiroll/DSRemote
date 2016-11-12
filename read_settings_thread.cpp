@@ -1764,6 +1764,41 @@ void read_settings_thread::run()
 
   devparms->math_decode_threshold[3] = atof(device->buf);
 
+  if(devparms->modelserie == 6)
+  {
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":BUS1:RS232:TTHR?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->math_decode_threshold_uart_tx = atof(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":BUS1:RS232:RTHR?") != 17)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->math_decode_threshold_uart_rx = atof(device->buf);
+  }
+
   if(devparms->modelserie != 6)
   {
     usleep(TMC_GDS_DELAY);
@@ -2101,28 +2136,20 @@ void read_settings_thread::run()
 
   if(!strcmp(device->buf, "CHAN1"))
   {
-    devparms->math_decode_spi_clk = 1;
+    devparms->math_decode_spi_clk = 0;
   }
   else if(!strcmp(device->buf, "CHAN2"))
     {
-      devparms->math_decode_spi_clk = 2;
+      devparms->math_decode_spi_clk = 1;
     }
     else if(!strcmp(device->buf, "CHAN3"))
       {
-        devparms->math_decode_spi_clk = 3;
+        devparms->math_decode_spi_clk = 2;
       }
       else if(!strcmp(device->buf, "CHAN4"))
         {
-          devparms->math_decode_spi_clk = 4;
+          devparms->math_decode_spi_clk = 3;
         }
-        else if(!strcmp(device->buf, "OFF"))
-          {
-            devparms->math_decode_spi_clk = 0;
-          }
-          else
-          {
-            devparms->math_decode_spi_clk = 0;
-          }
 
   usleep(TMC_GDS_DELAY);
 

@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1611061849"
+#define PROGRAM_VERSION       "0.33_1611121901"
 
 #define MAX_PATHLEN            4096
 
@@ -178,9 +178,12 @@ struct device_settings
                                            // threshold of decode channel 4 (SPI:SS for modelserie 6)
                                            // (-4 x VerticalScale - VerticalOffset) to
                                            // (4 x VerticalScale - VerticalOffset)
+  double math_decode_threshold_uart_tx;    // threshold of RS232:TX for modelserie 6
+  double math_decode_threshold_uart_rx;    // threshold of RS232:RX for modelserie 6
+
   int math_decode_threshold_auto;  // 0=off, 1=on
 
-  int math_decode_spi_clk;      // channel (0=off)
+  int math_decode_spi_clk;      // channel - 1
   int math_decode_spi_miso;     // channel (0=off)
   int math_decode_spi_mosi;     // channel (0=off)
   int math_decode_spi_cs;       // channel (0=off)

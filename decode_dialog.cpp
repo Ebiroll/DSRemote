@@ -42,7 +42,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   setMaximumSize(690, 525);
 
   tabholder = new QTabWidget(this);
-  tabholder->setGeometry(0, 0, 690, 455);
+  tabholder->setGeometry(0, 0, 250, 455);
 
   tab_par = new QWidget;
   tab_uart = new QWidget;
@@ -55,34 +55,36 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
 
   spi_clk_src_combobox = new QComboBox(tab_spi);
   spi_clk_src_combobox->setGeometry(130, 20, 100, 25);
-  spi_clk_src_combobox->addItem("Off");
   spi_clk_src_combobox->addItem("Ch. 1");
   spi_clk_src_combobox->addItem("Ch. 2");
-  spi_clk_src_combobox->addItem("Ch. 3");
-  spi_clk_src_combobox->addItem("Ch. 4");
+  if(devparms->channel_cnt == 4)
+  {
+    spi_clk_src_combobox->addItem("Ch. 3");
+    spi_clk_src_combobox->addItem("Ch. 4");
+  }
   spi_clk_src_combobox->setCurrentIndex(devparms->math_decode_spi_clk);
 
-  spi_clk_threshold_label = new QLabel(tab_spi);
-  spi_clk_threshold_label->setGeometry(270, 20, 100, 25);
-  spi_clk_threshold_label->setText("Threshold");
+  threshold_1_label = new QLabel(this);
+  threshold_1_label->setGeometry(270, 42, 100, 25);
+  threshold_1_label->setText("Threshold");
 
-  spi_clk_threshold_dspinbox = new QDoubleSpinBox(tab_spi);
-  spi_clk_threshold_dspinbox->setGeometry(370, 20, 100, 25);
-  spi_clk_threshold_dspinbox->setDecimals(3);
+  threshold_1_dspinbox = new QDoubleSpinBox(this);
+  threshold_1_dspinbox->setGeometry(370, 42, 100, 25);
+  threshold_1_dspinbox->setDecimals(3);
 
-  spi_threshold_auto_combobox = new QComboBox(tab_spi);
-  spi_threshold_auto_combobox->setGeometry(510, 20, 140, 25);
-  spi_threshold_auto_combobox->addItem("Manual threshold");
-  spi_threshold_auto_combobox->addItem("Auto threshold");
+  threshold_auto_combobox = new QComboBox(this);
+  threshold_auto_combobox->setGeometry(510, 42, 140, 25);
+  threshold_auto_combobox->addItem("Manual threshold");
+  threshold_auto_combobox->addItem("Auto threshold");
   if(devparms->modelserie == 6)
   {
     devparms->math_decode_threshold_auto = 0;
-    spi_threshold_auto_combobox->setCurrentIndex(0);
-    spi_threshold_auto_combobox->setEnabled(false);
+    threshold_auto_combobox->setCurrentIndex(0);
+    threshold_auto_combobox->setEnabled(false);
   }
   else
   {
-    spi_threshold_auto_combobox->setCurrentIndex(devparms->math_decode_threshold_auto);
+    threshold_auto_combobox->setCurrentIndex(devparms->math_decode_threshold_auto);
   }
 
   spi_mosi_src_label = new QLabel(tab_spi);
@@ -94,17 +96,20 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   spi_mosi_src_combobox->addItem("Off");
   spi_mosi_src_combobox->addItem("Ch. 1");
   spi_mosi_src_combobox->addItem("Ch. 2");
-  spi_mosi_src_combobox->addItem("Ch. 3");
-  spi_mosi_src_combobox->addItem("Ch. 4");
+  if(devparms->channel_cnt == 4)
+  {
+    spi_mosi_src_combobox->addItem("Ch. 3");
+    spi_mosi_src_combobox->addItem("Ch. 4");
+  }
   spi_mosi_src_combobox->setCurrentIndex(devparms->math_decode_spi_mosi);
 
-  spi_mosi_threshold_label = new QLabel(tab_spi);
-  spi_mosi_threshold_label->setGeometry(270, 55, 100, 25);
-  spi_mosi_threshold_label->setText("Threshold");
+  threshold_2_label = new QLabel(this);
+  threshold_2_label->setGeometry(270, 77, 100, 25);
+  threshold_2_label->setText("Threshold");
 
-  spi_mosi_threshold_dspinbox = new QDoubleSpinBox(tab_spi);
-  spi_mosi_threshold_dspinbox->setGeometry(370, 55, 100, 25);
-  spi_mosi_threshold_dspinbox->setDecimals(3);
+  threshold_2_dspinbox = new QDoubleSpinBox(this);
+  threshold_2_dspinbox->setGeometry(370, 77, 100, 25);
+  threshold_2_dspinbox->setDecimals(3);
 
   spi_miso_src_label = new QLabel(tab_spi);
   spi_miso_src_label->setGeometry(10, 90, 100, 25);
@@ -115,17 +120,20 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   spi_miso_src_combobox->addItem("Off");
   spi_miso_src_combobox->addItem("Ch. 1");
   spi_miso_src_combobox->addItem("Ch. 2");
-  spi_miso_src_combobox->addItem("Ch. 3");
-  spi_miso_src_combobox->addItem("Ch. 4");
+  if(devparms->channel_cnt == 4)
+  {
+    spi_miso_src_combobox->addItem("Ch. 3");
+    spi_miso_src_combobox->addItem("Ch. 4");
+  }
   spi_miso_src_combobox->setCurrentIndex(devparms->math_decode_spi_miso);
 
-  spi_miso_threshold_label = new QLabel(tab_spi);
-  spi_miso_threshold_label->setGeometry(270, 90, 100, 25);
-  spi_miso_threshold_label->setText("Threshold");
+  threshold_3_label = new QLabel(this);
+  threshold_3_label->setGeometry(270, 112, 100, 25);
+  threshold_3_label->setText("Threshold");
 
-  spi_miso_threshold_dspinbox = new QDoubleSpinBox(tab_spi);
-  spi_miso_threshold_dspinbox->setGeometry(370, 90, 100, 25);
-  spi_miso_threshold_dspinbox->setDecimals(3);
+  threshold_3_dspinbox = new QDoubleSpinBox(this);
+  threshold_3_dspinbox->setGeometry(370, 112, 100, 25);
+  threshold_3_dspinbox->setDecimals(3);
 
   spi_cs_src_label = new QLabel(tab_spi);
   spi_cs_src_label->setGeometry(10, 125, 100, 25);
@@ -136,17 +144,20 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   spi_cs_src_combobox->addItem("Off");
   spi_cs_src_combobox->addItem("Ch. 1");
   spi_cs_src_combobox->addItem("Ch. 2");
-  spi_cs_src_combobox->addItem("Ch. 3");
-  spi_cs_src_combobox->addItem("Ch. 4");
+  if(devparms->channel_cnt == 4)
+  {
+    spi_cs_src_combobox->addItem("Ch. 3");
+    spi_cs_src_combobox->addItem("Ch. 4");
+  }
   spi_cs_src_combobox->setCurrentIndex(devparms->math_decode_spi_cs);
 
-  spi_cs_threshold_label = new QLabel(tab_spi);
-  spi_cs_threshold_label->setGeometry(270, 125, 100, 25);
-  spi_cs_threshold_label->setText("Threshold");
+  threshold_4_label = new QLabel(this);
+  threshold_4_label->setGeometry(270, 147, 100, 25);
+  threshold_4_label->setText("Threshold");
 
-  spi_cs_threshold_dspinbox = new QDoubleSpinBox(tab_spi);
-  spi_cs_threshold_dspinbox->setGeometry(370, 125, 100, 25);
-  spi_cs_threshold_dspinbox->setDecimals(3);
+  threshold_4_dspinbox = new QDoubleSpinBox(this);
+  threshold_4_dspinbox->setGeometry(370, 147, 100, 25);
+  threshold_4_dspinbox->setDecimals(3);
 
   spi_select_label = new QLabel(tab_spi);
   spi_select_label->setGeometry(10, 160, 100, 25);
@@ -158,21 +169,21 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   spi_select_combobox->addItem("High");
   spi_select_combobox->setCurrentIndex(devparms->math_decode_spi_select);
 
-  spi_format_label = new QLabel(tab_spi);
-  spi_format_label->setGeometry(270, 160, 100, 25);
-  spi_format_label->setText("Format");
+  format_label = new QLabel(this);
+  format_label->setGeometry(270, 182, 100, 25);
+  format_label->setText("Format");
 
-  spi_format_combobox = new QComboBox(tab_spi);
-  spi_format_combobox->setGeometry(370, 160, 100, 25);
-  spi_format_combobox->addItem("Hexadecimal");
-  spi_format_combobox->addItem("ASCII");
-  spi_format_combobox->addItem("Decimal");
-  spi_format_combobox->addItem("Binary");
+  format_combobox = new QComboBox(this);
+  format_combobox->setGeometry(370, 182, 100, 25);
+  format_combobox->addItem("Hexadecimal");
+  format_combobox->addItem("ASCII");
+  format_combobox->addItem("Decimal");
+  format_combobox->addItem("Binary");
   if(devparms->modelserie != 6)
   {
-    spi_format_combobox->addItem("Line");
+    format_combobox->addItem("Line");
   }
-  spi_format_combobox->setCurrentIndex(devparms->math_decode_format);
+  format_combobox->setCurrentIndex(devparms->math_decode_format);
 
   spi_mode_label = new QLabel(tab_spi);
   spi_mode_label->setGeometry(10, 195, 100, 25);
@@ -234,16 +245,114 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   spi_width_spinbox->setRange(8, 32);
   spi_width_spinbox->setValue(devparms->math_decode_spi_width);
 
-  spi_trace_pos_label = new QLabel(tab_spi);
-  spi_trace_pos_label->setGeometry(270, 370, 100, 25);
-  spi_trace_pos_label->setText("Vertical position");
+  trace_pos_label = new QLabel(this);
+  trace_pos_label->setGeometry(270, 392, 100, 25);
+  trace_pos_label->setText("Vertical position");
 
-  spi_trace_pos_spinbox = new QSpinBox(tab_spi);
-  spi_trace_pos_spinbox->setGeometry(370, 370, 100, 25);
-  spi_trace_pos_spinbox->setRange(50, 350);
-  spi_trace_pos_spinbox->setValue(devparms->math_decode_pos);
+  trace_pos_spinbox = new QSpinBox(this);
+  trace_pos_spinbox->setGeometry(370, 392, 100, 25);
+  trace_pos_spinbox->setRange(50, 350);
+  trace_pos_spinbox->setValue(devparms->math_decode_pos);
 
-  spi_threshold_auto_clicked(devparms->math_decode_threshold_auto);
+  uart_tx_src_label = new QLabel(tab_uart);
+  uart_tx_src_label->setGeometry(10, 20, 100, 25);
+  uart_tx_src_label->setText("TX");
+
+  uart_tx_src_combobox = new QComboBox(tab_uart);
+  uart_tx_src_combobox->setGeometry(130, 20, 100, 25);
+  uart_tx_src_combobox->addItem("Off");
+  uart_tx_src_combobox->addItem("Ch. 1");
+  uart_tx_src_combobox->addItem("Ch. 2");
+  if(devparms->channel_cnt == 4)
+  {
+    uart_tx_src_combobox->addItem("Ch. 3");
+    uart_tx_src_combobox->addItem("Ch. 4");
+  }
+  uart_tx_src_combobox->setCurrentIndex(devparms->math_decode_uart_tx);
+
+  uart_rx_src_label = new QLabel(tab_uart);
+  uart_rx_src_label->setGeometry(10, 55, 100, 25);
+  uart_rx_src_label->setText("RX");
+
+  uart_rx_src_combobox = new QComboBox(tab_uart);
+  uart_rx_src_combobox->setGeometry(130, 55, 100, 25);
+  uart_rx_src_combobox->addItem("Off");
+  uart_rx_src_combobox->addItem("Ch. 1");
+  uart_rx_src_combobox->addItem("Ch. 2");
+  if(devparms->channel_cnt == 4)
+  {
+    uart_rx_src_combobox->addItem("Ch. 3");
+    uart_rx_src_combobox->addItem("Ch. 4");
+  }
+  uart_rx_src_combobox->setCurrentIndex(devparms->math_decode_uart_rx);
+
+  uart_polarity_label = new QLabel(tab_uart);
+  uart_polarity_label->setGeometry(10, 90, 100, 25);
+  uart_polarity_label->setText("Polarity");
+
+  uart_polarity_combobox = new QComboBox(tab_uart);
+  uart_polarity_combobox->setGeometry(130, 90, 100, 25);
+  uart_polarity_combobox->addItem("Negative");
+  uart_polarity_combobox->addItem("Positive");
+  uart_polarity_combobox->setCurrentIndex(devparms->math_decode_uart_pol);
+
+  uart_endian_label = new QLabel(tab_uart);
+  uart_endian_label->setGeometry(10, 125, 100, 25);
+  uart_endian_label->setText("Endian");
+
+  uart_endian_combobox = new QComboBox(tab_uart);
+  uart_endian_combobox->setGeometry(130, 125, 100, 25);
+  uart_endian_combobox->addItem("LSB");
+  uart_endian_combobox->addItem("MSB");
+  uart_endian_combobox->setCurrentIndex(devparms->math_decode_uart_end);
+
+  uart_baud_label = new QLabel(tab_uart);
+  uart_baud_label->setGeometry(10, 160, 100, 25);
+  uart_baud_label->setText("Baudrate");
+
+  uart_baud_spinbox = new QSpinBox(tab_uart);
+  uart_baud_spinbox->setGeometry(130, 160, 100, 25);
+  uart_baud_spinbox->setRange(110, 20000000);
+  uart_baud_spinbox->setValue(devparms->math_decode_uart_baud);
+
+  uart_width_label = new QLabel(tab_uart);
+  uart_width_label->setGeometry(10, 195, 100, 25);
+  uart_width_label->setText("Data bits");
+
+  uart_width_combobox = new QComboBox(tab_uart);
+  uart_width_combobox->setGeometry(130, 195, 100, 25);
+  uart_width_combobox->addItem("5");
+  uart_width_combobox->addItem("6");
+  uart_width_combobox->addItem("7");
+  uart_width_combobox->addItem("8");
+  if((devparms->math_decode_uart_width >= 5) && (devparms->math_decode_uart_width <= 8))
+  {
+    uart_width_combobox->setCurrentIndex(devparms->math_decode_uart_width - 5);
+  }
+
+  uart_stop_label = new QLabel(tab_uart);
+  uart_stop_label->setGeometry(10, 230, 100, 25);
+  uart_stop_label->setText("Stop bits");
+
+  uart_stop_combobox = new QComboBox(tab_uart);
+  uart_stop_combobox->setGeometry(130, 230, 100, 25);
+  uart_stop_combobox->addItem("1");
+  uart_stop_combobox->addItem("1.5");
+  uart_stop_combobox->addItem("2");
+  uart_stop_combobox->setCurrentIndex(devparms->math_decode_uart_stop);
+
+  uart_parity_label = new QLabel(tab_uart);
+  uart_parity_label->setGeometry(10, 265, 100, 25);
+  uart_parity_label->setText("Parity");
+
+  uart_parity_combobox = new QComboBox(tab_uart);
+  uart_parity_combobox->setGeometry(130, 265, 100, 25);
+  uart_parity_combobox->addItem("None");
+  uart_parity_combobox->addItem("Odd");
+  uart_parity_combobox->addItem("Even");
+  uart_parity_combobox->setCurrentIndex(devparms->math_decode_uart_par);
+
+  threshold_auto_clicked(devparms->math_decode_threshold_auto);
 
   toggle_decode_button = new QPushButton(this);
   toggle_decode_button->setGeometry(20, 475, 100, 25);
@@ -270,21 +379,31 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   tabholder->addTab(tab_iic, "I2C");
 
   tabholder->setCurrentIndex(devparms->math_decode_mode);
+  tabholder_index_changed(devparms->math_decode_mode);
 
-  connect(spi_threshold_auto_combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(spi_threshold_auto_clicked(int)));
+  connect(threshold_auto_combobox,     SIGNAL(currentIndexChanged(int)), this, SLOT(threshold_auto_clicked(int)));
 
-  connect(spi_clk_src_combobox,        SIGNAL(currentIndexChanged(int)), this, SLOT(spi_src_combobox_clicked(int)));
-  connect(spi_mosi_src_combobox,       SIGNAL(currentIndexChanged(int)), this, SLOT(spi_src_combobox_clicked(int)));
-  connect(spi_miso_src_combobox,       SIGNAL(currentIndexChanged(int)), this, SLOT(spi_src_combobox_clicked(int)));
-  connect(spi_cs_src_combobox,         SIGNAL(currentIndexChanged(int)), this, SLOT(spi_src_combobox_clicked(int)));
+  connect(uart_tx_src_combobox,        SIGNAL(currentIndexChanged(int)), this, SLOT(src_combobox_clicked(int)));
+  connect(uart_rx_src_combobox,        SIGNAL(currentIndexChanged(int)), this, SLOT(src_combobox_clicked(int)));
+  connect(uart_polarity_combobox,      SIGNAL(currentIndexChanged(int)), this, SLOT(uart_polarity_combobox_clicked(int)));
+  connect(uart_endian_combobox,        SIGNAL(currentIndexChanged(int)), this, SLOT(uart_endian_combobox_clicked(int)));
+  connect(uart_width_combobox,         SIGNAL(currentIndexChanged(int)), this, SLOT(uart_width_combobox_clicked(int)));
+  connect(uart_stop_combobox,          SIGNAL(currentIndexChanged(int)), this, SLOT(uart_stop_combobox_clicked(int)));
+  connect(uart_parity_combobox,        SIGNAL(currentIndexChanged(int)), this, SLOT(uart_parity_combobox_clicked(int)));
 
-  connect(spi_mosi_threshold_dspinbox, SIGNAL(editingFinished()),        this, SLOT(spi_mosi_threshold_dspinbox_changed()));
-  connect(spi_miso_threshold_dspinbox, SIGNAL(editingFinished()),        this, SLOT(spi_miso_threshold_dspinbox_changed()));
-  connect(spi_clk_threshold_dspinbox,  SIGNAL(editingFinished()),        this, SLOT(spi_clk_threshold_dspinbox_changed()));
-  connect(spi_cs_threshold_dspinbox,   SIGNAL(editingFinished()),        this, SLOT(spi_cs_threshold_dspinbox_changed()));
+  connect(spi_clk_src_combobox,        SIGNAL(currentIndexChanged(int)), this, SLOT(src_combobox_clicked(int)));
+  connect(spi_mosi_src_combobox,       SIGNAL(currentIndexChanged(int)), this, SLOT(src_combobox_clicked(int)));
+  connect(spi_miso_src_combobox,       SIGNAL(currentIndexChanged(int)), this, SLOT(src_combobox_clicked(int)));
+  connect(spi_cs_src_combobox,         SIGNAL(currentIndexChanged(int)), this, SLOT(src_combobox_clicked(int)));
 
+  connect(threshold_1_dspinbox,        SIGNAL(editingFinished()),        this, SLOT(threshold_1_dspinbox_changed()));
+  connect(threshold_2_dspinbox,        SIGNAL(editingFinished()),        this, SLOT(threshold_2_dspinbox_changed()));
+  connect(threshold_3_dspinbox,        SIGNAL(editingFinished()),        this, SLOT(threshold_3_dspinbox_changed()));
+  connect(threshold_4_dspinbox,        SIGNAL(editingFinished()),        this, SLOT(threshold_4_dspinbox_changed()));
+
+  connect(uart_baud_spinbox,           SIGNAL(editingFinished()),        this, SLOT(uart_baud_spinbox_changed()));
   connect(spi_width_spinbox,           SIGNAL(editingFinished()),        this, SLOT(spi_width_spinbox_changed()));
-  connect(spi_trace_pos_spinbox,       SIGNAL(editingFinished()),        this, SLOT(spi_trace_pos_spinbox_changed()));
+  connect(trace_pos_spinbox,           SIGNAL(editingFinished()),        this, SLOT(trace_pos_spinbox_changed()));
 
   connect(tabholder,                   SIGNAL(currentChanged(int)),      this, SLOT(tabholder_index_changed(int)));
 
@@ -293,12 +412,186 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   connect(spi_polarity_combobox,       SIGNAL(currentIndexChanged(int)), this, SLOT(spi_polarity_combobox_clicked(int)));
   connect(spi_edge_combobox,           SIGNAL(currentIndexChanged(int)), this, SLOT(spi_edge_combobox_clicked(int)));
   connect(spi_endian_combobox,         SIGNAL(currentIndexChanged(int)), this, SLOT(spi_endian_combobox_clicked(int)));
-  connect(spi_format_combobox,         SIGNAL(currentIndexChanged(int)), this, SLOT(spi_format_combobox_clicked(int)));
+  connect(format_combobox,             SIGNAL(currentIndexChanged(int)), this, SLOT(format_combobox_clicked(int)));
 
   connect(close_button,                SIGNAL(clicked()),                this, SLOT(close()));
   connect(toggle_decode_button,        SIGNAL(clicked()),                this, SLOT(toggle_decode()));
 
   exec();
+}
+
+
+void UI_decoder_window::uart_polarity_combobox_clicked(int idx)
+{
+  devparms->math_decode_uart_pol = idx;
+
+  if(devparms->modelserie == 6)
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":BUS1:RS232:POL NEG");
+    }
+    else
+    {
+      mainwindow->set_cue_cmd(":BUS1:RS232:POL POS");
+    }
+  }
+  else
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":DEC1:UART:POL NEG");
+    }
+    else
+    {
+      mainwindow->set_cue_cmd(":DEC1:UART:POL POS");
+    }
+  }
+}
+
+
+void UI_decoder_window::uart_endian_combobox_clicked(int idx)
+{
+  devparms->math_decode_uart_end = idx;
+
+  if(devparms->modelserie == 6)
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":BUS1:RS232:END LSB");
+    }
+    else
+    {
+      mainwindow->set_cue_cmd(":BUS1:RS232:END MSB");
+    }
+  }
+  else
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":DEC1:UART:END LSB");
+    }
+    else
+    {
+      mainwindow->set_cue_cmd(":DEC1:UART:END MSB");
+    }
+  }
+}
+
+
+void UI_decoder_window::uart_baud_spinbox_changed()
+{
+  char str[256];
+
+  devparms->math_decode_uart_baud = uart_baud_spinbox->value();
+
+  if(devparms->modelserie == 6)
+  {
+    sprintf(str, ":BUS1:RS232:BAUD %i", devparms->math_decode_uart_baud);
+  }
+  else
+  {
+    sprintf(str, ":DEC1:UART:BAUD %i", devparms->math_decode_uart_baud);
+  }
+
+  mainwindow->set_cue_cmd(str);
+}
+
+
+void UI_decoder_window::uart_width_combobox_clicked(int idx)
+{
+  char str[256];
+
+  idx += 5;
+
+  devparms->math_decode_uart_width = idx;
+
+  if(devparms->modelserie == 6)
+  {
+    sprintf(str, ":BUS1:RS232:DBIT %i", idx);
+
+    mainwindow->set_cue_cmd(str);
+  }
+  else
+  {
+    sprintf(str, ":DEC1:UART:WIDT %i", idx);
+
+    mainwindow->set_cue_cmd(str);
+  }
+}
+
+
+void UI_decoder_window::uart_stop_combobox_clicked(int idx)
+{
+  devparms->math_decode_uart_stop = idx;
+
+  if(devparms->modelserie == 6)
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":BUS1:RS232:SBIT 1");
+    }
+    else if(idx == 1)
+      {
+        mainwindow->set_cue_cmd(":BUS1:RS232:SBIT 1.5");
+      }
+      else if(idx == 2)
+        {
+          mainwindow->set_cue_cmd(":BUS1:RS232:SBIT 2");
+        }
+  }
+  else
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":DEC1:UART:STOP 1");
+    }
+    else if(idx == 1)
+      {
+        mainwindow->set_cue_cmd(":DEC1:UART:STOP 1.5");
+      }
+      else if(idx == 2)
+        {
+          mainwindow->set_cue_cmd(":DEC1:UART:STOP 2");
+        }
+  }
+}
+
+
+void UI_decoder_window::uart_parity_combobox_clicked(int idx)
+{
+  devparms->math_decode_uart_par = idx;
+
+  if(devparms->modelserie == 6)
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":BUS1:RS232:PAR NONE");
+    }
+    else if(idx == 1)
+      {
+        mainwindow->set_cue_cmd(":BUS1:RS232:PAR ODD");
+      }
+      else if(idx == 2)
+        {
+          mainwindow->set_cue_cmd(":BUS1:RS232:PAR EVEN");
+        }
+  }
+  else
+  {
+    if(idx == 0)
+    {
+      mainwindow->set_cue_cmd(":DEC1:UART:PAR NONE");
+    }
+    else if(idx == 1)
+      {
+        mainwindow->set_cue_cmd(":DEC1:UART:PAR ODD");
+      }
+      else if(idx == 2)
+        {
+          mainwindow->set_cue_cmd(":DEC1:UART:PAR EVEN");
+        }
+  }
 }
 
 
@@ -321,11 +614,11 @@ void UI_decoder_window::spi_width_spinbox_changed()
 }
 
 
-void UI_decoder_window::spi_trace_pos_spinbox_changed()
+void UI_decoder_window::trace_pos_spinbox_changed()
 {
   char str[256];
 
-  devparms->math_decode_pos = spi_trace_pos_spinbox->value();
+  devparms->math_decode_pos = trace_pos_spinbox->value();
 
   if(devparms->modelserie == 6)
   {
@@ -476,7 +769,7 @@ void UI_decoder_window::spi_endian_combobox_clicked(int idx)
 }
 
 
-void UI_decoder_window::spi_format_combobox_clicked(int idx)
+void UI_decoder_window::format_combobox_clicked(int idx)
 {
   devparms->math_decode_format = idx;
 
@@ -529,6 +822,8 @@ void UI_decoder_window::tabholder_index_changed(int idx)
 {
   devparms->math_decode_mode = idx;
 
+  threshold_auto_clicked(devparms->math_decode_threshold_auto);
+
   if(devparms->modelserie == 6)
   {
     if(idx == 0)
@@ -570,125 +865,183 @@ void UI_decoder_window::tabholder_index_changed(int idx)
 }
 
 
-void UI_decoder_window::spi_miso_threshold_dspinbox_changed()
+void UI_decoder_window::threshold_1_dspinbox_changed()
 {
   char str[256];
 
-  if(devparms->modelserie == 6)
+  if(tabholder->currentIndex() == 1)
   {
-    devparms->math_decode_threshold[0] = spi_miso_threshold_dspinbox->value();
-
-    sprintf(str, ":BUS1:SPI:MISO:THR %e", devparms->math_decode_threshold[0]);
-
-    mainwindow->set_cue_cmd(str);
-  }
-  else if(spi_miso_src_combobox->currentIndex() > 0)
+    if(devparms->modelserie == 6)
     {
-      devparms->math_decode_threshold[spi_miso_src_combobox->currentIndex() - 1] = spi_miso_threshold_dspinbox->value();
+      devparms->math_decode_threshold_uart_tx = threshold_1_dspinbox->value();
 
-      sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_miso_src_combobox->currentIndex(),
-              devparms->math_decode_threshold[spi_miso_src_combobox->currentIndex() - 1]);
+      sprintf(str, ":BUS1:RS232:TTHR %e", devparms->math_decode_threshold_uart_tx);
 
       mainwindow->set_cue_cmd(str);
     }
+    else if(uart_tx_src_combobox->currentIndex() > 0)
+      {
+        devparms->math_decode_threshold[uart_tx_src_combobox->currentIndex()] = threshold_1_dspinbox->value();
 
-  spi_threshold_auto_clicked(devparms->math_decode_threshold_auto);
+        sprintf(str, ":DEC1:THRE:CHAN%i %e", uart_tx_src_combobox->currentIndex(),
+                devparms->math_decode_threshold[uart_tx_src_combobox->currentIndex()]);
+
+        mainwindow->set_cue_cmd(str);
+      }
+  }
+  else if(tabholder->currentIndex() == 2)
+    {
+      if(devparms->modelserie == 6)
+      {
+        devparms->math_decode_threshold[2] = threshold_1_dspinbox->value();
+
+        sprintf(str, ":BUS1:SPI:SCLK:THR %e", devparms->math_decode_threshold[2]);
+
+        mainwindow->set_cue_cmd(str);
+      }
+      else
+      {
+        devparms->math_decode_threshold[spi_clk_src_combobox->currentIndex()] = threshold_1_dspinbox->value();
+
+        sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_clk_src_combobox->currentIndex() + 1,
+                devparms->math_decode_threshold[spi_clk_src_combobox->currentIndex()]);
+
+        mainwindow->set_cue_cmd(str);
+      }
+    }
+
+//  threshold_auto_clicked(devparms->math_decode_threshold_auto);
 }
 
 
-void UI_decoder_window::spi_mosi_threshold_dspinbox_changed()
+void UI_decoder_window::threshold_2_dspinbox_changed()
 {
   char str[256];
 
-  if(devparms->modelserie == 6)
+  if(tabholder->currentIndex() == 1)
   {
-    devparms->math_decode_threshold[1] = spi_mosi_threshold_dspinbox->value();
-
-    sprintf(str, ":BUS1:SPI:MOSI:THR %e", devparms->math_decode_threshold[1]);
-
-    mainwindow->set_cue_cmd(str);
-  }
-  else if(spi_mosi_src_combobox->currentIndex() > 0)
+    if(devparms->modelserie == 6)
     {
-      devparms->math_decode_threshold[spi_mosi_src_combobox->currentIndex() - 1] = spi_mosi_threshold_dspinbox->value();
+      devparms->math_decode_threshold_uart_rx = threshold_2_dspinbox->value();
 
-      sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_mosi_src_combobox->currentIndex(),
-              devparms->math_decode_threshold[spi_mosi_src_combobox->currentIndex() - 1]);
+      sprintf(str, ":BUS1:RS232:RTHR %e", devparms->math_decode_threshold_uart_rx);
 
       mainwindow->set_cue_cmd(str);
     }
+    else if(uart_rx_src_combobox->currentIndex() > 0)
+      {
+        devparms->math_decode_threshold[uart_rx_src_combobox->currentIndex()] = threshold_2_dspinbox->value();
 
-  spi_threshold_auto_clicked(devparms->math_decode_threshold_auto);
-}
+        sprintf(str, ":DEC1:THRE:CHAN%i %e", uart_rx_src_combobox->currentIndex(),
+                devparms->math_decode_threshold[uart_rx_src_combobox->currentIndex()]);
 
-
-void UI_decoder_window::spi_clk_threshold_dspinbox_changed()
-{
-  char str[256];
-
-  if(devparms->modelserie == 6)
-  {
-    devparms->math_decode_threshold[2] = spi_clk_threshold_dspinbox->value();
-
-    sprintf(str, ":BUS1:SPI:SCLK:THR %e", devparms->math_decode_threshold[2]);
-
-    mainwindow->set_cue_cmd(str);
+        mainwindow->set_cue_cmd(str);
+      }
   }
-  else if(spi_clk_src_combobox->currentIndex() > 0)
+  else if(tabholder->currentIndex() == 2)
     {
-      devparms->math_decode_threshold[spi_clk_src_combobox->currentIndex() - 1] = spi_clk_threshold_dspinbox->value();
+      if(devparms->modelserie == 6)
+      {
+        devparms->math_decode_threshold[1] = threshold_2_dspinbox->value();
 
-      sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_clk_src_combobox->currentIndex(),
-              devparms->math_decode_threshold[spi_clk_src_combobox->currentIndex() - 1]);
+        sprintf(str, ":BUS1:SPI:MOSI:THR %e", devparms->math_decode_threshold[1]);
 
-      mainwindow->set_cue_cmd(str);
+        mainwindow->set_cue_cmd(str);
+      }
+      else if(spi_mosi_src_combobox->currentIndex() > 0)
+        {
+          devparms->math_decode_threshold[spi_mosi_src_combobox->currentIndex() - 1] = threshold_2_dspinbox->value();
+
+          sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_mosi_src_combobox->currentIndex(),
+                  devparms->math_decode_threshold[spi_mosi_src_combobox->currentIndex() - 1]);
+
+          mainwindow->set_cue_cmd(str);
+        }
     }
 
-  spi_threshold_auto_clicked(devparms->math_decode_threshold_auto);
+//  threshold_auto_clicked(devparms->math_decode_threshold_auto);
 }
 
 
-void UI_decoder_window::spi_cs_threshold_dspinbox_changed()
+void UI_decoder_window::threshold_3_dspinbox_changed()
 {
   char str[256];
 
-  if(devparms->modelserie == 6)
+  if(tabholder->currentIndex() == 1)
   {
-    devparms->math_decode_threshold[3] = spi_cs_threshold_dspinbox->value();
-
-    sprintf(str, ":BUS1:SPI:SS:THR %e", devparms->math_decode_threshold[3]);
-
-    mainwindow->set_cue_cmd(str);
   }
-  else if(spi_cs_src_combobox->currentIndex() > 0)
+  else if(tabholder->currentIndex() == 2)
     {
-      devparms->math_decode_threshold[spi_cs_src_combobox->currentIndex() - 1] = spi_cs_threshold_dspinbox->value();
+      if(devparms->modelserie == 6)
+      {
+        devparms->math_decode_threshold[0] = threshold_3_dspinbox->value();
 
-      sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_cs_src_combobox->currentIndex(),
-              devparms->math_decode_threshold[spi_cs_src_combobox->currentIndex() - 1]);
+        sprintf(str, ":BUS1:SPI:MISO:THR %e", devparms->math_decode_threshold[0]);
 
-      mainwindow->set_cue_cmd(str);
+        mainwindow->set_cue_cmd(str);
+      }
+      else if(spi_miso_src_combobox->currentIndex() > 0)
+        {
+          devparms->math_decode_threshold[spi_miso_src_combobox->currentIndex() - 1] = threshold_3_dspinbox->value();
+
+          sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_miso_src_combobox->currentIndex(),
+                  devparms->math_decode_threshold[spi_miso_src_combobox->currentIndex() - 1]);
+
+          mainwindow->set_cue_cmd(str);
+        }
     }
 
-  spi_threshold_auto_clicked(devparms->math_decode_threshold_auto);
+//  threshold_auto_clicked(devparms->math_decode_threshold_auto);
 }
 
 
-void UI_decoder_window::spi_src_combobox_clicked(int)
-{
-  spi_threshold_auto_clicked(devparms->math_decode_threshold_auto);
-}
-
-
-void UI_decoder_window::spi_threshold_auto_clicked(int idx)
+void UI_decoder_window::threshold_4_dspinbox_changed()
 {
   char str[256];
 
-  devparms->math_decode_threshold_auto = idx;
+  if(tabholder->currentIndex() == 1)
+  {
+  }
+  else if(tabholder->currentIndex() == 2)
+    {
+      if(devparms->modelserie == 6)
+      {
+        devparms->math_decode_threshold[3] = threshold_4_dspinbox->value();
+
+        sprintf(str, ":BUS1:SPI:SS:THR %e", devparms->math_decode_threshold[3]);
+
+        mainwindow->set_cue_cmd(str);
+      }
+      else if(spi_cs_src_combobox->currentIndex() > 0)
+        {
+          devparms->math_decode_threshold[spi_cs_src_combobox->currentIndex() - 1] = threshold_4_dspinbox->value();
+
+          sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_cs_src_combobox->currentIndex(),
+                  devparms->math_decode_threshold[spi_cs_src_combobox->currentIndex() - 1]);
+
+          mainwindow->set_cue_cmd(str);
+        }
+    }
+
+//  threshold_auto_clicked(devparms->math_decode_threshold_auto);
+}
+
+
+void UI_decoder_window::src_combobox_clicked(int)
+{
+  threshold_auto_clicked(devparms->math_decode_threshold_auto);
+}
+
+
+void UI_decoder_window::threshold_auto_clicked(int thr_auto)
+{
+  char str[256];
+
+  devparms->math_decode_threshold_auto = thr_auto;
 
   if(devparms->modelserie != 6)
   {
-    if(idx == 0)
+    if(thr_auto == 0)
     {
       mainwindow->set_cue_cmd(":DEC1:THRE:AUTO 0");
     }
@@ -698,117 +1051,238 @@ void UI_decoder_window::spi_threshold_auto_clicked(int idx)
     }
   }
 
-  if((spi_clk_src_combobox->currentIndex() > 0) && (idx == 0))
+  if(tabholder->currentIndex() == 1)
   {
-    spi_clk_threshold_dspinbox->setEnabled(true);
-
-    if(devparms->modelserie == 6)
+    if(uart_tx_src_combobox->currentIndex() > 0)
     {
-      spi_clk_threshold_dspinbox->setValue(devparms->math_decode_threshold[2]);
+      if(devparms->modelserie == 6)
+      {
+        sprintf(str, ":BUS1:RS232:TX CHAN%i", uart_tx_src_combobox->currentIndex());
 
-      sprintf(str, ":BUS1:SPI:SCLK:THR %e", devparms->math_decode_threshold[2]);
+        mainwindow->set_cue_cmd(str);
+      }
+      else
+      {
+        sprintf(str, ":DEC1:UART:TX CHAN%i", uart_tx_src_combobox->currentIndex());
 
-      mainwindow->set_cue_cmd(str);
+        mainwindow->set_cue_cmd(str);
+      }
     }
     else
     {
-      spi_clk_threshold_dspinbox->setValue(devparms->math_decode_threshold[spi_clk_src_combobox->currentIndex() - 1]);
-
-      sprintf(str, ":DEC1:SPI:CLK:CHAN%i", spi_clk_src_combobox->currentIndex());
-
-      mainwindow->set_cue_cmd(str);
+      if(devparms->modelserie == 6)
+      {
+        mainwindow->set_cue_cmd(":BUS1:RS232:TX OFF");
+      }
+      else
+      {
+        mainwindow->set_cue_cmd(":DEC1:UART:TX OFF");
+      }
     }
-  }
-  else
-  {
-    spi_clk_threshold_dspinbox->setValue(0.0);
 
-    spi_clk_threshold_dspinbox->setEnabled(false);
-  }
-
-  if((spi_mosi_src_combobox->currentIndex() > 0) && (idx == 0))
-  {
-    spi_mosi_threshold_dspinbox->setEnabled(true);
-
-    if(devparms->modelserie == 6)
+    if(uart_rx_src_combobox->currentIndex() > 0)
     {
-      spi_mosi_threshold_dspinbox->setValue(devparms->math_decode_threshold[1]);
+      if(devparms->modelserie == 6)
+      {
+        sprintf(str, ":BUS1:RS232:RX CHAN%i", uart_rx_src_combobox->currentIndex());
 
-      sprintf(str, ":BUS1:SPI:MOSI:THR %e", devparms->math_decode_threshold[1]);
+        mainwindow->set_cue_cmd(str);
+      }
+      else
+      {
+        sprintf(str, ":DEC1:UART:RX CHAN%i", uart_rx_src_combobox->currentIndex());
 
-      mainwindow->set_cue_cmd(str);
+        mainwindow->set_cue_cmd(str);
+      }
     }
     else
     {
-      spi_mosi_threshold_dspinbox->setValue(devparms->math_decode_threshold[spi_mosi_src_combobox->currentIndex() - 1]);
-
-      sprintf(str, ":DEC1:SPI:MOSI:CHAN%i", spi_mosi_src_combobox->currentIndex());
-
-      mainwindow->set_cue_cmd(str);
+      if(devparms->modelserie == 6)
+      {
+        mainwindow->set_cue_cmd(":BUS1:RS232:RX OFF");
+      }
+      else
+      {
+        mainwindow->set_cue_cmd(":DEC1:UART:RX OFF");
+      }
     }
-  }
-  else
-  {
-    spi_mosi_threshold_dspinbox->setValue(0.0);
 
-    spi_mosi_threshold_dspinbox->setEnabled(false);
-  }
-
-  if((spi_miso_src_combobox->currentIndex() > 0) && (idx == 0))
-  {
-    spi_miso_threshold_dspinbox->setEnabled(true);
-
-    if(devparms->modelserie == 6)
+    if(thr_auto == 0)
     {
-      spi_miso_threshold_dspinbox->setValue(devparms->math_decode_threshold[0]);
+      threshold_1_dspinbox->setEnabled(true);
+      threshold_2_dspinbox->setEnabled(true);
 
-      sprintf(str, ":BUS1:SPI:MISO:THR %e", devparms->math_decode_threshold[0]);
-
-      mainwindow->set_cue_cmd(str);
+      if(devparms->modelserie == 6)
+      {
+        threshold_1_dspinbox->setValue(devparms->math_decode_threshold_uart_tx);
+        threshold_2_dspinbox->setValue(devparms->math_decode_threshold_uart_rx);
+      }
+      else
+      {
+        threshold_1_dspinbox->setValue(devparms->math_decode_threshold[uart_tx_src_combobox->currentIndex() - 1]);
+        threshold_2_dspinbox->setValue(devparms->math_decode_threshold[uart_rx_src_combobox->currentIndex() - 1]);
+      }
     }
     else
     {
-      spi_miso_threshold_dspinbox->setValue(devparms->math_decode_threshold[spi_miso_src_combobox->currentIndex() - 1]);
+      threshold_1_dspinbox->setValue(0.0);
+      threshold_2_dspinbox->setValue(0.0);
 
-      sprintf(str, ":DEC1:SPI:MISO:CHAN%i", spi_miso_src_combobox->currentIndex());
-
-      mainwindow->set_cue_cmd(str);
+      threshold_1_dspinbox->setEnabled(false);
+      threshold_2_dspinbox->setEnabled(false);
     }
+
+    threshold_1_label->setVisible(true);
+    threshold_2_label->setVisible(true);
+    threshold_3_label->setVisible(false);
+    threshold_4_label->setVisible(false);
+
+    threshold_1_dspinbox->setVisible(true);
+    threshold_2_dspinbox->setVisible(true);
+    threshold_3_dspinbox->setVisible(false);
+    threshold_4_dspinbox->setVisible(false);
   }
-  else
-  {
-    spi_miso_threshold_dspinbox->setValue(0.0);
-
-    spi_miso_threshold_dspinbox->setEnabled(false);
-  }
-
-  if((spi_cs_src_combobox->currentIndex() > 0) && (idx == 0))
-  {
-    spi_cs_threshold_dspinbox->setEnabled(true);
-
-    if(devparms->modelserie == 6)
+  else if(tabholder->currentIndex() == 2)
     {
-      spi_cs_threshold_dspinbox->setValue(devparms->math_decode_threshold[3]);
+      if(devparms->modelserie == 6)
+      {
+        sprintf(str, ":BUS1:SPI:SCLK:SOUR CHAN%i", spi_clk_src_combobox->currentIndex() + 1);
 
-      sprintf(str, ":BUS1:SPI:SS:THR %e", devparms->math_decode_threshold[3]);
+        mainwindow->set_cue_cmd(str);
+      }
+      else
+      {
+        sprintf(str, ":DEC1:SPI:CLK CHAN%i", spi_clk_src_combobox->currentIndex() + 1);
 
-      mainwindow->set_cue_cmd(str);
+        mainwindow->set_cue_cmd(str);
+      }
+
+      if(spi_mosi_src_combobox->currentIndex() > 0)
+      {
+        if(devparms->modelserie == 6)
+        {
+          sprintf(str, ":BUS1:SPI:MOSI:SOUR CHAN%i", spi_mosi_src_combobox->currentIndex());
+
+          mainwindow->set_cue_cmd(str);
+        }
+        else
+        {
+          sprintf(str, ":DEC1:SPI:MOSI CHAN%i", spi_mosi_src_combobox->currentIndex());
+
+          mainwindow->set_cue_cmd(str);
+        }
+      }
+      else
+      {
+        if(devparms->modelserie == 6)
+        {
+          mainwindow->set_cue_cmd(":BUS1:SPI:MOSI:SOUR OFF");
+        }
+        else
+        {
+          mainwindow->set_cue_cmd(":DEC1:SPI:MOSI OFF");
+        }
+      }
+
+      if(spi_miso_src_combobox->currentIndex() > 0)
+      {
+        if(devparms->modelserie == 6)
+        {
+          sprintf(str, ":BUS1:SPI:MISO:SOUR CHAN%i", spi_miso_src_combobox->currentIndex());
+
+          mainwindow->set_cue_cmd(str);
+        }
+        else
+        {
+          sprintf(str, ":DEC1:SPI:MISO CHAN%i", spi_miso_src_combobox->currentIndex());
+
+          mainwindow->set_cue_cmd(str);
+        }
+      }
+      else
+      {
+        if(devparms->modelserie == 6)
+        {
+          mainwindow->set_cue_cmd(":BUS1:SPI:MISO:SOUR OFF");
+        }
+        else
+        {
+          mainwindow->set_cue_cmd(":DEC1:SPI:MISO OFF");
+        }
+      }
+
+      if(spi_cs_src_combobox->currentIndex() > 0)
+      {
+        if(devparms->modelserie == 6)
+        {
+          sprintf(str, ":BUS1:SPI:SS:SOUR CHAN%i", spi_cs_src_combobox->currentIndex());
+
+          mainwindow->set_cue_cmd(str);
+        }
+        else
+        {
+          sprintf(str, ":DEC1:SPI:CS CHAN%i", spi_cs_src_combobox->currentIndex());
+
+          mainwindow->set_cue_cmd(str);
+        }
+      }
+      else
+      {
+        if(devparms->modelserie == 6)
+        {
+          mainwindow->set_cue_cmd(":BUS1:SPI:SS:SOUR OFF");
+        }
+        else
+        {
+          mainwindow->set_cue_cmd(":DEC1:SPI:SS OFF");
+        }
+      }
+
+      if(thr_auto == 0)
+      {
+        threshold_1_dspinbox->setEnabled(true);
+        threshold_2_dspinbox->setEnabled(true);
+        threshold_3_dspinbox->setEnabled(true);
+        threshold_4_dspinbox->setEnabled(true);
+
+        if(devparms->modelserie == 6)
+        {
+          threshold_1_dspinbox->setValue(devparms->math_decode_threshold[2]);
+          threshold_2_dspinbox->setValue(devparms->math_decode_threshold[1]);
+          threshold_3_dspinbox->setValue(devparms->math_decode_threshold[0]);
+          threshold_4_dspinbox->setValue(devparms->math_decode_threshold[3]);
+        }
+        else
+        {
+          threshold_1_dspinbox->setValue(devparms->math_decode_threshold[spi_clk_src_combobox->currentIndex()]);
+          threshold_2_dspinbox->setValue(devparms->math_decode_threshold[spi_mosi_src_combobox->currentIndex() - 1]);
+          threshold_3_dspinbox->setValue(devparms->math_decode_threshold[spi_miso_src_combobox->currentIndex() - 1]);
+          threshold_4_dspinbox->setValue(devparms->math_decode_threshold[spi_cs_src_combobox->currentIndex() - 1]);
+        }
+      }
+      else
+      {
+        threshold_1_dspinbox->setValue(0.0);
+        threshold_2_dspinbox->setValue(0.0);
+        threshold_3_dspinbox->setValue(0.0);
+        threshold_4_dspinbox->setValue(0.0);
+
+        threshold_1_dspinbox->setEnabled(false);
+        threshold_2_dspinbox->setEnabled(false);
+        threshold_3_dspinbox->setEnabled(false);
+        threshold_4_dspinbox->setEnabled(false);
+      }
+
+      threshold_1_label->setVisible(true);
+      threshold_2_label->setVisible(true);
+      threshold_3_label->setVisible(true);
+      threshold_4_label->setVisible(true);
+
+      threshold_1_dspinbox->setVisible(true);
+      threshold_2_dspinbox->setVisible(true);
+      threshold_3_dspinbox->setVisible(true);
+      threshold_4_dspinbox->setVisible(true);
     }
-    else
-    {
-      spi_cs_threshold_dspinbox->setValue(devparms->math_decode_threshold[spi_cs_src_combobox->currentIndex() - 1]);
-
-      sprintf(str, ":DEC1:SPI:CS:CHAN%i", spi_cs_src_combobox->currentIndex());
-
-      mainwindow->set_cue_cmd(str);
-    }
-  }
-  else
-  {
-    spi_cs_threshold_dspinbox->setValue(0.0);
-
-    spi_cs_threshold_dspinbox->setEnabled(false);
-  }
 }
 
 
@@ -849,6 +1323,7 @@ void UI_decoder_window::toggle_decode()
     mainwindow->statusLabel->setText("Decode on");
   }
 }
+
 
 
 

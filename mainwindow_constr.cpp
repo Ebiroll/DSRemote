@@ -122,6 +122,8 @@ UI_Mainwindow::UI_Mainwindow()
 
   devparms.channel_cnt = 4;
 
+  devparms.modelserie = 1;
+
   devparms.timebasescale = 0.001;
 
   devparms.hordivisions = 14;
@@ -575,8 +577,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   show();
 
-//   UI_decoder_window wi(this);
-//   wi.exec();
+//  UI_decoder_window w(this);
 }
 
 
