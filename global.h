@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1611121901"
+#define PROGRAM_VERSION       "0.33_1611131103"
 
 #define MAX_PATHLEN            4096
 
@@ -82,6 +82,10 @@
 
 #define TMC_DIAL_TIMER_DELAY    300
 
+#define DECODE_MODE_TAB_PAR       0
+#define DECODE_MODE_TAB_UART      1
+#define DECODE_MODE_TAB_SPI       2
+#define DECODE_MODE_TAB_I2C       3
 
 
 

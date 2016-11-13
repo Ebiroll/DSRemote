@@ -203,8 +203,16 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   spi_timeout_dspinbox->setGeometry(110, 230, 120, 25);
   spi_timeout_dspinbox->setSuffix(" Sec.");
   spi_timeout_dspinbox->setDecimals(7);
-  spi_timeout_dspinbox->setRange(1e-7, 1.0);
-  spi_timeout_dspinbox->setValue(devparms->math_decode_spi_timeout);
+  if(devparms->modelserie == 6)
+  {
+    spi_timeout_dspinbox->setValue(0.0);
+    spi_timeout_dspinbox->setEnabled(false);
+  }
+  else
+  {
+    spi_timeout_dspinbox->setRange(1e-7, 1.0);
+    spi_timeout_dspinbox->setValue(devparms->math_decode_spi_timeout);
+  }
 
   spi_polarity_label = new QLabel(tab_spi);
   spi_polarity_label->setGeometry(10, 265, 100, 25);
@@ -403,6 +411,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
 
   connect(uart_baud_spinbox,           SIGNAL(editingFinished()),        this, SLOT(uart_baud_spinbox_changed()));
   connect(spi_width_spinbox,           SIGNAL(editingFinished()),        this, SLOT(spi_width_spinbox_changed()));
+  connect(spi_timeout_dspinbox,        SIGNAL(editingFinished()),        this, SLOT(spi_timeout_dspinbox_changed()));
   connect(trace_pos_spinbox,           SIGNAL(editingFinished()),        this, SLOT(trace_pos_spinbox_changed()));
 
   connect(tabholder,                   SIGNAL(currentChanged(int)),      this, SLOT(tabholder_index_changed(int)));
@@ -509,15 +518,13 @@ void UI_decoder_window::uart_width_combobox_clicked(int idx)
   if(devparms->modelserie == 6)
   {
     sprintf(str, ":BUS1:RS232:DBIT %i", idx);
-
-    mainwindow->set_cue_cmd(str);
   }
   else
   {
     sprintf(str, ":DEC1:UART:WIDT %i", idx);
-
-    mainwindow->set_cue_cmd(str);
   }
+
+  mainwindow->set_cue_cmd(str);
 }
 
 
@@ -614,6 +621,21 @@ void UI_decoder_window::spi_width_spinbox_changed()
 }
 
 
+void UI_decoder_window::spi_timeout_dspinbox_changed()
+{
+  char str[256];
+
+  devparms->math_decode_spi_timeout = spi_timeout_dspinbox->value();
+
+  if(devparms->modelserie != 6)
+  {
+    sprintf(str, ":DEC1:SPI:TIM %e", devparms->math_decode_spi_timeout);
+
+    mainwindow->set_cue_cmd(str);
+  }
+}
+
+
 void UI_decoder_window::trace_pos_spinbox_changed()
 {
   char str[256];
@@ -622,6 +644,7 @@ void UI_decoder_window::trace_pos_spinbox_changed()
 
   if(devparms->modelserie == 6)
   {
+    sprintf(str, "FIXME!!");
 //     sprintf(str, ":BUS1:SPI:OFFS %i", devparms->math_decode_pos);  :FIXME
   }
   else
@@ -826,38 +849,38 @@ void UI_decoder_window::tabholder_index_changed(int idx)
 
   if(devparms->modelserie == 6)
   {
-    if(idx == 0)
+    if(idx == DECODE_MODE_TAB_PAR)
     {
       mainwindow->set_cue_cmd(":BUS1:MODE PAR");
     }
-    else if(idx == 1)
+    else if(idx == DECODE_MODE_TAB_UART)
       {
         mainwindow->set_cue_cmd(":BUS1:MODE RS232");
       }
-      else if(idx == 2)
+      else if(idx == DECODE_MODE_TAB_SPI)
         {
           mainwindow->set_cue_cmd(":BUS1:MODE SPI");
         }
-        else if(idx == 3)
+        else if(idx == DECODE_MODE_TAB_I2C)
           {
             mainwindow->set_cue_cmd(":BUS1:MODE IIC");
           }
   }
   else
   {
-    if(idx == 0)
+    if(idx == DECODE_MODE_TAB_PAR)
     {
       mainwindow->set_cue_cmd(":DEC1:MODE PAR");
     }
-    else if(idx == 1)
+    else if(idx == DECODE_MODE_TAB_UART)
       {
         mainwindow->set_cue_cmd(":DEC1:MODE UART");
       }
-      else if(idx == 2)
+      else if(idx == DECODE_MODE_TAB_SPI)
         {
           mainwindow->set_cue_cmd(":DEC1:MODE SPI");
         }
-        else if(idx == 3)
+        else if(idx == DECODE_MODE_TAB_I2C)
           {
             mainwindow->set_cue_cmd(":DEC1:MODE IIC");
           }
@@ -869,7 +892,7 @@ void UI_decoder_window::threshold_1_dspinbox_changed()
 {
   char str[256];
 
-  if(tabholder->currentIndex() == 1)
+  if(tabholder->currentIndex() == DECODE_MODE_TAB_UART)
   {
     if(devparms->modelserie == 6)
     {
@@ -881,15 +904,15 @@ void UI_decoder_window::threshold_1_dspinbox_changed()
     }
     else if(uart_tx_src_combobox->currentIndex() > 0)
       {
-        devparms->math_decode_threshold[uart_tx_src_combobox->currentIndex()] = threshold_1_dspinbox->value();
+        devparms->math_decode_threshold[uart_tx_src_combobox->currentIndex() - 1] = threshold_1_dspinbox->value();
 
         sprintf(str, ":DEC1:THRE:CHAN%i %e", uart_tx_src_combobox->currentIndex(),
-                devparms->math_decode_threshold[uart_tx_src_combobox->currentIndex()]);
+                devparms->math_decode_threshold[uart_tx_src_combobox->currentIndex() - 1]);
 
         mainwindow->set_cue_cmd(str);
       }
   }
-  else if(tabholder->currentIndex() == 2)
+  else if(tabholder->currentIndex() == DECODE_MODE_TAB_SPI)
     {
       if(devparms->modelserie == 6)
       {
@@ -910,7 +933,7 @@ void UI_decoder_window::threshold_1_dspinbox_changed()
       }
     }
 
-//  threshold_auto_clicked(devparms->math_decode_threshold_auto);
+  threshold_auto_clicked(devparms->math_decode_threshold_auto);
 }
 
 
@@ -918,7 +941,7 @@ void UI_decoder_window::threshold_2_dspinbox_changed()
 {
   char str[256];
 
-  if(tabholder->currentIndex() == 1)
+  if(tabholder->currentIndex() == DECODE_MODE_TAB_UART)
   {
     if(devparms->modelserie == 6)
     {
@@ -930,15 +953,15 @@ void UI_decoder_window::threshold_2_dspinbox_changed()
     }
     else if(uart_rx_src_combobox->currentIndex() > 0)
       {
-        devparms->math_decode_threshold[uart_rx_src_combobox->currentIndex()] = threshold_2_dspinbox->value();
+        devparms->math_decode_threshold[uart_rx_src_combobox->currentIndex() - 1] = threshold_2_dspinbox->value();
 
         sprintf(str, ":DEC1:THRE:CHAN%i %e", uart_rx_src_combobox->currentIndex(),
-                devparms->math_decode_threshold[uart_rx_src_combobox->currentIndex()]);
+                devparms->math_decode_threshold[uart_rx_src_combobox->currentIndex() - 1]);
 
         mainwindow->set_cue_cmd(str);
       }
   }
-  else if(tabholder->currentIndex() == 2)
+  else if(tabholder->currentIndex() == DECODE_MODE_TAB_SPI)
     {
       if(devparms->modelserie == 6)
       {
@@ -959,7 +982,7 @@ void UI_decoder_window::threshold_2_dspinbox_changed()
         }
     }
 
-//  threshold_auto_clicked(devparms->math_decode_threshold_auto);
+  threshold_auto_clicked(devparms->math_decode_threshold_auto);
 }
 
 
@@ -967,10 +990,10 @@ void UI_decoder_window::threshold_3_dspinbox_changed()
 {
   char str[256];
 
-  if(tabholder->currentIndex() == 1)
+  if(tabholder->currentIndex() == DECODE_MODE_TAB_UART)
   {
   }
-  else if(tabholder->currentIndex() == 2)
+  else if(tabholder->currentIndex() == DECODE_MODE_TAB_SPI)
     {
       if(devparms->modelserie == 6)
       {
@@ -991,7 +1014,7 @@ void UI_decoder_window::threshold_3_dspinbox_changed()
         }
     }
 
-//  threshold_auto_clicked(devparms->math_decode_threshold_auto);
+  threshold_auto_clicked(devparms->math_decode_threshold_auto);
 }
 
 
@@ -999,10 +1022,10 @@ void UI_decoder_window::threshold_4_dspinbox_changed()
 {
   char str[256];
 
-  if(tabholder->currentIndex() == 1)
+  if(tabholder->currentIndex() == DECODE_MODE_TAB_UART)
   {
   }
-  else if(tabholder->currentIndex() == 2)
+  else if(tabholder->currentIndex() == DECODE_MODE_TAB_SPI)
     {
       if(devparms->modelserie == 6)
       {
@@ -1023,12 +1046,19 @@ void UI_decoder_window::threshold_4_dspinbox_changed()
         }
     }
 
-//  threshold_auto_clicked(devparms->math_decode_threshold_auto);
+  threshold_auto_clicked(devparms->math_decode_threshold_auto);
 }
 
 
 void UI_decoder_window::src_combobox_clicked(int)
 {
+  devparms->math_decode_spi_clk = spi_clk_src_combobox->currentIndex();
+  devparms->math_decode_spi_mosi = spi_mosi_src_combobox->currentIndex();
+  devparms->math_decode_spi_miso = spi_miso_src_combobox->currentIndex();
+  devparms->math_decode_spi_cs = spi_cs_src_combobox->currentIndex();
+  devparms->math_decode_uart_tx = uart_tx_src_combobox->currentIndex();
+  devparms->math_decode_uart_rx = uart_rx_src_combobox->currentIndex();
+
   threshold_auto_clicked(devparms->math_decode_threshold_auto);
 }
 
@@ -1051,7 +1081,7 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
     }
   }
 
-  if(tabholder->currentIndex() == 1)
+  if(tabholder->currentIndex() == DECODE_MODE_TAB_UART)
   {
     if(uart_tx_src_combobox->currentIndex() > 0)
     {
@@ -1142,7 +1172,7 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
     threshold_3_dspinbox->setVisible(false);
     threshold_4_dspinbox->setVisible(false);
   }
-  else if(tabholder->currentIndex() == 2)
+  else if(tabholder->currentIndex() == DECODE_MODE_TAB_SPI)
     {
       if(devparms->modelserie == 6)
       {

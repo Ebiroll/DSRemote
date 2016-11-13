@@ -2065,7 +2065,18 @@ void read_settings_thread::run()
     goto GDS_OUT_ERROR;
   }
 
-  devparms->math_decode_uart_stop = atoi(device->buf);
+  if(!strcmp(device->buf, "1"))
+  {
+    devparms->math_decode_uart_stop = 0;
+  }
+  else if(!strcmp(device->buf, "1.5"))
+    {
+      devparms->math_decode_uart_stop = 1;
+    }
+    else if(!strcmp(device->buf, "2"))
+      {
+        devparms->math_decode_uart_stop = 2;
+      }
 
   usleep(TMC_GDS_DELAY);
 

@@ -148,6 +148,7 @@ private slots:
   void spi_edge_combobox_clicked(int);
   void spi_endian_combobox_clicked(int);
   void spi_width_spinbox_changed();
+  void spi_timeout_dspinbox_changed();
   void uart_baud_spinbox_changed();
   void uart_polarity_combobox_clicked(int);
   void uart_endian_combobox_clicked(int);
