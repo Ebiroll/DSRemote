@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1611131103"
+#define PROGRAM_VERSION       "0.33_1611222104"
 
 #define MAX_PATHLEN            4096
 
@@ -86,6 +86,11 @@
 #define DECODE_MODE_TAB_UART      1
 #define DECODE_MODE_TAB_SPI       2
 #define DECODE_MODE_TAB_I2C       3
+
+#define DECODE_MODE_PAR           0
+#define DECODE_MODE_UART          1
+#define DECODE_MODE_SPI           2
+#define DECODE_MODE_I2C           3
 
 
 

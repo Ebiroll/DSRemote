@@ -38,7 +38,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   setMinimumSize(1170, 630);
   setWindowTitle(PROGRAM_NAME " " PROGRAM_VERSION);
-  setWindowIcon(QIcon(":/images/r.png"));
+  setWindowIcon(QIcon(":/images/r_dsremote.png"));
 
   appfont = new QFont;
 

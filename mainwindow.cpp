@@ -31,6 +31,7 @@
 #include "timer_handlers.cpp"
 #include "save_data.cpp"
 #include "interface.cpp"
+#include "serial_decoder.cpp"
 
 
 
@@ -2533,6 +2534,11 @@ void UI_Mainwindow::screenUpdate()
   }
   else
   {
+    if(devparms.math_decode_display)
+    {
+      serial_decoder();
+    }
+
     waveForm->update();
   }
 

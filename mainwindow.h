@@ -234,6 +234,7 @@ private:
   int get_metric_factor(double);
   void get_device_model(const char *);
   double get_stepsize_divide_by_1000(double);
+  void serial_decoder(void);
 
 private slots:
 
