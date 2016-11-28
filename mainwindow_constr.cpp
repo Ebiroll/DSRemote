@@ -185,7 +185,7 @@ UI_Mainwindow::UI_Mainwindow()
   adjDialLabel = new QLabel(DPRwidget);
   adjDialLabel->setGeometry(20, 0, 40, 18);
   adjDialLabel->setStyleSheet("font: 7pt;");
-  adjDial = new QDial(DPRwidget);
+  adjDial = new TDial(DPRwidget);
   adjDial->setWrapping(true);
   adjDial->setNotchesVisible(true);
   adjDial->setGeometry(15, 15, 40, 40);
@@ -194,7 +194,7 @@ UI_Mainwindow::UI_Mainwindow()
   adjDial->setMinimum(0);
   adjDial->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  navDial = new QDial(DPRwidget);
+  navDial = new TDial(DPRwidget);
   navDial->setWrapping(false);
   navDial->setNotchesVisible(true);
   navDial->setGeometry(70, 80, 80, 80);
@@ -258,7 +258,7 @@ UI_Mainwindow::UI_Mainwindow()
   horScaleLabel->setGeometry(20, 18, 40, 18);
   horScaleLabel->setText("Scale");
   horScaleLabel->setStyleSheet("font: 7pt;");
-  horScaleDial = new QDial(horizontalGrpBox);
+  horScaleDial = new TDial(horizontalGrpBox);
   horScaleDial->setGeometry(10, 35, 50, 50);
   horScaleDial->setWrapping(true);
   horScaleDial->setNotchesVisible(true);
@@ -273,7 +273,7 @@ UI_Mainwindow::UI_Mainwindow()
   horPosLabel->setGeometry(128, 21, 40, 18);
   horPosLabel->setText("Position");
   horPosLabel->setStyleSheet("font: 7pt;");
-  horPosDial = new QDial(horizontalGrpBox);
+  horPosDial = new TDial(horizontalGrpBox);
   horPosDial->setGeometry(125, 40, 40, 40);
   horPosDial->setWrapping(true);
   horPosDial->setNotchesVisible(true);
@@ -323,7 +323,7 @@ UI_Mainwindow::UI_Mainwindow()
   vertOffsetLabel->setGeometry(80, 30, 40, 18);
   vertOffsetLabel->setStyleSheet("font: 7pt;");
   vertOffsetLabel->setText("Position");
-  vertOffsetDial = new QDial(verticalGrpBox);
+  vertOffsetDial = new TDial(verticalGrpBox);
   vertOffsetDial->setGeometry(75, 50, 40, 40);
   vertOffsetDial->setWrapping(true);
   vertOffsetDial->setNotchesVisible(true);
@@ -338,7 +338,7 @@ UI_Mainwindow::UI_Mainwindow()
   vertScaleLabel->setGeometry(80, 143, 40, 18);
   vertScaleLabel->setStyleSheet("font: 7pt;");
   vertScaleLabel->setText("Scale");
-  vertScaleDial = new QDial(verticalGrpBox);
+  vertScaleDial = new TDial(verticalGrpBox);
   vertScaleDial->setGeometry(70, 160, 50, 50);
   vertScaleDial->setWrapping(true);
   vertScaleDial->setNotchesVisible(true);
@@ -372,7 +372,7 @@ UI_Mainwindow::UI_Mainwindow()
   trigLevelLabel = new QLabel(triggerGrpBox);
   trigLevelLabel->setGeometry(34, 92, 40, 18);
   trigLevelLabel->setText("Level");
-  trigAdjustDial = new QDial(triggerGrpBox);
+  trigAdjustDial = new TDial(triggerGrpBox);
   trigAdjustDial->setGeometry(30, 110, 40, 40);
   trigAdjustDial->setWrapping(true);
   trigAdjustDial->setNotchesVisible(true);

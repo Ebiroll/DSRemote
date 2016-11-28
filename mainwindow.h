@@ -89,6 +89,7 @@
 #include "read_settings_thread.h"
 #include "save_data_thread.h"
 #include "decode_dialog.h"
+#include "tdial.h"
 
 #include "third_party/kiss_fft/kiss_fftr.h"
 
@@ -194,13 +195,14 @@ private:
               *measureButton,
               *mathMenuButton;
 
-  QDial       *adjDial,
+  TDial       *adjDial,
               *horScaleDial,
               *horPosDial,
               *vertScaleDial,
               *vertOffsetDial,
               *trigAdjustDial,
               *navDial;
+
 
   QString def_stylesh;
 
