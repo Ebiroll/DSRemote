@@ -2530,15 +2530,15 @@ void UI_Mainwindow::screenUpdate()
 
   if(devparms.triggerstatus != 1)  // Don't plot waveform data when triggerstatus is "wait"
   {
-    waveForm->drawCurve(&devparms, device);
-  }
-  else
-  {
     if(devparms.math_decode_display)
     {
       serial_decoder();
     }
 
+    waveForm->drawCurve(&devparms, device);
+  }
+  else  // trigger status is "wait"
+  {
     waveForm->update();
   }
 

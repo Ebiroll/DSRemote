@@ -450,6 +450,10 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     painter->setClipping(false);
   }
 
+/////////////////////////////////// draw the decoder ///////////////////////////////////////////
+
+  if(devparms->math_decode_display)  draw_decoder(painter, curve_w, curve_h);
+
 /////////////////////////////////// draw the trigger arrows ///////////////////////////////////////////
 
   if(trig_level_arrow_moving)
@@ -2246,6 +2250,82 @@ bool SignalCurve::hasMoveEvent(void)
   }
 
   return false;
+}
+
+
+void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
+{
+  int i, j, line_h;
+
+  double pix_per_smpl;
+
+  char str[256];
+
+
+  line_h = ((double)dh / 400.0) * devparms->math_decode_pos;
+
+  pix_per_smpl = (double)dw / (devparms->hordivisions * 100.0);
+
+  painter->setPen(Qt::green);
+
+  painter->drawLine(0, line_h, dw, line_h);
+
+  if(devparms->math_decode_mode == DECODE_MODE_UART)
+  {
+    for(i=0; i<devparms->math_decode_uart_nval; i++)
+    {
+      painter->fillRect(devparms->math_decode_uart_val_pos[i] * pix_per_smpl, line_h - 13, 70, 26, Qt::black);
+
+      painter->drawRect(devparms->math_decode_uart_val_pos[i] * pix_per_smpl, line_h - 13, 70, 26);
+    }
+  }
+
+  painter->setPen(Qt::white);
+
+  if(devparms->math_decode_mode == DECODE_MODE_UART)
+  {
+    for(i=0; i<devparms->math_decode_uart_nval; i++)
+    {
+      if(devparms->math_decode_format == 0)  // hex
+      {
+        sprintf(str, "0x%02X", devparms->math_decode_uart_val[i]);
+
+        painter->drawText(devparms->math_decode_uart_val_pos[i] * pix_per_smpl, line_h - 13, 70, 30, Qt::AlignCenter, str);
+      }
+      else if(devparms->math_decode_format == 1)  // ASCII
+        {
+          str[0]= devparms->math_decode_uart_val[i];
+
+          if(str[0] < 32)  str[0] = '.';
+
+          str[1] = 0;
+
+          painter->drawText(devparms->math_decode_uart_val_pos[i] * pix_per_smpl, line_h - 13, 70, 30, Qt::AlignCenter, str);
+        }
+        else if(devparms->math_decode_format == 2)  // decimal
+          {
+            sprintf(str, "%u", (unsigned int)devparms->math_decode_uart_val[i]);
+
+            painter->drawText(devparms->math_decode_uart_val_pos[i] * pix_per_smpl, line_h - 13, 70, 30, Qt::AlignCenter, str);
+          }
+          else if(devparms->math_decode_format == 3)  // binary
+            {
+              sprintf(str, "%u", (unsigned int)devparms->math_decode_uart_val[i]);
+
+              str[0] = '0';
+              str[1] = 'b';
+
+              for(j=7; j>=0; j--)
+              {
+                str[9-j] = ((((unsigned char *)devparms->math_decode_uart_val)[i] >> j) & 1) + '0';
+              }
+
+              str[10] = 0;
+
+              painter->drawText(devparms->math_decode_uart_val_pos[i] * pix_per_smpl, line_h - 13, 70, 30, Qt::AlignCenter, str);
+            }
+    }
+  }
 }
 
 
