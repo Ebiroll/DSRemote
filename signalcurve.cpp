@@ -2349,9 +2349,14 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
           {
             str[0]= devparms->math_decode_uart_tx_val[i];
 
-            if(str[0] < 32)  str[0] = '.';
-
-            str[1] = 0;
+            if((str[0] < 33) || (str[0] > 126))
+            {
+              ascii_decode_control_char(str);
+            }
+            else
+            {
+              str[1] = 0;
+            }
 
             painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
           }
@@ -2405,9 +2410,14 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
           {
             str[0]= devparms->math_decode_uart_rx_val[i];
 
-            if(str[0] < 32)  str[0] = '.';
-
-            str[1] = 0;
+            if((str[0] < 33) || (str[0] > 126))
+            {
+              ascii_decode_control_char(str);
+            }
+            else
+            {
+              str[1] = 0;
+            }
 
             painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
           }
@@ -2448,7 +2458,82 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
 }
 
 
-
+void SignalCurve::ascii_decode_control_char(char *str)
+{
+  switch(str[0])
+  {
+    case  0: strcpy(str, "NULL");
+             break;
+    case  1: strcpy(str, "SOH");
+             break;
+    case  2: strcpy(str, "STX");
+             break;
+    case  3: strcpy(str, "ETX");
+             break;
+    case  4: strcpy(str, "EOT");
+             break;
+    case  5: strcpy(str, "ENQ");
+             break;
+    case  6: strcpy(str, "ACK");
+             break;
+    case  7: strcpy(str, "BEL");
+             break;
+    case  8: strcpy(str, "BS");
+             break;
+    case  9: strcpy(str, "HT");
+             break;
+    case 10: strcpy(str, "LF");
+             break;
+    case 11: strcpy(str, "VT");
+             break;
+    case 12: strcpy(str, "FF");
+             break;
+    case 13: strcpy(str, "CR");
+             break;
+    case 14: strcpy(str, "SO");
+             break;
+    case 15: strcpy(str, "SI");
+             break;
+    case 16: strcpy(str, "DLE");
+             break;
+    case 17: strcpy(str, "DC1");
+             break;
+    case 18: strcpy(str, "DC2");
+             break;
+    case 19: strcpy(str, "DC3");
+             break;
+    case 20: strcpy(str, "DC4");
+             break;
+    case 21: strcpy(str, "NAK");
+             break;
+    case 22: strcpy(str, "SYN");
+             break;
+    case 23: strcpy(str, "ETB");
+             break;
+    case 24: strcpy(str, "CAN");
+             break;
+    case 25: strcpy(str, "EM");
+             break;
+    case 26: strcpy(str, "SUB");
+             break;
+    case 27: strcpy(str, "ESC");
+             break;
+    case 28: strcpy(str, "FS");
+             break;
+    case 29: strcpy(str, "GS");
+             break;
+    case 30: strcpy(str, "RS");
+             break;
+    case 31: strcpy(str, "US");
+             break;
+    case 32: strcpy(str, "SP");
+             break;
+    case 127: strcpy(str, "DEL");
+             break;
+    default: strcpy(str, ".");
+             break;
+  }
+}
 
 
 
