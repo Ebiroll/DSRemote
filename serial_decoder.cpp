@@ -116,107 +116,110 @@ void UI_Mainwindow::serial_decoder(void)
 
     if(devparms.math_decode_uart_tx)
     {
-      if(y_range[devparms.math_decode_uart_tx - 1] > 10)  // don't try to decode if amplitude of signal is too low...
+      if(devparms.chandisplay[devparms.math_decode_uart_tx - 1])  // don't try to decode if channel isn't enabled...
       {
-        for(i=1; i<devparms.wavebufsz; i++)
+        if(y_range[devparms.math_decode_uart_tx - 1] > 10)  // don't try to decode if amplitude of signal is too low...
         {
-          if(devparms.math_decode_uart_tx_nval >= DECODE_MAX_UART_CHARS)
+          for(i=1; i<devparms.wavebufsz; i++)
           {
-            break;
-          }
-
-          if(!uart_tx_start)
-          {
-            if(devparms.math_decode_uart_pol)
+            if(devparms.math_decode_uart_tx_nval >= DECODE_MAX_UART_CHARS)
             {
-              if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i-1] >= threshold[devparms.math_decode_uart_tx - 1])
+              break;
+            }
+
+            if(!uart_tx_start)
+            {
+              if(devparms.math_decode_uart_pol)
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] < threshold[devparms.math_decode_uart_tx - 1])
+                if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i-1] >= threshold[devparms.math_decode_uart_tx - 1])
                 {
-                  uart_tx_start = 1;
+                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] < threshold[devparms.math_decode_uart_tx - 1])
+                  {
+                    uart_tx_start = 1;
 
-                  val = 0;
+                    val = 0;
 
-                  uart_tx_x_pos = (uart_sample_per_bit * 1.5) + i;
+                    uart_tx_x_pos = (uart_sample_per_bit * 1.5) + i;
 
-                  i = uart_tx_x_pos - 1;
+                    i = uart_tx_x_pos - 1;
+                  }
+                }
+              }
+              else
+              {
+                if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i-1] < threshold[devparms.math_decode_uart_tx - 1])
+                {
+                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= threshold[devparms.math_decode_uart_tx - 1])
+                  {
+                    uart_tx_start = 1;
+
+                    val = 0;
+
+                    uart_tx_x_pos = (uart_sample_per_bit * 1.5) + i;
+
+                    i = uart_tx_x_pos - 1;
+                  }
                 }
               }
             }
             else
             {
-              if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i-1] < threshold[devparms.math_decode_uart_tx - 1])
+              if(devparms.math_decode_uart_pol)
               {
                 if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= threshold[devparms.math_decode_uart_tx - 1])
                 {
-                  uart_tx_start = 1;
-
-                  val = 0;
-
-                  uart_tx_x_pos = (uart_sample_per_bit * 1.5) + i;
-
-                  i = uart_tx_x_pos - 1;
+                  val += (1 << data_tx_bit);
                 }
               }
-            }
-          }
-          else
-          {
-            if(devparms.math_decode_uart_pol)
-            {
-              if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= threshold[devparms.math_decode_uart_tx - 1])
+              else
               {
-                val += (1 << data_tx_bit);
-              }
-            }
-            else
-            {
-              if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] < threshold[devparms.math_decode_uart_tx - 1])
-              {
-                val += (1 << data_tx_bit);
-              }
-            }
-
-            if(++data_tx_bit == devparms.math_decode_uart_width)
-            {
-              if((devparms.math_decode_uart_end) && (devparms.math_decode_format != 4))  // little endian?
-              {
-                val = reverse_bitorder(val);
-
-                val >>= (8 - data_tx_bit);
+                if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] < threshold[devparms.math_decode_uart_tx - 1])
+                {
+                  val += (1 << data_tx_bit);
+                }
               }
 
-              devparms.math_decode_uart_tx_val[devparms.math_decode_uart_tx_nval] = val;
-
-              devparms.math_decode_uart_tx_val_pos[devparms.math_decode_uart_tx_nval++] = i - (data_tx_bit * uart_sample_per_bit);
-
-              data_tx_bit = 0;
-
-              uart_tx_start = 0;
-
-              uart_tx_x_pos += uart_sample_per_bit;
-
-              if(devparms.math_decode_uart_stop == 1)
+              if(++data_tx_bit == devparms.math_decode_uart_width)
               {
-                uart_tx_x_pos += uart_sample_per_bit / 2;
-              }
-              else if(devparms.math_decode_uart_stop == 2)
+                if((devparms.math_decode_uart_end) && (devparms.math_decode_format != 4))  // little endian?
+                {
+                  val = reverse_bitorder(val);
+
+                  val >>= (8 - data_tx_bit);
+                }
+
+                devparms.math_decode_uart_tx_val[devparms.math_decode_uart_tx_nval] = val;
+
+                devparms.math_decode_uart_tx_val_pos[devparms.math_decode_uart_tx_nval++] = i - (data_tx_bit * uart_sample_per_bit);
+
+                data_tx_bit = 0;
+
+                uart_tx_start = 0;
+
+                uart_tx_x_pos += uart_sample_per_bit;
+
+                if(devparms.math_decode_uart_stop == 1)
+                {
+                  uart_tx_x_pos += uart_sample_per_bit / 2;
+                }
+                else if(devparms.math_decode_uart_stop == 2)
+                  {
+                    uart_tx_x_pos += uart_sample_per_bit;
+                  }
+
+                if(devparms.math_decode_uart_par)
                 {
                   uart_tx_x_pos += uart_sample_per_bit;
                 }
 
-              if(devparms.math_decode_uart_par)
+                i = uart_tx_x_pos - 1;
+              }
+              else
               {
                 uart_tx_x_pos += uart_sample_per_bit;
+
+                i = uart_tx_x_pos - 1;
               }
-
-              i = uart_tx_x_pos - 1;
-            }
-            else
-            {
-              uart_tx_x_pos += uart_sample_per_bit;
-
-              i = uart_tx_x_pos - 1;
             }
           }
         }
@@ -225,107 +228,110 @@ void UI_Mainwindow::serial_decoder(void)
 
     if(devparms.math_decode_uart_rx)
     {
-      if(y_range[devparms.math_decode_uart_rx - 1] > 10)  // don't try to decode if amplitude of signal is too low...
+      if(devparms.chandisplay[devparms.math_decode_uart_rx - 1])  // don't try to decode if channel isn't enabled...
       {
-        for(i=1; i<devparms.wavebufsz; i++)
+        if(y_range[devparms.math_decode_uart_rx - 1] > 10)  // don't try to decode if amplitude of signal is too low...
         {
-          if(devparms.math_decode_uart_rx_nval >= DECODE_MAX_UART_CHARS)
+          for(i=1; i<devparms.wavebufsz; i++)
           {
-            break;
-          }
-
-          if(!uart_rx_start)
-          {
-            if(devparms.math_decode_uart_pol)
+            if(devparms.math_decode_uart_rx_nval >= DECODE_MAX_UART_CHARS)
             {
-              if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i-1] >= threshold[devparms.math_decode_uart_rx - 1])
+              break;
+            }
+
+            if(!uart_rx_start)
+            {
+              if(devparms.math_decode_uart_pol)
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] < threshold[devparms.math_decode_uart_rx - 1])
+                if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i-1] >= threshold[devparms.math_decode_uart_rx - 1])
                 {
-                  uart_rx_start = 1;
+                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] < threshold[devparms.math_decode_uart_rx - 1])
+                  {
+                    uart_rx_start = 1;
 
-                  val = 0;
+                    val = 0;
 
-                  uart_rx_x_pos = (uart_sample_per_bit * 1.5) + i;
+                    uart_rx_x_pos = (uart_sample_per_bit * 1.5) + i;
 
-                  i = uart_rx_x_pos - 1;
+                    i = uart_rx_x_pos - 1;
+                  }
+                }
+              }
+              else
+              {
+                if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i-1] < threshold[devparms.math_decode_uart_rx - 1])
+                {
+                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= threshold[devparms.math_decode_uart_rx - 1])
+                  {
+                    uart_rx_start = 1;
+
+                    val = 0;
+
+                    uart_rx_x_pos = (uart_sample_per_bit * 1.5) + i;
+
+                    i = uart_rx_x_pos - 1;
+                  }
                 }
               }
             }
             else
             {
-              if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i-1] < threshold[devparms.math_decode_uart_rx - 1])
+              if(devparms.math_decode_uart_pol)
               {
                 if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= threshold[devparms.math_decode_uart_rx - 1])
                 {
-                  uart_rx_start = 1;
-
-                  val = 0;
-
-                  uart_rx_x_pos = (uart_sample_per_bit * 1.5) + i;
-
-                  i = uart_rx_x_pos - 1;
+                  val += (1 << data_rx_bit);
                 }
               }
-            }
-          }
-          else
-          {
-            if(devparms.math_decode_uart_pol)
-            {
-              if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= threshold[devparms.math_decode_uart_rx - 1])
+              else
               {
-                val += (1 << data_rx_bit);
-              }
-            }
-            else
-            {
-              if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] < threshold[devparms.math_decode_uart_rx - 1])
-              {
-                val += (1 << data_rx_bit);
-              }
-            }
-
-            if(++data_rx_bit == devparms.math_decode_uart_width)
-            {
-              if((devparms.math_decode_uart_end) && (devparms.math_decode_format != 4))  // little endian?
-              {
-                val = reverse_bitorder(val);
-
-                val >>= (8 - data_rx_bit);
+                if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] < threshold[devparms.math_decode_uart_rx - 1])
+                {
+                  val += (1 << data_rx_bit);
+                }
               }
 
-              devparms.math_decode_uart_rx_val[devparms.math_decode_uart_rx_nval] = val;
-
-              devparms.math_decode_uart_rx_val_pos[devparms.math_decode_uart_rx_nval++] = i - (data_rx_bit * uart_sample_per_bit);
-
-              data_rx_bit = 0;
-
-              uart_rx_start = 0;
-
-              uart_rx_x_pos += uart_sample_per_bit;
-
-              if(devparms.math_decode_uart_stop == 1)
+              if(++data_rx_bit == devparms.math_decode_uart_width)
               {
-                uart_rx_x_pos += uart_sample_per_bit / 2;
-              }
-              else if(devparms.math_decode_uart_stop == 2)
+                if((devparms.math_decode_uart_end) && (devparms.math_decode_format != 4))  // little endian?
+                {
+                  val = reverse_bitorder(val);
+
+                  val >>= (8 - data_rx_bit);
+                }
+
+                devparms.math_decode_uart_rx_val[devparms.math_decode_uart_rx_nval] = val;
+
+                devparms.math_decode_uart_rx_val_pos[devparms.math_decode_uart_rx_nval++] = i - (data_rx_bit * uart_sample_per_bit);
+
+                data_rx_bit = 0;
+
+                uart_rx_start = 0;
+
+                uart_rx_x_pos += uart_sample_per_bit;
+
+                if(devparms.math_decode_uart_stop == 1)
+                {
+                  uart_rx_x_pos += uart_sample_per_bit / 2;
+                }
+                else if(devparms.math_decode_uart_stop == 2)
+                  {
+                    uart_rx_x_pos += uart_sample_per_bit;
+                  }
+
+                if(devparms.math_decode_uart_par)
                 {
                   uart_rx_x_pos += uart_sample_per_bit;
                 }
 
-              if(devparms.math_decode_uart_par)
+                i = uart_rx_x_pos - 1;
+              }
+              else
               {
                 uart_rx_x_pos += uart_sample_per_bit;
+
+                i = uart_rx_x_pos - 1;
               }
-
-              i = uart_rx_x_pos - 1;
-            }
-            else
-            {
-              uart_rx_x_pos += uart_sample_per_bit;
-
-              i = uart_rx_x_pos - 1;
             }
           }
         }
