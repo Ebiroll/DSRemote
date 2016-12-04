@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1612032335"
+#define PROGRAM_VERSION       "0.33_1612041119"
 
 #define MAX_PATHLEN            4096
 
@@ -120,7 +120,7 @@ struct device_settings
   char serialnr[128];
   char softwvers[128];
   int modelserie;               // 1=DS1000, 2=DS2000, etc.
-  int hordivisions;             // number of horizontal divisions
+  int hordivisions;             // number of horizontal divisions, 12 or 14
 
   int screentimerival;
 
@@ -214,9 +214,12 @@ struct device_settings
   int math_decode_uart_width;   // databits, 5-8
   int math_decode_uart_stop;    // stopbits, 0=1, 1=1.5, 2=2
   int math_decode_uart_par;     // parity, 0=none, 1=odd, 2=even
-  int math_decode_uart_nval;    // number of decoded characters
-  char math_decode_uart_val[DECODE_MAX_UART_CHARS];  // array with decoded characters
-  int math_decode_uart_val_pos[DECODE_MAX_UART_CHARS];  // array with position of the decoded characters
+  int math_decode_uart_tx_nval;    // number of decoded characters
+  unsigned char math_decode_uart_tx_val[DECODE_MAX_UART_CHARS];  // array with decoded characters
+  int math_decode_uart_tx_val_pos[DECODE_MAX_UART_CHARS];  // array with position of the decoded characters
+  int math_decode_uart_rx_nval;    // number of decoded characters
+  unsigned char math_decode_uart_rx_val[DECODE_MAX_UART_CHARS];  // array with decoded characters
+  int math_decode_uart_rx_val_pos[DECODE_MAX_UART_CHARS];  // array with position of the decoded characters
 
   char *screenshot_buf;
   short *wavebuf[MAX_CHNS];
