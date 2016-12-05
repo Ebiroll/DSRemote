@@ -259,7 +259,14 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
 
   trace_pos_spinbox = new QSpinBox(this);
   trace_pos_spinbox->setGeometry(370, 392, 100, 25);
-  trace_pos_spinbox->setRange(50, 350);
+  if(devparms->modelserie == 6)
+  {
+    trace_pos_spinbox->setRange(-163, 143);
+  }
+  else
+  {
+    trace_pos_spinbox->setRange(50, 350);
+  }
   trace_pos_spinbox->setValue(devparms->math_decode_pos);
 
   uart_tx_src_label = new QLabel(tab_uart);
@@ -644,8 +651,22 @@ void UI_decoder_window::trace_pos_spinbox_changed()
 
   if(devparms->modelserie == 6)
   {
-    sprintf(str, "FIXME!!");
-//     sprintf(str, ":BUS1:SPI:OFFS %i", devparms->math_decode_pos);  :FIXME
+    if(devparms->math_decode_mode == DECODE_MODE_SPI)
+    {
+      sprintf(str, ":BUS1:SPI:OFFS %i", devparms->math_decode_pos);
+    }
+    else if(devparms->math_decode_mode == DECODE_MODE_UART)
+      {
+        sprintf(str, ":BUS1:RS232:OFFS %i", devparms->math_decode_pos);
+      }
+      else if(devparms->math_decode_mode == DECODE_MODE_I2C)
+        {
+          sprintf(str, ":BUS1:IIC:OFFS %i", devparms->math_decode_pos);
+        }
+        else if(devparms->math_decode_mode == DECODE_MODE_PAR)
+          {
+            sprintf(str, ":BUS1:PARA:OFFS %i", devparms->math_decode_pos);
+          }
   }
   else
   {

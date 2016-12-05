@@ -1633,7 +1633,7 @@ void read_settings_thread::run()
 
   if(devparms->modelserie == 6)
   {
-    if(tmc_write(":BUS1:IIC:OFFS?") != 15)
+    if(tmc_write(":BUS1:SPI:OFFS?") != 15)
     {
       line = __LINE__;
       goto GDS_OUT_ERROR;

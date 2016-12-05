@@ -2266,7 +2266,14 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
   char str[256];
 
 
-  base_line = ((double)dh / 400.0) * devparms->math_decode_pos;
+  if(devparms->modelserie == 6)
+  {
+    base_line = (dh / 2) - (((double)dh / 400.0) * devparms->math_decode_pos);
+  }
+  else
+  {
+    base_line = ((double)dh / 400.0) * devparms->math_decode_pos;
+  }
 
   pix_per_smpl = (double)dw / (devparms->hordivisions * 100.0);
 

@@ -44,7 +44,8 @@ void UI_Mainwindow::serial_decoder(void)
 
   double uart_sample_per_bit,
          uart_tx_x_pos,
-         uart_rx_x_pos;
+         uart_rx_x_pos,
+         bit_per_volt;
 
   devparms.math_decode_uart_tx_nval = 0;
 
@@ -74,14 +75,29 @@ void UI_Mainwindow::serial_decoder(void)
   {
     for(j=0; j<MAX_CHNS; j++)
     {
-      if(devparms.modelserie == 6)
+      threshold[j] = devparms.math_decode_threshold[j];
+    }
+
+    if(devparms.modelserie == 6)
+    {
+      if(devparms.math_decode_mode == DECODE_MODE_UART)
       {
-        // FIXME
+        if(devparms.math_decode_uart_tx)
+        {
+          bit_per_volt = -32.0 / devparms.chanscale[devparms.math_decode_uart_tx - 1];
+
+          threshold[devparms.math_decode_uart_tx - 1] = (devparms.math_decode_threshold_uart_tx + devparms.chanoffset[devparms.math_decode_uart_tx - 1]) * bit_per_volt;
+        }
+
+        if(devparms.math_decode_uart_rx)
+        {
+          threshold[devparms.math_decode_uart_rx - 1] = devparms.math_decode_threshold_uart_rx;
+        }
       }
-      else
-      {
-        threshold[j] = devparms.math_decode_threshold[j];
-      }
+      else if(devparms.math_decode_mode == DECODE_MODE_SPI)
+        {
+            // :FIXME
+        }
     }
   }
 
