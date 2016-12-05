@@ -71,6 +71,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   threshold_1_dspinbox = new QDoubleSpinBox(this);
   threshold_1_dspinbox->setGeometry(370, 42, 100, 25);
   threshold_1_dspinbox->setDecimals(3);
+  threshold_1_dspinbox->setRange(-20.0, 20.0);
 
   threshold_auto_combobox = new QComboBox(this);
   threshold_auto_combobox->setGeometry(510, 42, 140, 25);
@@ -110,6 +111,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   threshold_2_dspinbox = new QDoubleSpinBox(this);
   threshold_2_dspinbox->setGeometry(370, 77, 100, 25);
   threshold_2_dspinbox->setDecimals(3);
+  threshold_2_dspinbox->setRange(-20.0, 20.0);
 
   spi_miso_src_label = new QLabel(tab_spi);
   spi_miso_src_label->setGeometry(10, 90, 100, 25);
@@ -134,6 +136,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   threshold_3_dspinbox = new QDoubleSpinBox(this);
   threshold_3_dspinbox->setGeometry(370, 112, 100, 25);
   threshold_3_dspinbox->setDecimals(3);
+  threshold_3_dspinbox->setRange(-20.0, 20.0);
 
   spi_cs_src_label = new QLabel(tab_spi);
   spi_cs_src_label->setGeometry(10, 125, 100, 25);
@@ -158,6 +161,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   threshold_4_dspinbox = new QDoubleSpinBox(this);
   threshold_4_dspinbox->setGeometry(370, 147, 100, 25);
   threshold_4_dspinbox->setDecimals(3);
+  threshold_4_dspinbox->setRange(-20.0, 20.0);
 
   spi_select_label = new QLabel(tab_spi);
   spi_select_label->setGeometry(10, 160, 100, 25);
