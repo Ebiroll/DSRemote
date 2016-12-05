@@ -73,32 +73,67 @@ void UI_Mainwindow::serial_decoder(void)
   }
   else
   {
-    for(j=0; j<MAX_CHNS; j++)
+    if(devparms.math_decode_mode == DECODE_MODE_UART)
     {
-      threshold[j] = devparms.math_decode_threshold[j];
-    }
-
-    if(devparms.modelserie == 6)
-    {
-      if(devparms.math_decode_mode == DECODE_MODE_UART)
+      if(devparms.math_decode_uart_tx)
       {
-        if(devparms.math_decode_uart_tx)
+        if(devparms.modelserie == 6)
         {
-          bit_per_volt = -32.0 / devparms.chanscale[devparms.math_decode_uart_tx - 1];
+          bit_per_volt = 32.0 / devparms.chanscale[devparms.math_decode_uart_tx - 1];
 
-          threshold[devparms.math_decode_uart_tx - 1] = (devparms.math_decode_threshold_uart_tx + devparms.chanoffset[devparms.math_decode_uart_tx - 1]) * bit_per_volt;
+          threshold[devparms.math_decode_uart_tx - 1] =
+            (devparms.math_decode_threshold_uart_tx +
+            devparms.chanoffset[devparms.math_decode_uart_tx - 1])
+            * bit_per_volt;
         }
-
-        if(devparms.math_decode_uart_rx)
+        else
         {
-          threshold[devparms.math_decode_uart_rx - 1] = devparms.math_decode_threshold_uart_rx;
+          bit_per_volt = 25.0 / devparms.chanscale[devparms.math_decode_uart_tx - 1];
+
+          threshold[devparms.math_decode_uart_tx - 1] =
+            (devparms.math_decode_threshold[devparms.math_decode_uart_tx - 1] +
+            devparms.chanoffset[devparms.math_decode_uart_tx - 1])
+            * bit_per_volt;
+
+//            printf("chanscale: %f\n"
+//                   "chanoffset: %f\n"
+//                   "math_decode_threshold: %f\n"
+//                   "math_decode_uart_tx: %i\n"
+//                   "threshold: %i\n",
+//                   devparms.chanscale[devparms.math_decode_uart_tx - 1],
+//                   devparms.chanoffset[devparms.math_decode_uart_tx - 1],
+//                   devparms.math_decode_threshold[devparms.math_decode_uart_tx - 1],
+//                   devparms.math_decode_uart_tx,
+//                   threshold[devparms.math_decode_uart_tx - 1]);
         }
       }
-      else if(devparms.math_decode_mode == DECODE_MODE_SPI)
+
+      if(devparms.math_decode_uart_rx)
+      {
+        if(devparms.modelserie == 6)
         {
-            // :FIXME
+          bit_per_volt = 32.0 / devparms.chanscale[devparms.math_decode_uart_rx - 1];
+
+          threshold[devparms.math_decode_uart_rx - 1] =
+            (devparms.math_decode_threshold_uart_rx +
+            devparms.chanoffset[devparms.math_decode_uart_rx - 1])
+            * bit_per_volt;
         }
+        else
+        {
+          bit_per_volt = 25.0 / devparms.chanscale[devparms.math_decode_uart_rx - 1];
+
+          threshold[devparms.math_decode_uart_rx - 1] =
+            (devparms.math_decode_threshold[devparms.math_decode_uart_rx - 1] +
+            devparms.chanoffset[devparms.math_decode_uart_rx - 1])
+            * bit_per_volt;
+        }
+      }
     }
+    else if(devparms.math_decode_mode == DECODE_MODE_SPI)
+      {
+          // :FIXME
+      }
   }
 
   if(devparms.math_decode_mode == DECODE_MODE_UART)
