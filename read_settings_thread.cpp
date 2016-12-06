@@ -1780,7 +1780,8 @@ void read_settings_thread::run()
       goto GDS_OUT_ERROR;
     }
 
-    devparms->math_decode_threshold_uart_tx = atof(device->buf);
+//    devparms->math_decode_threshold_uart_tx = atof(device->buf);
+    devparms->math_decode_threshold_uart_tx = atof(device->buf) * 10.0;  // hack for firmware bug!
 
     usleep(TMC_GDS_DELAY);
 
@@ -1796,7 +1797,8 @@ void read_settings_thread::run()
       goto GDS_OUT_ERROR;
     }
 
-    devparms->math_decode_threshold_uart_rx = atof(device->buf);
+//    devparms->math_decode_threshold_uart_rx = atof(device->buf);
+    devparms->math_decode_threshold_uart_rx = atof(device->buf) * 10.0;  // hack for firmware bug!
   }
 
   if(devparms->modelserie != 6)

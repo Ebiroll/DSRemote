@@ -520,7 +520,8 @@ void screen_thread::run()
 
 //struct waveform_preamble wfp;
 
-  if(params.triggerstatus != 1)  // Don't download waveform data when triggerstatus is "wait"
+//  if(params.triggerstatus != 1)  // Don't download waveform data when triggerstatus is "wait"
+  if(1)
   {
     for(i=0; i<MAX_CHNS; i++)
     {

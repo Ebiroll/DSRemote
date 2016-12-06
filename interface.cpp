@@ -212,7 +212,7 @@ void UI_Mainwindow::navDialReleased()
 
 void UI_Mainwindow::adjDialChanged(int new_pos)
 {
-  static int old_pos=0;
+  static int old_pos=50;
 
   int diff, dir;
 
@@ -339,7 +339,7 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
 
 void UI_Mainwindow::trigAdjustDialChanged(int new_pos)
 {
-  static int old_pos=0;
+  static int old_pos=50;
 
   int diff, dir, chn;
 
@@ -443,7 +443,7 @@ void UI_Mainwindow::trigAdjustDialChanged(int new_pos)
 
 void UI_Mainwindow::horScaleDialChanged(int new_pos)
 {
-  static int old_pos=0;
+  static int old_pos=50;
 
   int diff, dir;
 
@@ -652,7 +652,7 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
 
 void UI_Mainwindow::horPosDialChanged(int new_pos)
 {
-  static int old_pos=0;
+  static int old_pos=50;
 
   int diff, dir;
 
@@ -783,7 +783,7 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
 
 void UI_Mainwindow::vertOffsetDialChanged(int new_pos)
 {
-  static int old_pos=0;
+  static int old_pos=50;
 
   int diff, dir, chn;
 
@@ -884,7 +884,7 @@ void UI_Mainwindow::vertOffsetDialChanged(int new_pos)
 
 void UI_Mainwindow::vertScaleDialChanged(int new_pos)
 {
-  static int old_pos=0;
+  static int old_pos=50;
 
   int diff, dir, chn;
 

@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1612052005"
+#define PROGRAM_VERSION       "0.33_1612062050"
 
 #define MAX_PATHLEN            4096
 
@@ -92,7 +92,7 @@
 #define DECODE_MODE_SPI           2
 #define DECODE_MODE_I2C           3
 
-#define DECODE_MAX_UART_CHARS   256
+#define DECODE_MAX_CHARS   256
 
 
 
@@ -205,6 +205,12 @@ struct device_settings
   int math_decode_spi_edge;     // edge, 0=falling edge of clock, 1=rising edge of clock
   int math_decode_spi_end;      // endian, 0=lsb, 1=msb
   int math_decode_spi_width;    // databits, 8-32
+  int math_decode_spi_mosi_nval;  // number of decoded characters
+  unsigned char math_decode_spi_mosi_val[DECODE_MAX_CHARS];  // array with decoded characters
+  int math_decode_spi_mosi_val_pos[DECODE_MAX_CHARS];  // array with position of the decoded characters
+  int math_decode_spi_miso_nval;    // number of decoded characters
+  unsigned char math_decode_spi_miso_val[DECODE_MAX_CHARS];  // array with decoded characters
+  int math_decode_spi_miso_val_pos[DECODE_MAX_CHARS];  // array with position of the decoded characters
 
   int math_decode_uart_tx;      // channel (0=off)
   int math_decode_uart_rx;      // channel (0=off)
@@ -215,11 +221,11 @@ struct device_settings
   int math_decode_uart_stop;    // stopbits, 0=1, 1=1.5, 2=2
   int math_decode_uart_par;     // parity, 0=none, 1=odd, 2=even
   int math_decode_uart_tx_nval;    // number of decoded characters
-  unsigned char math_decode_uart_tx_val[DECODE_MAX_UART_CHARS];  // array with decoded characters
-  int math_decode_uart_tx_val_pos[DECODE_MAX_UART_CHARS];  // array with position of the decoded characters
+  unsigned char math_decode_uart_tx_val[DECODE_MAX_CHARS];  // array with decoded characters
+  int math_decode_uart_tx_val_pos[DECODE_MAX_CHARS];  // array with position of the decoded characters
   int math_decode_uart_rx_nval;    // number of decoded characters
-  unsigned char math_decode_uart_rx_val[DECODE_MAX_UART_CHARS];  // array with decoded characters
-  int math_decode_uart_rx_val_pos[DECODE_MAX_UART_CHARS];  // array with position of the decoded characters
+  unsigned char math_decode_uart_rx_val[DECODE_MAX_CHARS];  // array with decoded characters
+  int math_decode_uart_rx_val_pos[DECODE_MAX_CHARS];  // array with position of the decoded characters
 
   char *screenshot_buf;
   short *wavebuf[MAX_CHNS];

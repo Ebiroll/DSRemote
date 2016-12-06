@@ -239,6 +239,11 @@ void TDial::setMaximum(int m)
   {
     degr_per_step = 300.0 / ((double)(dmax - dmin) / (double)step);
   }
+
+  dval = (dmax + dmin) / 2;
+
+  dval_old = dval;
+
   update();
 }
 
@@ -258,6 +263,11 @@ void TDial::setMinimum(int m)
   {
     degr_per_step = 300.0 / ((double)(dmax - dmin) / (double)step);
   }
+
+  dval = (dmax + dmin) / 2;
+
+  dval_old = dval;
+
   update();
 }
 

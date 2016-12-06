@@ -2528,7 +2528,8 @@ void UI_Mainwindow::screenUpdate()
     return;
   }
 
-  if(devparms.triggerstatus != 1)  // Don't plot waveform data when triggerstatus is "wait"
+//  if(devparms.triggerstatus != 1)  // Don't plot waveform data when triggerstatus is "wait"
+  if(1)
   {
     if(devparms.math_decode_display)
     {
