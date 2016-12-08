@@ -2504,6 +2504,40 @@ void read_settings_thread::run()
 
   devparms->math_decode_spi_width = atoi(device->buf);
 
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie == 6)
+  {
+    if(tmc_write(":BUS1:SPI:END?") != 14)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(tmc_write(":DEC1:SPI:END?") != 14)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+  }
+
+  if(tmc_read() < 1)
+  {
+    line = __LINE__;
+    goto GDS_OUT_ERROR;
+  }
+
+  if(!strcmp(device->buf, "LSB"))
+  {
+    devparms->math_decode_spi_end = 0;
+  }
+  else if(!strcmp(device->buf, "MSB"))
+    {
+      devparms->math_decode_spi_end = 1;
+    }
+
   err_num = 0;
 
   return;

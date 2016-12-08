@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1612062050"
+#define PROGRAM_VERSION       "0.33_1612081745"
 
 #define MAX_PATHLEN            4096
 
@@ -206,10 +206,10 @@ struct device_settings
   int math_decode_spi_end;      // endian, 0=lsb, 1=msb
   int math_decode_spi_width;    // databits, 8-32
   int math_decode_spi_mosi_nval;  // number of decoded characters
-  unsigned char math_decode_spi_mosi_val[DECODE_MAX_CHARS];  // array with decoded characters
+  unsigned int math_decode_spi_mosi_val[DECODE_MAX_CHARS];  // array with decoded characters
   int math_decode_spi_mosi_val_pos[DECODE_MAX_CHARS];  // array with position of the decoded characters
   int math_decode_spi_miso_nval;    // number of decoded characters
-  unsigned char math_decode_spi_miso_val[DECODE_MAX_CHARS];  // array with decoded characters
+  unsigned int math_decode_spi_miso_val[DECODE_MAX_CHARS];  // array with decoded characters
   int math_decode_spi_miso_val_pos[DECODE_MAX_CHARS];  // array with position of the decoded characters
 
   int math_decode_uart_tx;      // channel (0=off)

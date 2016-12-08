@@ -2255,11 +2255,14 @@ bool SignalCurve::hasMoveEvent(void)
 
 void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
 {
-  int i, j,
+  int i, j, k,
       cell_width,
       base_line,
       line_h_uart_tx=0,
-      line_h_uart_rx=0;
+      line_h_uart_rx=0,
+      line_h_spi_mosi=0,
+      line_h_spi_miso=0,
+      spi_chars=1;
 
   double pix_per_smpl;
 
@@ -2458,6 +2461,219 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
                   str[8] = 0;
 
                   painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
+                }
+      }
+    }
+  }
+
+  if(devparms->math_decode_mode == DECODE_MODE_SPI)
+  {
+    painter->setPen(Qt::green);
+
+    if(devparms->math_decode_spi_width > 24)
+    {
+      spi_chars = 4;
+    }
+    else if(devparms->math_decode_spi_width > 16)
+      {
+        spi_chars = 3;
+      }
+      else if(devparms->math_decode_spi_width > 8)
+        {
+          spi_chars = 2;
+        }
+        else
+        {
+          spi_chars = 1;
+        }
+
+    cell_width *= spi_chars;
+
+    if(devparms->math_decode_spi_mosi && devparms->math_decode_spi_miso)
+    {
+      line_h_spi_mosi = base_line - 5;
+
+      line_h_spi_miso = base_line + 45;
+
+      painter->drawLine(0, line_h_spi_mosi, dw, line_h_spi_mosi);
+
+      painter->drawLine(0, line_h_spi_miso, dw, line_h_spi_miso);
+    }
+    else if(devparms->math_decode_spi_mosi)
+      {
+        line_h_spi_mosi = base_line;
+
+        painter->drawLine(0, line_h_spi_mosi, dw, line_h_spi_mosi);
+      }
+      else if(devparms->math_decode_spi_miso)
+        {
+          line_h_spi_miso = base_line;
+
+          painter->drawLine(0, line_h_spi_miso, dw, line_h_spi_miso);
+        }
+
+    if(devparms->math_decode_spi_mosi)
+    {
+      for(i=0; i<devparms->math_decode_spi_mosi_nval; i++)
+      {
+        painter->fillRect(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 26, Qt::black);
+
+        painter->drawRect(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 26);
+      }
+    }
+
+    if(devparms->math_decode_spi_miso)
+    {
+      for(i=0; i<devparms->math_decode_spi_miso_nval; i++)
+      {
+        painter->fillRect(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 26, Qt::black);
+
+        painter->drawRect(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 26);
+      }
+    }
+
+    painter->setPen(Qt::white);
+
+    if(devparms->math_decode_spi_mosi)
+    {
+      painter->drawText(5, line_h_spi_mosi - 35, 40, 30, Qt::AlignCenter, "MOSI");
+
+      for(i=0; i<devparms->math_decode_spi_mosi_nval; i++)
+      {
+        if(devparms->math_decode_format == 0)  // hex
+        {
+          switch(spi_chars)
+          {
+            case 1: sprintf(str, "0x%02X", devparms->math_decode_spi_mosi_val[i]);
+                    break;
+            case 2: sprintf(str, "0x%04X", devparms->math_decode_spi_mosi_val[i]);
+                    break;
+            case 3: sprintf(str, "0x%06X", devparms->math_decode_spi_mosi_val[i]);
+                    break;
+            case 4: sprintf(str, "0x%08X", devparms->math_decode_spi_mosi_val[i]);
+                    break;
+          }
+
+          painter->drawText(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 30, Qt::AlignCenter, str);
+        }
+        else if(devparms->math_decode_format == 1)  // ASCII
+          {
+            for(k=0; k<spi_chars; k++)
+            {
+              str[k]= devparms->math_decode_spi_mosi_val[i] >> (k * 8);
+
+              if((str[k] < 33) || (str[k] > 126))
+              {
+                str[k] = '.';
+              }
+            }
+
+            str[k] = 0;
+
+            painter->drawText(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 30, Qt::AlignCenter, str);
+          }
+          else if(devparms->math_decode_format == 2)  // decimal
+            {
+              sprintf(str, "%u", devparms->math_decode_spi_mosi_val[i]);
+
+              painter->drawText(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 30, Qt::AlignCenter, str);
+            }
+            else if(devparms->math_decode_format == 3)  // binary
+              {
+                str[0] = '0';
+                str[1] = 'b';
+
+                for(j=0; j<devparms->math_decode_spi_width; j++)
+                {
+                  str[devparms->math_decode_spi_width + 1 - j] = ((devparms->math_decode_spi_mosi_val[i] >> j) & 1) + '0';
+                }
+
+                str[j + 2] = 0;
+
+                painter->drawText(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 30, Qt::AlignCenter, str);
+              }
+              else if(devparms->math_decode_format == 4)  // line
+                {
+                  for(j=0; j<devparms->math_decode_spi_width; j++)
+                  {
+                    str[j] = ((devparms->math_decode_spi_mosi_val[i] >> j) & 1) + '0';
+                  }
+
+                  str[devparms->math_decode_spi_width] = 0;
+
+                  painter->drawText(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 30, Qt::AlignCenter, str);
+                }
+      }
+    }
+
+    if(devparms->math_decode_spi_miso)
+    {
+      painter->drawText(5, line_h_spi_miso - 35, 40, 30, Qt::AlignCenter, "MISO");
+
+      for(i=0; i<devparms->math_decode_spi_miso_nval; i++)
+      {
+        if(devparms->math_decode_format == 0)  // hex
+        {
+          switch(spi_chars)
+          {
+            case 1: sprintf(str, "0x%02X", devparms->math_decode_spi_miso_val[i]);
+                    break;
+            case 2: sprintf(str, "0x%04X", devparms->math_decode_spi_miso_val[i]);
+                    break;
+            case 3: sprintf(str, "0x%06X", devparms->math_decode_spi_miso_val[i]);
+                    break;
+            case 4: sprintf(str, "0x%08X", devparms->math_decode_spi_miso_val[i]);
+                    break;
+          }
+
+          painter->drawText(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 30, Qt::AlignCenter, str);
+        }
+        else if(devparms->math_decode_format == 1)  // ASCII
+          {
+            for(k=0; k<spi_chars; k++)
+            {
+              str[k]= devparms->math_decode_spi_miso_val[i] >> (k * 8);
+
+              if((str[k] < 33) || (str[k] > 126))
+              {
+                str[k] = '.';
+              }
+            }
+
+            str[k] = 0;
+
+            painter->drawText(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 30, Qt::AlignCenter, str);
+          }
+          else if(devparms->math_decode_format == 2)  // decimal
+            {
+              sprintf(str, "%u", devparms->math_decode_spi_miso_val[i]);
+
+              painter->drawText(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 30, Qt::AlignCenter, str);
+            }
+            else if(devparms->math_decode_format == 3)  // binary
+              {
+                str[0] = '0';
+                str[1] = 'b';
+
+                for(j=0; j<devparms->math_decode_spi_width; j++)
+                {
+                  str[devparms->math_decode_spi_width + 1 - j] = ((devparms->math_decode_spi_miso_val[i] >> j) & 1) + '0';
+                }
+
+                str[j + 2] = 0;
+
+                painter->drawText(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 30, Qt::AlignCenter, str);
+              }
+              else if(devparms->math_decode_format == 4)  // line
+                {
+                  for(j=0; j<devparms->math_decode_spi_width; j++)
+                  {
+                    str[j] = ((devparms->math_decode_spi_miso_val[i] >> j) & 1) + '0';
+                  }
+
+                  str[devparms->math_decode_spi_width] = 0;
+
+                  painter->drawText(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 30, Qt::AlignCenter, str);
                 }
       }
     }

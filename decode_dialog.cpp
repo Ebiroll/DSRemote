@@ -152,7 +152,10 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
     spi_cs_src_combobox->addItem("Ch. 3");
     spi_cs_src_combobox->addItem("Ch. 4");
   }
-  spi_cs_src_combobox->setCurrentIndex(devparms->math_decode_spi_cs);
+  if(devparms->math_decode_spi_mode)
+  {
+    spi_cs_src_combobox->setCurrentIndex(devparms->math_decode_spi_cs);
+  }
 
   threshold_4_label = new QLabel(this);
   threshold_4_label->setGeometry(270, 147, 100, 25);
@@ -226,6 +229,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   spi_polarity_combobox->setGeometry(130, 265, 100, 25);
   spi_polarity_combobox->addItem("Negative");
   spi_polarity_combobox->addItem("Positive");
+  spi_polarity_combobox->setCurrentIndex(devparms->math_decode_spi_pol);
 
   spi_edge_label = new QLabel(tab_spi);
   spi_edge_label->setGeometry(10, 300, 100, 25);
@@ -689,22 +693,22 @@ void UI_decoder_window::spi_select_combobox_clicked(int idx)
   {
     if(idx == 0)
     {
-      mainwindow->set_cue_cmd(":BUS1:SPI:SS:POL NCS");
+      mainwindow->set_cue_cmd(":BUS1:SPI:SS:POL NEG");
     }
     else
     {
-      mainwindow->set_cue_cmd(":BUS1:SPI:SS:POL CS");
+      mainwindow->set_cue_cmd(":BUS1:SPI:SS:POL POS");
     }
   }
   else
   {
     if(idx == 0)
     {
-      mainwindow->set_cue_cmd(":DEC1:SPI:SEL NEG");
+      mainwindow->set_cue_cmd(":DEC1:SPI:SEL NCS");
     }
     else
     {
-      mainwindow->set_cue_cmd(":DEC1:SPI:SEL POS");
+      mainwindow->set_cue_cmd(":DEC1:SPI:SEL CS");
     }
   }
 }
@@ -712,6 +716,8 @@ void UI_decoder_window::spi_select_combobox_clicked(int idx)
 
 void UI_decoder_window::spi_mode_combobox_clicked(int idx)
 {
+  char str[256];
+
   devparms->math_decode_spi_mode = idx;
 
   if(devparms->modelserie != 6)
@@ -719,10 +725,21 @@ void UI_decoder_window::spi_mode_combobox_clicked(int idx)
     if(idx == 0)
     {
       mainwindow->set_cue_cmd(":DEC1:SPI:MODE TIM");
+
+      spi_cs_src_combobox->setCurrentIndex(0);
+
+      devparms->math_decode_spi_cs = 0;
     }
     else
     {
       mainwindow->set_cue_cmd(":DEC1:SPI:MODE CS");
+
+      if(spi_cs_src_combobox->currentIndex() > 0)
+      {
+        sprintf(str, ":DEC1:SPI:CS CHAN%i", spi_cs_src_combobox->currentIndex());
+
+        mainwindow->set_cue_cmd(str);
+      }
     }
   }
 }
@@ -749,11 +766,11 @@ void UI_decoder_window::spi_polarity_combobox_clicked(int idx)
   {
     if(idx == 0)
     {
-      mainwindow->set_cue_cmd(":DEC1:SPI:EDGE NEG");
+      mainwindow->set_cue_cmd(":DEC1:SPI:POL NEG");
     }
     else
     {
-      mainwindow->set_cue_cmd(":DEC1:SPI:EDGE POS");
+      mainwindow->set_cue_cmd(":DEC1:SPI:POL POS");
     }
   }
 }
@@ -778,11 +795,11 @@ void UI_decoder_window::spi_edge_combobox_clicked(int idx)
   {
     if(idx == 0)
     {
-      mainwindow->set_cue_cmd(":DEC1:SPI:EDGE NEG");
+      mainwindow->set_cue_cmd(":DEC1:SPI:EDGE FALL");
     }
     else
     {
-      mainwindow->set_cue_cmd(":DEC1:SPI:EDGE POS");
+      mainwindow->set_cue_cmd(":DEC1:SPI:EDGE RISE");
     }
   }
 }
@@ -1083,6 +1100,8 @@ void UI_decoder_window::src_combobox_clicked(int)
   devparms->math_decode_spi_cs = spi_cs_src_combobox->currentIndex();
   devparms->math_decode_uart_tx = uart_tx_src_combobox->currentIndex();
   devparms->math_decode_uart_rx = uart_rx_src_combobox->currentIndex();
+  devparms->math_decode_spi_mode = spi_mode_combobox->currentIndex();
+  devparms->math_decode_spi_select = spi_select_combobox->currentIndex();
 
   threshold_auto_clicked(devparms->math_decode_threshold_auto);
 }
@@ -1266,6 +1285,18 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
         }
       }
 
+      if(devparms->modelserie != 6)
+      {
+        if(spi_mode_combobox->currentIndex() == 0)
+        {
+          mainwindow->set_cue_cmd(":DEC1:SPI:MODE TIM");
+        }
+        else
+        {
+          mainwindow->set_cue_cmd(":DEC1:SPI:MODE CS");
+        }
+      }
+
       if(spi_cs_src_combobox->currentIndex() > 0)
       {
         if(devparms->modelserie == 6)
@@ -1276,9 +1307,12 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
         }
         else
         {
-          sprintf(str, ":DEC1:SPI:CS CHAN%i", spi_cs_src_combobox->currentIndex());
+          if(devparms->math_decode_spi_mode)
+          {
+            sprintf(str, ":DEC1:SPI:CS CHAN%i", spi_cs_src_combobox->currentIndex());
 
-          mainwindow->set_cue_cmd(str);
+            mainwindow->set_cue_cmd(str);
+          }
         }
       }
       else
@@ -1287,9 +1321,31 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
         {
           mainwindow->set_cue_cmd(":BUS1:SPI:SS:SOUR OFF");
         }
+      }
+
+      if(spi_select_combobox->currentIndex() == 0)
+      {
+        if(devparms->modelserie == 6)
+        {
+          mainwindow->set_cue_cmd(":BUS1:SPI:SS:POL NEG");
+        }
         else
         {
-          mainwindow->set_cue_cmd(":DEC1:SPI:SS OFF");
+          if(devparms->math_decode_spi_mode)
+          {
+            mainwindow->set_cue_cmd(":DEC1:SPI:SEL NCS");
+          }
+        }
+      }
+      else
+      {
+        if(devparms->modelserie == 6)
+        {
+          mainwindow->set_cue_cmd(":BUS1:SPI:SS:POL POS");
+        }
+        else
+        {
+          mainwindow->set_cue_cmd(":DEC1:SPI:SEL CS");
         }
       }
 

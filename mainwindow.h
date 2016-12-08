@@ -237,7 +237,8 @@ private:
   void get_device_model(const char *);
   double get_stepsize_divide_by_1000(double);
   void serial_decoder(void);
-  inline unsigned char reverse_bitorder(unsigned char);
+  inline unsigned char reverse_bitorder_8(unsigned char);
+  inline unsigned int reverse_bitorder_32(unsigned int);
 
 private slots:
 
