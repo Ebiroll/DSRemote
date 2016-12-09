@@ -848,7 +848,9 @@ void UI_Mainwindow::serial_decoder(void)
 
             devparms.math_decode_spi_mosi_val[devparms.math_decode_spi_mosi_nval] = spi_mosi_val;
 
-            devparms.math_decode_spi_mosi_val_pos[devparms.math_decode_spi_mosi_nval++] = spi_mosi_bit0_pos;
+            devparms.math_decode_spi_mosi_val_pos[devparms.math_decode_spi_mosi_nval] = spi_mosi_bit0_pos;
+
+            devparms.math_decode_spi_mosi_val_pos_end[devparms.math_decode_spi_mosi_nval++] = i;
 
             spi_data_mosi_bit = 0;
 
@@ -884,7 +886,9 @@ void UI_Mainwindow::serial_decoder(void)
 
             devparms.math_decode_spi_miso_val[devparms.math_decode_spi_miso_nval] = spi_miso_val;
 
-            devparms.math_decode_spi_miso_val_pos[devparms.math_decode_spi_miso_nval++] = spi_miso_bit0_pos;
+            devparms.math_decode_spi_miso_val_pos[devparms.math_decode_spi_miso_nval] = spi_miso_bit0_pos;
+
+            devparms.math_decode_spi_miso_val_pos_end[devparms.math_decode_spi_miso_nval++] = i;
 
             spi_data_miso_bit = 0;
 

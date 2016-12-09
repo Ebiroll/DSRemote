@@ -2568,6 +2568,9 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
     {
       for(i=0; i<devparms->math_decode_spi_mosi_nval; i++)
       {
+        cell_width = (devparms->math_decode_spi_mosi_val_pos_end[i] - devparms->math_decode_spi_mosi_val_pos[i]) *
+                      pix_per_smpl;
+
         painter->fillRect(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 26, Qt::black);
 
         painter->drawRect(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 26);
@@ -2578,6 +2581,9 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
     {
       for(i=0; i<devparms->math_decode_spi_miso_nval; i++)
       {
+        cell_width = (devparms->math_decode_spi_miso_val_pos_end[i] - devparms->math_decode_spi_miso_val_pos[i]) *
+                      pix_per_smpl;
+
         painter->fillRect(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 26, Qt::black);
 
         painter->drawRect(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 26);
@@ -2673,17 +2679,17 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
     {
       switch(devparms->math_decode_format)
       {
-        case 0: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[HEX]");
+        case 0: painter->drawText(5, line_h_spi_miso - 35, 80, 30, Qt::AlignCenter, "Miso[HEX]");
                 break;
-        case 1: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[HEX]");
+        case 1: painter->drawText(5, line_h_spi_miso - 35, 80, 30, Qt::AlignCenter, "Miso[HEX]");
                 break;
-        case 2: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[DEC]");
+        case 2: painter->drawText(5, line_h_spi_miso - 35, 80, 30, Qt::AlignCenter, "Miso[DEC]");
                 break;
-        case 3: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[BIN]");
+        case 3: painter->drawText(5, line_h_spi_miso - 35, 80, 30, Qt::AlignCenter, "Miso[BIN]");
                 break;
-        case 4: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[LINE]");
+        case 4: painter->drawText(5, line_h_spi_miso - 35, 80, 30, Qt::AlignCenter, "Miso[LINE]");
                 break;
-        default: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[\?\?\?]");
+        default: painter->drawText(5, line_h_spi_miso - 35, 80, 30, Qt::AlignCenter, "Miso[\?\?\?]");
                 break;
       }
 
