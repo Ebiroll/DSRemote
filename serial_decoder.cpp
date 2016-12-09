@@ -70,7 +70,8 @@ void UI_Mainwindow::serial_decoder(void)
       spi_miso_bit0_pos=0,
       spi_clk_new,
       spi_clk_old,
-      spi_chars=1;
+      spi_chars=1,
+      stop_bit_error;
 
   unsigned int uart_val=0,
                spi_mosi_val=0,
@@ -406,17 +407,61 @@ void UI_Mainwindow::serial_decoder(void)
               if(!devparms.math_decode_uart_pol)  // positive, line level RS-232 or negative, cpu level TTL/CMOS?
               {
                uart_val = ~uart_val;
+
+               uart_val &= (0xff >> (8 - uart_tx_data_bit));
               }
 
-              devparms.math_decode_uart_tx_val[devparms.math_decode_uart_tx_nval] =uart_val;
+              devparms.math_decode_uart_tx_val[devparms.math_decode_uart_tx_nval] = uart_val;
 
-              devparms.math_decode_uart_tx_val_pos[devparms.math_decode_uart_tx_nval++] = i - (uart_tx_data_bit * uart_sample_per_bit);
+              devparms.math_decode_uart_tx_val_pos[devparms.math_decode_uart_tx_nval] =
+               i - (uart_tx_data_bit * uart_sample_per_bit) + (0.5 * uart_sample_per_bit);
 
               uart_tx_data_bit = 0;
 
               uart_tx_start = 0;
 
               uart_tx_x_pos += uart_sample_per_bit;
+
+              i = uart_tx_x_pos;
+
+              devparms.math_decode_uart_tx_err[devparms.math_decode_uart_tx_nval] = 0;
+
+              stop_bit_error = 0;  // check stop bit
+
+              if(i < devparms.wavebufsz)
+              {
+                if(devparms.modelserie == 6)
+                {
+                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= devparms.math_decode_threshold_uart_tx)
+                  {
+                    stop_bit_error = 1;
+                  }
+                }
+                else  // modelserie = 1, 2 or 4
+                {
+                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= threshold[devparms.math_decode_uart_tx - 1])
+                  {
+                    stop_bit_error = 1;
+                  }
+                }
+
+                if(devparms.math_decode_uart_pol)
+                {
+                  if(stop_bit_error)
+                  {
+                    stop_bit_error = 0;
+                  }
+                  else
+                  {
+                    stop_bit_error = 1;
+                  }
+                }
+
+                if(stop_bit_error)
+                {
+                  devparms.math_decode_uart_tx_err[devparms.math_decode_uart_tx_nval] = 1;
+                }
+              }
 
               if(devparms.math_decode_uart_stop == 1)
               {
@@ -433,6 +478,8 @@ void UI_Mainwindow::serial_decoder(void)
               }
 
               i = uart_tx_x_pos - 1;
+
+              devparms.math_decode_uart_tx_nval++;
             }
             else
             {
@@ -466,10 +513,9 @@ void UI_Mainwindow::serial_decoder(void)
                 {
                   if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] < devparms.math_decode_threshold_uart_rx)
                   {
-
                     uart_rx_start = 1;
 
-                   uart_val = 0;
+                    uart_val = 0;
 
                     uart_rx_x_pos = (uart_sample_per_bit * 1.5) + i;
 
@@ -485,7 +531,7 @@ void UI_Mainwindow::serial_decoder(void)
                   {
                     uart_rx_start = 1;
 
-                   uart_val = 0;
+                    uart_val = 0;
 
                     uart_rx_x_pos = (uart_sample_per_bit * 1.5) + i;
 
@@ -502,10 +548,9 @@ void UI_Mainwindow::serial_decoder(void)
                 {
                   if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= devparms.math_decode_threshold_uart_rx)
                   {
-
                     uart_rx_start = 1;
 
-                   uart_val = 0;
+                    uart_val = 0;
 
                     uart_rx_x_pos = (uart_sample_per_bit * 1.5) + i;
 
@@ -521,7 +566,7 @@ void UI_Mainwindow::serial_decoder(void)
                   {
                     uart_rx_start = 1;
 
-                   uart_val = 0;
+                    uart_val = 0;
 
                     uart_rx_x_pos = (uart_sample_per_bit * 1.5) + i;
 
@@ -560,17 +605,61 @@ void UI_Mainwindow::serial_decoder(void)
               if(!devparms.math_decode_uart_pol)  // positive, line level RS-232 or negative, cpu level TTL/CMOS?
               {
                uart_val = ~uart_val;
+
+               uart_val &= (0xff >> (8 - uart_rx_data_bit));
               }
 
-              devparms.math_decode_uart_rx_val[devparms.math_decode_uart_rx_nval] =uart_val;
+              devparms.math_decode_uart_rx_val[devparms.math_decode_uart_rx_nval] = uart_val;
 
-              devparms.math_decode_uart_rx_val_pos[devparms.math_decode_uart_rx_nval++] = i - (uart_rx_data_bit * uart_sample_per_bit);
+              devparms.math_decode_uart_rx_val_pos[devparms.math_decode_uart_rx_nval] =
+               i - (uart_rx_data_bit * uart_sample_per_bit) + (0.5 * uart_sample_per_bit);
 
               uart_rx_data_bit = 0;
 
               uart_rx_start = 0;
 
               uart_rx_x_pos += uart_sample_per_bit;
+
+              i = uart_rx_x_pos;
+
+              devparms.math_decode_uart_rx_err[devparms.math_decode_uart_rx_nval] = 0;
+
+              stop_bit_error = 0;  // check stop bit
+
+              if(i < devparms.wavebufsz)
+              {
+                if(devparms.modelserie == 6)
+                {
+                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= devparms.math_decode_threshold_uart_rx)
+                  {
+                    stop_bit_error = 1;
+                  }
+                }
+                else  // modelserie = 1, 2 or 4
+                {
+                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= threshold[devparms.math_decode_uart_rx - 1])
+                  {
+                    stop_bit_error = 1;
+                  }
+                }
+
+                if(devparms.math_decode_uart_pol)
+                {
+                  if(stop_bit_error)
+                  {
+                    stop_bit_error = 0;
+                  }
+                  else
+                  {
+                    stop_bit_error = 1;
+                  }
+                }
+
+                if(stop_bit_error)
+                {
+                  devparms.math_decode_uart_rx_err[devparms.math_decode_uart_rx_nval] = 1;
+                }
+              }
 
               if(devparms.math_decode_uart_stop == 1)
               {
@@ -587,6 +676,8 @@ void UI_Mainwindow::serial_decoder(void)
               }
 
               i = uart_rx_x_pos - 1;
+
+              devparms.math_decode_uart_rx_nval++;
             }
             else
             {

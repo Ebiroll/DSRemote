@@ -2262,7 +2262,8 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
       line_h_uart_rx=0,
       line_h_spi_mosi=0,
       line_h_spi_miso=0,
-      spi_chars=1;
+      spi_chars=1,
+      pixel_per_bit=1;
 
   double pix_per_smpl;
 
@@ -2296,6 +2297,17 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
 
   if(devparms->math_decode_mode == DECODE_MODE_UART)
   {
+    if(devparms->timebasedelayenable)
+    {
+      pixel_per_bit = ((double)dw / 12.0 / devparms->timebasedelayscale) / (double)devparms->math_decode_uart_baud;
+    }
+    else
+    {
+      pixel_per_bit = ((double)dw / 12.0 / devparms->timebasescale) / (double)devparms->math_decode_uart_baud;
+    }
+
+    cell_width = pixel_per_bit * devparms->math_decode_uart_width;
+
     painter->setPen(Qt::green);
 
     if(devparms->math_decode_uart_tx && devparms->math_decode_uart_rx)
@@ -2345,13 +2357,27 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
 
     if(devparms->math_decode_uart_tx)
     {
-      painter->drawText(5, line_h_uart_tx - 35, 25, 30, Qt::AlignCenter, "TX");
+      switch(devparms->math_decode_format)
+      {
+        case 0: painter->drawText(5, line_h_uart_tx - 35, 65, 30, Qt::AlignCenter, "Tx[HEX]");
+                break;
+        case 1: painter->drawText(5, line_h_uart_tx - 35, 65, 30, Qt::AlignCenter, "Tx[ASC]");
+                break;
+        case 2: painter->drawText(5, line_h_uart_tx - 35, 65, 30, Qt::AlignCenter, "Tx[DEC]");
+                break;
+        case 3: painter->drawText(5, line_h_uart_tx - 35, 65, 30, Qt::AlignCenter, "Tx[BIN]");
+                break;
+        case 4: painter->drawText(5, line_h_uart_tx - 35, 65, 30, Qt::AlignCenter, "Tx[LINE]");
+                break;
+        default: painter->drawText(5, line_h_uart_tx - 35, 65, 30, Qt::AlignCenter, "Tx[\?\?\?]");
+                break;
+      }
 
       for(i=0; i<devparms->math_decode_uart_tx_nval; i++)
       {
         if(devparms->math_decode_format == 0)  // hex
         {
-          sprintf(str, "0x%02X", devparms->math_decode_uart_tx_val[i]);
+          sprintf(str, "%02X", devparms->math_decode_uart_tx_val[i]);
 
           painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
         }
@@ -2378,41 +2404,61 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
             }
             else if(devparms->math_decode_format == 3)  // binary
               {
-                str[0] = '0';
-                str[1] = 'b';
-
-                for(j=7; j>=0; j--)
+                for(j=0; j<devparms->math_decode_uart_width; j++)
                 {
-                  str[9-j] = ((devparms->math_decode_uart_tx_val[i] >> j) & 1) + '0';
+                  str[devparms->math_decode_uart_width - 1 - j] = ((devparms->math_decode_uart_tx_val[i] >> j) & 1) + '0';
                 }
 
-                str[10] = 0;
+                str[j] = 0;
 
                 painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
               }
               else if(devparms->math_decode_format == 4)  // line
                 {
-                  for(j=0; j<8; j++)
+                  for(j=0; j<devparms->math_decode_uart_width; j++)
                   {
-                    str[j] = ((devparms->math_decode_uart_rx_val[i] >> j) & 1) + '0';
+                    str[j] = ((devparms->math_decode_uart_tx_val[i] >> j) & 1) + '0';
                   }
 
-                  str[8] = 0;
+                  str[j] = 0;
 
                   painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
                 }
+
+          if(devparms->math_decode_uart_tx_err[i])
+          {
+            painter->setPen(Qt::red);
+
+            painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl + cell_width, line_h_uart_tx - 13, 25, 25, Qt::AlignCenter, "?");
+
+            painter->setPen(Qt::white);
+          }
       }
     }
 
     if(devparms->math_decode_uart_rx)
     {
-      painter->drawText(5, line_h_uart_rx - 35, 25, 30, Qt::AlignCenter, "RX");
+      switch(devparms->math_decode_format)
+      {
+        case 0: painter->drawText(5, line_h_uart_rx - 35, 65, 30, Qt::AlignCenter, "Rx[HEX]");
+                break;
+        case 1: painter->drawText(5, line_h_uart_rx - 35, 65, 30, Qt::AlignCenter, "Rx[ASC]");
+                break;
+        case 2: painter->drawText(5, line_h_uart_rx - 35, 65, 30, Qt::AlignCenter, "Rx[DEC]");
+                break;
+        case 3: painter->drawText(5, line_h_uart_rx - 35, 65, 30, Qt::AlignCenter, "Rx[BIN]");
+                break;
+        case 4: painter->drawText(5, line_h_uart_rx - 35, 65, 30, Qt::AlignCenter, "Rx[LINE]");
+                break;
+        default: painter->drawText(5, line_h_uart_rx - 35, 65, 30, Qt::AlignCenter, "Rx[\?\?\?]");
+                break;
+      }
 
       for(i=0; i<devparms->math_decode_uart_rx_nval; i++)
       {
         if(devparms->math_decode_format == 0)  // hex
         {
-          sprintf(str, "0x%02X", devparms->math_decode_uart_rx_val[i]);
+          sprintf(str, "%02X", devparms->math_decode_uart_rx_val[i]);
 
           painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
         }
@@ -2439,29 +2485,35 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
             }
             else if(devparms->math_decode_format == 3)  // binary
               {
-                str[0] = '0';
-                str[1] = 'b';
-
-                for(j=7; j>=0; j--)
+                for(j=0; j<devparms->math_decode_uart_width; j++)
                 {
-                  str[9-j] = ((devparms->math_decode_uart_rx_val[i] >> j) & 1) + '0';
+                  str[devparms->math_decode_uart_width - 1 - j] = ((devparms->math_decode_uart_rx_val[i] >> j) & 1) + '0';
                 }
 
-                str[10] = 0;
+                str[j] = 0;
 
                 painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
               }
               else if(devparms->math_decode_format == 4)  // line
                 {
-                  for(j=0; j<8; j++)
+                  for(j=0; j<devparms->math_decode_uart_width; j++)
                   {
                     str[j] = ((devparms->math_decode_uart_rx_val[i] >> j) & 1) + '0';
                   }
 
-                  str[8] = 0;
+                  str[j] = 0;
 
                   painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
                 }
+
+          if(devparms->math_decode_uart_rx_err[i])
+          {
+            painter->setPen(Qt::red);
+
+            painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl + cell_width, line_h_uart_rx - 13, 25, 25, Qt::AlignCenter, "?");
+
+            painter->setPen(Qt::white);
+          }
       }
     }
   }
@@ -2536,7 +2588,21 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
 
     if(devparms->math_decode_spi_mosi)
     {
-      painter->drawText(5, line_h_spi_mosi - 35, 40, 30, Qt::AlignCenter, "MOSI");
+      switch(devparms->math_decode_format)
+      {
+        case 0: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Mosi[HEX]");
+                break;
+        case 1: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Mosi[ASC]");
+                break;
+        case 2: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Mosi[DEC]");
+                break;
+        case 3: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Mosi[BIN]");
+                break;
+        case 4: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Mosi[LINE]");
+                break;
+        default: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Mosi[\?\?\?]");
+                break;
+      }
 
       for(i=0; i<devparms->math_decode_spi_mosi_nval; i++)
       {
@@ -2544,13 +2610,13 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
         {
           switch(spi_chars)
           {
-            case 1: sprintf(str, "0x%02X", devparms->math_decode_spi_mosi_val[i]);
+            case 1: sprintf(str, "%02X", devparms->math_decode_spi_mosi_val[i]);
                     break;
-            case 2: sprintf(str, "0x%04X", devparms->math_decode_spi_mosi_val[i]);
+            case 2: sprintf(str, "%04X", devparms->math_decode_spi_mosi_val[i]);
                     break;
-            case 3: sprintf(str, "0x%06X", devparms->math_decode_spi_mosi_val[i]);
+            case 3: sprintf(str, "%06X", devparms->math_decode_spi_mosi_val[i]);
                     break;
-            case 4: sprintf(str, "0x%08X", devparms->math_decode_spi_mosi_val[i]);
+            case 4: sprintf(str, "%08X", devparms->math_decode_spi_mosi_val[i]);
                     break;
           }
 
@@ -2580,15 +2646,12 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
             }
             else if(devparms->math_decode_format == 3)  // binary
               {
-                str[0] = '0';
-                str[1] = 'b';
-
                 for(j=0; j<devparms->math_decode_spi_width; j++)
                 {
-                  str[devparms->math_decode_spi_width + 1 - j] = ((devparms->math_decode_spi_mosi_val[i] >> j) & 1) + '0';
+                  str[devparms->math_decode_spi_width - 1 - j] = ((devparms->math_decode_spi_mosi_val[i] >> j) & 1) + '0';
                 }
 
-                str[j + 2] = 0;
+                str[j] = 0;
 
                 painter->drawText(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 30, Qt::AlignCenter, str);
               }
@@ -2608,7 +2671,21 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
 
     if(devparms->math_decode_spi_miso)
     {
-      painter->drawText(5, line_h_spi_miso - 35, 40, 30, Qt::AlignCenter, "MISO");
+      switch(devparms->math_decode_format)
+      {
+        case 0: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[HEX]");
+                break;
+        case 1: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[HEX]");
+                break;
+        case 2: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[DEC]");
+                break;
+        case 3: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[BIN]");
+                break;
+        case 4: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[LINE]");
+                break;
+        default: painter->drawText(5, line_h_spi_mosi - 35, 80, 30, Qt::AlignCenter, "Miso[\?\?\?]");
+                break;
+      }
 
       for(i=0; i<devparms->math_decode_spi_miso_nval; i++)
       {
@@ -2616,13 +2693,13 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
         {
           switch(spi_chars)
           {
-            case 1: sprintf(str, "0x%02X", devparms->math_decode_spi_miso_val[i]);
+            case 1: sprintf(str, "%02X", devparms->math_decode_spi_miso_val[i]);
                     break;
-            case 2: sprintf(str, "0x%04X", devparms->math_decode_spi_miso_val[i]);
+            case 2: sprintf(str, "%04X", devparms->math_decode_spi_miso_val[i]);
                     break;
-            case 3: sprintf(str, "0x%06X", devparms->math_decode_spi_miso_val[i]);
+            case 3: sprintf(str, "%06X", devparms->math_decode_spi_miso_val[i]);
                     break;
-            case 4: sprintf(str, "0x%08X", devparms->math_decode_spi_miso_val[i]);
+            case 4: sprintf(str, "%08X", devparms->math_decode_spi_miso_val[i]);
                     break;
           }
 
@@ -2652,15 +2729,12 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
             }
             else if(devparms->math_decode_format == 3)  // binary
               {
-                str[0] = '0';
-                str[1] = 'b';
-
                 for(j=0; j<devparms->math_decode_spi_width; j++)
                 {
-                  str[devparms->math_decode_spi_width + 1 - j] = ((devparms->math_decode_spi_miso_val[i] >> j) & 1) + '0';
+                  str[devparms->math_decode_spi_width - 1 - j] = ((devparms->math_decode_spi_miso_val[i] >> j) & 1) + '0';
                 }
 
-                str[j + 2] = 0;
+                str[j] = 0;
 
                 painter->drawText(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 30, Qt::AlignCenter, str);
               }

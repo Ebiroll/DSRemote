@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1612081745"
+#define PROGRAM_VERSION       "0.33_1612091806"
 
 #define MAX_PATHLEN            4096
 
@@ -223,9 +223,11 @@ struct device_settings
   int math_decode_uart_tx_nval;    // number of decoded characters
   unsigned char math_decode_uart_tx_val[DECODE_MAX_CHARS];  // array with decoded characters
   int math_decode_uart_tx_val_pos[DECODE_MAX_CHARS];  // array with position of the decoded characters
+  int math_decode_uart_tx_err[DECODE_MAX_CHARS];  // array with protocol errors, non zero means an error
   int math_decode_uart_rx_nval;    // number of decoded characters
   unsigned char math_decode_uart_rx_val[DECODE_MAX_CHARS];  // array with decoded characters
   int math_decode_uart_rx_val_pos[DECODE_MAX_CHARS];  // array with position of the decoded characters
+  int math_decode_uart_rx_err[DECODE_MAX_CHARS];  // array with protocol errors, non zero means an error
 
   char *screenshot_buf;
   short *wavebuf[MAX_CHNS];
