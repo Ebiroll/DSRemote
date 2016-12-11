@@ -156,7 +156,7 @@ private:
   void drawFFT(QPainter *, int, int);
   void drawfpsLabel(QPainter *, int, int);
   void draw_decoder(QPainter *, int, int);
-  void ascii_decode_control_char(char *);
+  int ascii_decode_control_char(char, char *);
 
   struct device_settings *devparms;
 

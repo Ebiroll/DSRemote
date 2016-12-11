@@ -2383,16 +2383,7 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
         }
         else if(devparms->math_decode_format == 1)  // ASCII
           {
-            str[0]= devparms->math_decode_uart_tx_val[i];
-
-            if((str[0] < 33) || (str[0] > 126))
-            {
-              ascii_decode_control_char(str);
-            }
-            else
-            {
-              str[1] = 0;
-            }
+            ascii_decode_control_char(devparms->math_decode_uart_tx_val[i], str);
 
             painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
           }
@@ -2464,16 +2455,7 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
         }
         else if(devparms->math_decode_format == 1)  // ASCII
           {
-            str[0]= devparms->math_decode_uart_rx_val[i];
-
-            if((str[0] < 33) || (str[0] > 126))
-            {
-              ascii_decode_control_char(str);
-            }
-            else
-            {
-              str[1] = 0;
-            }
+            ascii_decode_control_char(devparms->math_decode_uart_rx_val[i], str);
 
             painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
           }
@@ -2630,17 +2612,10 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
         }
         else if(devparms->math_decode_format == 1)  // ASCII
           {
-            for(k=0; k<spi_chars; k++)
+            for(k=0, j=0; k<spi_chars; k++)
             {
-              str[k]= devparms->math_decode_spi_mosi_val[i] >> (k * 8);
-
-              if((str[k] < 33) || (str[k] > 126))
-              {
-                str[k] = '.';
-              }
+              j += ascii_decode_control_char(devparms->math_decode_spi_mosi_val[i] >> (k * 8), str + j);
             }
-
-            str[k] = 0;
 
             painter->drawText(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 30, Qt::AlignCenter, str);
           }
@@ -2713,17 +2688,10 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
         }
         else if(devparms->math_decode_format == 1)  // ASCII
           {
-            for(k=0; k<spi_chars; k++)
+            for(k=0, j=0; k<spi_chars; k++)
             {
-              str[k]= devparms->math_decode_spi_miso_val[i] >> (k * 8);
-
-              if((str[k] < 33) || (str[k] > 126))
-              {
-                str[k] = '.';
-              }
+              j += ascii_decode_control_char(devparms->math_decode_spi_miso_val[i] >> (k * 8), str + j);
             }
-
-            str[k] = 0;
 
             painter->drawText(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 30, Qt::AlignCenter, str);
           }
@@ -2761,9 +2729,18 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
 }
 
 
-void SignalCurve::ascii_decode_control_char(char *str)
+int SignalCurve::ascii_decode_control_char(char ch, char *str)
 {
-  switch(str[0])
+  if((ch > 32) && (ch < 127))
+  {
+    str[0] = ch;
+
+    str[1] = 0;
+
+    return 1;
+  }
+
+  switch(ch)
   {
     case  0: strcpy(str, "NULL");
              break;
@@ -2836,6 +2813,8 @@ void SignalCurve::ascii_decode_control_char(char *str)
     default: strcpy(str, ".");
              break;
   }
+
+  return strlen(str);
 }
 
 
