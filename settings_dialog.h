@@ -77,10 +77,12 @@ QSpinBox     *refreshSpinbox,
 
 QLabel       *refreshLabel,
              *invScrShtLabel,
-             *showfpsLabel;
+             *showfpsLabel,
+             *extendvertdivLabel;
 
 QCheckBox    *invScrShtCheckbox,
-             *showfpsCheckbox;
+             *showfpsCheckbox,
+             *extendvertdivCheckbox;
 
 UI_Mainwindow *mainwindow;
 
@@ -90,6 +92,7 @@ void applyButtonClicked();
 void refreshSpinboxChanged(int);
 void invScrShtCheckboxChanged(int);
 void showfpsCheckboxChanged(int);
+void extendvertdivCheckboxChanged(int);
 
 };
 

@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1612111915"
+#define PROGRAM_VERSION       "0.33_1612181629"
 
 #define MAX_PATHLEN            4096
 
@@ -121,6 +121,8 @@ struct device_settings
   char softwvers[128];
   int modelserie;               // 1=DS1000, 2=DS2000, etc.
   int hordivisions;             // number of horizontal divisions, 12 or 14
+  int vertdivisions;            // number of vertical divisions, 8 or 10
+  int use_extra_vertdivisions;  // If 1: use 10 vertical divisions instead of 8, DS1000Z only
 
   int screentimerival;
 

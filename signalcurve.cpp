@@ -264,9 +264,9 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
           painter->drawLine(step * i, curve_h - 1, step * i, 0);
         }
 
-        step = curve_h / 8.0;
+        step = curve_h / (double)devparms->vertdivisions;
 
-        for(i=1; i<8; i++)
+        for(i=1; i<devparms->vertdivisions; i++)
         {
           painter->drawLine(0, step * i, curve_w - 1, step * i);
         }
@@ -306,9 +306,9 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
       }
     }
 
-    step = curve_h / 40.0;
+    step = curve_h / (5.0 * devparms->vertdivisions);
 
-    for(i=1; i<40; i++)
+    for(i=1; i<(5 * devparms->vertdivisions); i++)
     {
       step2 = step * i;
 
@@ -346,7 +346,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   }
   else
   {
-    v_sense = -((double)curve_h / 200.0);
+    v_sense = -((double)curve_h / (25.0 * devparms->vertdivisions));
   }
 
   drawTrigCenterArrow(painter, curve_w / 2, 0);
@@ -364,7 +364,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     }
     else
     {
-      chan_arrow_pos[chn] =  (curve_h / 2) - (devparms->chanoffset[chn] / ((devparms->chanscale[chn] * 8) / curve_h));
+      chan_arrow_pos[chn] =  (curve_h / 2) - (devparms->chanoffset[chn] / ((devparms->chanscale[chn] * devparms->vertdivisions) / curve_h));
 
       if(chan_arrow_pos[chn] < 0)
       {
@@ -468,7 +468,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   {
     if(devparms->triggeredgesource < 4)
     {
-      trig_level_arrow_pos = (curve_h / 2) - ((devparms->triggeredgelevel[devparms->triggeredgesource] + devparms->chanoffset[devparms->triggeredgesource]) / ((devparms->chanscale[devparms->triggeredgesource] * 8) / curve_h));
+      trig_level_arrow_pos = (curve_h / 2) - ((devparms->triggeredgelevel[devparms->triggeredgesource] + devparms->chanoffset[devparms->triggeredgesource]) / ((devparms->chanscale[devparms->triggeredgesource] * devparms->vertdivisions) / curve_h));
 
       if(trig_level_arrow_pos < 0)
       {
@@ -1903,7 +1903,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
   //       printf("chanoffset[chn] is: %e   chanscale[chn] is %e   trig_level_arrow_pos is: %i   v_sense is: %e\n",
   //              devparms->chanoffset[chn], devparms->chanscale[chn], trig_level_arrow_pos, v_sense);
 
-      devparms->triggeredgelevel[devparms->triggeredgesource] = (((h / 2) - trig_level_arrow_pos) * ((devparms->chanscale[devparms->triggeredgesource] * 8) / h))
+      devparms->triggeredgelevel[devparms->triggeredgesource] = (((h / 2) - trig_level_arrow_pos) * ((devparms->chanscale[devparms->triggeredgesource] * devparms->vertdivisions) / h))
                                                                 - devparms->chanoffset[devparms->triggeredgesource];
 
       tmp = devparms->triggeredgelevel[devparms->triggeredgesource] / (devparms->chanscale[devparms->triggeredgesource] / 50);
@@ -1950,7 +1950,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
     //       printf("chanoffset[chn] is: %e   chanscale[chn] is %e   chan_arrow_pos[chn] is: %i   v_sense is: %e\n",
     //              devparms->chanoffset[chn], devparms->chanscale[chn], chan_arrow_pos[chn], v_sense);
 
-          devparms->chanoffset[chn] = ((h / 2) - chan_arrow_pos[chn]) * ((devparms->chanscale[chn] * 8) / h);
+          devparms->chanoffset[chn] = ((h / 2) - chan_arrow_pos[chn]) * ((devparms->chanscale[chn] * devparms->vertdivisions) / h);
 
           tmp = devparms->chanoffset[chn] / (devparms->chanscale[chn] / 50);
 
@@ -2081,7 +2081,7 @@ void SignalCurve::mouseMoveEvent(QMouseEvent *move_event)
         trig_level_arrow_pos = h;
       }
 
-      devparms->triggeredgelevel[devparms->triggeredgesource] = (((h / 2) - trig_level_arrow_pos) * ((devparms->chanscale[devparms->triggeredgesource] * 8) / h))
+      devparms->triggeredgelevel[devparms->triggeredgesource] = (((h / 2) - trig_level_arrow_pos) * ((devparms->chanscale[devparms->triggeredgesource] * devparms->vertdivisions) / h))
                                                                 - devparms->chanoffset[devparms->triggeredgesource];
 
       dtmp = devparms->triggeredgelevel[devparms->triggeredgesource] / (devparms->chanscale[devparms->triggeredgesource] / 50);
@@ -2115,7 +2115,7 @@ void SignalCurve::mouseMoveEvent(QMouseEvent *move_event)
             chan_arrow_pos[chn] = h;
           }
 
-          devparms->chanoffset[chn] = ((h / 2) - chan_arrow_pos[chn]) * ((devparms->chanscale[chn] * 8) / h);
+          devparms->chanoffset[chn] = ((h / 2) - chan_arrow_pos[chn]) * ((devparms->chanscale[chn] * devparms->vertdivisions) / h);
 
 //          chan_tmp_y_pixel_offset[chn] = (h / 2) - chan_arrow_pos[chn];
 

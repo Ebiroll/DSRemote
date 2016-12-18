@@ -128,6 +128,23 @@ UI_Mainwindow::UI_Mainwindow()
 
   devparms.hordivisions = 14;
 
+  devparms.vertdivisions = 8;
+
+  devparms.use_extra_vertdivisions = settings.value("gui/use_extra_vertdivisions", 1).toInt();
+
+  if(devparms.use_extra_vertdivisions)
+  {
+    devparms.use_extra_vertdivisions = 1;
+
+    settings.setValue("gui/use_extra_vertdivisions", devparms.use_extra_vertdivisions);
+  }
+  else
+  {
+    devparms.use_extra_vertdivisions = 0;
+
+    settings.setValue("gui/use_extra_vertdivisions", devparms.use_extra_vertdivisions);
+  }
+
   devparms.current_screen_sf = 1;
 
   devparms.fft_vscale = 10.0;

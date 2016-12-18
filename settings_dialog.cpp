@@ -172,6 +172,22 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
     showfpsCheckbox->setCheckState(Qt::Unchecked);
   }
 
+  extendvertdivLabel = new QLabel(this);
+  extendvertdivLabel->setGeometry(40, 270, 120, 35);
+  extendvertdivLabel->setText("Use extended\n vertical range");
+
+  extendvertdivCheckbox = new QCheckBox(this);
+  extendvertdivCheckbox->setGeometry(180, 270, 120, 35);
+  extendvertdivCheckbox->setTristate(false);
+  if(mainwindow->devparms.use_extra_vertdivisions)
+  {
+    extendvertdivCheckbox->setCheckState(Qt::Checked);
+  }
+  else
+  {
+    extendvertdivCheckbox->setCheckState(Qt::Unchecked);
+  }
+
   applyButton = new QPushButton(this);
   applyButton->setGeometry(40, 450, 100, 25);
   applyButton->setText("Apply");
@@ -207,10 +223,11 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
     QObject::connect(applyButton, SIGNAL(clicked()), this, SLOT(applyButtonClicked()));
   }
 
-  QObject::connect(cancelButton,      SIGNAL(clicked()),         this, SLOT(close()));
-  QObject::connect(refreshSpinbox,    SIGNAL(valueChanged(int)), this, SLOT(refreshSpinboxChanged(int)));
-  QObject::connect(invScrShtCheckbox, SIGNAL(stateChanged(int)), this, SLOT(invScrShtCheckboxChanged(int)));
-  QObject::connect(showfpsCheckbox,   SIGNAL(stateChanged(int)), this, SLOT(showfpsCheckboxChanged(int)));
+  QObject::connect(cancelButton,          SIGNAL(clicked()),         this, SLOT(close()));
+  QObject::connect(refreshSpinbox,        SIGNAL(valueChanged(int)), this, SLOT(refreshSpinboxChanged(int)));
+  QObject::connect(invScrShtCheckbox,     SIGNAL(stateChanged(int)), this, SLOT(invScrShtCheckboxChanged(int)));
+  QObject::connect(showfpsCheckbox,       SIGNAL(stateChanged(int)), this, SLOT(showfpsCheckboxChanged(int)));
+  QObject::connect(extendvertdivCheckbox, SIGNAL(stateChanged(int)), this, SLOT(extendvertdivCheckboxChanged(int)));
 
   exec();
 }
@@ -327,6 +344,35 @@ void UI_settings_window::showfpsCheckboxChanged(int state)
   }
 
   settings.setValue("gui/show_fps", mainwindow->devparms.show_fps);
+}
+
+
+void UI_settings_window::extendvertdivCheckboxChanged(int state)
+{
+  QSettings settings;
+
+  if(state == Qt::Checked)
+  {
+    mainwindow->devparms.use_extra_vertdivisions = 1;
+  }
+  else
+  {
+    mainwindow->devparms.use_extra_vertdivisions = 0;
+  }
+
+  settings.setValue("gui/use_extra_vertdivisions", mainwindow->devparms.use_extra_vertdivisions);
+
+  if(mainwindow->devparms.modelserie == 1)
+  {
+    if(mainwindow->devparms.use_extra_vertdivisions == 1)
+    {
+      mainwindow->devparms.vertdivisions = 10;
+    }
+    else
+    {
+      mainwindow->devparms.vertdivisions = 8;
+    }
+  }
 }
 
 

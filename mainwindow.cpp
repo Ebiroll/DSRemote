@@ -855,6 +855,8 @@ void UI_Mainwindow::get_device_model(const char *str)
 
   devparms.hordivisions = 14;
 
+  devparms.vertdivisions = 8;
+
   if(!strcmp(str, "DS6104"))
   {
     devparms.channel_cnt = 4;
@@ -1053,6 +1055,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.modelserie = 1;
 
     devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS1074Z"))
@@ -1064,6 +1068,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.modelserie = 1;
 
     devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS1074Z-S"))
@@ -1075,6 +1081,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.modelserie = 1;
 
     devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS1104Z"))
@@ -1086,6 +1094,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.modelserie = 1;
 
     devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS1104Z-S"))
@@ -1097,6 +1107,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.modelserie = 1;
 
     devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(devparms.channel_cnt && devparms.bandwidth && devparms.modelserie)
