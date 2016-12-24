@@ -155,7 +155,7 @@ void SignalCurve::paintEvent(QPaintEvent *)
 
 void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 {
-  int i, chn, tmp, rot=1, small_rulers, curve_w_backup, curve_h_backup;
+  int i, chn, tmp, rot=1, small_rulers, curve_w_backup, curve_h_backup, w_trace, w_trace_offset;
 
   char str[1024];
 
@@ -399,7 +399,27 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     painter->setClipping(true);
     painter->setClipRegion(QRegion(0, 0, curve_w, curve_h), Qt::ReplaceClip);
 
-    h_step = (double)curve_w / (double)bufsize;
+    if(bufsize != (devparms->hordivisions * 100))
+    {
+      w_trace = ((double)bufsize / (double)(devparms->hordivisions * 100)) * (double)curve_w;
+
+      h_step = (double)w_trace / (double)bufsize;
+
+      if(devparms->timebaseoffset < 0)
+      {
+        w_trace_offset = curve_w - ((double)curve_w * ((double)bufsize / (double)(devparms->hordivisions * 100)));
+      }
+      else
+      {
+        w_trace_offset = 0;
+      }
+    }
+    else
+    {
+      h_step = (double)curve_w / (double)bufsize;
+
+      w_trace_offset = 0;
+    }
 
     for(chn=0; chn<devparms->channel_cnt; chn++)
     {
@@ -414,15 +434,15 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
       {
         if(bufsize < (curve_w / 2))
         {
-          painter->drawLine(i * h_step,
+          painter->drawLine(i * h_step + w_trace_offset,
                             (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn],
-                            (i + 1) * h_step,
+                            (i + 1) * h_step + w_trace_offset,
                             (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn]);
           if(i)
           {
-            painter->drawLine(i * h_step,
+            painter->drawLine(i * h_step + w_trace_offset,
                               (devparms->wavebuf[chn][i - 1] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn],
-                              i * h_step,
+                              i * h_step + w_trace_offset,
                               (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn]);
           }
         }
@@ -432,14 +452,14 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
           {
             if(devparms->displaytype)
             {
-              painter->drawPoint(i * h_step,
+              painter->drawPoint(i * h_step + w_trace_offset,
                                  (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn]);
             }
             else
             {
-              painter->drawLine(i * h_step,
+              painter->drawLine(i * h_step + w_trace_offset,
                                 (devparms->wavebuf[chn][i] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn],
-                                (i + 1) * h_step,
+                                (i + 1) * h_step + w_trace_offset,
                                 (devparms->wavebuf[chn][i + 1] * v_sense) + (curve_h / 2) - chan_tmp_y_pixel_offset[chn]);
             }
           }
