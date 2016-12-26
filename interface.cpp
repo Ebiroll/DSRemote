@@ -3345,8 +3345,19 @@ void UI_Mainwindow::toggle_fft()
 
 void UI_Mainwindow::toggle_fft_split()
 {
+  QMessageBox msgBox;
+
   if(devparms.math_fft_split == 1)
   {
+    if(devparms.vertdivisions == 10)
+    {
+      msgBox.setIcon(QMessageBox::NoIcon);
+      msgBox.setText("Can not set FFT to fullscreen when extended vertical range is set.\n"
+                     "Uncheck \"Use extended vertical range\" checkbox in the settings menu first.");
+      msgBox.exec();
+      return;
+    }
+
     devparms.math_fft_split = 0;
 
     set_cue_cmd(":MATH:FFT:SPL OFF");

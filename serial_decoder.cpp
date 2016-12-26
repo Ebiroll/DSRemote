@@ -73,6 +73,8 @@ void UI_Mainwindow::serial_decoder(void)
       spi_clk_new,
       spi_clk_old,
       spi_chars=1,
+      spi_timeout,
+      spi_timeout_cntr,
       stop_bit_error;
 
   unsigned int uart_val=0,
@@ -869,6 +871,8 @@ void UI_Mainwindow::serial_decoder(void)
 
     spi_miso_val = 0;
 
+    spi_timeout_cntr = 0;
+
     if(devparms.math_decode_spi_width > 24)
     {
       spi_chars = 4;
@@ -914,9 +918,16 @@ void UI_Mainwindow::serial_decoder(void)
         goto SPI_DECODE_OUT;
       }
     }
-    else
+    else  // use timeout to detect start of frame
     {
-      // FIXME  use time out
+      if(devparms.timebasedelayenable)
+      {
+        spi_timeout = devparms.math_decode_spi_timeout / (devparms.timebasedelayscale / 100.0);
+      }
+      else
+      {
+        spi_timeout = devparms.math_decode_spi_timeout / (devparms.timebasescale / 100.0);
+      }
     }
 
     for(i=0; i<devparms.wavebufsz; i++)
@@ -936,6 +947,10 @@ void UI_Mainwindow::serial_decoder(void)
 
             spi_data_miso_bit = 0;
 
+            spi_mosi_val = 0;
+
+            spi_miso_val = 0;
+
             continue;  // chip select is not active
           }
         }
@@ -947,8 +962,29 @@ void UI_Mainwindow::serial_decoder(void)
 
             spi_data_miso_bit = 0;
 
+            spi_mosi_val = 0;
+
+            spi_miso_val = 0;
+
             continue;  // chip select is not active
           }
+        }
+      }
+      else  // use timeout to detect start of frame
+      {
+        if(spi_timeout_cntr > spi_timeout)
+        {
+          spi_data_mosi_bit = 0;
+
+          spi_data_miso_bit = 0;
+
+          spi_mosi_val = 0;
+
+          spi_miso_val = 0;
+        }
+        else
+        {
+          spi_timeout_cntr++;
         }
       }
 
@@ -972,6 +1008,8 @@ void UI_Mainwindow::serial_decoder(void)
 
         continue;
       }
+
+      spi_timeout_cntr = 0;
 
       spi_clk_old = spi_clk_new;
 

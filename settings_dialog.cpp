@@ -351,8 +351,20 @@ void UI_settings_window::extendvertdivCheckboxChanged(int state)
 {
   QSettings settings;
 
+  QMessageBox msgBox;
+
   if(state == Qt::Checked)
   {
+    if((mainwindow->devparms.connected == 1) && (mainwindow->devparms.math_fft == 1) && (mainwindow->devparms.math_fft_split == 0))
+    {
+      msgBox.setIcon(QMessageBox::NoIcon);
+      msgBox.setText("Can not use extended vertical range when FFT is fullscreen.\n"
+                     "Set FFT to \"half\" first (splitscreen mode).");
+      msgBox.exec();
+      extendvertdivCheckbox->setCheckState(Qt::Unchecked);
+      return;
+    }
+
     mainwindow->devparms.use_extra_vertdivisions = 1;
   }
   else

@@ -263,7 +263,7 @@ void UI_Mainwindow::save_memory_waveform()
 
   if(mempnts < 1)
   {
-    strcpy(str, "Can not save waveform when memory depth is set to \"Auto\".");
+    strcpy(str, "Can not download waveform when memory depth is set to \"Auto\".");
     goto OUT_ERROR;
   }
 
