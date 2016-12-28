@@ -1492,6 +1492,86 @@ void UI_Mainwindow::shift_page_right()
 }
 
 
+void UI_Mainwindow::center_trigger()
+{
+  char str[256];
+
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.math_fft && devparms.math_fft_split)
+  {
+    devparms.math_fft_hcenter = 0;
+
+    if(devparms.modelserie != 1)
+    {
+      sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
+    }
+    else
+    {
+      sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hcenter);
+    }
+
+    set_cue_cmd(str);
+
+    strcpy(str, "FFT center: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hcenter, 0);
+
+    strcat(str, "Hz");
+
+    statusLabel->setText(str);
+
+    waveForm->update();
+
+    return;
+  }
+
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
+  if(devparms.timebasedelayenable)
+  {
+    devparms.timebasedelayoffset = 0;
+
+    strcpy(str, "Delayed timebase position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
+  }
+  else
+  {
+    devparms.timebaseoffset = 0;
+
+    strcpy(str, "Horizontal position: ");
+
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+
+    strcat(str, "s");
+
+    statusLabel->setText(str);
+
+    horPosDial_timer->start(TMC_DIAL_TIMER_DELAY);
+  }
+
+  waveForm->update();
+}
+
+
 void UI_Mainwindow::zoom_in()
 {
   char str[256];

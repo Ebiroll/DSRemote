@@ -59,10 +59,6 @@ WaveCurve::WaveCurve(QWidget *w_parent) : QWidget(w_parent)
   mouse_old_x = 0;
   mouse_old_y = 0;
 
-  trig_pos_arrow_moving = 0;
-
-  trig_pos_arrow_pos = 100;
-
   use_move_events = 0;
 
   old_w = 10000;
@@ -378,38 +374,31 @@ void WaveCurve::paintEvent(QPaintEvent *)
       }
   }
 
-  if(trig_pos_arrow_moving)
+  if(devparms->timebasedelayenable)
   {
-    drawArrow(painter, trig_pos_arrow_pos, 27, 1, QColor(255, 128, 0), 'T');
+    trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebasedelayoffset / (devparms->timebasedelayscale * (double)devparms->hordivisions)) * curve_w);
   }
   else
   {
-    if(devparms->timebasedelayenable)
+    trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebaseoffset / (devparms->timebasescale * (double)devparms->hordivisions)) * curve_w);
+  }
+
+  if(trig_pos_arrow_pos < 0)
+  {
+    trig_pos_arrow_pos = -1;
+
+    drawArrow(painter, trig_pos_arrow_pos, 18, 2, QColor(255, 128, 0), 'T');
+  }
+  else if(trig_pos_arrow_pos > curve_w)
     {
-      trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebasedelayoffset / (devparms->timebasedelayscale * (double)devparms->hordivisions)) * curve_w);
+      trig_pos_arrow_pos = curve_w + 1;
+
+      drawArrow(painter, trig_pos_arrow_pos, 18, 0, QColor(255, 128, 0), 'T');
     }
     else
     {
-      trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebaseoffset / (devparms->timebasescale * (double)devparms->hordivisions)) * curve_w);
+      drawArrow(painter, trig_pos_arrow_pos, 27, 1, QColor(255, 128, 0), 'T');
     }
-
-    if(trig_pos_arrow_pos < 0)
-    {
-      trig_pos_arrow_pos = -1;
-
-      drawArrow(painter, trig_pos_arrow_pos, 18, 2, QColor(255, 128, 0), 'T');
-    }
-    else if(trig_pos_arrow_pos > curve_w)
-      {
-        trig_pos_arrow_pos = curve_w + 1;
-
-        drawArrow(painter, trig_pos_arrow_pos, 18, 0, QColor(255, 128, 0), 'T');
-      }
-      else
-      {
-        drawArrow(painter, trig_pos_arrow_pos, 27, 1, QColor(255, 128, 0), 'T');
-      }
-  }
 }
 
 
@@ -860,49 +849,28 @@ void WaveCurve::setBorderSize(int newsize)
 }
 
 
-void WaveCurve::mousePressEvent(QMouseEvent *press_event)
+void WaveCurve::mousePressEvent(QMouseEvent *) //press_event)
 {
-  int m_x,
-      m_y;
+//   int m_x,
+//       m_y;
 
   setFocus(Qt::MouseFocusReason);
 
   w = width() - (2 * bordersize);
   h = height() - (2 * bordersize);
 
-  m_x = press_event->x() - bordersize;
-  m_y = press_event->y() - bordersize;
+//   m_x = press_event->x() - bordersize;
+//   m_y = press_event->y() - bordersize;
 
   if(devparms == NULL)
   {
     return;
-  }
-
-  if(!devparms->connected)
-  {
-    return;
-  }
-
-  if(press_event->button() == Qt::LeftButton)
-  {
-    if(((m_x > (trig_pos_arrow_pos - 8)) && (m_x < (trig_pos_arrow_pos + 8)) && (m_y > 5) && (m_y < 24)) ||
-       ((trig_pos_arrow_pos > w) && (m_x > (trig_pos_arrow_pos - 24)) && (m_x <= trig_pos_arrow_pos) && (m_y > 9) && (m_y < 26)) ||
-       ((trig_pos_arrow_pos < 0) && (m_x < 24) && (m_x >= 0) && (m_y > 9) && (m_y < 26)))
-    {
-      trig_pos_arrow_moving = 1;
-      use_move_events = 1;
-      setMouseTracking(true);
-      mouse_old_x = m_x;
-      mouse_old_y = m_y;
-    }
   }
 }
 
 
 void WaveCurve::mouseReleaseEvent(QMouseEvent *release_event)
 {
-  int  tmp;
-
   w = width() - (2 * bordersize);
   h = height() - (2 * bordersize);
 
@@ -914,30 +882,6 @@ void WaveCurve::mouseReleaseEvent(QMouseEvent *release_event)
     return;
   }
 
-  if(trig_pos_arrow_moving)
-  {
-    trig_pos_arrow_pos = mouse_x;
-
-    if(trig_pos_arrow_pos < 0)
-    {
-      trig_pos_arrow_pos = 0;
-    }
-
-    if(trig_pos_arrow_pos > w)
-    {
-      trig_pos_arrow_pos = w;
-    }
-
-//    printf("w is %i   trig_pos_arrow_pos is %i\n", w, trig_pos_arrow_pos);
-
-    devparms->timebaseoffset = ((devparms->timebasescale * (double)devparms->hordivisions) / w) * ((w / 2) - trig_pos_arrow_pos);
-
-    tmp = devparms->timebaseoffset / (devparms->timebasescale / 50);
-
-    devparms->timebaseoffset = (devparms->timebasescale / 50) * tmp;
-  }
-
-  trig_pos_arrow_moving = 0;
   use_move_events = 0;
   setMouseTracking(false);
 
@@ -963,21 +907,6 @@ void WaveCurve::mouseMoveEvent(QMouseEvent *move_event)
   if(!devparms->connected)
   {
     return;
-  }
-
-  if(trig_pos_arrow_moving)
-  {
-    trig_pos_arrow_pos = mouse_x;
-
-    if(trig_pos_arrow_pos < 0)
-    {
-      trig_pos_arrow_pos = 0;
-    }
-
-    if(trig_pos_arrow_pos > w)
-    {
-      trig_pos_arrow_pos = w;
-    }
   }
 
   update();

@@ -223,7 +223,8 @@ private:
           *select_chan2_act,
           *select_chan3_act,
           *select_chan4_act,
-          *toggle_fft_act;
+          *toggle_fft_act,
+          *center_trigger_act;
 
   struct tmcdev *device;
 
@@ -405,6 +406,7 @@ private slots:
   void chan_scale_minus();
   void shift_trace_up();
   void shift_trace_down();
+  void center_trigger();
 
   void set_to_factory();
 

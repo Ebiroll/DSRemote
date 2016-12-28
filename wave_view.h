@@ -98,7 +98,6 @@ private:
       chan_arrow_pos[MAX_CHNS],
       trig_level_arrow_pos,
       trig_pos_arrow_pos,
-      trig_pos_arrow_moving,
       use_move_events,
       mouse_x,
       mouse_y,
