@@ -115,9 +115,6 @@ void WaveCurve::paintEvent(QPaintEvent *)
 
   samples_per_div = devparms->samplerate * devparms->timebasescale;
 
-  devparms->timebaseoffset = (double)(((devparms->wavebufsz - (devparms->hordivisions * samples_per_div)) / 2) - devparms->wave_mem_view_sample_start) /
-                              devparms->samplerate * -1.0;
-
   drawTopLabels(painter);
 
   drawSmallTriggerArrow(painter, 408, 16, 1, QColor(255, 128, 0));
@@ -310,16 +307,24 @@ void WaveCurve::paintEvent(QPaintEvent *)
       {
         if(sample_range < (curve_w / 2))
         {
-          painter->drawLine(i * h_step + w_trace_offset,
-                            (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2),
-                            (i + 1) * h_step + w_trace_offset,
-                            (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2));
-          if(i)
+          if(devparms->displaytype)
+          {
+            painter->drawPoint(i * h_step + w_trace_offset,
+                               (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2));
+          }
+          else
           {
             painter->drawLine(i * h_step + w_trace_offset,
-                              (devparms->wavebuf[chn][i - 1] * v_sense) + (curve_h / 2),
-                              i * h_step + w_trace_offset,
+                              (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2),
+                              (i + 1) * h_step + w_trace_offset,
                               (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2));
+            if(i)
+            {
+              painter->drawLine(i * h_step + w_trace_offset,
+                                (devparms->wavebuf[chn][i - 1 + sample_start] * v_sense) + (curve_h / 2),
+                                i * h_step + w_trace_offset,
+                                (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2));
+            }
           }
         }
         else

@@ -58,6 +58,8 @@ public:
   UI_wave_window(struct device_settings *, short *wbuf[MAX_CHNS], QWidget *parent=0);
   ~UI_wave_window();
 
+  void set_wavslider(void);
+
 private:
 
 struct device_settings *devparms;
@@ -70,9 +72,25 @@ WaveCurve *wavcurve;
 
 QSlider *wavslider;
 
+QAction *former_page_act,
+        *shift_page_left_act,
+        *shift_page_right_act,
+        *next_page_act,
+        *zoom_in_act,
+        *zoom_out_act,
+        *center_trigger_act;
+
 private slots:
 
 void wavslider_value_changed(int);
+
+void former_page();
+void shift_page_left();
+void shift_page_right();
+void next_page();
+void zoom_in();
+void zoom_out();
+void center_trigger();
 
 };
 

@@ -34,7 +34,7 @@
 
 UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[MAX_CHNS], QWidget *parnt)
 {
-  int i, samples_per_div;
+  int i;
 
   mainwindow = (UI_Mainwindow *)parnt;
 
@@ -60,14 +60,12 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
 
   if(devparms->timebasedelayenable)
   {
-    samples_per_div = devparms->samplerate * devparms->timebasedelayscale;
-  }
-  else
-  {
-    samples_per_div = devparms->samplerate * devparms->timebasescale;
+    devparms->timebasescale = devparms->timebasedelayscale;
   }
 
   devparms->timebasedelayenable = 0;
+
+  devparms->timebaseoffset = 0;
 
   wavcurve = new WaveCurve;
   wavcurve->setBackgroundColor(Qt::black);
@@ -81,14 +79,48 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
 
   wavslider = new QSlider;
   wavslider->setOrientation(Qt::Horizontal);
-  wavslider->setRange(0, devparms->wavebufsz - (devparms->hordivisions * samples_per_div));
-  wavslider->setValue((devparms->wavebufsz - (devparms->hordivisions * samples_per_div)) / 2);
+  set_wavslider();
 
   devparms->wave_mem_view_sample_start = wavslider->value();
 
   g_layout = new QGridLayout(this);
   g_layout->addWidget(wavcurve, 0, 0);
   g_layout->addWidget(wavslider, 1, 0);
+
+  former_page_act = new QAction(this);
+  former_page_act->setShortcut(QKeySequence::MoveToPreviousPage);
+  connect(former_page_act, SIGNAL(triggered()), this, SLOT(former_page()));
+  addAction(former_page_act);
+
+  shift_page_left_act = new QAction(this);
+  shift_page_left_act->setShortcut(QKeySequence::MoveToPreviousChar);
+  connect(shift_page_left_act, SIGNAL(triggered()), this, SLOT(shift_page_left()));
+  addAction(shift_page_left_act);
+
+  center_trigger_act = new QAction(this);
+  center_trigger_act->setShortcut(QKeySequence("c"));
+  connect(center_trigger_act, SIGNAL(triggered()), this, SLOT(center_trigger()));
+  addAction(center_trigger_act);
+
+  shift_page_right_act = new QAction(this);
+  shift_page_right_act->setShortcut(QKeySequence::MoveToNextChar);
+  connect(shift_page_right_act, SIGNAL(triggered()), this, SLOT(shift_page_right()));
+  addAction(shift_page_right_act);
+
+  next_page_act = new QAction(this);
+  next_page_act->setShortcut(QKeySequence::MoveToNextPage);
+  connect(next_page_act, SIGNAL(triggered()), this, SLOT(next_page()));
+  addAction(next_page_act);
+
+  zoom_in_act = new QAction(this);
+  zoom_in_act->setShortcut(QKeySequence::ZoomIn);
+  connect(zoom_in_act, SIGNAL(triggered()), this, SLOT(zoom_in()));
+  addAction(zoom_in_act);
+
+  zoom_out_act = new QAction(this);
+  zoom_out_act->setShortcut(QKeySequence::ZoomOut);
+  connect(zoom_out_act, SIGNAL(triggered()), this, SLOT(zoom_out()));
+  addAction(zoom_out_act);
 
   connect(wavslider, SIGNAL(sliderMoved(int)), this, SLOT(wavslider_value_changed(int)));
 
@@ -112,6 +144,162 @@ UI_wave_window::~UI_wave_window()
 void UI_wave_window::wavslider_value_changed(int val)
 {
   devparms->wave_mem_view_sample_start = val;
+
+  int samples_per_div = devparms->samplerate * devparms->timebasescale;
+
+  devparms->timebaseoffset = (double)(((devparms->wavebufsz - (devparms->hordivisions * samples_per_div)) / 2) - devparms->wave_mem_view_sample_start) /
+                              devparms->samplerate * -1.0;
+
+  wavcurve->update();
+}
+
+
+void UI_wave_window::set_wavslider(void)
+{
+  int samples_per_div = devparms->samplerate * devparms->timebasescale;
+
+  wavslider->setRange(0, devparms->wavebufsz - (devparms->hordivisions * samples_per_div));
+
+  devparms->wave_mem_view_sample_start = ((devparms->wavebufsz - (devparms->hordivisions * samples_per_div)) / 2) +
+                                         devparms->samplerate * devparms->timebaseoffset;
+
+  wavslider->setValue(devparms->wave_mem_view_sample_start);
+}
+
+
+void UI_wave_window::former_page()
+{
+  devparms->timebaseoffset -= devparms->timebasescale * devparms->hordivisions;
+
+  if(devparms->timebaseoffset <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / -2))
+  {
+    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / -2;
+  }
+
+  set_wavslider();
+
+  wavcurve->update();
+}
+
+
+void UI_wave_window::next_page()
+{
+  devparms->timebaseoffset += devparms->timebasescale * devparms->hordivisions;
+
+  if(devparms->timebaseoffset >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / 2))
+  {
+    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / 2;
+  }
+
+  set_wavslider();
+
+  wavcurve->update();
+}
+
+
+void UI_wave_window::shift_page_left()
+{
+  devparms->timebaseoffset -= devparms->timebasescale;
+
+  if(devparms->timebaseoffset <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / -2))
+  {
+    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / -2;
+  }
+
+  set_wavslider();
+
+  wavcurve->update();
+}
+
+
+void UI_wave_window::shift_page_right()
+{
+  devparms->timebaseoffset += devparms->timebasescale;
+
+  if(devparms->timebaseoffset >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / 2))
+  {
+    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / 2;
+  }
+
+  set_wavslider();
+
+  wavcurve->update();
+}
+
+
+void UI_wave_window::center_trigger()
+{
+  devparms->timebaseoffset = 0;
+
+  set_wavslider();
+
+  wavcurve->update();
+}
+
+
+void UI_wave_window::zoom_in()
+{
+  devparms->timebasescale = round_down_step125(devparms->timebasescale, NULL);
+
+  if(devparms->timebasescale <= 1.001e-9)
+  {
+    devparms->timebasescale = 1e-9;
+  }
+
+  if(devparms->timebaseoffset <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / -2))
+  {
+    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / -2;
+  }
+
+  if(devparms->timebaseoffset >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / 2))
+  {
+    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / 2;
+  }
+
+  set_wavslider();
+
+  wavcurve->update();
+}
+
+
+void UI_wave_window::zoom_out()
+{
+  if(devparms->timebasescale >= ((double)devparms->acquirememdepth / devparms->samplerate) / (double)devparms->hordivisions)
+  {
+    devparms->timebasescale = ((double)devparms->acquirememdepth / devparms->samplerate) / (double)devparms->hordivisions;
+
+    return;
+  }
+
+  devparms->timebasescale = round_up_step125(devparms->timebasescale, NULL);
+
+  if(devparms->timebaseoffset <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / -2))
+  {
+    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / -2;
+  }
+
+  if(devparms->timebaseoffset >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / 2))
+  {
+    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / 2;
+  }
+
+  set_wavslider();
 
   wavcurve->update();
 }
