@@ -77,8 +77,8 @@ void WaveCurve::paintEvent(QPaintEvent *)
       samples_per_div,
       sample_range,
       sample_start,
-      sample_end;
-
+      sample_end,
+      t_pos;
 
   double h_step=0.0,
          step,
@@ -117,7 +117,9 @@ void WaveCurve::paintEvent(QPaintEvent *)
 
   drawTopLabels(painter);
 
-  drawSmallTriggerArrow(painter, 408, 16, 1, QColor(255, 128, 0));
+  t_pos = 408 - ((devparms->timebaseoffset / ((double)devparms->acquirememdepth / devparms->samplerate)) * 233);
+
+  drawSmallTriggerArrow(painter, t_pos, 16, 1, QColor(255, 128, 0));
 
   painter->fillRect(0, curve_h - 30, curve_w, curve_h, QColor(32, 32, 32));
 
@@ -379,14 +381,7 @@ void WaveCurve::paintEvent(QPaintEvent *)
       }
   }
 
-  if(devparms->timebasedelayenable)
-  {
-    trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebasedelayoffset / (devparms->timebasedelayscale * (double)devparms->hordivisions)) * curve_w);
-  }
-  else
-  {
-    trig_pos_arrow_pos = (curve_w / 2) - ((devparms->timebaseoffset / (devparms->timebasescale * (double)devparms->hordivisions)) * curve_w);
-  }
+  trig_pos_arrow_pos = (curve_w / 2) - (((devparms->timebaseoffset + devparms->viewer_center_position) / (devparms->timebasescale * (double)devparms->hordivisions)) * curve_w);
 
   if(trig_pos_arrow_pos < 0)
   {
@@ -520,7 +515,7 @@ void WaveCurve::drawTopLabels(QPainter *painter)
 
   dtmp1 = (devparms->hordivisions * devparms->timebasescale) / (devparms->acquirememdepth / devparms->samplerate);
 
-  dtmp2 = devparms->timebaseoffset / (devparms->acquirememdepth / devparms->samplerate);
+  dtmp2 = devparms->viewer_center_position / (devparms->acquirememdepth / devparms->samplerate);
 
   painter->fillRect(288, 16, 233, 8, QColor(64, 160, 255));
 
@@ -557,7 +552,7 @@ void WaveCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(555, 20, "D");
 
-  convert_to_metric_suffix(str, devparms->timebaseoffset, 4);
+  convert_to_metric_suffix(str, devparms->timebaseoffset + devparms->viewer_center_position, 4);
 
   strcat(str, "s");
 

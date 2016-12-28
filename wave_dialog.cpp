@@ -65,7 +65,7 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
 
   devparms->timebasedelayenable = 0;
 
-  devparms->timebaseoffset = 0;
+  devparms->viewer_center_position = 0;
 
   devparms->math_decode_uart_tx_nval = 0;
   devparms->math_decode_uart_rx_nval = 0;
@@ -159,7 +159,7 @@ void UI_wave_window::wavslider_value_changed(int val)
 
   int samples_per_div = devparms->samplerate * devparms->timebasescale;
 
-  devparms->timebaseoffset = (double)(((devparms->wavebufsz - (devparms->hordivisions * samples_per_div)) / 2) - devparms->wave_mem_view_sample_start) /
+  devparms->viewer_center_position = (double)(((devparms->wavebufsz - (devparms->hordivisions * samples_per_div)) / 2) - devparms->wave_mem_view_sample_start) /
                               devparms->samplerate * -1.0;
 
   wavcurve->update();
@@ -173,7 +173,7 @@ void UI_wave_window::set_wavslider(void)
   wavslider->setRange(0, devparms->wavebufsz - (devparms->hordivisions * samples_per_div));
 
   devparms->wave_mem_view_sample_start = ((devparms->wavebufsz - (devparms->hordivisions * samples_per_div)) / 2) +
-                                         devparms->samplerate * devparms->timebaseoffset;
+                                         devparms->samplerate * devparms->viewer_center_position;
 
   wavslider->setValue(devparms->wave_mem_view_sample_start);
 }
@@ -181,12 +181,12 @@ void UI_wave_window::set_wavslider(void)
 
 void UI_wave_window::former_page()
 {
-  devparms->timebaseoffset -= devparms->timebasescale * devparms->hordivisions;
+  devparms->viewer_center_position -= devparms->timebasescale * devparms->hordivisions;
 
-  if(devparms->timebaseoffset <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+  if(devparms->viewer_center_position <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
                                   (devparms->timebasescale * devparms->hordivisions)) / -2))
   {
-    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
                                 (devparms->timebasescale * devparms->hordivisions)) / -2;
   }
 
@@ -198,12 +198,12 @@ void UI_wave_window::former_page()
 
 void UI_wave_window::next_page()
 {
-  devparms->timebaseoffset += devparms->timebasescale * devparms->hordivisions;
+  devparms->viewer_center_position += devparms->timebasescale * devparms->hordivisions;
 
-  if(devparms->timebaseoffset >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+  if(devparms->viewer_center_position >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
                                   (devparms->timebasescale * devparms->hordivisions)) / 2))
   {
-    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
                                 (devparms->timebasescale * devparms->hordivisions)) / 2;
   }
 
@@ -215,12 +215,12 @@ void UI_wave_window::next_page()
 
 void UI_wave_window::shift_page_left()
 {
-  devparms->timebaseoffset -= devparms->timebasescale;
+  devparms->viewer_center_position -= devparms->timebasescale;
 
-  if(devparms->timebaseoffset <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+  if(devparms->viewer_center_position <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
                                   (devparms->timebasescale * devparms->hordivisions)) / -2))
   {
-    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
                                 (devparms->timebasescale * devparms->hordivisions)) / -2;
   }
 
@@ -232,12 +232,12 @@ void UI_wave_window::shift_page_left()
 
 void UI_wave_window::shift_page_right()
 {
-  devparms->timebaseoffset += devparms->timebasescale;
+  devparms->viewer_center_position += devparms->timebasescale;
 
-  if(devparms->timebaseoffset >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+  if(devparms->viewer_center_position >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
                                   (devparms->timebasescale * devparms->hordivisions)) / 2))
   {
-    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
                                 (devparms->timebasescale * devparms->hordivisions)) / 2;
   }
 
@@ -249,7 +249,7 @@ void UI_wave_window::shift_page_right()
 
 void UI_wave_window::center_trigger()
 {
-  devparms->timebaseoffset = 0;
+  devparms->viewer_center_position = 0;
 
   set_wavslider();
 
@@ -266,17 +266,17 @@ void UI_wave_window::zoom_in()
     devparms->timebasescale = 1e-9;
   }
 
-  if(devparms->timebaseoffset <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+  if(devparms->viewer_center_position <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
                                   (devparms->timebasescale * devparms->hordivisions)) / -2))
   {
-    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
                                 (devparms->timebasescale * devparms->hordivisions)) / -2;
   }
 
-  if(devparms->timebaseoffset >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+  if(devparms->viewer_center_position >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
                                   (devparms->timebasescale * devparms->hordivisions)) / 2))
   {
-    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
                                 (devparms->timebasescale * devparms->hordivisions)) / 2;
   }
 
@@ -297,17 +297,17 @@ void UI_wave_window::zoom_out()
 
   devparms->timebasescale = round_up_step125(devparms->timebasescale, NULL);
 
-  if(devparms->timebaseoffset <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+  if(devparms->viewer_center_position <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
                                   (devparms->timebasescale * devparms->hordivisions)) / -2))
   {
-    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
                                 (devparms->timebasescale * devparms->hordivisions)) / -2;
   }
 
-  if(devparms->timebaseoffset >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+  if(devparms->viewer_center_position >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
                                   (devparms->timebasescale * devparms->hordivisions)) / 2))
   {
-    devparms->timebaseoffset = (((double)devparms->acquirememdepth / devparms->samplerate) -
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
                                 (devparms->timebasescale * devparms->hordivisions)) / 2;
   }
 
