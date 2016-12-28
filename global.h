@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1612261016"
+#define PROGRAM_VERSION       "0.33_1612281147"
 
 #define MAX_PATHLEN            4096
 
@@ -92,7 +92,7 @@
 #define DECODE_MODE_SPI           2
 #define DECODE_MODE_I2C           3
 
-#define DECODE_MAX_CHARS   256
+#define DECODE_MAX_CHARS        512
 
 
 
@@ -173,7 +173,7 @@ struct device_settings
   int acquiretype;              // 0=normal, 1=average, 2=peak, 3=highres
   int acquireaverages;          // 2, 4, 8, 16, 32, 64, etc. to 8192
   int acquirememdepth;          // Number of waveform points that the oscilloscope can
-                                //store in a single trigger sample. 0=AUTO
+                                // store in a single trigger sample. 0=AUTO
 
   int countersrc;               // 0=off, 1=ch1, 2=ch2, 3=ch3, 4=ch4
   double counterfreq;           // Value of frequency counter
@@ -273,6 +273,8 @@ struct device_settings
   int current_screen_sf;
 
   int show_fps;
+
+  int wave_mem_view_sample_start;
 };
 
 

@@ -58,6 +58,8 @@ HEADERS += read_settings_thread.h
 HEADERS += save_data_thread.h
 HEADERS += decode_dialog.h
 HEADERS += tdial.h
+HEADERS += wave_dialog.h
+HEADERS += wave_view.h
 
 HEADERS += third_party/kiss_fft/kiss_fft.h
 HEADERS += third_party/kiss_fft/_kiss_fft_guts.h
@@ -85,6 +87,8 @@ SOURCES += read_settings_thread.cpp
 SOURCES += save_data_thread.cpp
 SOURCES += decode_dialog.cpp
 SOURCES += tdial.cpp
+SOURCES += wave_dialog.cpp
+SOURCES += wave_view.cpp
 
 SOURCES += third_party/kiss_fft/kiss_fft.c
 SOURCES += third_party/kiss_fft/kiss_fftr.c

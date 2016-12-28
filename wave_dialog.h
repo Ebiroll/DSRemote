@@ -3,7 +3,7 @@
 *
 * Author: Teunis van Beelen
 *
-* Copyright (C) 2015, 2016 Teunis van Beelen
+* Copyright (C) 2016 Teunis van Beelen
 *
 * Email: teuniz@gmail.com
 *
@@ -28,71 +28,51 @@
 
 
 
-#ifndef SETTINGS_DIALOG_H
-#define SETTINGS_DIALOG_H
+#ifndef WAVE_DIALOG_H
+#define WAVE_DIALOG_H
 
 
 
 #include <QApplication>
 #include <QObject>
 #include <QDialog>
-#include <QLabel>
-#include <QPushButton>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QSettings>
-#include <QRadioButton>
-#include <QSpinBox>
+#include <QGridLayout>
+#include <QSlider>
 
 #include "mainwindow.h"
 #include "global.h"
+#include "wave_view.h"
 
 
 class UI_Mainwindow;
 
+class WaveCurve;
 
-class UI_settings_window : public QDialog
+
+class UI_wave_window : public QDialog
 {
   Q_OBJECT
 
 public:
 
-  UI_settings_window(QWidget *parent=0);
+  UI_wave_window(struct device_settings *, short *wbuf[MAX_CHNS], QWidget *parent=0);
+  ~UI_wave_window();
 
 private:
 
-QPushButton  *cancelButton,
-             *applyButton;
-
-QRadioButton *usbRadioButton,
-             *lanRadioButton;
-
-QComboBox    *comboBox1;
-
-QSpinBox     *refreshSpinbox,
-             *ipSpinbox1,
-             *ipSpinbox2,
-             *ipSpinbox3,
-             *ipSpinbox4;
-
-QLabel       *refreshLabel,
-             *invScrShtLabel,
-             *showfpsLabel,
-             *extendvertdivLabel;
-
-QCheckBox    *invScrShtCheckbox,
-             *showfpsCheckbox,
-             *extendvertdivCheckbox;
+struct device_settings *devparms;
 
 UI_Mainwindow *mainwindow;
 
+QGridLayout *g_layout;
+
+WaveCurve *wavcurve;
+
+QSlider *wavslider;
+
 private slots:
 
-void applyButtonClicked();
-void refreshSpinboxChanged(int);
-void invScrShtCheckboxChanged(int);
-void showfpsCheckboxChanged(int);
-void extendvertdivCheckboxChanged(int);
+void wavslider_value_changed(int);
 
 };
 

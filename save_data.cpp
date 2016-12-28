@@ -179,7 +179,7 @@ OUT_ERROR:
 }
 
 
-void UI_Mainwindow::save_memory_waveform()
+void UI_Mainwindow::save_memory_waveform(int job)
 {
   int i, j, k,
       n=0,
@@ -269,7 +269,7 @@ void UI_Mainwindow::save_memory_waveform()
 
   rec_len = (EDFLIB_TIME_DIMENSION * (long long)mempnts) / devparms.samplerate;
 
-  if(rec_len < 100)
+  if((job == 1) && (rec_len < 100))
   {
     strcpy(str, "Can not save waveforms shorter than 10 uSec.\n"
                 "Set the horizontal timebase to 1 uSec or higher.");
@@ -406,6 +406,12 @@ void UI_Mainwindow::save_memory_waveform()
         goto OUT_ERROR;
       }
 
+      if(n == 0)
+      {
+        sprintf(str, "No waveform data available.");
+        goto OUT_ERROR;
+      }
+
       printf("received %i bytes, total %i bytes\n", n, n + bytes_rcvd);
 
       if(n > SAV_MEM_BSZ)
@@ -426,14 +432,29 @@ void UI_Mainwindow::save_memory_waveform()
         empty_buf = 0;
       }
 
-      for(k=0; k<n; k++)
+      if(job == 1)
       {
-        if((bytes_rcvd + k) >= mempnts)
+        for(k=0; k<n; k++)
         {
-          break;
-        }
+          if((bytes_rcvd + k) >= mempnts)
+          {
+            break;
+          }
 
-        wavbuf[chn][bytes_rcvd + k] = ((int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn]) << 5;
+          wavbuf[chn][bytes_rcvd + k] = ((int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn]) << 5;
+        }
+      }
+      else
+      {
+        for(k=0; k<n; k++)
+        {
+          if((bytes_rcvd + k) >= mempnts)
+          {
+            break;
+          }
+
+          wavbuf[chn][bytes_rcvd + k] = (int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn];
+        }
       }
 
       bytes_rcvd += n;
@@ -500,6 +521,13 @@ void UI_Mainwindow::save_memory_waveform()
   else
   {
     statusLabel->setText("Downloading finished");
+  }
+
+  if(job == 0)
+  {
+    new UI_wave_window(&devparms, wavbuf, this);
+
+    goto OUT_NORMAL;
   }
 
   opath[0] = 0;
@@ -597,15 +625,18 @@ OUT_NORMAL:
   disconnect(&get_data_thrd, 0, 0, 0);
   disconnect(&sav_data_thrd, 0, 0, 0);
 
-  if(hdl >= 0)
+  if(job == 1)
   {
-    edfclose_file(hdl);
-  }
+    if(hdl >= 0)
+    {
+      edfclose_file(hdl);
+    }
 
-  for(chn=0; chn<MAX_CHNS; chn++)
-  {
-    free(wavbuf[chn]);
-    wavbuf[chn] = NULL;
+    for(chn=0; chn<MAX_CHNS; chn++)
+    {
+      free(wavbuf[chn]);
+      wavbuf[chn] = NULL;
+    }
   }
 
   scrn_timer->start(devparms.screentimerival);

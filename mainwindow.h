@@ -90,6 +90,7 @@
 #include "save_data_thread.h"
 #include "decode_dialog.h"
 #include "tdial.h"
+#include "wave_dialog.h"
 
 #include "third_party/kiss_fft/kiss_fftr.h"
 
@@ -239,6 +240,7 @@ private:
   void serial_decoder(void);
   inline unsigned char reverse_bitorder_8(unsigned char);
   inline unsigned int reverse_bitorder_32(unsigned int);
+  void save_memory_waveform(int);
 
 private slots:
 
@@ -260,7 +262,8 @@ private slots:
   void open_settings_dialog();
   int get_device_settings();
   void save_screen_waveform();
-  void save_memory_waveform();
+  void save_mem_wav();
+  void analyze_mem_wav();
   void save_screenshot();
 
   void adjDialChanged(int);
