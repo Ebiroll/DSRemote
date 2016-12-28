@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.33_1612281501"
+#define PROGRAM_VERSION       "0.33_1612281910"
 
 #define MAX_PATHLEN            4096
 
@@ -274,7 +274,9 @@ struct device_settings
 
   int show_fps;
 
+  // below here is use for the wave inspector
   int wave_mem_view_sample_start;
+  int wave_mem_view_enabled;
 };
 
 

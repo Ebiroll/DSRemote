@@ -945,7 +945,9 @@ void WaveCurve::draw_decoder(QPainter *painter, int dw, int dh)
       line_h_spi_miso=0,
       spi_chars=1,
       pixel_per_bit=1,
-      samples_per_div;
+      samples_per_div,
+      sample_start,
+      sample_end;
 
   double pix_per_smpl;
 
@@ -953,6 +955,15 @@ void WaveCurve::draw_decoder(QPainter *painter, int dw, int dh)
 
 
   samples_per_div = devparms->samplerate * devparms->timebasescale;
+
+  sample_start = devparms->wave_mem_view_sample_start;
+
+  sample_end = devparms->hordivisions * samples_per_div + sample_start;
+
+  if(sample_end > bufsize)
+  {
+    sample_end = bufsize;
+  }
 
   if(devparms->modelserie == 6)
   {
@@ -981,7 +992,7 @@ void WaveCurve::draw_decoder(QPainter *painter, int dw, int dh)
 
   if(devparms->math_decode_mode == DECODE_MODE_UART)
   {
-    pixel_per_bit = ((double)dw / 12.0 / devparms->timebasescale) / (double)devparms->math_decode_uart_baud;
+    pixel_per_bit = ((double)dw / devparms->hordivisions / devparms->timebasescale) / (double)devparms->math_decode_uart_baud;
 
     cell_width = pixel_per_bit * devparms->math_decode_uart_width;
 
@@ -1014,9 +1025,12 @@ void WaveCurve::draw_decoder(QPainter *painter, int dw, int dh)
     {
       for(i=0; i<devparms->math_decode_uart_tx_nval; i++)
       {
-        painter->fillRect(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 26, Qt::black);
+        if((devparms->math_decode_uart_tx_val_pos[i] >= sample_start) && (devparms->math_decode_uart_tx_val_pos[i] < sample_end))
+        {
+          painter->fillRect(devparms->math_decode_uart_tx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 26, Qt::black);
 
-        painter->drawRect(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 26);
+          painter->drawRect(devparms->math_decode_uart_tx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 26);
+        }
       }
     }
 
@@ -1024,9 +1038,12 @@ void WaveCurve::draw_decoder(QPainter *painter, int dw, int dh)
     {
       for(i=0; i<devparms->math_decode_uart_rx_nval; i++)
       {
-        painter->fillRect(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 26, Qt::black);
+        if((devparms->math_decode_uart_rx_val_pos[i] >= sample_start) && (devparms->math_decode_uart_rx_val_pos[i] < sample_end))
+        {
+          painter->fillRect(devparms->math_decode_uart_rx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 26, Qt::black);
 
-        painter->drawRect(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 26);
+          painter->drawRect(devparms->math_decode_uart_rx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 26);
+        }
       }
     }
 
@@ -1052,55 +1069,58 @@ void WaveCurve::draw_decoder(QPainter *painter, int dw, int dh)
 
       for(i=0; i<devparms->math_decode_uart_tx_nval; i++)
       {
-        if(devparms->math_decode_format == 0)  // hex
+        if((devparms->math_decode_uart_tx_val_pos[i] >= sample_start) && (devparms->math_decode_uart_tx_val_pos[i] < sample_end))
         {
-          sprintf(str, "%02X", devparms->math_decode_uart_tx_val[i]);
-
-          painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
-        }
-        else if(devparms->math_decode_format == 1)  // ASCII
+          if(devparms->math_decode_format == 0)  // hex
           {
-            ascii_decode_control_char(devparms->math_decode_uart_tx_val[i], str);
+            sprintf(str, "%02X", devparms->math_decode_uart_tx_val[i]);
 
-            painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
+            painter->drawText(devparms->math_decode_uart_tx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
           }
-          else if(devparms->math_decode_format == 2)  // decimal
+          else if(devparms->math_decode_format == 1)  // ASCII
             {
-              sprintf(str, "%u", (unsigned int)devparms->math_decode_uart_tx_val[i]);
+              ascii_decode_control_char(devparms->math_decode_uart_tx_val[i], str);
 
-              painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
+              painter->drawText(devparms->math_decode_uart_tx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
             }
-            else if(devparms->math_decode_format == 3)  // binary
+            else if(devparms->math_decode_format == 2)  // decimal
               {
-                for(j=0; j<devparms->math_decode_uart_width; j++)
-                {
-                  str[devparms->math_decode_uart_width - 1 - j] = ((devparms->math_decode_uart_tx_val[i] >> j) & 1) + '0';
-                }
+                sprintf(str, "%u", (unsigned int)devparms->math_decode_uart_tx_val[i]);
 
-                str[j] = 0;
-
-                painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
+                painter->drawText(devparms->math_decode_uart_tx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
               }
-              else if(devparms->math_decode_format == 4)  // line
+              else if(devparms->math_decode_format == 3)  // binary
                 {
                   for(j=0; j<devparms->math_decode_uart_width; j++)
                   {
-                    str[j] = ((devparms->math_decode_uart_tx_val[i] >> j) & 1) + '0';
+                    str[devparms->math_decode_uart_width - 1 - j] = ((devparms->math_decode_uart_tx_val[i] >> j) & 1) + '0';
                   }
 
                   str[j] = 0;
 
-                  painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
+                  painter->drawText(devparms->math_decode_uart_tx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
                 }
+                else if(devparms->math_decode_format == 4)  // line
+                  {
+                    for(j=0; j<devparms->math_decode_uart_width; j++)
+                    {
+                      str[j] = ((devparms->math_decode_uart_tx_val[i] >> j) & 1) + '0';
+                    }
 
-          if(devparms->math_decode_uart_tx_err[i])
-          {
-            painter->setPen(Qt::red);
+                    str[j] = 0;
 
-            painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl + cell_width, line_h_uart_tx - 13, 25, 25, Qt::AlignCenter, "?");
+                    painter->drawText(devparms->math_decode_uart_tx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
+                  }
 
-            painter->setPen(Qt::white);
-          }
+            if(devparms->math_decode_uart_tx_err[i])
+            {
+              painter->setPen(Qt::red);
+
+              painter->drawText(devparms->math_decode_uart_tx_val_pos[i - sample_start] * pix_per_smpl + cell_width, line_h_uart_tx - 13, 25, 25, Qt::AlignCenter, "?");
+
+              painter->setPen(Qt::white);
+            }
+        }
       }
     }
 
@@ -1124,55 +1144,58 @@ void WaveCurve::draw_decoder(QPainter *painter, int dw, int dh)
 
       for(i=0; i<devparms->math_decode_uart_rx_nval; i++)
       {
-        if(devparms->math_decode_format == 0)  // hex
+        if((devparms->math_decode_uart_rx_val_pos[i] >= sample_start) && (devparms->math_decode_uart_rx_val_pos[i] < sample_end))
         {
-          sprintf(str, "%02X", devparms->math_decode_uart_rx_val[i]);
-
-          painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
-        }
-        else if(devparms->math_decode_format == 1)  // ASCII
+          if(devparms->math_decode_format == 0)  // hex
           {
-            ascii_decode_control_char(devparms->math_decode_uart_rx_val[i], str);
+            sprintf(str, "%02X", devparms->math_decode_uart_rx_val[i]);
 
-            painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
+            painter->drawText(devparms->math_decode_uart_rx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
           }
-          else if(devparms->math_decode_format == 2)  // decimal
+          else if(devparms->math_decode_format == 1)  // ASCII
             {
-              sprintf(str, "%u", (unsigned int)devparms->math_decode_uart_rx_val[i]);
+              ascii_decode_control_char(devparms->math_decode_uart_rx_val[i], str);
 
-              painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
+              painter->drawText(devparms->math_decode_uart_rx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
             }
-            else if(devparms->math_decode_format == 3)  // binary
+            else if(devparms->math_decode_format == 2)  // decimal
               {
-                for(j=0; j<devparms->math_decode_uart_width; j++)
-                {
-                  str[devparms->math_decode_uart_width - 1 - j] = ((devparms->math_decode_uart_rx_val[i] >> j) & 1) + '0';
-                }
+                sprintf(str, "%u", (unsigned int)devparms->math_decode_uart_rx_val[i]);
 
-                str[j] = 0;
-
-                painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
+                painter->drawText(devparms->math_decode_uart_rx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
               }
-              else if(devparms->math_decode_format == 4)  // line
+              else if(devparms->math_decode_format == 3)  // binary
                 {
                   for(j=0; j<devparms->math_decode_uart_width; j++)
                   {
-                    str[j] = ((devparms->math_decode_uart_rx_val[i] >> j) & 1) + '0';
+                    str[devparms->math_decode_uart_width - 1 - j] = ((devparms->math_decode_uart_rx_val[i] >> j) & 1) + '0';
                   }
 
                   str[j] = 0;
 
-                  painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
+                  painter->drawText(devparms->math_decode_uart_rx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
                 }
+                else if(devparms->math_decode_format == 4)  // line
+                  {
+                    for(j=0; j<devparms->math_decode_uart_width; j++)
+                    {
+                      str[j] = ((devparms->math_decode_uart_rx_val[i] >> j) & 1) + '0';
+                    }
 
-          if(devparms->math_decode_uart_rx_err[i])
-          {
-            painter->setPen(Qt::red);
+                    str[j] = 0;
 
-            painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl + cell_width, line_h_uart_rx - 13, 25, 25, Qt::AlignCenter, "?");
+                    painter->drawText(devparms->math_decode_uart_rx_val_pos[i - sample_start] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
+                  }
 
-            painter->setPen(Qt::white);
-          }
+            if(devparms->math_decode_uart_rx_err[i])
+            {
+              painter->setPen(Qt::red);
+
+              painter->drawText(devparms->math_decode_uart_rx_val_pos[i - sample_start] * pix_per_smpl + cell_width, line_h_uart_rx - 13, 25, 25, Qt::AlignCenter, "?");
+
+              painter->setPen(Qt::white);
+            }
+        }
       }
     }
   }

@@ -2625,7 +2625,7 @@ void UI_Mainwindow::screenUpdate()
   {
     if(devparms.math_decode_display)
     {
-      serial_decoder();
+      serial_decoder(&devparms);
     }
 
     waveForm->drawCurve(&devparms, device);

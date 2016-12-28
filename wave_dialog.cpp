@@ -39,7 +39,7 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
   mainwindow = (UI_Mainwindow *)parnt;
 
   setMinimumSize(840, 635);
-  setWindowTitle("Wave Memory");
+  setWindowTitle("Wave Inspector");
 
   devparms = (struct device_settings *)calloc(1, sizeof(struct device_settings));
   if(devparms == NULL)
@@ -66,6 +66,18 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
   devparms->timebasedelayenable = 0;
 
   devparms->timebaseoffset = 0;
+
+  devparms->math_decode_uart_tx_nval = 0;
+  devparms->math_decode_uart_rx_nval = 0;
+  devparms->math_decode_spi_mosi_nval = 0;
+  devparms->math_decode_spi_miso_nval = 0;
+
+  devparms->wave_mem_view_enabled = 1;
+
+  if(devparms->math_decode_display)
+  {
+    mainwindow->serial_decoder(devparms);
+  }
 
   wavcurve = new WaveCurve;
   wavcurve->setBackgroundColor(Qt::black);
@@ -276,10 +288,10 @@ void UI_wave_window::zoom_in()
 
 void UI_wave_window::zoom_out()
 {
-  if(devparms->timebasescale >= ((double)devparms->acquirememdepth / devparms->samplerate) / (double)devparms->hordivisions)
-  {
-    devparms->timebasescale = ((double)devparms->acquirememdepth / devparms->samplerate) / (double)devparms->hordivisions;
+  double dtmp = round_up_step125(devparms->timebasescale, NULL);
 
+  if(dtmp >= ((double)devparms->acquirememdepth / devparms->samplerate) / (double)devparms->hordivisions)
+  {
     return;
   }
 

@@ -56,7 +56,7 @@
 
 
 
-void UI_Mainwindow::serial_decoder(void)
+void UI_Mainwindow::serial_decoder(struct device_settings *d_parms)
 {
   int i, j,
       threshold[MAX_CHNS],
@@ -88,29 +88,29 @@ void UI_Mainwindow::serial_decoder(void)
          uart_rx_x_pos,
          bit_per_volt;
 
-  devparms.math_decode_uart_tx_nval = 0;
+  d_parms->math_decode_uart_tx_nval = 0;
 
-  devparms.math_decode_uart_rx_nval = 0;
+  d_parms->math_decode_uart_rx_nval = 0;
 
-  devparms.math_decode_spi_mosi_nval = 0;
+  d_parms->math_decode_spi_mosi_nval = 0;
 
-  devparms.math_decode_spi_miso_nval = 0;
+  d_parms->math_decode_spi_miso_nval = 0;
 
-  if(devparms.wavebufsz < 32)  return;
+  if(d_parms->wavebufsz < 32)  return;
 
-  if(devparms.math_decode_threshold_auto)
+  if(d_parms->math_decode_threshold_auto)
   {
     for(j=0; j<MAX_CHNS; j++)
     {
-      if(!devparms.chandisplay[j])  continue;
+      if(!d_parms->chandisplay[j])  continue;
 
       s_max = -32768;
       s_min = 32767;
 
-      for(i=0; i<devparms.wavebufsz; i++)
+      for(i=0; i<d_parms->wavebufsz; i++)
       {
-        if(devparms.wavebuf[j][i] > s_max)  s_max = devparms.wavebuf[j][i];
-        if(devparms.wavebuf[j][i] < s_min)  s_min = devparms.wavebuf[j][i];
+        if(d_parms->wavebuf[j][i] > s_max)  s_max = d_parms->wavebuf[j][i];
+        if(d_parms->wavebuf[j][i] < s_min)  s_min = d_parms->wavebuf[j][i];
       }
 
       threshold[j] = (s_max + s_min) / 2;
@@ -118,154 +118,161 @@ void UI_Mainwindow::serial_decoder(void)
   }
   else
   {
-    if(devparms.math_decode_mode == DECODE_MODE_UART)
+    if(d_parms->math_decode_mode == DECODE_MODE_UART)
     {
-      if(devparms.math_decode_uart_tx)
+      if(d_parms->math_decode_uart_tx)
       {
-        if(devparms.modelserie == 6)
+        if(d_parms->modelserie == 6)
         {
-          bit_per_volt = 32.0 / devparms.chanscale[devparms.math_decode_uart_tx - 1];
+          bit_per_volt = 32.0 / d_parms->chanscale[d_parms->math_decode_uart_tx - 1];
 
-          threshold[devparms.math_decode_uart_tx - 1] =
-            (devparms.math_decode_threshold_uart_tx +
-            devparms.chanoffset[devparms.math_decode_uart_tx - 1])
+          threshold[d_parms->math_decode_uart_tx - 1] =
+            (d_parms->math_decode_threshold_uart_tx +
+            d_parms->chanoffset[d_parms->math_decode_uart_tx - 1])
             * bit_per_volt;
         }
         else
         {
-          bit_per_volt = 25.0 / devparms.chanscale[devparms.math_decode_uart_tx - 1];
+          bit_per_volt = 25.0 / d_parms->chanscale[d_parms->math_decode_uart_tx - 1];
 
-          threshold[devparms.math_decode_uart_tx - 1] =
-            (devparms.math_decode_threshold[devparms.math_decode_uart_tx - 1] +
-            devparms.chanoffset[devparms.math_decode_uart_tx - 1])
+          threshold[d_parms->math_decode_uart_tx - 1] =
+            (d_parms->math_decode_threshold[d_parms->math_decode_uart_tx - 1] +
+            d_parms->chanoffset[d_parms->math_decode_uart_tx - 1])
             * bit_per_volt;
         }
       }
 
-      if(devparms.math_decode_uart_rx)
+      if(d_parms->math_decode_uart_rx)
       {
-        if(devparms.modelserie == 6)
+        if(d_parms->modelserie == 6)
         {
-          bit_per_volt = 32.0 / devparms.chanscale[devparms.math_decode_uart_rx - 1];
+          bit_per_volt = 32.0 / d_parms->chanscale[d_parms->math_decode_uart_rx - 1];
 
-          threshold[devparms.math_decode_uart_rx - 1] =
-            (devparms.math_decode_threshold_uart_rx +
-            devparms.chanoffset[devparms.math_decode_uart_rx - 1])
+          threshold[d_parms->math_decode_uart_rx - 1] =
+            (d_parms->math_decode_threshold_uart_rx +
+            d_parms->chanoffset[d_parms->math_decode_uart_rx - 1])
             * bit_per_volt;
         }
         else
         {
-          bit_per_volt = 25.0 / devparms.chanscale[devparms.math_decode_uart_rx - 1];
+          bit_per_volt = 25.0 / d_parms->chanscale[d_parms->math_decode_uart_rx - 1];
 
-          threshold[devparms.math_decode_uart_rx - 1] =
-            (devparms.math_decode_threshold[devparms.math_decode_uart_rx - 1] +
-            devparms.chanoffset[devparms.math_decode_uart_rx - 1])
+          threshold[d_parms->math_decode_uart_rx - 1] =
+            (d_parms->math_decode_threshold[d_parms->math_decode_uart_rx - 1] +
+            d_parms->chanoffset[d_parms->math_decode_uart_rx - 1])
             * bit_per_volt;
         }
       }
     }
-    else if(devparms.math_decode_mode == DECODE_MODE_SPI)
+    else if(d_parms->math_decode_mode == DECODE_MODE_SPI)
       {
-        if(devparms.modelserie == 6)
+        if(d_parms->modelserie == 6)
         {
-          bit_per_volt = 32.0 / devparms.chanscale[devparms.math_decode_spi_clk];
+          bit_per_volt = 32.0 / d_parms->chanscale[d_parms->math_decode_spi_clk];
 
-          threshold[devparms.math_decode_spi_clk] =
-            (devparms.math_decode_threshold[2] +
-            devparms.chanoffset[devparms.math_decode_spi_clk])
+          threshold[d_parms->math_decode_spi_clk] =
+            (d_parms->math_decode_threshold[2] +
+            d_parms->chanoffset[d_parms->math_decode_spi_clk])
             * bit_per_volt;
         }
         else
         {
-          bit_per_volt = 25.0 / devparms.chanscale[devparms.math_decode_spi_clk];
+          bit_per_volt = 25.0 / d_parms->chanscale[d_parms->math_decode_spi_clk];
 
-          threshold[devparms.math_decode_spi_clk] =
-            (devparms.math_decode_threshold[devparms.math_decode_spi_clk] +
-            devparms.chanoffset[devparms.math_decode_spi_clk])
+          threshold[d_parms->math_decode_spi_clk] =
+            (d_parms->math_decode_threshold[d_parms->math_decode_spi_clk] +
+            d_parms->chanoffset[d_parms->math_decode_spi_clk])
             * bit_per_volt;
         }
 
-        if(devparms.math_decode_spi_mosi)
+        if(d_parms->math_decode_spi_mosi)
         {
-          if(devparms.modelserie == 6)
+          if(d_parms->modelserie == 6)
           {
-            bit_per_volt = 32.0 / devparms.chanscale[devparms.math_decode_spi_mosi - 1];
+            bit_per_volt = 32.0 / d_parms->chanscale[d_parms->math_decode_spi_mosi - 1];
 
-            threshold[devparms.math_decode_spi_mosi - 1] =
-              (devparms.math_decode_threshold[1] +
-              devparms.chanoffset[devparms.math_decode_spi_mosi - 1])
+            threshold[d_parms->math_decode_spi_mosi - 1] =
+              (d_parms->math_decode_threshold[1] +
+              d_parms->chanoffset[d_parms->math_decode_spi_mosi - 1])
               * bit_per_volt;
           }
           else
           {
-            bit_per_volt = 25.0 / devparms.chanscale[devparms.math_decode_spi_mosi - 1];
+            bit_per_volt = 25.0 / d_parms->chanscale[d_parms->math_decode_spi_mosi - 1];
 
-            threshold[devparms.math_decode_spi_mosi - 1] =
-              (devparms.math_decode_threshold[devparms.math_decode_spi_mosi - 1] +
-              devparms.chanoffset[devparms.math_decode_spi_mosi - 1])
+            threshold[d_parms->math_decode_spi_mosi - 1] =
+              (d_parms->math_decode_threshold[d_parms->math_decode_spi_mosi - 1] +
+              d_parms->chanoffset[d_parms->math_decode_spi_mosi - 1])
               * bit_per_volt;
           }
         }
 
-        if(devparms.math_decode_spi_miso)
+        if(d_parms->math_decode_spi_miso)
         {
-          if(devparms.modelserie == 6)
+          if(d_parms->modelserie == 6)
           {
-            bit_per_volt = 32.0 / devparms.chanscale[devparms.math_decode_spi_miso - 1];
+            bit_per_volt = 32.0 / d_parms->chanscale[d_parms->math_decode_spi_miso - 1];
 
-            threshold[devparms.math_decode_spi_miso - 1] =
-              (devparms.math_decode_threshold[0] +
-              devparms.chanoffset[devparms.math_decode_spi_miso -1])
+            threshold[d_parms->math_decode_spi_miso - 1] =
+              (d_parms->math_decode_threshold[0] +
+              d_parms->chanoffset[d_parms->math_decode_spi_miso -1])
               * bit_per_volt;
           }
           else
           {
-            bit_per_volt = 25.0 / devparms.chanscale[devparms.math_decode_spi_miso - 1];
+            bit_per_volt = 25.0 / d_parms->chanscale[d_parms->math_decode_spi_miso - 1];
 
-            threshold[devparms.math_decode_spi_miso - 1] =
-              (devparms.math_decode_threshold[devparms.math_decode_spi_miso - 1] +
-              devparms.chanoffset[devparms.math_decode_spi_miso -1])
+            threshold[d_parms->math_decode_spi_miso - 1] =
+              (d_parms->math_decode_threshold[d_parms->math_decode_spi_miso - 1] +
+              d_parms->chanoffset[d_parms->math_decode_spi_miso -1])
               * bit_per_volt;
           }
         }
 
-        if(devparms.math_decode_spi_cs)
+        if(d_parms->math_decode_spi_cs)
         {
-          if(devparms.modelserie == 6)
+          if(d_parms->modelserie == 6)
           {
-            bit_per_volt = 32.0 / devparms.chanscale[devparms.math_decode_spi_cs - 1];
+            bit_per_volt = 32.0 / d_parms->chanscale[d_parms->math_decode_spi_cs - 1];
 
-            threshold[devparms.math_decode_spi_cs - 1] =
-              (devparms.math_decode_threshold[3] +
-              devparms.chanoffset[devparms.math_decode_spi_cs - 1])
+            threshold[d_parms->math_decode_spi_cs - 1] =
+              (d_parms->math_decode_threshold[3] +
+              d_parms->chanoffset[d_parms->math_decode_spi_cs - 1])
               * bit_per_volt;
           }
           else
           {
-            bit_per_volt = 25.0 / devparms.chanscale[devparms.math_decode_spi_cs - 1];
+            bit_per_volt = 25.0 / d_parms->chanscale[d_parms->math_decode_spi_cs - 1];
 
-            threshold[devparms.math_decode_spi_cs - 1] =
-              (devparms.math_decode_threshold[devparms.math_decode_spi_cs - 1] +
-              devparms.chanoffset[devparms.math_decode_spi_cs - 1])
+            threshold[d_parms->math_decode_spi_cs - 1] =
+              (d_parms->math_decode_threshold[d_parms->math_decode_spi_cs - 1] +
+              d_parms->chanoffset[d_parms->math_decode_spi_cs - 1])
               * bit_per_volt;
           }
         }
       }
   }
 
-  if(devparms.math_decode_mode == DECODE_MODE_UART)
+  if(d_parms->math_decode_mode == DECODE_MODE_UART)
   {
-    devparms.math_decode_uart_tx_nval = 0;
+    d_parms->math_decode_uart_tx_nval = 0;
 
-    devparms.math_decode_uart_rx_nval = 0;
+    d_parms->math_decode_uart_rx_nval = 0;
 
-    if(devparms.timebasedelayenable)
+    if(d_parms->wave_mem_view_enabled)
     {
-      uart_sample_per_bit = (100.0 / devparms.timebasedelayscale) / (double)devparms.math_decode_uart_baud;
+      uart_sample_per_bit = d_parms->samplerate / (double)d_parms->math_decode_uart_baud;
     }
     else
     {
-      uart_sample_per_bit = (100.0 / devparms.timebasescale) / (double)devparms.math_decode_uart_baud;
+      if(d_parms->timebasedelayenable)
+      {
+        uart_sample_per_bit = (100.0 / d_parms->timebasedelayscale) / (double)d_parms->math_decode_uart_baud;
+      }
+      else
+      {
+        uart_sample_per_bit = (100.0 / d_parms->timebasescale) / (double)d_parms->math_decode_uart_baud;
+      }
     }
 
     if(uart_sample_per_bit < 3)  return;
@@ -282,7 +289,7 @@ void UI_Mainwindow::serial_decoder(void)
 
     uart_rx_x_pos = 1;
 
-//     if(devparms.modelserie == 6)
+//     if(d_parms->modelserie == 6)
 //     {
 //       printf("chanscale: %f\n"
 //             "chanoffset: %f\n"
@@ -291,13 +298,13 @@ void UI_Mainwindow::serial_decoder(void)
 //             "threshold: %i\n"
 //             "uart_sample_per_bit: %f\n"
 //             "wavebufsz: %i\n",
-//             devparms.chanscale[devparms.math_decode_uart_tx - 1],
-//             devparms.chanoffset[devparms.math_decode_uart_tx - 1],
-//             devparms.math_decode_threshold_uart_tx,
-//             devparms.math_decode_uart_tx,
-//             threshold[devparms.math_decode_uart_tx - 1],
+//             d_parms->chanscale[d_parms->math_decode_uart_tx - 1],
+//             d_parms->chanoffset[d_parms->math_decode_uart_tx - 1],
+//             d_parms->math_decode_threshold_uart_tx,
+//             d_parms->math_decode_uart_tx,
+//             threshold[d_parms->math_decode_uart_tx - 1],
 //             uart_sample_per_bit,
-//             devparms.wavebufsz);
+//             d_parms->wavebufsz);
 //     }
 //     else
 //     {
@@ -309,35 +316,35 @@ void UI_Mainwindow::serial_decoder(void)
 //             "threshold: %i\n"
 //             "uart_sample_per_bit: %f\n"
 //             "wavebufsz: %i\n",
-//             devparms.chanscale[devparms.math_decode_uart_tx - 1],
-//             devparms.chanoffset[devparms.math_decode_uart_tx - 1],
-//             devparms.math_decode_threshold[devparms.math_decode_uart_tx - 1],
-//             devparms.math_decode_uart_tx,
-//             threshold[devparms.math_decode_uart_tx - 1],
+//             d_parms->chanscale[d_parms->math_decode_uart_tx - 1],
+//             d_parms->chanoffset[d_parms->math_decode_uart_tx - 1],
+//             d_parms->math_decode_threshold[d_parms->math_decode_uart_tx - 1],
+//             d_parms->math_decode_uart_tx,
+//             threshold[d_parms->math_decode_uart_tx - 1],
 //             uart_sample_per_bit,
-//             devparms.wavebufsz);
+//             d_parms->wavebufsz);
 //     }
 
-    if(devparms.math_decode_uart_tx)
+    if(d_parms->math_decode_uart_tx)
     {
-      if(devparms.chandisplay[devparms.math_decode_uart_tx - 1])  // don't try to decode if channel isn't enabled...
+      if(d_parms->chandisplay[d_parms->math_decode_uart_tx - 1])  // don't try to decode if channel isn't enabled...
       {
-        for(i=1; i<devparms.wavebufsz; i++)
+        for(i=1; i<d_parms->wavebufsz; i++)
         {
-          if(devparms.math_decode_uart_tx_nval >= DECODE_MAX_CHARS)
+          if(d_parms->math_decode_uart_tx_nval >= DECODE_MAX_CHARS)
           {
             break;
           }
 
           if(!uart_tx_start)
           {
-            if(devparms.math_decode_uart_pol)  // positive, line level RS-232
+            if(d_parms->math_decode_uart_pol)  // positive, line level RS-232
             {
-              if(devparms.modelserie == 6)
+              if(d_parms->modelserie == 6)
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i-1] >= devparms.math_decode_threshold_uart_tx)
+                if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i-1] >= d_parms->math_decode_threshold_uart_tx)
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] < devparms.math_decode_threshold_uart_tx)
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] < d_parms->math_decode_threshold_uart_tx)
                   {
                     uart_tx_start = 1;
 
@@ -351,9 +358,9 @@ void UI_Mainwindow::serial_decoder(void)
               }
               else  // modelserie = 1, 2 or 4
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i-1] >= threshold[devparms.math_decode_uart_tx - 1])
+                if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i-1] >= threshold[d_parms->math_decode_uart_tx - 1])
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] < threshold[devparms.math_decode_uart_tx - 1])
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] < threshold[d_parms->math_decode_uart_tx - 1])
                   {
                     uart_tx_start = 1;
 
@@ -368,11 +375,11 @@ void UI_Mainwindow::serial_decoder(void)
             }
             else  // negative, cpu level TTL/CMOS
             {
-              if(devparms.modelserie == 6)
+              if(d_parms->modelserie == 6)
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i-1] < devparms.math_decode_threshold_uart_tx)
+                if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i-1] < d_parms->math_decode_threshold_uart_tx)
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= devparms.math_decode_threshold_uart_tx)
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] >= d_parms->math_decode_threshold_uart_tx)
                   {
                     uart_tx_start = 1;
 
@@ -386,9 +393,9 @@ void UI_Mainwindow::serial_decoder(void)
               }
               else  // modelserie = 1, 2 or 4
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i-1] < threshold[devparms.math_decode_uart_tx - 1])
+                if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i-1] < threshold[d_parms->math_decode_uart_tx - 1])
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= threshold[devparms.math_decode_uart_tx - 1])
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] >= threshold[d_parms->math_decode_uart_tx - 1])
                   {
                     uart_tx_start = 1;
 
@@ -404,61 +411,61 @@ void UI_Mainwindow::serial_decoder(void)
           }
           else  // uart_rx_start != 0
           {
-            if(devparms.modelserie == 6)
+            if(d_parms->modelserie == 6)
             {
-              if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= devparms.math_decode_threshold_uart_tx)
+              if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] >= d_parms->math_decode_threshold_uart_tx)
               {
                uart_val += (1 << uart_tx_data_bit);
               }
             }
             else  // modelserie = 1, 2 or 4
             {
-              if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= threshold[devparms.math_decode_uart_tx - 1])
+              if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] >= threshold[d_parms->math_decode_uart_tx - 1])
               {
                uart_val += (1 << uart_tx_data_bit);
               }
             }
 
-            if(++uart_tx_data_bit == devparms.math_decode_uart_width)
+            if(++uart_tx_data_bit == d_parms->math_decode_uart_width)
             {
-              if((devparms.math_decode_uart_end) && (devparms.math_decode_format != 4))  // big endian?
+              if((d_parms->math_decode_uart_end) && (d_parms->math_decode_format != 4))  // big endian?
               {
                uart_val = reverse_bitorder_8(uart_val);
 
                uart_val >>= (8 - uart_tx_data_bit);
               }
 
-              if(!devparms.math_decode_uart_pol)  // positive, line level RS-232 or negative, cpu level TTL/CMOS?
+              if(!d_parms->math_decode_uart_pol)  // positive, line level RS-232 or negative, cpu level TTL/CMOS?
               {
                uart_val = ~uart_val;
 
                uart_val &= (0xff >> (8 - uart_tx_data_bit));
               }
 
-              devparms.math_decode_uart_tx_val[devparms.math_decode_uart_tx_nval] = uart_val;
+              d_parms->math_decode_uart_tx_val[d_parms->math_decode_uart_tx_nval] = uart_val;
 
-              devparms.math_decode_uart_tx_val_pos[devparms.math_decode_uart_tx_nval] =
+              d_parms->math_decode_uart_tx_val_pos[d_parms->math_decode_uart_tx_nval] =
                i - (uart_tx_data_bit * uart_sample_per_bit) + (0.5 * uart_sample_per_bit);
 
               uart_tx_data_bit = 0;
 
               uart_tx_start = 0;
 
-              devparms.math_decode_uart_tx_err[devparms.math_decode_uart_tx_nval] = 0;
+              d_parms->math_decode_uart_tx_err[d_parms->math_decode_uart_tx_nval] = 0;
 
-              if(devparms.math_decode_uart_par)
+              if(d_parms->math_decode_uart_par)
               {
                 uart_tx_x_pos += uart_sample_per_bit;
 
                 i = uart_tx_x_pos;
 
-                if(i < devparms.wavebufsz)
+                if(i < d_parms->wavebufsz)
                 {
-                  if(devparms.modelserie == 6)
+                  if(d_parms->modelserie == 6)
                   {
-                    if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= devparms.math_decode_threshold_uart_tx)
+                    if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] >= d_parms->math_decode_threshold_uart_tx)
                     {
-                      if(devparms.math_decode_uart_pol)
+                      if(d_parms->math_decode_uart_pol)
                       {
                         uart_parity_bit = 1;
                       }
@@ -469,7 +476,7 @@ void UI_Mainwindow::serial_decoder(void)
                     }
                     else
                     {
-                      if(devparms.math_decode_uart_pol)
+                      if(d_parms->math_decode_uart_pol)
                       {
                         uart_parity_bit = 0;
                       }
@@ -481,9 +488,9 @@ void UI_Mainwindow::serial_decoder(void)
                   }
                   else
                   {
-                    if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= threshold[devparms.math_decode_uart_tx - 1])
+                    if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] >= threshold[d_parms->math_decode_uart_tx - 1])
                     {
-                      if(devparms.math_decode_uart_pol)
+                      if(d_parms->math_decode_uart_pol)
                       {
                         uart_parity_bit = 1;
                       }
@@ -494,7 +501,7 @@ void UI_Mainwindow::serial_decoder(void)
                     }
                     else
                     {
-                      if(devparms.math_decode_uart_pol)
+                      if(d_parms->math_decode_uart_pol)
                       {
                         uart_parity_bit = 0;
                       }
@@ -505,19 +512,19 @@ void UI_Mainwindow::serial_decoder(void)
                     }
                   }
 
-                  for(j=0, uart_parity=0; j<devparms.math_decode_uart_width; j++)
+                  for(j=0, uart_parity=0; j<d_parms->math_decode_uart_width; j++)
                   {
                     uart_parity += ((uart_val >> j) & 1);
                   }
 
-                  if(devparms.math_decode_uart_par & 1)
+                  if(d_parms->math_decode_uart_par & 1)
                   {
                     uart_parity++;
                   }
 
                   if((uart_parity & 1) != uart_parity_bit)
                   {
-                    devparms.math_decode_uart_tx_err[devparms.math_decode_uart_tx_nval] = 1;
+                    d_parms->math_decode_uart_tx_err[d_parms->math_decode_uart_tx_nval] = 1;
                   }
                 }
               }
@@ -528,24 +535,24 @@ void UI_Mainwindow::serial_decoder(void)
 
               stop_bit_error = 0;  // check stop bit
 
-              if(i < devparms.wavebufsz)
+              if(i < d_parms->wavebufsz)
               {
-                if(devparms.modelserie == 6)
+                if(d_parms->modelserie == 6)
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= devparms.math_decode_threshold_uart_tx)
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] >= d_parms->math_decode_threshold_uart_tx)
                   {
                     stop_bit_error = 1;
                   }
                 }
                 else  // modelserie = 1, 2 or 4
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_tx - 1][i] >= threshold[devparms.math_decode_uart_tx - 1])
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_tx - 1][i] >= threshold[d_parms->math_decode_uart_tx - 1])
                   {
                     stop_bit_error = 1;
                   }
                 }
 
-                if(devparms.math_decode_uart_pol)
+                if(d_parms->math_decode_uart_pol)
                 {
                   if(stop_bit_error)
                   {
@@ -559,22 +566,22 @@ void UI_Mainwindow::serial_decoder(void)
 
                 if(stop_bit_error)
                 {
-                  devparms.math_decode_uart_tx_err[devparms.math_decode_uart_tx_nval] = 1;
+                  d_parms->math_decode_uart_tx_err[d_parms->math_decode_uart_tx_nval] = 1;
                 }
               }
 
-              if(devparms.math_decode_uart_stop == 1)
+              if(d_parms->math_decode_uart_stop == 1)
               {
                 uart_tx_x_pos += uart_sample_per_bit / 2;
               }
-              else if(devparms.math_decode_uart_stop == 2)
+              else if(d_parms->math_decode_uart_stop == 2)
                 {
                   uart_tx_x_pos += uart_sample_per_bit;
                 }
 
               i = uart_tx_x_pos - 1;
 
-              devparms.math_decode_uart_tx_nval++;
+              d_parms->math_decode_uart_tx_nval++;
             }
             else
             {
@@ -587,26 +594,26 @@ void UI_Mainwindow::serial_decoder(void)
       }
     }
 
-    if(devparms.math_decode_uart_rx)
+    if(d_parms->math_decode_uart_rx)
     {
-      if(devparms.chandisplay[devparms.math_decode_uart_rx - 1])  // don't try to decode if channel isn't enabled...
+      if(d_parms->chandisplay[d_parms->math_decode_uart_rx - 1])  // don't try to decode if channel isn't enabled...
       {
-        for(i=1; i<devparms.wavebufsz; i++)
+        for(i=1; i<d_parms->wavebufsz; i++)
         {
-          if(devparms.math_decode_uart_rx_nval >= DECODE_MAX_CHARS)
+          if(d_parms->math_decode_uart_rx_nval >= DECODE_MAX_CHARS)
           {
             break;
           }
 
           if(!uart_rx_start)
           {
-            if(devparms.math_decode_uart_pol)  // positive, line level RS-232
+            if(d_parms->math_decode_uart_pol)  // positive, line level RS-232
             {
-              if(devparms.modelserie == 6)
+              if(d_parms->modelserie == 6)
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i-1] >= devparms.math_decode_threshold_uart_rx)
+                if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i-1] >= d_parms->math_decode_threshold_uart_rx)
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] < devparms.math_decode_threshold_uart_rx)
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] < d_parms->math_decode_threshold_uart_rx)
                   {
                     uart_rx_start = 1;
 
@@ -620,9 +627,9 @@ void UI_Mainwindow::serial_decoder(void)
               }
               else  // modelserie = 1, 2 or 4
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i-1] >= threshold[devparms.math_decode_uart_rx - 1])
+                if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i-1] >= threshold[d_parms->math_decode_uart_rx - 1])
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] < threshold[devparms.math_decode_uart_rx - 1])
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] < threshold[d_parms->math_decode_uart_rx - 1])
                   {
                     uart_rx_start = 1;
 
@@ -637,11 +644,11 @@ void UI_Mainwindow::serial_decoder(void)
             }
             else  // negative, cpu level TTL/CMOS
             {
-              if(devparms.modelserie == 6)
+              if(d_parms->modelserie == 6)
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i-1] < devparms.math_decode_threshold_uart_rx)
+                if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i-1] < d_parms->math_decode_threshold_uart_rx)
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= devparms.math_decode_threshold_uart_rx)
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] >= d_parms->math_decode_threshold_uart_rx)
                   {
                     uart_rx_start = 1;
 
@@ -655,9 +662,9 @@ void UI_Mainwindow::serial_decoder(void)
               }
               else  // modelserie = 1, 2 or 4
               {
-                if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i-1] < threshold[devparms.math_decode_uart_rx - 1])
+                if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i-1] < threshold[d_parms->math_decode_uart_rx - 1])
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= threshold[devparms.math_decode_uart_rx - 1])
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] >= threshold[d_parms->math_decode_uart_rx - 1])
                   {
                     uart_rx_start = 1;
 
@@ -673,61 +680,61 @@ void UI_Mainwindow::serial_decoder(void)
           }
           else  // uart_rx_start != 0
           {
-            if(devparms.modelserie == 6)
+            if(d_parms->modelserie == 6)
             {
-              if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= devparms.math_decode_threshold_uart_rx)
+              if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] >= d_parms->math_decode_threshold_uart_rx)
               {
                uart_val += (1 << uart_rx_data_bit);
               }
             }
             else  // modelserie = 1, 2 or 4
             {
-              if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= threshold[devparms.math_decode_uart_rx - 1])
+              if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] >= threshold[d_parms->math_decode_uart_rx - 1])
               {
                uart_val += (1 << uart_rx_data_bit);
               }
             }
 
-            if(++uart_rx_data_bit == devparms.math_decode_uart_width)
+            if(++uart_rx_data_bit == d_parms->math_decode_uart_width)
             {
-              if((devparms.math_decode_uart_end) && (devparms.math_decode_format != 4))  // big endian?
+              if((d_parms->math_decode_uart_end) && (d_parms->math_decode_format != 4))  // big endian?
               {
                uart_val = reverse_bitorder_8(uart_val);
 
                uart_val >>= (8 - uart_rx_data_bit);
               }
 
-              if(!devparms.math_decode_uart_pol)  // positive, line level RS-232 or negative, cpu level TTL/CMOS?
+              if(!d_parms->math_decode_uart_pol)  // positive, line level RS-232 or negative, cpu level TTL/CMOS?
               {
                uart_val = ~uart_val;
 
                uart_val &= (0xff >> (8 - uart_rx_data_bit));
               }
 
-              devparms.math_decode_uart_rx_val[devparms.math_decode_uart_rx_nval] = uart_val;
+              d_parms->math_decode_uart_rx_val[d_parms->math_decode_uart_rx_nval] = uart_val;
 
-              devparms.math_decode_uart_rx_val_pos[devparms.math_decode_uart_rx_nval] =
+              d_parms->math_decode_uart_rx_val_pos[d_parms->math_decode_uart_rx_nval] =
                i - (uart_rx_data_bit * uart_sample_per_bit) + (0.5 * uart_sample_per_bit);
 
               uart_rx_data_bit = 0;
 
               uart_rx_start = 0;
 
-              devparms.math_decode_uart_rx_err[devparms.math_decode_uart_rx_nval] = 0;
+              d_parms->math_decode_uart_rx_err[d_parms->math_decode_uart_rx_nval] = 0;
 
-              if(devparms.math_decode_uart_par)
+              if(d_parms->math_decode_uart_par)
               {
                 uart_rx_x_pos += uart_sample_per_bit;
 
                 i = uart_rx_x_pos;
 
-                if(i < devparms.wavebufsz)
+                if(i < d_parms->wavebufsz)
                 {
-                  if(devparms.modelserie == 6)
+                  if(d_parms->modelserie == 6)
                   {
-                    if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= devparms.math_decode_threshold_uart_rx)
+                    if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] >= d_parms->math_decode_threshold_uart_rx)
                     {
-                      if(devparms.math_decode_uart_pol)
+                      if(d_parms->math_decode_uart_pol)
                       {
                         uart_parity_bit = 1;
                       }
@@ -738,7 +745,7 @@ void UI_Mainwindow::serial_decoder(void)
                     }
                     else
                     {
-                      if(devparms.math_decode_uart_pol)
+                      if(d_parms->math_decode_uart_pol)
                       {
                         uart_parity_bit = 0;
                       }
@@ -750,9 +757,9 @@ void UI_Mainwindow::serial_decoder(void)
                   }
                   else
                   {
-                    if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= threshold[devparms.math_decode_uart_rx - 1])
+                    if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] >= threshold[d_parms->math_decode_uart_rx - 1])
                     {
-                      if(devparms.math_decode_uart_pol)
+                      if(d_parms->math_decode_uart_pol)
                       {
                         uart_parity_bit = 1;
                       }
@@ -763,7 +770,7 @@ void UI_Mainwindow::serial_decoder(void)
                     }
                     else
                     {
-                      if(devparms.math_decode_uart_pol)
+                      if(d_parms->math_decode_uart_pol)
                       {
                         uart_parity_bit = 0;
                       }
@@ -774,19 +781,19 @@ void UI_Mainwindow::serial_decoder(void)
                     }
                   }
 
-                  for(j=0, uart_parity=0; j<devparms.math_decode_uart_width; j++)
+                  for(j=0, uart_parity=0; j<d_parms->math_decode_uart_width; j++)
                   {
                     uart_parity += ((uart_val >> j) & 1);
                   }
 
-                  if(devparms.math_decode_uart_par & 1)
+                  if(d_parms->math_decode_uart_par & 1)
                   {
                     uart_parity++;
                   }
 
                   if((uart_parity & 1) != uart_parity_bit)
                   {
-                    devparms.math_decode_uart_rx_err[devparms.math_decode_uart_rx_nval] = 1;
+                    d_parms->math_decode_uart_rx_err[d_parms->math_decode_uart_rx_nval] = 1;
                   }
                 }
               }
@@ -797,24 +804,24 @@ void UI_Mainwindow::serial_decoder(void)
 
               stop_bit_error = 0;  // check stop bit
 
-              if(i < devparms.wavebufsz)
+              if(i < d_parms->wavebufsz)
               {
-                if(devparms.modelserie == 6)
+                if(d_parms->modelserie == 6)
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= devparms.math_decode_threshold_uart_rx)
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] >= d_parms->math_decode_threshold_uart_rx)
                   {
                     stop_bit_error = 1;
                   }
                 }
                 else  // modelserie = 1, 2 or 4
                 {
-                  if(devparms.wavebuf[devparms.math_decode_uart_rx - 1][i] >= threshold[devparms.math_decode_uart_rx - 1])
+                  if(d_parms->wavebuf[d_parms->math_decode_uart_rx - 1][i] >= threshold[d_parms->math_decode_uart_rx - 1])
                   {
                     stop_bit_error = 1;
                   }
                 }
 
-                if(devparms.math_decode_uart_pol)
+                if(d_parms->math_decode_uart_pol)
                 {
                   if(stop_bit_error)
                   {
@@ -828,22 +835,22 @@ void UI_Mainwindow::serial_decoder(void)
 
                 if(stop_bit_error)
                 {
-                  devparms.math_decode_uart_rx_err[devparms.math_decode_uart_rx_nval] = 1;
+                  d_parms->math_decode_uart_rx_err[d_parms->math_decode_uart_rx_nval] = 1;
                 }
               }
 
-              if(devparms.math_decode_uart_stop == 1)
+              if(d_parms->math_decode_uart_stop == 1)
               {
                 uart_rx_x_pos += uart_sample_per_bit / 2;
               }
-              else if(devparms.math_decode_uart_stop == 2)
+              else if(d_parms->math_decode_uart_stop == 2)
                 {
                   uart_rx_x_pos += uart_sample_per_bit;
                 }
 
               i = uart_rx_x_pos - 1;
 
-              devparms.math_decode_uart_rx_nval++;
+              d_parms->math_decode_uart_rx_nval++;
             }
             else
             {
@@ -857,11 +864,11 @@ void UI_Mainwindow::serial_decoder(void)
     }
   }
 
-  if(devparms.math_decode_mode == DECODE_MODE_SPI)
+  if(d_parms->math_decode_mode == DECODE_MODE_SPI)
   {
-    devparms.math_decode_spi_mosi_nval = 0;
+    d_parms->math_decode_spi_mosi_nval = 0;
 
-    devparms.math_decode_spi_miso_nval = 0;
+    d_parms->math_decode_spi_miso_nval = 0;
 
     spi_data_mosi_bit = 0;
 
@@ -873,15 +880,15 @@ void UI_Mainwindow::serial_decoder(void)
 
     spi_timeout_cntr = 0;
 
-    if(devparms.math_decode_spi_width > 24)
+    if(d_parms->math_decode_spi_width > 24)
     {
       spi_chars = 4;
     }
-    else if(devparms.math_decode_spi_width > 16)
+    else if(d_parms->math_decode_spi_width > 16)
       {
         spi_chars = 3;
       }
-      else if(devparms.math_decode_spi_width > 8)
+      else if(d_parms->math_decode_spi_width > 8)
         {
           spi_chars = 2;
         }
@@ -890,7 +897,7 @@ void UI_Mainwindow::serial_decoder(void)
           spi_chars = 1;
         }
 
-    if(devparms.math_decode_spi_edge)  // sample at rising edge of spi clock?
+    if(d_parms->math_decode_spi_edge)  // sample at rising edge of spi clock?
     {
       spi_clk_old = 1;
     }
@@ -899,16 +906,16 @@ void UI_Mainwindow::serial_decoder(void)
       spi_clk_old = 0;
     }
 
-    if(!devparms.chandisplay[devparms.math_decode_spi_clk])  // without a clock we can't do much...
+    if(!d_parms->chandisplay[d_parms->math_decode_spi_clk])  // without a clock we can't do much...
     {
       goto SPI_DECODE_OUT;
     }
 
-    if(devparms.math_decode_spi_mode)  // use chip select line?
+    if(d_parms->math_decode_spi_mode)  // use chip select line?
     {
-      if(devparms.math_decode_spi_cs)  // is chip select channel selected?
+      if(d_parms->math_decode_spi_cs)  // is chip select channel selected?
       {
-        if(!devparms.chandisplay[devparms.math_decode_spi_cs])  // is selected channel for CS enabled?
+        if(!d_parms->chandisplay[d_parms->math_decode_spi_cs])  // is selected channel for CS enabled?
         {
           goto SPI_DECODE_OUT;
         }
@@ -920,28 +927,28 @@ void UI_Mainwindow::serial_decoder(void)
     }
     else  // use timeout to detect start of frame
     {
-      if(devparms.timebasedelayenable)
+      if(d_parms->timebasedelayenable)
       {
-        spi_timeout = devparms.math_decode_spi_timeout / (devparms.timebasedelayscale / 100.0);
+        spi_timeout = d_parms->math_decode_spi_timeout / (d_parms->timebasedelayscale / 100.0);
       }
       else
       {
-        spi_timeout = devparms.math_decode_spi_timeout / (devparms.timebasescale / 100.0);
+        spi_timeout = d_parms->math_decode_spi_timeout / (d_parms->timebasescale / 100.0);
       }
     }
 
-    for(i=0; i<devparms.wavebufsz; i++)
+    for(i=0; i<d_parms->wavebufsz; i++)
     {
-      if(devparms.math_decode_spi_mosi_nval >= DECODE_MAX_CHARS)
+      if(d_parms->math_decode_spi_mosi_nval >= DECODE_MAX_CHARS)
       {
         break;
       }
 
-      if(devparms.math_decode_spi_mode)  // use chip select line?
+      if(d_parms->math_decode_spi_mode)  // use chip select line?
       {
-        if(devparms.math_decode_spi_select)  // use positive chip select?
+        if(d_parms->math_decode_spi_select)  // use positive chip select?
         {
-          if(devparms.wavebuf[devparms.math_decode_spi_cs - 1][i] < threshold[devparms.math_decode_spi_cs - 1])
+          if(d_parms->wavebuf[d_parms->math_decode_spi_cs - 1][i] < threshold[d_parms->math_decode_spi_cs - 1])
           {
             spi_data_mosi_bit = 0;
 
@@ -956,7 +963,7 @@ void UI_Mainwindow::serial_decoder(void)
         }
         else  // use negative chip select?
         {
-          if(devparms.wavebuf[devparms.math_decode_spi_cs - 1][1] >= threshold[devparms.math_decode_spi_cs - 1])
+          if(d_parms->wavebuf[d_parms->math_decode_spi_cs - 1][1] >= threshold[d_parms->math_decode_spi_cs - 1])
           {
             spi_data_mosi_bit = 0;
 
@@ -988,7 +995,7 @@ void UI_Mainwindow::serial_decoder(void)
         }
       }
 
-      if(devparms.wavebuf[devparms.math_decode_spi_clk][i] >= threshold[devparms.math_decode_spi_clk])
+      if(d_parms->wavebuf[d_parms->math_decode_spi_clk][i] >= threshold[d_parms->math_decode_spi_clk])
       {
         spi_clk_new = 1;
       }
@@ -1002,7 +1009,7 @@ void UI_Mainwindow::serial_decoder(void)
         continue;  // no clock change
       }
 
-      if(devparms.math_decode_spi_edge != spi_clk_new)  // wrong clock edge?
+      if(d_parms->math_decode_spi_edge != spi_clk_new)  // wrong clock edge?
       {
         spi_clk_old = spi_clk_new;
 
@@ -1013,27 +1020,27 @@ void UI_Mainwindow::serial_decoder(void)
 
       spi_clk_old = spi_clk_new;
 
-      if(devparms.math_decode_spi_mosi)
+      if(d_parms->math_decode_spi_mosi)
       {
-        if(devparms.chandisplay[devparms.math_decode_spi_mosi - 1])  // don't try to decode if channel isn't enabled...
+        if(d_parms->chandisplay[d_parms->math_decode_spi_mosi - 1])  // don't try to decode if channel isn't enabled...
         {
-          if(devparms.wavebuf[devparms.math_decode_spi_mosi - 1][i] >= threshold[devparms.math_decode_spi_mosi - 1])
+          if(d_parms->wavebuf[d_parms->math_decode_spi_mosi - 1][i] >= threshold[d_parms->math_decode_spi_mosi - 1])
           {
             spi_mosi_val += (1 << spi_data_mosi_bit);
           }
 
           if(!spi_data_mosi_bit)  spi_mosi_bit0_pos = i;
 
-          if(++spi_data_mosi_bit == devparms.math_decode_spi_width)
+          if(++spi_data_mosi_bit == d_parms->math_decode_spi_width)
           {
-            if((devparms.math_decode_spi_end) && (devparms.math_decode_format != 4))  // big endian?
+            if((d_parms->math_decode_spi_end) && (d_parms->math_decode_format != 4))  // big endian?
             {
               spi_mosi_val = reverse_bitorder_32(spi_mosi_val);
 
               spi_mosi_val >>= (32 - spi_data_mosi_bit);
             }
 
-            if(!devparms.math_decode_spi_pol)
+            if(!d_parms->math_decode_spi_pol)
             {
               spi_mosi_val = ~spi_mosi_val;
 
@@ -1048,11 +1055,11 @@ void UI_Mainwindow::serial_decoder(void)
               }
             }
 
-            devparms.math_decode_spi_mosi_val[devparms.math_decode_spi_mosi_nval] = spi_mosi_val;
+            d_parms->math_decode_spi_mosi_val[d_parms->math_decode_spi_mosi_nval] = spi_mosi_val;
 
-            devparms.math_decode_spi_mosi_val_pos[devparms.math_decode_spi_mosi_nval] = spi_mosi_bit0_pos;
+            d_parms->math_decode_spi_mosi_val_pos[d_parms->math_decode_spi_mosi_nval] = spi_mosi_bit0_pos;
 
-            devparms.math_decode_spi_mosi_val_pos_end[devparms.math_decode_spi_mosi_nval++] = i;
+            d_parms->math_decode_spi_mosi_val_pos_end[d_parms->math_decode_spi_mosi_nval++] = i;
 
             spi_data_mosi_bit = 0;
 
@@ -1061,36 +1068,36 @@ void UI_Mainwindow::serial_decoder(void)
         }
       }
 
-      if(devparms.math_decode_spi_miso)
+      if(d_parms->math_decode_spi_miso)
       {
-        if(devparms.chandisplay[devparms.math_decode_spi_miso - 1])  // don't try to decode if channel isn't enabled...
+        if(d_parms->chandisplay[d_parms->math_decode_spi_miso - 1])  // don't try to decode if channel isn't enabled...
         {
-          if(devparms.wavebuf[devparms.math_decode_spi_miso - 1][i] >= threshold[devparms.math_decode_spi_miso - 1])
+          if(d_parms->wavebuf[d_parms->math_decode_spi_miso - 1][i] >= threshold[d_parms->math_decode_spi_miso - 1])
           {
             spi_miso_val += (1 << spi_data_miso_bit);
           }
 
           if(!spi_data_miso_bit)  spi_miso_bit0_pos = i;
 
-          if(++spi_data_miso_bit == devparms.math_decode_spi_width)
+          if(++spi_data_miso_bit == d_parms->math_decode_spi_width)
           {
-            if((devparms.math_decode_spi_end) && (devparms.math_decode_format != 4))  // big endian?
+            if((d_parms->math_decode_spi_end) && (d_parms->math_decode_format != 4))  // big endian?
             {
               spi_miso_val = reverse_bitorder_32(spi_miso_val);
 
               spi_miso_val >>= (32 - spi_data_miso_bit);
             }
 
-            if(!devparms.math_decode_spi_pol)
+            if(!d_parms->math_decode_spi_pol)
             {
              spi_miso_val = ~spi_miso_val;
             }
 
-            devparms.math_decode_spi_miso_val[devparms.math_decode_spi_miso_nval] = spi_miso_val;
+            d_parms->math_decode_spi_miso_val[d_parms->math_decode_spi_miso_nval] = spi_miso_val;
 
-            devparms.math_decode_spi_miso_val_pos[devparms.math_decode_spi_miso_nval] = spi_miso_bit0_pos;
+            d_parms->math_decode_spi_miso_val_pos[d_parms->math_decode_spi_miso_nval] = spi_miso_bit0_pos;
 
-            devparms.math_decode_spi_miso_val_pos_end[devparms.math_decode_spi_miso_nval++] = i;
+            d_parms->math_decode_spi_miso_val_pos_end[d_parms->math_decode_spi_miso_nval++] = i;
 
             spi_data_miso_bit = 0;
 

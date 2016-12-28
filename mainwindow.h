@@ -114,6 +114,8 @@ public:
 
   void set_cue_cmd(const char *);
 
+  void serial_decoder(struct device_settings *);
+
   struct device_settings devparms;
 
   QLabel       *statusLabel;
@@ -238,7 +240,6 @@ private:
   int get_metric_factor(double);
   void get_device_model(const char *);
   double get_stepsize_divide_by_1000(double);
-  void serial_decoder(void);
   inline unsigned char reverse_bitorder_8(unsigned char);
   inline unsigned int reverse_bitorder_32(unsigned int);
   void save_memory_waveform(int);
