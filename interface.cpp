@@ -1869,7 +1869,8 @@ void UI_Mainwindow::show_howto_operate()
     "Decrease vertical scale: +\n"
     "Press '1' to select or deselect channel 1\n"
     "Press '2' to select or deselect channel 2, etc.\n"
-    "Press 'c' to center the horizontal position (set timebase offset to zero).\n"
+    "Press 'c' to center the horizontal position.\n"
+    "Press 't' to center the trigger position.\n"
     "Press 'f' to toggle FFT.\n"
     );
 

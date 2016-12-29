@@ -67,11 +67,6 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
 
   devparms->viewer_center_position = 0;
 
-  devparms->math_decode_uart_tx_nval = 0;
-  devparms->math_decode_uart_rx_nval = 0;
-  devparms->math_decode_spi_mosi_nval = 0;
-  devparms->math_decode_spi_miso_nval = 0;
-
   devparms->wave_mem_view_enabled = 1;
 
   if(devparms->math_decode_display)
@@ -109,8 +104,13 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
   connect(shift_page_left_act, SIGNAL(triggered()), this, SLOT(shift_page_left()));
   addAction(shift_page_left_act);
 
+  center_position_act = new QAction(this);
+  center_position_act->setShortcut(QKeySequence("c"));
+  connect(center_position_act, SIGNAL(triggered()), this, SLOT(center_position()));
+  addAction(center_position_act);
+
   center_trigger_act = new QAction(this);
-  center_trigger_act->setShortcut(QKeySequence("c"));
+  center_trigger_act->setShortcut(QKeySequence("t"));
   connect(center_trigger_act, SIGNAL(triggered()), this, SLOT(center_trigger()));
   addAction(center_trigger_act);
 
@@ -247,9 +247,33 @@ void UI_wave_window::shift_page_right()
 }
 
 
-void UI_wave_window::center_trigger()
+void UI_wave_window::center_position()
 {
   devparms->viewer_center_position = 0;
+
+  set_wavslider();
+
+  wavcurve->update();
+}
+
+
+void UI_wave_window::center_trigger()
+{
+  devparms->viewer_center_position = -devparms->timebaseoffset;
+
+  if(devparms->viewer_center_position <= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / -2))
+  {
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / -2;
+  }
+
+  if(devparms->viewer_center_position >= ((((double)devparms->acquirememdepth / devparms->samplerate) -
+                                  (devparms->timebasescale * devparms->hordivisions)) / 2))
+  {
+    devparms->viewer_center_position = (((double)devparms->acquirememdepth / devparms->samplerate) -
+                                (devparms->timebasescale * devparms->hordivisions)) / 2;
+  }
 
   set_wavslider();
 

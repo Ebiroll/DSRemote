@@ -81,7 +81,8 @@ Increase vertical scale: -
 Decrease vertical scale: +
 Press '1' to select or deselect channel 1.
 Press '2' to select or deselect channel 2, etc.
-Press 'c' to center the horizontal position (set timebase offset to zero).
+Press 'c' to center the horizontal position.
+Press 't' to center the trigger position
 Press 'f' to toggle FFT.
 
 

@@ -435,8 +435,13 @@ UI_Mainwindow::UI_Mainwindow()
   connect(shift_page_left_act, SIGNAL(triggered()), this, SLOT(shift_page_left()));
   addAction(shift_page_left_act);
 
+  center_position_act = new QAction(this);
+  center_position_act->setShortcut(QKeySequence("c"));
+  connect(center_position_act, SIGNAL(triggered()), this, SLOT(center_trigger()));
+  addAction(center_position_act);
+
   center_trigger_act = new QAction(this);
-  center_trigger_act->setShortcut(QKeySequence("c"));
+  center_trigger_act->setShortcut(QKeySequence("t"));
   connect(center_trigger_act, SIGNAL(triggered()), this, SLOT(center_trigger()));
   addAction(center_trigger_act);
 
