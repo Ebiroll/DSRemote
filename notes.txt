@@ -1,4 +1,12 @@
 
+DSRemote 0.33
+-------------
+
+Added partial support for serial decoding.
+Started to implement the Wave Inspector.
+
+
+
 DSRemote 0.32
 -------------
 
@@ -27,9 +35,8 @@ Some settings are checked regularly and will always be synchronized:
 
 There are some peculiarities when testing with the DS6104 and the DS1054Z:
 
-
 DS6104: (software version 00.02.00.SP5, hardware version 1.8)
-======
+=======
 
 USB connection: full speed (12MBit)
 Reading screen data is pretty fast, 20 waveforms per second is easily possible.
@@ -38,7 +45,7 @@ You need to add an udev rule. See readme_usbtmc_driver.txt for how to do that.
 
 
 DS1054Z: (softversion 00.04.04.SP1, boardversion 0.1.1)
-=======
+========
 
 USB connection: high speed (480 Mbit)
 Reading screen data is slow, maximum 4 waveforms per second with one channel.
@@ -48,16 +55,20 @@ It's plug and play, no need to add an udev rule.
 
 
 How to operate:
-==============
+---------------
 
-Use the mousewheel to change the dials. In order to simulate a push on a dial,click on it with the right mouse button.
+Use the mousewheel to change the dials. In order to simulate a push on a dial,
+click on it with the right mouse button.
 To toggle the delayed timebase, right-click on the timebase dial.
 To set the horizontal position to zero, right-click on the horizontal position dial.
 To set the vertical offset to zero, right-click on the vertical position dial.
 
-In addition of using the dials to change the scale and offset of the traces and the trigger position,you can use the mouse to drag the colored arrows aside of the plot.
+In addition of using the dials to change the scale and offset of the traces and
+the trigger position,you can use the mouse to drag the colored arrows aside of the plot.
 
 Keyboard shortcuts:
+-------------------
+
 PageUp: move traces 12 (or 14) divisions to the right.
 PageDn: move traces 12 (or 14) divisions to the left.
 Arrow left: move traces 1 division to the right.
@@ -68,6 +79,10 @@ Zoom In (decrease timebase): Ctl+
 Zoom Out (increase timebase): Ctl-
 Increase vertical scale: -
 Decrease vertical scale: +
+Press '1' to select or deselect channel 1.
+Press '2' to select or deselect channel 2, etc.
+Press 'c' to center the horizontal position (set timebase offset to zero).
+Press 'f' to toggle FFT.
 
 
 What's implemented so far:
@@ -78,7 +93,6 @@ What's implemented so far:
 - horizontal timebase delay on/off
 - horizontal vernier
 
-
 - vertical sensitivity
 - vertical offset
 - vertical bandwith limit
@@ -86,7 +100,6 @@ What's implemented so far:
 - vertical display channel on/off
 - vertical vernier
 - vertical invert
-
 
 - basic trigger settings like:
 - run/stop, single, auto
@@ -97,9 +110,7 @@ What's implemented so far:
 - trigger level 50% (DS6000 series only)
 - trigger force
 
-
 - measure hardware frequency counter
-
 
 - display clear
 - display grid
@@ -107,13 +118,11 @@ What's implemented so far:
 - display vectors
 - display dots
 
-
 - acquire normal
 - acquire average
 - acquire peak detect
 - acquire high resolution
 - acquire memory depth
-
 
 - save screenshot
 - save display data
@@ -129,6 +138,17 @@ What's implemented so far:
   Due to a bug in the firmware of the scope, the parameters "Center" and "Hz/Div" are not updated
   correctly on the scope itself when you change the horizontal timebase.
   A workaround is to disable and enable the FFT again.
+
+- Wave Inspector
+  The wave Inspector allows you to download the whole waveform memory (up to 24Mpts for the DS1054Z,
+  depending to the acquire memory depth setting) after which it will be displayed in a separate window.
+  Once the Wave Inspector has been opened, you can quickly and comfortable navigate through the waveform
+  using the above described keyboard shortcuts or the slider at the bottom of the screen.
+
+- Serial Decoder
+  This is a work in progress. So far, only UART and SPI are imlemented.
+  Stay tuned for updates.
+
 
 
 
