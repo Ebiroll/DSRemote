@@ -1,17 +1,21 @@
 
+
+DSRemote 0.34
+-------------
+
+Added the Wave Inspector
+
+
 DSRemote 0.33
 -------------
 
 Added partial support for serial decoding.
-Started to implement the Wave Inspector.
-
 
 
 DSRemote 0.32
 -------------
 
 Added support for FFT.
-
 
 
 DSRemote 0.31
