@@ -563,7 +563,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   {
     convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource], 2);
 
-    strcat(str, "V");
+    strcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]]);
 
     paintLabel(painter, curve_w - 120, curve_h - 50, 100, 20, str, QColor(255, 128, 0));
   }
@@ -571,7 +571,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     {
       convert_to_metric_suffix(str, devparms->chanoffset[0], 2);
 
-      strcat(str, "V");
+      strcat(str, devparms->chanunitstr[devparms->chanunit[0]]);
 
       paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[0]);
     }
@@ -579,7 +579,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
       {
         convert_to_metric_suffix(str, devparms->chanoffset[1], 2);
 
-        strcat(str, "V");
+        strcat(str, devparms->chanunitstr[devparms->chanunit[1]]);
 
         paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[1]);
       }
@@ -587,7 +587,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
         {
           convert_to_metric_suffix(str, devparms->chanoffset[2], 2);
 
-          strcat(str, "V");
+          strcat(str, devparms->chanunitstr[devparms->chanunit[2]]);
 
           paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[2]);
         }
@@ -595,7 +595,7 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
           {
             convert_to_metric_suffix(str, devparms->chanoffset[3], 2);
 
-            strcat(str, "V");
+            strcat(str, devparms->chanunitstr[devparms->chanunit[3]]);
 
             paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[3]);
           }
@@ -1133,7 +1133,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource], 2);
 
-  strcat(str, "V");
+  strcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]]);
 
   if(devparms->triggeredgesource < 4)
   {
@@ -1256,7 +1256,7 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
 
   convert_to_metric_suffix(str2, devparms->chanscale[chn], 2);
 
-  strcat(str2, "V");
+  strcat(str2, devparms->chanunitstr[devparms->chanunit[chn]]);
 
   if(devparms->chanbwlimit[chn])
   {
@@ -1924,7 +1924,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       convert_to_metric_suffix(str + strlen(str), devparms->triggeredgelevel[devparms->triggeredgesource], 2);
 
-      strcat(str, "V");
+      strcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]]);
 
       mainwindow->statusLabel->setText(str);
 
@@ -1970,7 +1970,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
           convert_to_metric_suffix(str + strlen(str), devparms->chanoffset[chn], 3);
 
-          strcat(str, "V");
+          strcat(str, devparms->chanunitstr[devparms->chanunit[chn]]);
 
           mainwindow->statusLabel->setText(str);
 

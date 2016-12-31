@@ -423,7 +423,7 @@ void UI_Mainwindow::trigAdjustDialChanged(int new_pos)
 
   convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[chn], 2);
 
-  strcat(str, "V");
+  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
 
   statusLabel->setText(str);
 
@@ -866,7 +866,7 @@ void UI_Mainwindow::vertOffsetDialChanged(int new_pos)
 
   convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
 
-  strcat(str, "V");
+  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
 
   statusLabel->setText(str);
 
@@ -994,7 +994,7 @@ void UI_Mainwindow::vertScaleDialChanged(int new_pos)
 
   convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
 
-  strcat(str, "V");
+  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
 
   statusLabel->setText(str);
 
@@ -2129,7 +2129,8 @@ void UI_Mainwindow::chan_menu()
         submenubwl,
         submenucoupling,
         submenuinvert,
-        submenuprobe;
+        submenuprobe,
+        submenuunit;
 
   QList<QAction *> actionList;
 
@@ -2209,6 +2210,82 @@ void UI_Mainwindow::chan_menu()
   }
   submenuprobe.addAction("100X", this, SLOT(chan_probe_100()));
   actionList = submenuprobe.actions();
+  if(devparms.modelserie != 6)
+  {
+    if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.1))
+    {
+      actionList[0]->setCheckable(true);
+      actionList[0]->setChecked(true);
+    }
+    else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.2))
+      {
+        actionList[1]->setCheckable(true);
+        actionList[1]->setChecked(true);
+      }
+      else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.5))
+        {
+          actionList[2]->setCheckable(true);
+          actionList[2]->setChecked(true);
+        }
+        else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 1))
+          {
+            actionList[3]->setCheckable(true);
+            actionList[3]->setChecked(true);
+          }
+          else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 2))
+            {
+              actionList[4]->setCheckable(true);
+              actionList[4]->setChecked(true);
+            }
+            else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 5))
+              {
+                actionList[5]->setCheckable(true);
+                actionList[5]->setChecked(true);
+              }
+              else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 10))
+                {
+                  actionList[6]->setCheckable(true);
+                  actionList[6]->setChecked(true);
+                }
+                else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 20))
+                  {
+                    actionList[7]->setCheckable(true);
+                    actionList[7]->setChecked(true);
+                  }
+                  else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 50))
+                    {
+                      actionList[8]->setCheckable(true);
+                      actionList[8]->setChecked(true);
+                    }
+                    else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 100))
+                      {
+                        actionList[9]->setCheckable(true);
+                        actionList[9]->setChecked(true);
+                      }
+  }
+  else
+  {
+    if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.1))
+    {
+      actionList[0]->setCheckable(true);
+      actionList[0]->setChecked(true);
+    }
+    else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 1))
+      {
+        actionList[1]->setCheckable(true);
+        actionList[1]->setChecked(true);
+      }
+      else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 10))
+        {
+          actionList[2]->setCheckable(true);
+          actionList[2]->setChecked(true);
+        }
+        else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 100))
+          {
+            actionList[3]->setCheckable(true);
+            actionList[3]->setChecked(true);
+          }
+  }
   menu.addMenu(&submenuprobe);
 
   submenuinvert.setTitle("Invert");
@@ -2226,6 +2303,16 @@ void UI_Mainwindow::chan_menu()
     actionList[1]->setChecked(true);
   }
   menu.addMenu(&submenuinvert);
+
+  submenuunit.setTitle("Unit");
+  submenuunit.addAction("Volt",    this, SLOT(chan_unit_v()));
+  submenuunit.addAction("Watt",    this, SLOT(chan_unit_w()));
+  submenuunit.addAction("Ampere",  this, SLOT(chan_unit_a()));
+  submenuunit.addAction("Unknown", this, SLOT(chan_unit_u()));
+  actionList = submenuunit.actions();
+  actionList[devparms.chanunit[devparms.activechannel]]->setCheckable(true);
+  actionList[devparms.chanunit[devparms.activechannel]]->setChecked(true);
+  menu.addMenu(&submenuunit);
 
   menu.exec(chanMenuButton->mapToGlobal(QPoint(0,0)));
 }
@@ -2531,6 +2618,70 @@ void UI_Mainwindow::chan_coupling_gnd()
   set_cue_cmd(str);
 
   updateLabels();
+}
+
+
+void UI_Mainwindow::chan_unit_v()
+{
+  char str[128];
+
+  devparms.chanunit[devparms.activechannel] = 0;
+
+  sprintf(str, "Channel %i units: Volt", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:UNIT VOLT", devparms.activechannel + 1);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_unit_w()
+{
+  char str[128];
+
+  devparms.chanunit[devparms.activechannel] = 1;
+
+  sprintf(str, "Channel %i units: Watt", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:UNIT WATT", devparms.activechannel + 1);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_unit_a()
+{
+  char str[128];
+
+  devparms.chanunit[devparms.activechannel] = 2;
+
+  sprintf(str, "Channel %i units: Ampere", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:UNIT AMP", devparms.activechannel + 1);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_unit_u()
+{
+  char str[128];
+
+  devparms.chanunit[devparms.activechannel] = 3;
+
+  sprintf(str, "Channel %i units: Unknown", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:UNIT UNKN", devparms.activechannel + 1);
+
+  set_cue_cmd(str);
 }
 
 
@@ -2894,7 +3045,7 @@ void UI_Mainwindow::vertOffsetDialClicked(QPoint)
 
   convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
 
-  strcat(str, "V");
+  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
 
   statusLabel->setText(str);
 
@@ -3535,7 +3686,7 @@ void UI_Mainwindow::trigAdjustDialClicked(QPoint)
 
   convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[devparms.triggeredgesource], 2);
 
-  strcat(str, "V");
+  strcat(str, devparms.chanunitstr[devparms.chanunit[devparms.triggeredgesource]]);
 
   statusLabel->setText(str);
 

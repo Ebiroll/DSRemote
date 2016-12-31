@@ -71,6 +71,11 @@ UI_Mainwindow::UI_Mainwindow()
     devparms.chanscale[i] = 1;
   }
 
+  strcpy(devparms.chanunitstr[0], "V");
+  strcpy(devparms.chanunitstr[1], "W");
+  strcpy(devparms.chanunitstr[2], "A");
+  strcpy(devparms.chanunitstr[3], "U");
+
   devparms.fftbuf_in = (double *)malloc(FFT_MAX_BUFSZ * sizeof(double));
 
   devparms.fftbuf_out = (double *)malloc(FFT_MAX_BUFSZ * sizeof(double));

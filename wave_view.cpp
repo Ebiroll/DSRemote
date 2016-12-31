@@ -572,7 +572,7 @@ void WaveCurve::drawTopLabels(QPainter *painter)
 
   convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource], 2);
 
-  strcat(str, "V");
+  strcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]]);
 
   if(devparms->triggeredgesource < 4)
   {

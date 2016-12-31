@@ -372,6 +372,11 @@ private slots:
   void chan_probe_50();
   void chan_probe_100();
 
+  void chan_unit_v();
+  void chan_unit_w();
+  void chan_unit_a();
+  void chan_unit_u();
+
   void chan_menu();
   void math_menu();
 

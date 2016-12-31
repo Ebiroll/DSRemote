@@ -2238,7 +2238,7 @@ void UI_Mainwindow::shift_trace_up()
 
   convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
 
-  strcat(str, "V");
+  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
 
   statusLabel->setText(str);
 
@@ -2346,7 +2346,7 @@ void UI_Mainwindow::shift_trace_down()
 
   convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
 
-  strcat(str, "V");
+  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
 
   statusLabel->setText(str);
 

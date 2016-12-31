@@ -283,6 +283,43 @@ void read_settings_thread::run()
 
     devparms->chanprobe[chn] = atof(device->buf);
 
+    sprintf(str, ":CHAN%i:UNIT?", chn + 1);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(str) != 12)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(!strcmp(device->buf, "VOLT"))
+    {
+      devparms->chanunit[chn] = 0;
+    }
+    else if(!strcmp(device->buf, "WATT"))
+      {
+        devparms->chanunit[chn] = 1;
+      }
+      else if(!strcmp(device->buf, "AMP"))
+        {
+          devparms->chanunit[chn] = 2;
+        }
+        else if(!strcmp(device->buf, "UNKN"))
+          {
+            devparms->chanunit[chn] = 3;
+          }
+          else
+          {
+            devparms->chanunit[chn] = 0;
+          }
+
     sprintf(str, ":CHAN%i:SCAL?", chn + 1);
 
     usleep(TMC_GDS_DELAY);

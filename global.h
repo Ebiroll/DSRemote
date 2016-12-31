@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.34_1612311057"
+#define PROGRAM_VERSION       "0.34_1612311710"
 
 #define MAX_PATHLEN            4096
 
@@ -134,6 +134,8 @@ struct device_settings
   int chandisplay[MAX_CHNS];    // 0=off, 1=on
   int chanimpedance[MAX_CHNS];  // 0=1MOhm, 1=50Ohm
   int chaninvert[MAX_CHNS];     // 0=normal, 1=inverted
+  int chanunit[MAX_CHNS];       // 0=V, 1=W, 2=A, 3=U
+  char chanunitstr[4][2];
   double chanoffset[MAX_CHNS];  // expressed in volts
   double chanprobe[MAX_CHNS];   // Probe attenuation ratio e.g. 10:1
   double chanscale[MAX_CHNS];
