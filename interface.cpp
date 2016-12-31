@@ -2128,7 +2128,8 @@ void UI_Mainwindow::chan_menu()
   QMenu menu,
         submenubwl,
         submenucoupling,
-        submenuinvert;
+        submenuinvert,
+        submenuprobe;
 
   QList<QAction *> actionList;
 
@@ -2186,6 +2187,29 @@ void UI_Mainwindow::chan_menu()
         }
       }
   menu.addMenu(&submenubwl);
+
+  submenuprobe.setTitle("Probe");
+  submenuprobe.addAction("0.1", this, SLOT(chan_probe_01()));
+  if(devparms.modelserie != 6)
+  {
+    submenuprobe.addAction("0.2", this, SLOT(chan_probe_02()));
+    submenuprobe.addAction("0.5", this, SLOT(chan_probe_05()));
+  }
+  submenuprobe.addAction("1",   this, SLOT(chan_probe_1()));
+  if(devparms.modelserie != 6)
+  {
+    submenuprobe.addAction("2",   this, SLOT(chan_probe_2()));
+    submenuprobe.addAction("5",   this, SLOT(chan_probe_5()));
+  }
+  submenuprobe.addAction("10",  this, SLOT(chan_probe_10()));
+  if(devparms.modelserie != 6)
+  {
+    submenuprobe.addAction("20",  this, SLOT(chan_probe_20()));
+    submenuprobe.addAction("50",  this, SLOT(chan_probe_50()));
+  }
+  submenuprobe.addAction("100", this, SLOT(chan_probe_100()));
+  actionList = submenuprobe.actions();
+  menu.addMenu(&submenuprobe);
 
   submenuinvert.setTitle("Invert");
   submenuinvert.addAction("On",  this, SLOT(chan_invert_on()));
@@ -2507,6 +2531,206 @@ void UI_Mainwindow::chan_coupling_gnd()
   set_cue_cmd(str);
 
   updateLabels();
+}
+
+
+void UI_Mainwindow::chan_probe_01()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 0.1;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 0.1X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_02()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 0.2;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 0.2X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_05()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 0.5;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 0.5X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_1()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 1;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 1X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_2()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 2;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 2X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_5()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 5;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 5X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_10()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 10;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 10X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_20()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 20;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 20X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_50()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 50;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 50X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_100()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 100;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 100X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
 }
 
 
