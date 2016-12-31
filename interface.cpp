@@ -2189,25 +2189,25 @@ void UI_Mainwindow::chan_menu()
   menu.addMenu(&submenubwl);
 
   submenuprobe.setTitle("Probe");
-  submenuprobe.addAction("0.1", this, SLOT(chan_probe_01()));
+  submenuprobe.addAction("0.1X", this, SLOT(chan_probe_01()));
   if(devparms.modelserie != 6)
   {
-    submenuprobe.addAction("0.2", this, SLOT(chan_probe_02()));
-    submenuprobe.addAction("0.5", this, SLOT(chan_probe_05()));
+    submenuprobe.addAction("0.2X", this, SLOT(chan_probe_02()));
+    submenuprobe.addAction("0.5X", this, SLOT(chan_probe_05()));
   }
-  submenuprobe.addAction("1",   this, SLOT(chan_probe_1()));
+  submenuprobe.addAction("1X",   this, SLOT(chan_probe_1()));
   if(devparms.modelserie != 6)
   {
-    submenuprobe.addAction("2",   this, SLOT(chan_probe_2()));
-    submenuprobe.addAction("5",   this, SLOT(chan_probe_5()));
+    submenuprobe.addAction("2X",   this, SLOT(chan_probe_2()));
+    submenuprobe.addAction("5X",   this, SLOT(chan_probe_5()));
   }
-  submenuprobe.addAction("10",  this, SLOT(chan_probe_10()));
+  submenuprobe.addAction("10X",  this, SLOT(chan_probe_10()));
   if(devparms.modelserie != 6)
   {
-    submenuprobe.addAction("20",  this, SLOT(chan_probe_20()));
-    submenuprobe.addAction("50",  this, SLOT(chan_probe_50()));
+    submenuprobe.addAction("20X",  this, SLOT(chan_probe_20()));
+    submenuprobe.addAction("50X",  this, SLOT(chan_probe_50()));
   }
-  submenuprobe.addAction("100", this, SLOT(chan_probe_100()));
+  submenuprobe.addAction("100X", this, SLOT(chan_probe_100()));
   actionList = submenuprobe.actions();
   menu.addMenu(&submenuprobe);
 
