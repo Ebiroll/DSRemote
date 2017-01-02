@@ -1220,6 +1220,16 @@ void UI_Mainwindow::set_memdepth(int mdepth)
 {
   char str[256];
 
+  QMessageBox msgBox;
+
+  if(devparms.triggerstatus == 5)  // Trigger status is STOP?
+  {
+    msgBox.setIcon(QMessageBox::NoIcon);
+    msgBox.setText("Can not set memory depth when in STOP mode.\n");
+    msgBox.exec();
+    return;
+  }
+
   if(mdepth <= 0)
   {
     statusLabel->setText("Memory depth: auto");

@@ -1549,106 +1549,49 @@ void WaveCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
 
   if(devparms->chandisplay[chn])
   {
-    if(chn == devparms->activechannel)
+    path.addRoundedRect(xpos, ypos, 20, 20, 3, 3);
+
+    path.addRoundedRect(xpos + 25, ypos, 85, 20, 3, 3);
+
+    painter->fillPath(path, Qt::black);
+
+    painter->setPen(SignalColor[chn]);
+
+    painter->drawText(xpos + 6, ypos + 15, str1);
+
+    if(devparms->chaninvert[chn])
     {
-      path.addRoundedRect(xpos, ypos, 20, 20, 3, 3);
-
-      painter->fillPath(path, SignalColor[chn]);
-
-      painter->setPen(Qt::black);
-
-      painter->drawText(xpos + 6, ypos + 15, str1);
-
-      if(devparms->chaninvert[chn])
-      {
-        painter->drawLine(xpos + 6, ypos + 3, xpos + 14, ypos + 3);
-      }
-
-      path = QPainterPath();
-
-      path.addRoundedRect(xpos + 25, ypos, 90, 20, 3, 3);
-
-      painter->fillPath(path, Qt::black);
-
-      painter->setPen(SignalColor[chn]);
-
-      painter->drawRoundedRect(xpos + 25, ypos, 90, 20, 3, 3);
-
-      painter->drawText(xpos + 35, ypos + 1, 90, 20, Qt::AlignCenter, str2);
-
-      if(devparms->chancoupling[chn] == 0)
-      {
-        painter->drawLine(xpos + 33, ypos + 6, xpos + 33, ypos + 10);
-
-        painter->drawLine(xpos + 28, ypos + 10, xpos + 38, ypos + 10);
-
-        painter->drawLine(xpos + 30, ypos + 12, xpos + 36, ypos + 12);
-
-        painter->drawLine(xpos + 32, ypos + 14, xpos + 34, ypos + 14);
-      }
-      else if(devparms->chancoupling[chn] == 1)
-        {
-          painter->drawLine(xpos + 28, ypos + 8, xpos + 38, ypos + 8);
-
-          painter->drawLine(xpos + 28, ypos + 12, xpos + 30, ypos + 12);
-
-          painter->drawLine(xpos + 32, ypos + 12, xpos + 34, ypos + 12);
-
-          painter->drawLine(xpos + 36, ypos + 12, xpos + 38, ypos + 12);
-        }
-        else if(devparms->chancoupling[chn] == 2)
-          {
-            painter->drawArc(xpos + 30, ypos + 8, 5, 5, 10 * 16, 160 * 16);
-
-            painter->drawArc(xpos + 35, ypos + 8, 5, 5, -10 * 16, -160 * 16);
-          }
+      painter->drawLine(xpos + 6, ypos + 3, xpos + 14, ypos + 3);
     }
-    else
+
+    painter->drawText(xpos + 35, ypos + 1, 90, 20, Qt::AlignCenter, str2);
+
+    if(devparms->chancoupling[chn] == 0)
     {
-      path.addRoundedRect(xpos, ypos, 20, 20, 3, 3);
+      painter->drawLine(xpos + 33, ypos + 6, xpos + 33, ypos + 10);
 
-      path.addRoundedRect(xpos + 25, ypos, 85, 20, 3, 3);
+      painter->drawLine(xpos + 28, ypos + 10, xpos + 38, ypos + 10);
 
-      painter->fillPath(path, Qt::black);
+      painter->drawLine(xpos + 30, ypos + 12, xpos + 36, ypos + 12);
 
-      painter->setPen(SignalColor[chn]);
-
-      painter->drawText(xpos + 6, ypos + 15, str1);
-
-      if(devparms->chaninvert[chn])
-      {
-        painter->drawLine(xpos + 6, ypos + 3, xpos + 14, ypos + 3);
-      }
-
-      painter->drawText(xpos + 35, ypos + 1, 90, 20, Qt::AlignCenter, str2);
-
-      if(devparms->chancoupling[chn] == 0)
-      {
-        painter->drawLine(xpos + 33, ypos + 6, xpos + 33, ypos + 10);
-
-        painter->drawLine(xpos + 28, ypos + 10, xpos + 38, ypos + 10);
-
-        painter->drawLine(xpos + 30, ypos + 12, xpos + 36, ypos + 12);
-
-        painter->drawLine(xpos + 32, ypos + 14, xpos + 34, ypos + 14);
-      }
-      else if(devparms->chancoupling[chn] == 1)
-        {
-          painter->drawLine(xpos + 28, ypos + 8, xpos + 38, ypos + 8);
-
-          painter->drawLine(xpos + 28, ypos + 12, xpos + 30, ypos + 12);
-
-          painter->drawLine(xpos + 32, ypos + 12, xpos + 34, ypos + 12);
-
-          painter->drawLine(xpos + 36, ypos + 12, xpos + 38, ypos + 12);
-        }
-        else if(devparms->chancoupling[chn] == 2)
-          {
-            painter->drawArc(xpos + 30, ypos + 8, 5, 5, 10 * 16, 160 * 16);
-
-            painter->drawArc(xpos + 35, ypos + 8, 5, 5, -10 * 16, -160 * 16);
-          }
+      painter->drawLine(xpos + 32, ypos + 14, xpos + 34, ypos + 14);
     }
+    else if(devparms->chancoupling[chn] == 1)
+      {
+        painter->drawLine(xpos + 28, ypos + 8, xpos + 38, ypos + 8);
+
+        painter->drawLine(xpos + 28, ypos + 12, xpos + 30, ypos + 12);
+
+        painter->drawLine(xpos + 32, ypos + 12, xpos + 34, ypos + 12);
+
+        painter->drawLine(xpos + 36, ypos + 12, xpos + 38, ypos + 12);
+      }
+      else if(devparms->chancoupling[chn] == 2)
+        {
+          painter->drawArc(xpos + 30, ypos + 8, 5, 5, 10 * 16, 160 * 16);
+
+          painter->drawArc(xpos + 35, ypos + 8, 5, 5, -10 * 16, -160 * 16);
+        }
   }
   else
   {
