@@ -108,6 +108,7 @@ private:
   void drawSmallTriggerArrow(QPainter *, int, int, int, QColor);
   void drawTrigCenterArrow(QPainter *, int, int);
   void drawTopLabels(QPainter *);
+  void drawChanLabel(QPainter *, int, int, int);
   void paintLabel(QPainter *, int, int, int, int, const char *, QColor);
   void draw_decoder(QPainter *, int, int);
   int ascii_decode_control_char(char, char *);
