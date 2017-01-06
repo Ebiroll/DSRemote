@@ -74,13 +74,13 @@ void WaveCurve::paintEvent(QPaintEvent *)
       w_trace_offset,
       curve_w,
       curve_h,
-      samples_per_div,
       sample_range,
       sample_start,
       sample_end,
       t_pos;
 
   double h_step=0.0,
+         samples_per_div,
          step,
          step2;
 
