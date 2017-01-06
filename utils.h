@@ -92,6 +92,7 @@ int convert_to_metric_suffix(char *, double, int);
 
 double round_up_step125(double, double *);      /* Rounds the value up to 1-2-5 steps */
 double round_down_step125(double, double *);    /* Rounds the value down to 1-2-5 steps */
+double round_to_3digits(double);   /* Rounds the value to max 3 digits */
 
 int strtoipaddr(unsigned int *, const char *);  /* convert a string "192.168.1.12" to an integer */
 

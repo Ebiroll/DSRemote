@@ -1599,13 +1599,64 @@ void hextobin(char *dest, const char *str)
 }
 
 
+double round_to_3digits(double val)
+{
+  int i, exp=0, polarity=1;
+
+  if(!dblcmp(val, 0.0))
+  {
+    return 0;
+  }
+
+  if(val < 0)
+  {
+    polarity = -1;
+
+    val *= -1;
+  }
+
+  while(val < 99.999)
+  {
+    val *= 10;
+
+    exp--;
+  }
+
+  while(val > 999.999)
+  {
+    val /= 10;
+
+    exp++;
+  }
+
+  val = nearbyint(val);
+
+  for(i=0; i<exp; i++)
+  {
+    val *= 10;
+  }
+
+  for(i=0; i>exp; i--)
+  {
+    val /= 10;
+  }
+
+  return val * polarity;
+}
+
+
 double round_up_step125(double val, double *ratio)
 {
   int i, exp=0;
 
   double ltmp;
 
-   while(val < 0.999)
+  if(!dblcmp(val, 0.0))
+  {
+    return 0;
+  }
+
+  while(val < 0.999)
   {
     val *= 10;
 
@@ -1673,6 +1724,11 @@ double round_down_step125(double val, double *ratio)
   int i, exp=0;
 
   double ltmp;
+
+  if(!dblcmp(val, 0.0))
+  {
+    return 0;
+  }
 
   while(val < 0.999)
   {

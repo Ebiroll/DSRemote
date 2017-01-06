@@ -302,6 +302,9 @@ void UI_Mainwindow::save_memory_waveform(int job)
       continue;
     }
 
+    sprintf(str, "Downloading channel %i waveform data...", chn + 1);
+    progress.setLabelText(str);
+
     sprintf(str, ":WAV:SOUR CHAN%i", chn + 1);
 
     tmc_write(str);

@@ -38,7 +38,7 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
 
   mainwindow = (UI_Mainwindow *)parnt;
 
-  setMinimumSize(840, 635);
+  setMinimumSize(840, 655);
   setWindowTitle("Wave Inspector");
 
   devparms = (struct device_settings *)calloc(1, sizeof(struct device_settings));
@@ -90,7 +90,16 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
 
   devparms->wave_mem_view_sample_start = wavslider->value();
 
+  menubar = new QMenuBar(this);
+
+  helpmenu = new QMenu(this);
+  helpmenu->setTitle("Help");
+  helpmenu->addAction("How to operate", mainwindow, SLOT(helpButtonClicked()));
+  helpmenu->addAction("About", mainwindow, SLOT(show_about_dialog()));
+  menubar->addMenu(helpmenu);
+
   g_layout = new QGridLayout(this);
+  g_layout->setMenuBar(menubar);
   g_layout->addWidget(wavcurve, 0, 0);
   g_layout->addWidget(wavslider, 1, 0);
 
@@ -161,6 +170,9 @@ void UI_wave_window::wavslider_value_changed(int val)
 
   devparms->viewer_center_position = (double)(((devparms->wavebufsz - (devparms->hordivisions * samples_per_div)) / 2) - devparms->wave_mem_view_sample_start) /
                               devparms->samplerate * -1.0;
+
+
+  devparms->viewer_center_position = round_to_3digits(devparms->viewer_center_position);
 
   wavcurve->update();
 }

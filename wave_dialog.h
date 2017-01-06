@@ -38,6 +38,8 @@
 #include <QDialog>
 #include <QGridLayout>
 #include <QSlider>
+#include <QMenuBar>
+#include <QMenu>
 
 #include "mainwindow.h"
 #include "global.h"
@@ -65,6 +67,10 @@ private:
 struct device_settings *devparms;
 
 UI_Mainwindow *mainwindow;
+
+QMenuBar     *menubar;
+
+QMenu        *helpmenu;
 
 QGridLayout *g_layout;
 
