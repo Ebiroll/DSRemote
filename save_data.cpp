@@ -440,7 +440,7 @@ void UI_Mainwindow::save_memory_waveform(int job)
           break;
         }
 
-        wavbuf[chn][bytes_rcvd + k] = ((int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn]) << 5;
+        wavbuf[chn][bytes_rcvd + k] = ((int)(((unsigned char *)device->buf)[k]) - yref[chn]) << 5;
       }
 
       bytes_rcvd += n;
