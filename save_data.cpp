@@ -202,8 +202,6 @@ void UI_Mainwindow::save_memory_waveform(int job)
 
   long long rec_len=0LL;
 
-  double yinc[MAX_CHNS];
-
   QEventLoop ev_loop;
 
   QMessageBox wi_msg_box;
@@ -323,9 +321,9 @@ void UI_Mainwindow::save_memory_waveform(int job)
 
     tmc_read();
 
-    yinc[chn] = atof(device->buf);
+    devparms.yinc[chn] = atof(device->buf);
 
-    if(yinc[chn] < 1e-6)
+    if(devparms.yinc[chn] < 1e-6)
     {
       sprintf(str, "Error, parameter \"YINC\" out of range.  line %i file %s", __LINE__, __FILE__);
       goto OUT_ERROR;
@@ -435,29 +433,14 @@ void UI_Mainwindow::save_memory_waveform(int job)
         empty_buf = 0;
       }
 
-      if(job == 1)
+      for(k=0; k<n; k++)
       {
-        for(k=0; k<n; k++)
+        if((bytes_rcvd + k) >= mempnts)
         {
-          if((bytes_rcvd + k) >= mempnts)
-          {
-            break;
-          }
-
-          wavbuf[chn][bytes_rcvd + k] = ((int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn]) << 5;
+          break;
         }
-      }
-      else
-      {
-        for(k=0; k<n; k++)
-        {
-          if((bytes_rcvd + k) >= mempnts)
-          {
-            break;
-          }
 
-          wavbuf[chn][bytes_rcvd + k] = (int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn];
-        }
+        wavbuf[chn][bytes_rcvd + k] = ((int)(((unsigned char *)device->buf)[k]) - yref[chn] - yor[chn]) << 5;
       }
 
       bytes_rcvd += n;
@@ -579,14 +562,14 @@ void UI_Mainwindow::save_memory_waveform(int job)
     edf_set_digital_minimum(hdl, j, -32768);
     if(devparms.chanscale[chn] > 2)
     {
-      edf_set_physical_maximum(hdl, j, yinc[chn] * 32767.0 / 32.0);
-      edf_set_physical_minimum(hdl, j, yinc[chn] * -32768.0 / 32.0);
+      edf_set_physical_maximum(hdl, j, devparms.yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, devparms.yinc[chn] * -32768.0 / 32.0);
       edf_set_physical_dimension(hdl, j, "V");
     }
     else
     {
-      edf_set_physical_maximum(hdl, j, 1000.0 * yinc[chn] * 32767.0 / 32.0);
-      edf_set_physical_minimum(hdl, j, 1000.0 * yinc[chn] * -32768.0 / 32.0);
+      edf_set_physical_maximum(hdl, j, 1000.0 * devparms.yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, 1000.0 * devparms.yinc[chn] * -32768.0 / 32.0);
       edf_set_physical_dimension(hdl, j, "mV");
     }
     sprintf(str, "CHAN%i", chn + 1);
@@ -773,8 +756,6 @@ void UI_Mainwindow::save_screen_waveform()
 
   long long rec_len=0LL;
 
-  double yinc[MAX_CHNS];
-
   if(device == NULL)
   {
     return;
@@ -863,9 +844,9 @@ void UI_Mainwindow::save_screen_waveform()
 
     tmc_read();
 
-    yinc[chn] = atof(device->buf);
+    devparms.yinc[chn] = atof(device->buf);
 
-    if(yinc[chn] < 1e-6)
+    if(devparms.yinc[chn] < 1e-6)
     {
       sprintf(str, "Error, parameter \"YINC\" out of range.  line %i file %s", __LINE__, __FILE__);
       goto OUT_ERROR;
@@ -989,14 +970,14 @@ void UI_Mainwindow::save_screen_waveform()
     edf_set_digital_minimum(hdl, j, -32768);
     if(devparms.chanscale[chn] > 2)
     {
-      edf_set_physical_maximum(hdl, j, yinc[chn] * 32767.0 / 32.0);
-      edf_set_physical_minimum(hdl, j, yinc[chn] * -32768.0 / 32.0);
+      edf_set_physical_maximum(hdl, j, devparms.yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, devparms.yinc[chn] * -32768.0 / 32.0);
       edf_set_physical_dimension(hdl, j, "V");
     }
     else
     {
-      edf_set_physical_maximum(hdl, j, 1000.0 * yinc[chn] * 32767.0 / 32.0);
-      edf_set_physical_minimum(hdl, j, 1000.0 * yinc[chn] * -32768.0 / 32.0);
+      edf_set_physical_maximum(hdl, j, 1000.0 * devparms.yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, 1000.0 * devparms.yinc[chn] * -32768.0 / 32.0);
       edf_set_physical_dimension(hdl, j, "mV");
     }
     sprintf(str, "CHAN%i", chn + 1);

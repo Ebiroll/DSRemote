@@ -71,6 +71,7 @@ void WaveCurve::paintEvent(QPaintEvent *)
 {
   int i, chn,
       small_rulers,
+      h_trace_offset,
       w_trace_offset,
       curve_w,
       curve_h,
@@ -233,15 +234,6 @@ void WaveCurve::paintEvent(QPaintEvent *)
 
 /////////////////////////////////// draw the arrows ///////////////////////////////////////////
 
-  if(devparms->modelserie == 6)
-  {
-    v_sense = -((double)curve_h / 256.0);
-  }
-  else
-  {
-    v_sense = -((double)curve_h / (25.0 * devparms->vertdivisions));
-  }
-
   drawTrigCenterArrow(painter, curve_w / 2, 0);
 
   for(chn=0; chn<devparms->channel_cnt; chn++)
@@ -249,6 +241,15 @@ void WaveCurve::paintEvent(QPaintEvent *)
     if(!devparms->chandisplay[chn])
     {
       continue;
+    }
+
+    if(devparms->modelserie == 6)
+    {
+      v_sense = -((double)curve_h / 256.0);
+    }
+    else
+    {
+      v_sense = ((double)curve_h / ((devparms->chanscale[chn] * devparms->vertdivisions) / devparms->yinc[chn])) / -32.0;
     }
 
     chan_arrow_pos[chn] =  (curve_h / 2) - (devparms->chanoffset[chn] / ((devparms->chanscale[chn] * devparms->vertdivisions) / curve_h));
@@ -308,6 +309,10 @@ void WaveCurve::paintEvent(QPaintEvent *)
         continue;
       }
 
+      h_trace_offset = curve_h / 2;
+
+      h_trace_offset -= ((devparms->chanoffset[chn] / (devparms->chanscale[chn] * devparms->vertdivisions)) * (double)curve_h);
+
       painter->setPen(QPen(QBrush(SignalColor[chn], Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 
       for(i=0; i<sample_range; i++)
@@ -317,20 +322,20 @@ void WaveCurve::paintEvent(QPaintEvent *)
           if(devparms->displaytype)
           {
             painter->drawPoint(i * h_step + w_trace_offset,
-                               (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2));
+                               (devparms->wavebuf[chn][i + sample_start] * v_sense) + h_trace_offset);
           }
           else
           {
             painter->drawLine(i * h_step + w_trace_offset,
-                              (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2),
+                              (devparms->wavebuf[chn][i + sample_start] * v_sense) + h_trace_offset,
                               (i + 1) * h_step + w_trace_offset,
-                              (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2));
+                              (devparms->wavebuf[chn][i + sample_start] * v_sense) + h_trace_offset);
             if(i)
             {
               painter->drawLine(i * h_step + w_trace_offset,
-                                (devparms->wavebuf[chn][i - 1 + sample_start] * v_sense) + (curve_h / 2),
+                                (devparms->wavebuf[chn][i - 1 + sample_start] * v_sense) + h_trace_offset,
                                 i * h_step + w_trace_offset,
-                                (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2));
+                                (devparms->wavebuf[chn][i + sample_start] * v_sense) + h_trace_offset);
             }
           }
         }
@@ -341,14 +346,14 @@ void WaveCurve::paintEvent(QPaintEvent *)
             if(devparms->displaytype)
             {
               painter->drawPoint(i * h_step + w_trace_offset,
-                                 (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2));
+                                 (devparms->wavebuf[chn][i + sample_start] * v_sense) + h_trace_offset);
             }
             else
             {
               painter->drawLine(i * h_step + w_trace_offset,
-                                (devparms->wavebuf[chn][i + sample_start] * v_sense) + (curve_h / 2),
+                                (devparms->wavebuf[chn][i + sample_start] * v_sense) + h_trace_offset,
                                 (i + 1) * h_step + w_trace_offset,
-                                (devparms->wavebuf[chn][i + 1 + sample_start] * v_sense) + (curve_h / 2));
+                                (devparms->wavebuf[chn][i + 1 + sample_start] * v_sense) + h_trace_offset);
             }
           }
         }
