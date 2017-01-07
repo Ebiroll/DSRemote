@@ -111,10 +111,9 @@ public:
 
   void read_settings(void);
   void write_settings(void);
-
   void set_cue_cmd(const char *);
-
   void serial_decoder(struct device_settings *);
+  void save_wave_inspector_buffer_to_edf(struct device_settings *);
 
   struct device_settings devparms;
 
@@ -243,7 +242,6 @@ private:
   double get_stepsize_divide_by_1000(double);
   inline unsigned char reverse_bitorder_8(unsigned char);
   inline unsigned int reverse_bitorder_32(unsigned int);
-  void save_memory_waveform(int);
 
 private slots:
 
@@ -265,8 +263,7 @@ private slots:
   void open_settings_dialog();
   int get_device_settings();
   void save_screen_waveform();
-  void save_mem_wav();
-  void analyze_mem_wav();
+  void get_deep_memory_waveform();
   void save_screenshot();
 
   void adjDialChanged(int);

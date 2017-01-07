@@ -1497,24 +1497,11 @@ void UI_Mainwindow::saveButtonClicked()
   QMenu menu;
 
   menu.addAction("Save screen waveform", this, SLOT(save_screen_waveform()));
-  menu.addAction("Save memory waveform", this, SLOT(save_mem_wav()));
-  menu.addAction("Wave Inspector",       this, SLOT(analyze_mem_wav()));
+  menu.addAction("Wave Inspector",       this, SLOT(get_deep_memory_waveform()));
   menu.addAction("Save screenshot",      this, SLOT(save_screenshot()));
   menu.addAction("Factory",              this, SLOT(set_to_factory()));
 
   menu.exec(saveButton->mapToGlobal(QPoint(0,0)));
-}
-
-
-void UI_Mainwindow::save_mem_wav()
-{
-  save_memory_waveform(1);
-}
-
-
-void UI_Mainwindow::analyze_mem_wav()
-{
-  save_memory_waveform(0);
 }
 
 

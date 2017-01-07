@@ -179,36 +179,27 @@ OUT_ERROR:
 }
 
 
-void UI_Mainwindow::save_memory_waveform(int job)
+void UI_Mainwindow::get_deep_memory_waveform(void)
 {
-  int i, j, k,
+  int i, k,
       n=0,
       chn,
       chns=0,
-      hdl=-1,
       bytes_rcvd=0,
       mempnts,
       yref[MAX_CHNS],
       yor[MAX_CHNS],
-      smps_per_record,
-      datrecs=1,
-      empty_buf,
-      ret_stat;
+      empty_buf;
 
-  char str[256],
-       opath[MAX_PATHLEN];
+  char str[256];
 
   short *wavbuf[MAX_CHNS];
-
-  long long rec_len=0LL;
 
   QEventLoop ev_loop;
 
   QMessageBox wi_msg_box;
 
   save_data_thread get_data_thrd(0);
-
-  save_data_thread sav_data_thrd(1);
 
   if(device == NULL)
   {
@@ -225,8 +216,6 @@ void UI_Mainwindow::save_memory_waveform(int job)
   }
 
   mempnts = devparms.acquirememdepth;
-
-  smps_per_record = mempnts;
 
   QProgressDialog progress("Downloading data...", "Abort", 0, mempnts, this);
   progress.setWindowModality(Qt::WindowModal);
@@ -252,25 +241,9 @@ void UI_Mainwindow::save_memory_waveform(int job)
     goto OUT_ERROR;
   }
 
-  while(smps_per_record >= (5000000 / chns))
-  {
-    smps_per_record /= 2;
-
-    datrecs *= 2;
-  }
-
   if(mempnts < 1)
   {
     strcpy(str, "Can not download waveform when memory depth is set to \"Auto\".");
-    goto OUT_ERROR;
-  }
-
-  rec_len = (EDFLIB_TIME_DIMENSION * (long long)mempnts) / devparms.samplerate;
-
-  if((job == 1) && (rec_len < 100))
-  {
-    strcpy(str, "Can not save waveforms shorter than 10 uSec.\n"
-                "Set the horizontal timebase to 1 uSec or higher.");
     goto OUT_ERROR;
   }
 
@@ -509,121 +482,9 @@ void UI_Mainwindow::save_memory_waveform(int job)
     statusLabel->setText("Downloading finished");
   }
 
-  if(job == 0)
-  {
-    new UI_wave_window(&devparms, wavbuf, this);
-
-    goto OUT_NORMAL;
-  }
-
-  opath[0] = 0;
-  if(recent_savedir[0]!=0)
-  {
-    strcpy(opath, recent_savedir);
-    strcat(opath, "/");
-  }
-  strcat(opath, "waveform.edf");
-
-  strcpy(opath, QFileDialog::getSaveFileName(this, "Save file", opath, "EDF files (*.edf *.EDF)").toLocal8Bit().data());
-
-  if(!strcmp(opath, ""))
-  {
-    goto OUT_NORMAL;
-  }
-
-  get_directory_from_path(recent_savedir, opath, MAX_PATHLEN);
-
-  hdl = edfopen_file_writeonly(opath, EDFLIB_FILETYPE_EDFPLUS, chns);
-  if(hdl < 0)
-  {
-    strcpy(str, "Can not create EDF file.");
-    goto OUT_ERROR;
-  }
-
-  statusLabel->setText("Saving EDF file...");
-
-  if(edf_set_datarecord_us_duration(hdl, (rec_len / 10LL) / datrecs))
-  {
-    strcpy(str, "Can not set datarecord duration of EDF file.");
-    goto OUT_ERROR;
-  }
-
-  j = 0;
-
-  for(chn=0; chn<MAX_CHNS; chn++)
-  {
-    if(!devparms.chandisplay[chn])
-    {
-      continue;
-    }
-
-    edf_set_samplefrequency(hdl, j, smps_per_record);
-    edf_set_digital_maximum(hdl, j, 32767);
-    edf_set_digital_minimum(hdl, j, -32768);
-    if(devparms.chanscale[chn] > 2)
-    {
-      edf_set_physical_maximum(hdl, j, devparms.yinc[chn] * 32767.0 / 32.0);
-      edf_set_physical_minimum(hdl, j, devparms.yinc[chn] * -32768.0 / 32.0);
-      edf_set_physical_dimension(hdl, j, "V");
-    }
-    else
-    {
-      edf_set_physical_maximum(hdl, j, 1000.0 * devparms.yinc[chn] * 32767.0 / 32.0);
-      edf_set_physical_minimum(hdl, j, 1000.0 * devparms.yinc[chn] * -32768.0 / 32.0);
-      edf_set_physical_dimension(hdl, j, "mV");
-    }
-    sprintf(str, "CHAN%i", chn + 1);
-    edf_set_label(hdl, j, str);
-
-    j++;
-  }
-
-  edf_set_equipment(hdl, devparms.modelname);
-
-  sav_data_thrd.init_save_memory_edf_file(&devparms, hdl, datrecs, smps_per_record, wavbuf);
-
-  connect(&sav_data_thrd, SIGNAL(finished()), &ev_loop, SLOT(quit()));
-
-  wi_msg_box.setIcon(QMessageBox::NoIcon);
-  wi_msg_box.setText("Saving EDF file ...");
-  wi_msg_box.setStandardButtons(QMessageBox::Abort);
-
-  connect(&sav_data_thrd, SIGNAL(finished()), &wi_msg_box, SLOT(accept()));
-
-  sav_data_thrd.start();
-
-  ret_stat = wi_msg_box.exec();
-
-  if(ret_stat != QDialog::Accepted)
-  {
-    strcpy(str, "Saving EDF file aborted.");
-    goto OUT_ERROR;
-  }
-
-  if(sav_data_thrd.get_error_num())
-  {
-    sav_data_thrd.get_error_str(str);
-    goto OUT_ERROR;
-  }
-
-OUT_NORMAL:
+  new UI_wave_window(&devparms, wavbuf, this);
 
   disconnect(&get_data_thrd, 0, 0, 0);
-  disconnect(&sav_data_thrd, 0, 0, 0);
-
-  if(job == 1)
-  {
-    if(hdl >= 0)
-    {
-      edfclose_file(hdl);
-    }
-
-    for(chn=0; chn<MAX_CHNS; chn++)
-    {
-      free(wavbuf[chn]);
-      wavbuf[chn] = NULL;
-    }
-  }
 
   scrn_timer->start(devparms.screentimerival);
 
@@ -632,7 +493,6 @@ OUT_NORMAL:
 OUT_ERROR:
 
   disconnect(&get_data_thrd, 0, 0, 0);
-  disconnect(&sav_data_thrd, 0, 0, 0);
 
   progress.reset();
 
@@ -648,11 +508,6 @@ OUT_ERROR:
     connect(&get_data_thrd, SIGNAL(finished()), &w_msg_box, SLOT(accept()));
 
     w_msg_box.exec();
-  }
-
-  if(hdl >= 0)
-  {
-    edfclose_file(hdl);
   }
 
   if(progress.wasCanceled() == false)
@@ -697,6 +552,183 @@ OUT_ERROR:
   }
 
   scrn_timer->start(devparms.screentimerival);
+}
+
+
+void UI_Mainwindow::save_wave_inspector_buffer_to_edf(struct device_settings *d_parms)
+{
+  int i, j,
+      chn,
+      chns=0,
+      hdl=-1,
+      mempnts,
+      smps_per_record,
+      datrecs=1,
+      ret_stat;
+
+  char str[256],
+       opath[MAX_PATHLEN];
+
+  long long rec_len=0LL;
+
+  QMessageBox wi_msg_box;
+
+  save_data_thread sav_data_thrd(1);
+
+  mempnts = d_parms->acquirememdepth;
+
+  smps_per_record = mempnts;
+
+  for(i=0; i<MAX_CHNS; i++)
+  {
+    if(!d_parms->chandisplay[i])
+    {
+      continue;
+    }
+
+    chns++;
+  }
+
+  if(!chns)
+  {
+    strcpy(str, "No active channels.");
+    goto OUT_ERROR;
+  }
+
+  while(smps_per_record >= (5000000 / chns))
+  {
+    smps_per_record /= 2;
+
+    datrecs *= 2;
+  }
+
+  rec_len = (EDFLIB_TIME_DIMENSION * (long long)mempnts) / d_parms->samplerate;
+
+  if(rec_len < 100)
+  {
+    strcpy(str, "Can not save waveforms shorter than 10 uSec.\n"
+                "Set the horizontal timebase to 1 uSec or higher.");
+    goto OUT_ERROR;
+  }
+
+  opath[0] = 0;
+  if(recent_savedir[0]!=0)
+  {
+    strcpy(opath, recent_savedir);
+    strcat(opath, "/");
+  }
+  strcat(opath, "waveform.edf");
+
+  strcpy(opath, QFileDialog::getSaveFileName(this, "Save file", opath, "EDF files (*.edf *.EDF)").toLocal8Bit().data());
+
+  if(!strcmp(opath, ""))
+  {
+    goto OUT_NORMAL;
+  }
+
+  get_directory_from_path(recent_savedir, opath, MAX_PATHLEN);
+
+  hdl = edfopen_file_writeonly(opath, EDFLIB_FILETYPE_EDFPLUS, chns);
+  if(hdl < 0)
+  {
+    strcpy(str, "Can not create EDF file.");
+    goto OUT_ERROR;
+  }
+
+  statusLabel->setText("Saving EDF file...");
+
+  if(edf_set_datarecord_us_duration(hdl, (rec_len / 10LL) / datrecs))
+  {
+    strcpy(str, "Can not set datarecord duration of EDF file.");
+    goto OUT_ERROR;
+  }
+
+  j = 0;
+
+  for(chn=0; chn<MAX_CHNS; chn++)
+  {
+    if(!d_parms->chandisplay[chn])
+    {
+      continue;
+    }
+
+    edf_set_samplefrequency(hdl, j, smps_per_record);
+    edf_set_digital_maximum(hdl, j, 32767);
+    edf_set_digital_minimum(hdl, j, -32768);
+    if(d_parms->chanscale[chn] > 2)
+    {
+      edf_set_physical_maximum(hdl, j, d_parms->yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, d_parms->yinc[chn] * -32768.0 / 32.0);
+      edf_set_physical_dimension(hdl, j, "V");
+    }
+    else
+    {
+      edf_set_physical_maximum(hdl, j, 1000.0 * d_parms->yinc[chn] * 32767.0 / 32.0);
+      edf_set_physical_minimum(hdl, j, 1000.0 * d_parms->yinc[chn] * -32768.0 / 32.0);
+      edf_set_physical_dimension(hdl, j, "mV");
+    }
+    sprintf(str, "CHAN%i", chn + 1);
+    edf_set_label(hdl, j, str);
+
+    j++;
+  }
+
+  edf_set_equipment(hdl, d_parms->modelname);
+
+  sav_data_thrd.init_save_memory_edf_file(d_parms, hdl, datrecs, smps_per_record, d_parms->wavebuf);
+
+  wi_msg_box.setIcon(QMessageBox::NoIcon);
+  wi_msg_box.setText("Saving EDF file ...");
+  wi_msg_box.setStandardButtons(QMessageBox::Abort);
+
+  connect(&sav_data_thrd, SIGNAL(finished()), &wi_msg_box, SLOT(accept()));
+
+  sav_data_thrd.start();
+
+  ret_stat = wi_msg_box.exec();
+
+  if(ret_stat != QDialog::Accepted)
+  {
+    strcpy(str, "Saving EDF file aborted.");
+    goto OUT_ERROR;
+  }
+
+  if(sav_data_thrd.get_error_num())
+  {
+    sav_data_thrd.get_error_str(str);
+    goto OUT_ERROR;
+  }
+
+OUT_NORMAL:
+
+  disconnect(&sav_data_thrd, 0, 0, 0);
+
+  if(hdl >= 0)
+  {
+    edfclose_file(hdl);
+  }
+
+  if(!strcmp(opath, ""))
+  {
+    statusLabel->setText("Save file canceled.");
+  }
+  else
+  {
+    statusLabel->setText("Saved memory buffer to EDF file.");
+  }
+
+  return;
+
+OUT_ERROR:
+
+  disconnect(&sav_data_thrd, 0, 0, 0);
+
+  statusLabel->setText("Saving file aborted.");
+
+  if(hdl >= 0)
+  {
+    edfclose_file(hdl);
+  }
 }
 
 

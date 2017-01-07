@@ -70,7 +70,8 @@ UI_Mainwindow *mainwindow;
 
 QMenuBar     *menubar;
 
-QMenu        *helpmenu;
+QMenu        *savemenu,
+             *helpmenu;
 
 QGridLayout *g_layout;
 
@@ -99,6 +100,8 @@ void zoom_in();
 void zoom_out();
 void center_position();
 void center_trigger();
+
+void save_wi_buffer_to_edf();
 
 };
 

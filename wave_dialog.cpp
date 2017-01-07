@@ -92,6 +92,11 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
 
   menubar = new QMenuBar(this);
 
+  savemenu = new QMenu(this);
+  savemenu->setTitle("Save");
+  savemenu->addAction("Save to EDF file", this, SLOT(save_wi_buffer_to_edf()));
+  menubar->addMenu(savemenu);
+
   helpmenu = new QMenu(this);
   helpmenu->setTitle("Help");
   helpmenu->addAction("How to operate", mainwindow, SLOT(helpButtonClicked()));
@@ -159,6 +164,12 @@ UI_wave_window::~UI_wave_window()
   }
 
   free(devparms);
+}
+
+
+void UI_wave_window::save_wi_buffer_to_edf()
+{
+  mainwindow->save_wave_inspector_buffer_to_edf(devparms);
 }
 
 
