@@ -606,7 +606,7 @@ void UI_Mainwindow::save_wave_inspector_buffer_to_edf(struct device_settings *d_
   if(rec_len < 100)
   {
     strcpy(str, "Can not save waveforms shorter than 10 uSec.\n"
-                "Set the horizontal timebase to 1 uSec or higher.");
+                "Select a higher memory depth or a higher timebase.");
     goto OUT_ERROR;
   }
 
