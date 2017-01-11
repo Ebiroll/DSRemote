@@ -188,7 +188,6 @@ void UI_Mainwindow::get_deep_memory_waveform(void)
       bytes_rcvd=0,
       mempnts,
       yref[MAX_CHNS],
-      yor[MAX_CHNS],
       empty_buf;
 
   char str[256];
@@ -326,9 +325,9 @@ void UI_Mainwindow::get_deep_memory_waveform(void)
 
     tmc_read();
 
-    yor[chn] = atoi(device->buf);
+    devparms.yor[chn] = atoi(device->buf);
 
-    if((yor[chn] < -255) || (yor[chn] > 255))
+    if((devparms.yor[chn] < -255) || (devparms.yor[chn] > 255))
     {
       sprintf(str, "Error, parameter \"YOR\" out of range.  line %i file %s", __LINE__, __FILE__);
       goto OUT_ERROR;
@@ -413,7 +412,7 @@ void UI_Mainwindow::get_deep_memory_waveform(void)
           break;
         }
 
-        wavbuf[chn][bytes_rcvd + k] = ((int)(((unsigned char *)device->buf)[k]) - yref[chn]) << 5;
+        wavbuf[chn][bytes_rcvd + k] = ((int)(((unsigned char *)device->buf)[k]) - yref[chn] - devparms.yor[chn]) << 5;
       }
 
       bytes_rcvd += n;
@@ -778,8 +777,7 @@ void UI_Mainwindow::save_screen_waveform()
       chn,
       chns=0,
       hdl=-1,
-      yref[MAX_CHNS],
-      yor[MAX_CHNS];
+      yref[MAX_CHNS];
 
   char str[128],
        opath[MAX_PATHLEN];
@@ -908,9 +906,9 @@ void UI_Mainwindow::save_screen_waveform()
 
     tmc_read();
 
-    yor[chn] = atoi(device->buf);
+    devparms.yor[chn] = atoi(device->buf);
 
-    if((yor[chn] < -255) || (yor[chn] > 255))
+    if((devparms.yor[chn] < -255) || (devparms.yor[chn] > 255))
     {
       sprintf(str, "Error, parameter \"YOR\" out of range.  line %i file %s", __LINE__, __FILE__);
       goto OUT_ERROR;
@@ -954,7 +952,7 @@ void UI_Mainwindow::save_screen_waveform()
 
     for(i=0; i<n; i++)
     {
-      wavbuf[chn][i] = ((int)(((unsigned char *)device->buf)[i]) - yref[chn] - yor[chn]) << 5;
+      wavbuf[chn][i] = ((int)(((unsigned char *)device->buf)[i]) - yref[chn] - devparms.yor[chn]) << 5;
     }
   }
 
