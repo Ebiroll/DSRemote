@@ -40,6 +40,7 @@ UI_wave_window::UI_wave_window(struct device_settings *p_devparms, short *wbuf[M
 
   setMinimumSize(840, 655);
   setWindowTitle("Wave Inspector");
+  setWindowIcon(QIcon(":/images/r_dsremote.png"));
 
   devparms = (struct device_settings *)calloc(1, sizeof(struct device_settings));
   if(devparms == NULL)
