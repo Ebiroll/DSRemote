@@ -5,20 +5,29 @@ Operate your Rigol oscilloscope from your Linux desktop.
 How to compile:
 ---------------
 
-- Install the Qt4 development package.
- For example, on openSuse, start Yast and install the package "libqt4-devel".
- On Ubuntu, open a console and enter: sudo apt-get install libqt4-dev libqt4-core g++
 
-- Now, open a terminal (console) and cd to the directory that contains the source files and
- enter the following commands:
+- Install Git, the GCC compiler and the Qt4 development package:
+Linux Mint 18: sudo apt-get install git-core libqt4-dev libqt4-core g++
+openSuse Leap 42.2: sudo zypper in git-core libqt4-devel
+Fedora 25: sudo dnf install git-core qt-devel gcc-c++
 
- qmake
+- Download the source code:
+mkdir DSRemote_git
+cd DSRemote_git
+git init
+git pull https://github.com/Teuniz/DSRemote
 
- make -j16
+- Create the makefile:
+Linux Mint 18: qmake
+openSuse Leap 42.2: qmake
+Fedora 25: qmake-qt4
 
- sudo make install
+- Compile the source code and install it:
+make -j16
+sudo make install
 
- Now you can run the program by typing: dsremote
+Now you can run the program by typing: dsremote
+
 
  Read also the file readme_usbtcm_driver.txt
  and the file notes.txt.
