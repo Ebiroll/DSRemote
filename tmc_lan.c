@@ -40,7 +40,6 @@
 #include <sys/time.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <stropts.h>
 #include <netinet/tcp.h>
 
 #include "tmc_dev.h"
