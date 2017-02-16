@@ -3077,15 +3077,7 @@ void UI_Mainwindow::autoButtonClicked()
 
   tmc_write(":AUT");
 
-  qApp->processEvents();
-
-  usleep(20000);
-
-  qApp->processEvents();
-
-  sleep(2);
-
-  get_device_settings();
+  get_device_settings(7);
 
   scrn_timer->start(devparms.screentimerival);
 }

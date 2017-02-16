@@ -38,6 +38,14 @@ read_settings_thread::read_settings_thread()
   err_num = -1;
 
   devparms = NULL;
+
+  delay = 0;
+}
+
+
+void read_settings_thread::set_delay(int val)
+{
+  delay = val;
 }
 
 
@@ -78,6 +86,11 @@ void read_settings_thread::run()
   if(devparms == NULL) return;
 
   devparms->activechannel = -1;
+
+  if(delay > 0)
+  {
+    sleep(delay);
+  }
 
   for(chn=0; chn<devparms->channel_cnt; chn++)
   {

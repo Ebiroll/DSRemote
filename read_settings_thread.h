@@ -57,6 +57,7 @@ public:
   void set_devparm_ptr(struct device_settings *);
   int get_error_num(void);
   void get_error_str(char *);
+  void set_delay(int);
 
 private:
 
@@ -65,7 +66,7 @@ private:
 
   char err_str[4096];
 
-  int err_num;
+  int err_num, delay;
 
   void run();
 };

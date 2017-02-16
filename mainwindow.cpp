@@ -568,7 +568,7 @@ void UI_Mainwindow::closeEvent(QCloseEvent *cl_event)
 }
 
 
-int UI_Mainwindow::get_device_settings()
+int UI_Mainwindow::get_device_settings(int delay)
 {
   int chn;
 
@@ -578,6 +578,7 @@ int UI_Mainwindow::get_device_settings()
 
   read_settings_thread rd_set_thrd;
   rd_set_thrd.set_device(device);
+  rd_set_thrd.set_delay(delay);
   rd_set_thrd.set_devparm_ptr(&devparms);
   rd_set_thrd.start();
 

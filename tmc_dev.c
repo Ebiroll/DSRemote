@@ -147,7 +147,10 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
     printf("tmc_dev write: %s", buf);
   }
 
-  if(!strncmp(buf, "*RST", 4))  qry = 1;
+  if((!strncmp(buf, "*RST", 4)) || (!strncmp(buf, ":AUT", 4)))
+  {
+    qry = 1;
+  }
 
   n = write(dev->fd, buf, strlen(buf));
 

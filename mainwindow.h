@@ -242,6 +242,7 @@ private:
   double get_stepsize_divide_by_1000(double);
   inline unsigned char reverse_bitorder_8(unsigned char);
   inline unsigned int reverse_bitorder_32(unsigned int);
+  int get_device_settings(int delay=0);
 
 private slots:
 
@@ -261,7 +262,6 @@ private slots:
   void open_connection();
   void close_connection();
   void open_settings_dialog();
-  int get_device_settings();
   void save_screen_waveform();
   void get_deep_memory_waveform();
   void save_screenshot();
