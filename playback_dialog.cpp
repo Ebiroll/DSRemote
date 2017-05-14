@@ -176,6 +176,7 @@ void UI_playback_window::t1_func()
   rec_fend_spinbox->setValue(devparms->func_wrec_fend);
   rec_fint_spinbox->setValue(devparms->func_wrec_fintval);
   rep_fstart_spinbox->setValue(devparms->func_wplay_fstart);
+  rep_fstart_spinbox->setRange(1, devparms->func_wrec_fend);
   rep_fend_spinbox->setRange(1, devparms->func_wrec_fend);
   rep_fend_spinbox->setValue(devparms->func_wplay_fend);
   rep_fint_spinbox->setValue(devparms->func_wplay_fintval);
