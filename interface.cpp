@@ -568,6 +568,11 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
     horScaleDial_timer->start(TMC_DIAL_TIMER_DELAY);
 
     old_pos = new_pos;
+
+    if(devparms.timebasedelayscale > 0.1000001)
+    {
+      devparms.func_wrec_enable = 0;
+    }
   }
   else
   {
@@ -644,6 +649,11 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
     horScaleDial_timer->start(TMC_DIAL_TIMER_DELAY);
 
     old_pos = new_pos;
+
+    if(devparms.timebasescale > 0.1000001)
+    {
+      devparms.func_wrec_enable = 0;
+    }
   }
 
   waveForm->update();
@@ -1832,6 +1842,89 @@ void UI_Mainwindow::set_grading_inf()
 
 void UI_Mainwindow::utilButtonClicked()
 {
+  QMenu menu;
+
+  menu.addAction("Record", this, SLOT(show_playback_window()));
+
+  menu.exec(utilButton->mapToGlobal(QPoint(0,0)));
+}
+
+
+void UI_Mainwindow::show_playback_window()
+{
+  UI_playback_window w(this);
+}
+
+
+void UI_Mainwindow::playpauseButtonClicked()
+{
+  if(devparms.func_wrec_enable == 0)  return;
+
+  if(devparms.func_wrec_operate)  return;
+
+  if(devparms.func_has_record == 0)  return;
+
+  if(devparms.func_wplay_operate == 1)
+  {
+    devparms.func_wplay_operate = 2;
+
+    statusLabel->setText("Replay paused");
+
+    set_cue_cmd(":FUNC:WREP:OPER PAUS");
+  }
+  else
+  {
+    devparms.func_wplay_operate = 1;
+
+    devparms.func_wplay_fcur = 0;
+
+    statusLabel->setText("Replay on");
+
+    set_cue_cmd(":FUNC:WREP:OPER PLAY");
+  }
+}
+
+
+void UI_Mainwindow::stopButtonClicked()
+{
+  if(devparms.func_wrec_enable == 0)  return;
+
+  if(devparms.func_wrec_operate)
+  {
+    statusLabel->setText("Record off");
+
+    set_cue_cmd(":FUNC:WREC:OPER STOP");
+  }
+
+  if(devparms.func_wplay_operate)
+  {
+    statusLabel->setText("Replay off");
+
+    set_cue_cmd(":FUNC:WREP:OPER STOP");
+  }
+}
+
+
+void UI_Mainwindow::recordButtonClicked()
+{
+  if(devparms.func_wrec_enable == 0)  return;
+
+  if(devparms.func_wplay_operate)  return;
+
+  if(devparms.func_wrec_operate)  return;
+
+  statusLabel->setText("Record on");
+
+  if(devparms.modelserie == 6)
+  {
+    set_cue_cmd(":FUNC:WREC:OPER REC");
+  }
+  else
+  {
+    set_cue_cmd(":FUNC:WREC:OPER RUN");
+  }
+
+  devparms.func_has_record = 1;
 }
 
 

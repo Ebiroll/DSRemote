@@ -91,6 +91,7 @@
 #include "decode_dialog.h"
 #include "tdial.h"
 #include "wave_dialog.h"
+#include "playback_dialog.h"
 
 #include "third_party/kiss_fft/kiss_fftr.h"
 
@@ -112,6 +113,7 @@ public:
   void read_settings(void);
   void write_settings(void);
   void set_cue_cmd(const char *);
+  void set_cue_cmd(const char *, char *);
   void serial_decoder(struct device_settings *);
   void save_wave_inspector_buffer_to_edf(struct device_settings *);
 
@@ -463,6 +465,11 @@ private slots:
   void set_fft_voffset();
 
   void show_decode_window();
+
+  void show_playback_window();
+  void playpauseButtonClicked();
+  void stopButtonClicked();
+  void recordButtonClicked();
 
   void updateLabels();
 

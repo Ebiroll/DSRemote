@@ -1,5 +1,11 @@
 
 
+DSRemote 0.35
+-------------
+
+Added Record & Playback function
+
+
 DSRemote 0.34
 -------------
 
@@ -131,7 +137,7 @@ What's implemented so far:
 
 - save screenshot
 - save display data
-- save memory data
+- save memory data (via the Wave Inspector)
   fileformat for waveform data is EDF, these files can be read by lots
   of viewers and analyzing software like EDFbrowser, Scilab, Octave, Matlab, Labview, etc.
 
@@ -151,10 +157,10 @@ What's implemented so far:
   using the above described keyboard shortcuts or the slider at the bottom of the screen.
 
 - Serial Decoder
-  This is a work in progress. So far, only UART and SPI are imlemented.
+  This is a work in progress. So far, only UART and SPI are implemented.
   Stay tuned for updates.
 
-
+- Record & Replay (it's hidden under the "util" button)
 
 
 

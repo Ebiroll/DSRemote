@@ -544,6 +544,11 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     paintCounterLabel(painter, curve_w - 180, 6);
   }
 
+  if(devparms->func_wrec_enable)
+  {
+    paintPlaybackLabel(painter, curve_w - 180, 40);
+  }
+
   if((mainwindow->adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF) || (mainwindow->navDialFunc == NAV_DIAL_FUNC_HOLDOFF))
   {
     convert_to_metric_suffix(str, devparms->triggerholdoff, 2);
@@ -2249,6 +2254,43 @@ void SignalCurve::paintCounterLabel(QPainter *painter, int xpos, int ypos)
   painter->drawLine(xpos + 22 + (i * 14), ypos + 14, xpos + 29 + (i * 14), ypos + 14);
 
   painter->drawText(xpos + 75, ypos, 100, 20, Qt::AlignCenter, str);
+}
+
+
+void SignalCurve::paintPlaybackLabel(QPainter *painter, int xpos, int ypos)
+{
+  char str[128];
+
+  QPainterPath path;
+
+  path.addRoundedRect(xpos, ypos, 175, 20, 3, 3);
+
+  painter->fillPath(path, Qt::black);
+
+  painter->setPen(Qt::darkGray);
+
+  painter->drawRoundedRect(xpos, ypos, 175, 20, 3, 3);
+
+  if(devparms->func_wrec_operate || !devparms->func_has_record)
+  {
+    painter->fillRect(xpos + 5, ypos + 5, 10, 10, Qt::red);
+
+    painter->setPen(Qt::red);
+
+    sprintf(str, "%i/%i", 0, devparms->func_wrec_fend);
+
+    painter->drawText(xpos + 30, ypos, 120, 20, Qt::AlignCenter, str);
+  }
+  else
+  {
+    painter->fillRect(xpos + 5, ypos + 5, 10, 10, Qt::green);
+
+    painter->setPen(Qt::green);
+
+    sprintf(str, "%i/%i", devparms->func_wplay_fcur, devparms->func_wrec_fend);
+
+    painter->drawText(xpos + 30, ypos, 120, 20, Qt::AlignCenter, str);
+  }
 }
 
 

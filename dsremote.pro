@@ -60,6 +60,7 @@ HEADERS += decode_dialog.h
 HEADERS += tdial.h
 HEADERS += wave_dialog.h
 HEADERS += wave_view.h
+HEADERS += playback_dialog.h
 
 HEADERS += third_party/kiss_fft/kiss_fft.h
 HEADERS += third_party/kiss_fft/_kiss_fft_guts.h
@@ -89,6 +90,7 @@ SOURCES += decode_dialog.cpp
 SOURCES += tdial.cpp
 SOURCES += wave_dialog.cpp
 SOURCES += wave_view.cpp
+SOURCES += playback_dialog.cpp
 
 SOURCES += third_party/kiss_fft/kiss_fft.c
 SOURCES += third_party/kiss_fft/kiss_fftr.c

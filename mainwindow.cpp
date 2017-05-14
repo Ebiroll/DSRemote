@@ -341,6 +341,8 @@ void UI_Mainwindow::open_connection()
   devparms.cmd_cue_idx_in = 0;
   devparms.cmd_cue_idx_out = 0;
 
+  devparms.func_has_record = 0;
+
   devparms.fftbufsz = devparms.hordivisions * 50;
 
   if(devparms.k_cfg != NULL)
@@ -396,6 +398,10 @@ void UI_Mainwindow::open_connection()
   connect(vertScaleDial,  SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(vertScaleDialClicked(QPoint)));
   connect(trigAdjustDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(trigAdjustDialClicked(QPoint)));
   connect(adjDial,        SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(adjustDialClicked(QPoint)));
+
+  connect(playpauseButton, SIGNAL(clicked()), this, SLOT(playpauseButtonClicked()));
+  connect(stopButton,      SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
+  connect(recordButton,    SIGNAL(clicked()), this, SLOT(recordButtonClicked()));
 
   sprintf(str, PROGRAM_NAME " " PROGRAM_VERSION "   %s   %s   %s",
           devparms.serialnr, devparms.softwvers, dev_str);
@@ -516,6 +522,10 @@ void UI_Mainwindow::close_connection()
   disconnect(vertScaleDial,  SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(vertScaleDialClicked(QPoint)));
   disconnect(trigAdjustDial, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(trigAdjustDialClicked(QPoint)));
   disconnect(adjDial,        SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(adjustDialClicked(QPoint)));
+
+  disconnect(playpauseButton, SIGNAL(clicked()), this, SLOT(playpauseButtonClicked()));
+  disconnect(stopButton,      SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
+  disconnect(recordButton,    SIGNAL(clicked()), this, SLOT(recordButtonClicked()));
 
   scrn_thread->set_device(NULL);
 
@@ -1838,6 +1848,11 @@ void UI_Mainwindow::zoom_out()
     sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
 
     set_cue_cmd(str);
+
+    if(devparms.timebasedelayscale > 0.1000001)
+    {
+      devparms.func_wrec_enable = 0;
+    }
   }
   else
   {
@@ -1863,6 +1878,11 @@ void UI_Mainwindow::zoom_out()
     sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
 
     set_cue_cmd(str);
+
+    if(devparms.timebasescale > 0.1000001)
+    {
+      devparms.func_wrec_enable = 0;
+    }
   }
 
   waveForm->update();
@@ -2440,6 +2460,8 @@ void UI_Mainwindow::set_to_factory()
 
   devparms.countersrc = 0;
 
+  devparms.func_wrec_enable = 0;
+
   statusLabel->setText("Reset to factory settings");
 
   waveForm->update();
@@ -2645,6 +2667,26 @@ void UI_Mainwindow::set_cue_cmd(const char *str)
   strncpy(devparms.cmd_cue[devparms.cmd_cue_idx_in], str, 128);
 
   devparms.cmd_cue[devparms.cmd_cue_idx_in][127] = 0;
+
+  devparms.cmd_cue_resp[devparms.cmd_cue_idx_in] = NULL;
+
+  devparms.cmd_cue_idx_in++;
+
+  devparms.cmd_cue_idx_in %= TMC_CMD_CUE_SZ;
+
+  scrn_timer_handler();
+}
+
+
+void UI_Mainwindow::set_cue_cmd(const char *str, char *ptr)
+{
+  strncpy(devparms.cmd_cue[devparms.cmd_cue_idx_in], str, 128);
+
+  devparms.cmd_cue[devparms.cmd_cue_idx_in][127] = 0;
+
+  ptr[0] = 0;
+
+  devparms.cmd_cue_resp[devparms.cmd_cue_idx_in] = ptr;
 
   devparms.cmd_cue_idx_in++;
 

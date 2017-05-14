@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.34_1702162027"
+#define PROGRAM_VERSION       "0.35_1705141814"
 
 #define MAX_PATHLEN            4096
 
@@ -256,7 +256,7 @@ struct device_settings
   struct waveform_preamble preamble;
 
   char cmd_cue[TMC_CMD_CUE_SZ][128];
-
+  char *cmd_cue_resp[TMC_CMD_CUE_SZ];
   int cmd_cue_idx_in;
   int cmd_cue_idx_out;
 
@@ -283,6 +283,22 @@ struct device_settings
   int wave_mem_view_enabled;
 
   double viewer_center_position;
+
+  int func_wrec_enable;
+  int func_wrec_fend;
+  int func_wrec_fmax;
+  double func_wrec_fintval;
+  int func_wrec_prompt;
+  int func_wrec_operate;
+  int func_wplay_fstart;
+  int func_wplay_fend;
+  int func_wplay_fmax;
+  double func_wplay_fintval;
+  int func_wplay_mode;
+  int func_wplay_dir;
+  int func_wplay_operate;
+  int func_wplay_fcur;
+  int func_has_record;
 };
 
 

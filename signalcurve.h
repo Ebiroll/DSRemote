@@ -153,6 +153,7 @@ private:
   void drawTopLabels(QPainter *);
   void paintLabel(QPainter *, int, int, int, int, const char *, QColor);
   void paintCounterLabel(QPainter *, int, int);
+  void paintPlaybackLabel(QPainter *, int, int);
   void drawFFT(QPainter *, int, int);
   void drawfpsLabel(QPainter *, int, int);
   void draw_decoder(QPainter *, int, int);

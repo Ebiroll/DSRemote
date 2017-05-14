@@ -98,6 +98,12 @@ void screen_thread::set_params(struct device_settings *dev_parms)
   params.kiss_fftbuf = deviceparms->kiss_fftbuf;
   params.current_screen_sf = deviceparms->current_screen_sf;
   params.debug_str[0] = 0;
+  params.func_wrec_enable = deviceparms->func_wrec_enable;
+  params.func_wrec_operate = deviceparms->func_wrec_operate;
+  params.func_wplay_operate = deviceparms->func_wplay_operate;
+  params.func_wplay_fcur = deviceparms->func_wplay_fcur;
+  params.func_wrec_fmax = deviceparms->func_wrec_fmax;
+  params.func_wrep_fmax = deviceparms->func_wplay_fmax;
 }
 
 
@@ -137,6 +143,14 @@ void screen_thread::get_params(struct device_settings *dev_parms)
   {
     dev_parms->math_fft_hscale = params.math_fft_hscale;
     dev_parms->math_fft_hcenter = params.math_fft_hcenter;
+  }
+  if(dev_parms->func_wrec_enable)
+  {
+    dev_parms->func_wrec_operate = params.func_wrec_operate;
+    dev_parms->func_wplay_operate = params.func_wplay_operate;
+    deviceparms->func_wplay_fcur = params.func_wplay_fcur;
+    deviceparms->func_wrec_fmax = params.func_wrec_fmax;
+    deviceparms->func_wplay_fmax = params.func_wrep_fmax;
   }
   if(params.debug_str[0])
   {
@@ -278,6 +292,136 @@ int screen_thread::get_devicestatus()
     params.counterfreq = atof(device->buf);
   }
 
+  if(params.func_wrec_enable)
+  {
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREC:OPER?") != 16)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(params.modelserie == 6)
+    {
+      if(!strcmp(device->buf, "REC"))
+      {
+        params.func_wrec_operate = 1;
+      }
+      else if(!strcmp(device->buf, "STOP"))
+        {
+          params.func_wrec_operate = 0;
+        }
+        else
+        {
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+    }
+    else
+    {
+      if(!strcmp(device->buf, "RUN"))
+      {
+        params.func_wrec_operate = 1;
+      }
+      else if(!strcmp(device->buf, "STOP"))
+        {
+          params.func_wrec_operate = 0;
+        }
+        else
+        {
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+    }
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREP:OPER?") != 16)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(!strcmp(device->buf, "PLAY"))
+    {
+      params.func_wplay_operate = 1;
+    }
+    else if(!strcmp(device->buf, "STOP"))
+      {
+        params.func_wplay_operate = 0;
+      }
+      else if(!strcmp(device->buf, "PAUS"))
+        {
+          params.func_wplay_operate = 2;
+        }
+        else
+        {
+          line = __LINE__;
+          goto OUT_ERROR;
+        }
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREP:FCUR?") != 16)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    params.func_wplay_fcur = atoi(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREC:FMAX?") != 16)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    params.func_wrec_fmax = atoi(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREP:FMAX?") != 16)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto OUT_ERROR;
+    }
+
+    params.func_wrep_fmax = atoi(device->buf);
+  }
+
   params.debug_str[0] = 0;
 
   return 0;
@@ -333,6 +477,22 @@ void screen_thread::run()
     usleep(TMC_GDS_DELAY);
 
     tmc_write(deviceparms->cmd_cue[params.cmd_cue_idx_out]);
+
+    if(deviceparms->cmd_cue_resp[params.cmd_cue_idx_out] != NULL)
+    {
+      usleep(TMC_GDS_DELAY);
+
+      if(tmc_read() < 1)
+      {
+        printf("Can not read from device.\n");
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+
+      strncpy(deviceparms->cmd_cue_resp[params.cmd_cue_idx_out], device->buf, 128);
+
+      deviceparms->cmd_cue_resp[params.cmd_cue_idx_out][127] = 0;
+    }
 
     if((!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":TLHA", 5)) ||
        ((!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":CHAN", 5)) &&

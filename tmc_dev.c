@@ -142,7 +142,12 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
        !strncmp(buf, ":TRIG:SWE?", 10) ||
        !strncmp(buf, ":ACQ:SRAT?", 10) ||
        !strncmp(buf, ":ACQ:MDEP?", 10) ||
-       !strncmp(buf, ":MEAS:COUN:VAL?", 15)))
+       !strncmp(buf, ":MEAS:COUN:VAL?", 15) ||
+       !strncmp(buf, ":FUNC:WREC:OPER?", 16) ||
+       !strncmp(buf, ":FUNC:WREP:OPER?", 16) ||
+       !strncmp(buf, ":FUNC:WREP:FMAX?", 16) ||
+       !strncmp(buf, ":FUNC:WREC:FMAX?", 16) ||
+       !strncmp(buf, ":FUNC:WREP:FCUR?", 16)))
   {
     printf("tmc_dev write: %s", buf);
   }

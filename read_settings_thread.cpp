@@ -2588,6 +2588,168 @@ void read_settings_thread::run()
       devparms->math_decode_spi_end = 1;
     }
 
+  usleep(TMC_GDS_DELAY);
+
+  if(devparms->modelserie != 6)
+  {
+    if(tmc_write(":FUNC:WREC:ENAB?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(!strcmp(device->buf, "1"))
+    {
+      devparms->func_wrec_enable = 1;
+    }
+    else if(!strcmp(device->buf, "0"))
+      {
+        devparms->func_wrec_enable = 0;
+      }
+      else
+      {
+        line = __LINE__;
+        goto GDS_OUT_ERROR;
+      }
+  }
+
+  if(devparms->func_wrec_enable)
+  {
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREC:FEND?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->func_wrec_fend = atoi(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREC:FMAX?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->func_wrec_fmax = atoi(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREC:FINT?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->func_wrec_fintval = atof(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREP:FST?") != 15)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->func_wplay_fstart = atoi(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREP:FEND?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->func_wplay_fend = atoi(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREP:FMAX?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->func_wplay_fmax = atoi(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREP:FINT?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->func_wplay_fintval = atof(device->buf);
+
+    usleep(TMC_GDS_DELAY);
+
+    if(tmc_write(":FUNC:WREP:FCUR?") != 16)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    devparms->func_wplay_fcur = atoi(device->buf);
+  }
+
   err_num = 0;
 
   return;

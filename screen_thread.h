@@ -103,6 +103,13 @@ private:
 
     int current_screen_sf;
 
+    int func_wrec_enable;
+    int func_wrec_fmax;
+    int func_wrec_operate;
+    int func_wrep_fmax;
+    int func_wplay_operate;
+    int func_wplay_fcur;
+
     char debug_str[1024];
   } params;
 
