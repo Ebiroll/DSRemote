@@ -1874,6 +1874,13 @@ void UI_Mainwindow::playpauseButtonClicked()
   }
   else
   {
+    if((devparms.modelserie == 6) && (devparms.func_wrec_enable == 1))  // DS6000 series record mode
+    {
+      set_cue_cmd(":FUNC:WRM PLAY");
+
+      devparms.func_wrec_enable = 2;  // DS6000 series play mode
+    }
+
     devparms.func_wplay_operate = 1;
 
     devparms.func_wplay_fcur = 0;
@@ -1912,6 +1919,13 @@ void UI_Mainwindow::recordButtonClicked()
   if(devparms.func_wplay_operate)  return;
 
   if(devparms.func_wrec_operate)  return;
+
+  if(devparms.func_wrec_enable == 2)  // DS6000 series play mode
+  {
+    set_cue_cmd(":FUNC:WRM REC");
+
+    devparms.func_wrec_enable = 1;  // DS6000 series record mode
+  }
 
   statusLabel->setText("Record on");
 

@@ -38,11 +38,19 @@ UI_playback_window::UI_playback_window(QWidget *w_parent)
 
   mainwindow->set_cue_cmd(":FUNC:WREC:FMAX?", rec_fmax_resp);
   mainwindow->set_cue_cmd(":FUNC:WREC:FEND?", rec_fend_resp);
-  mainwindow->set_cue_cmd(":FUNC:WREC:FINT?", rec_fint_resp);
+  if(devparms->modelserie != 6)
+  {
+    mainwindow->set_cue_cmd(":FUNC:WREC:FINT?", rec_fint_resp);
+    mainwindow->set_cue_cmd(":FUNC:WREP:FINT?", rep_fint_resp);
+  }
+  else
+  {
+    mainwindow->set_cue_cmd(":FUNC:WREC:INT?", rec_fint_resp);
+    mainwindow->set_cue_cmd(":FUNC:WREP:INT?", rep_fint_resp);
+  }
   mainwindow->set_cue_cmd(":FUNC:WREP:FST?", rep_fstart_resp);
   mainwindow->set_cue_cmd(":FUNC:WREP:FEND?", rep_fend_resp);
   mainwindow->set_cue_cmd(":FUNC:WREP:FMAX?", rep_fmax_resp);
-  mainwindow->set_cue_cmd(":FUNC:WREP:FINT?", rep_fint_resp);
 
   setWindowTitle("Record/Playback");
 
@@ -113,13 +121,13 @@ UI_playback_window::UI_playback_window(QWidget *w_parent)
 
   toggle_playback_button = new QPushButton(this);
   toggle_playback_button->setGeometry(20, 255, 100, 25);
-  if(devparms->func_wrec_enable == 1)
+  if(!devparms->func_wrec_enable)
   {
-    toggle_playback_button->setText("Disable");
+    toggle_playback_button->setText("Enable");
   }
   else
   {
-    toggle_playback_button->setText("Enable");
+    toggle_playback_button->setText("Disable");
   }
   toggle_playback_button->setAutoDefault(false);
   toggle_playback_button->setDefault(false);
@@ -196,7 +204,7 @@ void UI_playback_window::toggle_playback()
   QMessageBox msgBox;
   msgBox.setText("Timebase scale must be <= 100mS.");
 
-  if(devparms->func_wrec_enable == 0)
+  if(!devparms->func_wrec_enable)
   {
     if(devparms->timebasedelayenable)
     {
@@ -229,6 +237,10 @@ void UI_playback_window::toggle_playback()
     {
       mainwindow->set_cue_cmd(":FUNC:WREC:ENAB ON");
     }
+    else
+    {
+      mainwindow->set_cue_cmd(":FUNC:WRM REC");
+    }
   }
   else
   {
@@ -253,6 +265,10 @@ void UI_playback_window::toggle_playback()
     if(devparms->modelserie != 6)
     {
       mainwindow->set_cue_cmd(":FUNC:WREC:ENAB OFF");
+    }
+    else
+    {
+      mainwindow->set_cue_cmd(":FUNC:WRM OFF");
     }
   }
 }
@@ -282,7 +298,14 @@ void UI_playback_window::rec_fint_spinbox_changed(double fint)
 
   strcat(str, "S");
 
-  sprintf(str, ":FUNC:WREC:FINT %e", fint);
+  if(devparms->modelserie != 6)
+  {
+    sprintf(str, ":FUNC:WREC:FINT %e", fint);
+  }
+  else
+  {
+    sprintf(str, ":FUNC:WREC:INT %e", fint);
+  }
 
   mainwindow->set_cue_cmd(str);
 }
@@ -328,7 +351,14 @@ void UI_playback_window::rep_fint_spinbox_changed(double fint)
 
   mainwindow->statusLabel->setText(str);
 
-  sprintf(str, ":FUNC:WREP:FINT %e", fint);
+  if(devparms->modelserie != 6)
+  {
+    sprintf(str, ":FUNC:WREP:FINT %e", fint);
+  }
+  else
+  {
+    sprintf(str, ":FUNC:WREP:INT %e", fint);
+  }
 
   mainwindow->set_cue_cmd(str);
 }

@@ -2618,6 +2618,38 @@ void read_settings_thread::run()
         goto GDS_OUT_ERROR;
       }
   }
+  else
+  {
+    if(tmc_write(":FUNC:WRM?") != 10)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(tmc_read() < 1)
+    {
+      line = __LINE__;
+      goto GDS_OUT_ERROR;
+    }
+
+    if(!strcmp(device->buf, "REC"))
+    {
+      devparms->func_wrec_enable = 1;
+    }
+    else if(!strcmp(device->buf, "PLAY"))
+      {
+        devparms->func_wrec_enable = 2;
+      }
+      else if(!strcmp(device->buf, "OFF"))
+        {
+          devparms->func_wrec_enable = 0;
+        }
+        else
+        {
+          line = __LINE__;
+          goto GDS_OUT_ERROR;
+        }
+  }
 
   if(devparms->func_wrec_enable)
   {
