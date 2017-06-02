@@ -1122,6 +1122,19 @@ void UI_Mainwindow::get_device_model(const char *str)
     if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
+  if(!strcmp(str, "DS1104Z Plus"))
+  {
+    devparms.channel_cnt = 4;
+
+    devparms.bandwidth = 100;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
+  }
+
   if(devparms.channel_cnt && devparms.bandwidth && devparms.modelserie)
   {
     strcpy(devparms.modelname, str);
