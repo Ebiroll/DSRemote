@@ -219,7 +219,9 @@ private:
           *zoom_in_act,
           *zoom_out_act,
           *chan_scale_plus_act,
+          *chan_scale_plus_all_channels_act,
           *chan_scale_minus_act,
+          *chan_scale_minus_all_channels_act,
           *shift_trace_up_act,
           *shift_trace_down_act,
           *select_chan1_act,
@@ -419,6 +421,8 @@ private slots:
   void zoom_in();
   void zoom_out();
   void chan_scale_plus();
+  void chan_scale_plus_all();
+  void chan_scale_minus_all();
   void chan_scale_minus();
   void shift_trace_up();
   void shift_trace_down();

@@ -475,10 +475,20 @@ UI_Mainwindow::UI_Mainwindow()
   connect(chan_scale_plus_act, SIGNAL(triggered()), this, SLOT(chan_scale_plus()));
   addAction(chan_scale_plus_act);
 
+  chan_scale_plus_all_channels_act = new QAction(this);
+  chan_scale_plus_all_channels_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Minus));
+  connect(chan_scale_plus_all_channels_act, SIGNAL(triggered()), this, SLOT(chan_scale_plus_all()));
+  addAction(chan_scale_plus_all_channels_act);
+
   chan_scale_minus_act = new QAction(this);
   chan_scale_minus_act->setShortcut(Qt::Key_Plus);
   connect(chan_scale_minus_act, SIGNAL(triggered()), this, SLOT(chan_scale_minus()));
   addAction(chan_scale_minus_act);
+
+  chan_scale_minus_all_channels_act = new QAction(this);
+  chan_scale_minus_all_channels_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Plus));
+  connect(chan_scale_minus_all_channels_act, SIGNAL(triggered()), this, SLOT(chan_scale_minus_all()));
+  addAction(chan_scale_minus_all_channels_act);
 
   select_chan1_act = new QAction(this);
   select_chan1_act->setShortcut(QKeySequence("1"));

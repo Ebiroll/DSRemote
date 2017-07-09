@@ -1971,6 +1971,8 @@ void UI_Mainwindow::show_howto_operate()
     "Zoom Out (increase timebase): Ctl-\n"
     "Increase vertical scale: -\n"
     "Decrease vertical scale: +\n"
+    "Increase vertical scale for all active channels: Shift-\n"
+    "Decrease vertical scale for all active channels: Shift+\n"
     "Press '1' to select or deselect channel 1\n"
     "Press '2' to select or deselect channel 2, etc.\n"
     "Press 'c' to center the horizontal position.\n"

@@ -2079,6 +2079,81 @@ void UI_Mainwindow::chan_scale_plus()
 }
 
 
+void UI_Mainwindow::chan_scale_plus_all()
+{
+  int chn;
+
+  double val, ltmp;
+
+  char str[512];
+
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
+  if(devparms.math_fft && devparms.math_fft_split)
+  {
+    return;
+  }
+
+  for(chn=0; chn<devparms.channel_cnt; chn++)
+  {
+    if(!devparms.chandisplay[chn])  continue;
+
+    if(devparms.chanscale[chn] >= 20)
+    {
+      devparms.chanscale[chn] = 20;
+
+      return;
+    }
+
+    ltmp = devparms.chanscale[chn];
+
+    val = round_up_step125(devparms.chanscale[chn], NULL);
+
+    if(devparms.chanvernier[chn])
+    {
+      val /= 100;
+
+      devparms.chanscale[chn] += val;
+    }
+    else
+    {
+      devparms.chanscale[chn] = val;
+    }
+
+    ltmp /= val;
+
+    devparms.chanoffset[chn] /= ltmp;
+
+    sprintf(str, "Channel %i scale: ", chn + 1);
+
+    convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+
+    strcat(str, "V");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+
+    set_cue_cmd(str);
+  }
+
+  waveForm->update();
+}
+
+
 void UI_Mainwindow::chan_scale_minus()
 {
   int chn;
@@ -2219,6 +2294,88 @@ void UI_Mainwindow::chan_scale_minus()
   sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
   set_cue_cmd(str);
+
+  waveForm->update();
+}
+
+
+void UI_Mainwindow::chan_scale_minus_all()
+{
+  int chn;
+
+  double val, ltmp;
+
+  char str[512];
+
+  if(device == NULL)
+  {
+    return;
+  }
+
+  if(!devparms.connected)
+  {
+    return;
+  }
+
+  if(devparms.activechannel < 0)
+  {
+    return;
+  }
+
+  if(devparms.math_fft && devparms.math_fft_split)
+  {
+    return;
+  }
+
+  for(chn=0; chn<devparms.channel_cnt; chn++)
+  {
+    if(!devparms.chandisplay[chn])  continue;
+
+    if(devparms.chanscale[chn] <= 1e-2)
+    {
+      devparms.chanscale[chn] = 1e-2;
+
+      return;
+    }
+
+    ltmp = devparms.chanscale[chn];
+
+    if(devparms.chanvernier[chn])
+    {
+      val = round_up_step125(devparms.chanscale[chn], NULL);
+    }
+    else
+    {
+      val = round_down_step125(devparms.chanscale[chn], NULL);
+    }
+
+    if(devparms.chanvernier[chn])
+    {
+      val /= 100;
+
+      devparms.chanscale[chn] -= val;
+    }
+    else
+    {
+      devparms.chanscale[chn] = val;
+    }
+
+    ltmp /= val;
+
+    devparms.chanoffset[chn] /= ltmp;
+
+    sprintf(str, "Channel %i scale: ", chn + 1);
+
+    convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+
+    strcat(str, "V");
+
+    statusLabel->setText(str);
+
+    sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+
+    set_cue_cmd(str);
+  }
 
   waveForm->update();
 }
