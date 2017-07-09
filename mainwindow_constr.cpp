@@ -158,7 +158,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   strcpy(devparms.modelname, "-----");
 
-  devparms.mutexx = new QMutex();
+  pthread_mutex_init(&devparms.mutexx, NULL);
 
   scrn_thread = new screen_thread;
   scrn_thread->set_device(NULL);
@@ -632,7 +632,7 @@ UI_Mainwindow::~UI_Mainwindow()
   delete scrn_thread;
   delete appfont;
   delete monofont;
-  delete devparms.mutexx;
+  pthread_mutex_destroy(&devparms.mutexx);
 
   free(devparms.screenshot_buf);
 

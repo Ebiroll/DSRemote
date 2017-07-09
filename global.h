@@ -29,13 +29,13 @@
 #ifndef DSR_GLOBAL_H
 #define DSR_GLOBAL_H
 
-#include <QMutex>
+#include <pthread.h>
 
 #include "third_party/kiss_fft/kiss_fftr.h"
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.35_1707091423"
+#define PROGRAM_VERSION       "0.35_1707091429"
 
 #define MAX_PATHLEN            4096
 
@@ -245,7 +245,7 @@ struct device_settings
 
   int screenupdates_on;
 
-  QMutex *mutexx;
+  pthread_mutex_t mutexx;
 
   int thread_error_stat;
   int thread_error_line;

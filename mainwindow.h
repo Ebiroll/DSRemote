@@ -74,6 +74,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "global.h"
 #include "about_dialog.h"

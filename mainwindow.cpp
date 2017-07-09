@@ -461,7 +461,8 @@ void UI_Mainwindow::close_connection()
 
     scrn_thread->wait(5000);
 
-    devparms.mutexx->unlock();
+    pthread_mutex_trylock(&devparms.mutexx);
+    pthread_mutex_unlock(&devparms.mutexx);
 
     scrn_thread->h_busy = 0;
   }
@@ -2714,21 +2715,21 @@ void UI_Mainwindow::screenUpdate()
 
   if(device == NULL)
   {
-    devparms.mutexx->unlock();
+    pthread_mutex_unlock(&devparms.mutexx);
 
     return;
   }
 
   if(!devparms.connected)
   {
-    devparms.mutexx->unlock();
+    pthread_mutex_unlock(&devparms.mutexx);
 
     return;
   }
 
   if(!devparms.screenupdates_on)
   {
-    devparms.mutexx->unlock();
+    pthread_mutex_unlock(&devparms.mutexx);
 
     return;
   }
@@ -2747,7 +2748,7 @@ void UI_Mainwindow::screenUpdate()
     msgBox.setText(str);
     msgBox.exec();
 
-    devparms.mutexx->unlock();
+    pthread_mutex_unlock(&devparms.mutexx);
 
     close_connection();
 
@@ -2756,7 +2757,7 @@ void UI_Mainwindow::screenUpdate()
 
   if(devparms.thread_result == TMC_THRD_RESULT_NONE)
   {
-    devparms.mutexx->unlock();
+    pthread_mutex_unlock(&devparms.mutexx);
 
     return;
   }
@@ -2770,14 +2771,14 @@ void UI_Mainwindow::screenUpdate()
 //      waveForm->setTrigLineVisible();
     }
 
-    devparms.mutexx->unlock();
+    pthread_mutex_unlock(&devparms.mutexx);
 
     return;
   }
 
   if(scrn_timer->isActive() == false)
   {
-    devparms.mutexx->unlock();
+    pthread_mutex_unlock(&devparms.mutexx);
 
     return;
   }
@@ -2828,7 +2829,7 @@ void UI_Mainwindow::screenUpdate()
 
   if(waveForm->hasMoveEvent() == true)
   {
-    devparms.mutexx->unlock();
+    pthread_mutex_unlock(&devparms.mutexx);
 
     return;
   }
@@ -2847,7 +2848,7 @@ void UI_Mainwindow::screenUpdate()
   {
     waveForm->clear();
 
-    devparms.mutexx->unlock();
+    pthread_mutex_unlock(&devparms.mutexx);
 
     return;
   }
@@ -2867,7 +2868,7 @@ void UI_Mainwindow::screenUpdate()
     waveForm->update();
   }
 
-  devparms.mutexx->unlock();
+  pthread_mutex_unlock(&devparms.mutexx);
 }
 
 

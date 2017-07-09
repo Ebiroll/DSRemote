@@ -117,7 +117,7 @@ void UI_Mainwindow::adjdial_timer_handler()
 
 void UI_Mainwindow::scrn_timer_handler()
 {
-  if(devparms.mutexx->tryLock() == false)
+  if(pthread_mutex_trylock(&devparms.mutexx))
   {
     return;
   }
