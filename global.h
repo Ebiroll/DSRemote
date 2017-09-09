@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.35_1707091429"
+#define PROGRAM_VERSION       "0.35_1709091834"
 
 #define MAX_PATHLEN            4096
 
@@ -123,6 +123,8 @@ struct device_settings
   int hordivisions;             // number of horizontal divisions, 12 or 14
   int vertdivisions;            // number of vertical divisions, 8 or 10
   int use_extra_vertdivisions;  // If 1: use 10 vertical divisions instead of 8, DS1000Z only
+
+  char hostname[128];
 
   int screentimerival;
 

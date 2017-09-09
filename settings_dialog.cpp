@@ -57,13 +57,18 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
     usbRadioButton->setChecked(true);
   }
 
-  lanRadioButton = new QRadioButton("LAN", this);
-  lanRadioButton->setAutoExclusive(true);
-  lanRadioButton->setGeometry(40, 70, 110, 25);
+  lanIPRadioButton = new QRadioButton("LAN", this);
+  lanIPRadioButton->setAutoExclusive(true);
+  lanIPRadioButton->setGeometry(40, 70, 110, 25);
   if(mainwindow->devparms.connectiontype == 1)
   {
-    lanRadioButton->setChecked(true);
+    lanIPRadioButton->setChecked(true);
   }
+
+  hostnameLabel = new QLabel(this);
+  hostnameLabel->setGeometry(40, 120, 120, 35);
+  hostnameLabel->setText("Hostname\n(overides IP-address)");
+  hostnameLabel->setToolTip("Leave empty if you want to use the above IP-address");
 
   comboBox1 = new QComboBox(this);
   comboBox1->setGeometry(180, 20, 110, 25);
@@ -129,23 +134,34 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
     ipSpinbox4->setValue(100);
   }
 
+  if(settings.contains("connection/hostname"))
+  {
+    strncpy(mainwindow->devparms.hostname, settings.value("connection/hostname").toString().toLatin1().data(), 63);
+  }
+
+  HostLineEdit = new QLineEdit(this);
+  HostLineEdit->setGeometry(180, 120, 240, 25);
+  HostLineEdit->setMaxLength(63);
+  HostLineEdit->setText(mainwindow->devparms.hostname);
+  HostLineEdit->setToolTip("Leave empty if you want to use the above IP-address");
+
   refreshLabel = new QLabel(this);
-  refreshLabel->setGeometry(40, 120, 120, 35);
-  refreshLabel->setText("Screen update\n interval");
+  refreshLabel->setGeometry(40, 170, 120, 35);
+  refreshLabel->setText("Screen update\ninterval");
 
   refreshSpinbox = new QSpinBox(this);
-  refreshSpinbox->setGeometry(180, 120, 100, 25);
+  refreshSpinbox->setGeometry(180, 170, 100, 25);
   refreshSpinbox->setSuffix(" mS");
   refreshSpinbox->setRange(50, 2000);
   refreshSpinbox->setSingleStep(10);
   refreshSpinbox->setValue(mainwindow->devparms.screentimerival);
 
   invScrShtLabel = new QLabel(this);
-  invScrShtLabel->setGeometry(40, 170, 120, 35);
+  invScrShtLabel->setGeometry(40, 220, 120, 35);
   invScrShtLabel->setText("Screenshot invert\n colors");
 
   invScrShtCheckbox = new QCheckBox(this);
-  invScrShtCheckbox->setGeometry(180, 170, 120, 35);
+  invScrShtCheckbox->setGeometry(180, 220, 120, 35);
   invScrShtCheckbox->setTristate(false);
   if(mainwindow->devparms.screenshot_inv)
   {
@@ -157,11 +173,11 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   }
 
   showfpsLabel = new QLabel(this);
-  showfpsLabel->setGeometry(40, 220, 120, 35);
+  showfpsLabel->setGeometry(40, 270, 120, 35);
   showfpsLabel->setText("Show frames\n per second");
 
   showfpsCheckbox = new QCheckBox(this);
-  showfpsCheckbox->setGeometry(180, 220, 120, 35);
+  showfpsCheckbox->setGeometry(180, 270, 120, 35);
   showfpsCheckbox->setTristate(false);
   if(mainwindow->devparms.show_fps)
   {
@@ -173,11 +189,11 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   }
 
   extendvertdivLabel = new QLabel(this);
-  extendvertdivLabel->setGeometry(40, 270, 120, 35);
+  extendvertdivLabel->setGeometry(40, 320, 120, 35);
   extendvertdivLabel->setText("Use extended\n vertical range");
 
   extendvertdivCheckbox = new QCheckBox(this);
-  extendvertdivCheckbox->setGeometry(180, 270, 120, 35);
+  extendvertdivCheckbox->setGeometry(180, 320, 120, 35);
   extendvertdivCheckbox->setTristate(false);
   if(mainwindow->devparms.use_extra_vertdivisions)
   {
@@ -210,7 +226,7 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   if(mainwindow->devparms.connected)
   {
     usbRadioButton->setEnabled(false);
-    lanRadioButton->setEnabled(false);
+    lanIPRadioButton->setEnabled(false);
     ipSpinbox1->setEnabled(false);
     ipSpinbox2->setEnabled(false);
     ipSpinbox3->setEnabled(false);
@@ -223,11 +239,12 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
     QObject::connect(applyButton, SIGNAL(clicked()), this, SLOT(applyButtonClicked()));
   }
 
-  QObject::connect(cancelButton,          SIGNAL(clicked()),         this, SLOT(close()));
-  QObject::connect(refreshSpinbox,        SIGNAL(valueChanged(int)), this, SLOT(refreshSpinboxChanged(int)));
-  QObject::connect(invScrShtCheckbox,     SIGNAL(stateChanged(int)), this, SLOT(invScrShtCheckboxChanged(int)));
-  QObject::connect(showfpsCheckbox,       SIGNAL(stateChanged(int)), this, SLOT(showfpsCheckboxChanged(int)));
-  QObject::connect(extendvertdivCheckbox, SIGNAL(stateChanged(int)), this, SLOT(extendvertdivCheckboxChanged(int)));
+  QObject::connect(cancelButton,          SIGNAL(clicked()),           this, SLOT(close()));
+  QObject::connect(refreshSpinbox,        SIGNAL(valueChanged(int)),   this, SLOT(refreshSpinboxChanged(int)));
+  QObject::connect(invScrShtCheckbox,     SIGNAL(stateChanged(int)),   this, SLOT(invScrShtCheckboxChanged(int)));
+  QObject::connect(showfpsCheckbox,       SIGNAL(stateChanged(int)),   this, SLOT(showfpsCheckboxChanged(int)));
+  QObject::connect(extendvertdivCheckbox, SIGNAL(stateChanged(int)),   this, SLOT(extendvertdivCheckboxChanged(int)));
+  QObject::connect(HostLineEdit,          SIGNAL(textEdited(QString)), this, SLOT(hostnamechanged(QString)));
 
   exec();
 }
@@ -267,6 +284,10 @@ void UI_settings_window::applyButtonClicked()
           ipSpinbox1->value(), ipSpinbox2->value(), ipSpinbox3->value(), ipSpinbox4->value());
 
   settings.setValue("connection/ip", dev_str);
+
+  strncpy(mainwindow->devparms.hostname, HostLineEdit->text().toLatin1().data(), 64);
+
+  settings.setValue("connection/hostname", mainwindow->devparms.hostname);
 
   if(invScrShtCheckbox->checkState() == Qt::Checked)
   {
@@ -384,6 +405,55 @@ void UI_settings_window::extendvertdivCheckboxChanged(int state)
     {
       mainwindow->devparms.vertdivisions = 8;
     }
+  }
+}
+
+
+void UI_settings_window::hostnamechanged(QString qstr)
+{
+  int i, j, len, trunc=0;
+
+  char str[128];
+
+  strncpy(str, qstr.toLatin1().data(), 63);
+
+  str[63] = 0;
+
+  len = strlen(str);
+
+  for(i=0; i<len; i++)
+  {
+    if(((str[i] < '0') && (str[i] != '-') && (str[i] != '.')) ||
+       ((str[i] > '9') && (str[i] < 'A')) ||
+       ((str[i] > 'Z') && (str[i] < 'a')) ||
+        (str[i] > 'z'))
+    {
+      for(j=i; j<len; j++)
+      {
+        str[j] = str[j+1];
+      }
+
+      len--;
+
+      i--;
+
+      trunc = 1;
+    }
+  }
+
+  for(i=0; i<len; i++)
+  {
+    if((str[i] >= 'A') && (str[i] <= 'Z'))
+    {
+      str[i] += 32;
+
+      trunc = 1;
+    }
+  }
+
+  if(trunc)
+  {
+    HostLineEdit->setText(str);
   }
 }
 

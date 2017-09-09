@@ -98,53 +98,62 @@ void UI_Mainwindow::open_connection()
 
   if(devparms.connectiontype == 1)  // LAN
   {
-    strcpy(dev_str, settings.value("connection/ip", "192.168.1.100").toString().toLatin1().data());
+    strcpy(devparms.hostname, settings.value("connection/hostname", "").toString().toLatin1().data());
 
-    if(!strcmp(dev_str, ""))
+    if(strlen(devparms.hostname))
     {
-      sprintf(str, "No IP address set");
-      goto OC_OUT_ERROR;
+      strcpy(dev_str, devparms.hostname);
     }
-
-    len = strlen(dev_str);
-
-    if(len < 7)
+    else
     {
-      sprintf(str, "No IP address set");
-      goto OC_OUT_ERROR;
-    }
+      strcpy(dev_str, settings.value("connection/ip", "192.168.1.100").toString().toLatin1().data());
 
-    int cf = 0;
-
-    for(i=0; i<len; i++)
-    {
-      if(dev_str[i] == '.')
+      if(!strcmp(dev_str, ""))
       {
-        cf = 0;
+        sprintf(str, "No IP address or hostname set");
+        goto OC_OUT_ERROR;
       }
 
-      if(dev_str[i] == '0')
+      len = strlen(dev_str);
+
+      if(len < 7)
       {
-        if(cf == 0)
+        sprintf(str, "No IP address set");
+        goto OC_OUT_ERROR;
+      }
+
+      int cf = 0;
+
+      for(i=0; i<len; i++)
+      {
+        if(dev_str[i] == '.')
         {
-          if((dev_str[i+1] != 0) && (dev_str[i+1] != '.'))
+          cf = 0;
+        }
+
+        if(dev_str[i] == '0')
+        {
+          if(cf == 0)
           {
-            for(j=i; j<len; j++)
+            if((dev_str[i+1] != 0) && (dev_str[i+1] != '.'))
             {
-              dev_str[j] = dev_str[j+1];
+              for(j=i; j<len; j++)
+              {
+                dev_str[j] = dev_str[j+1];
+              }
+
+              i--;
+
+              len--;
             }
-
-            i--;
-
-            len--;
           }
         }
-      }
-      else
-      {
-        if(dev_str[i] != '.')
+        else
         {
-          cf = 1;
+          if(dev_str[i] != '.')
+          {
+            cf = 1;
+          }
         }
       }
     }
@@ -548,6 +557,8 @@ void UI_Mainwindow::close_connection()
   }
 
   statusLabel->setText("Disconnected");
+
+  printf("Disconnected from device\n");
 }
 
 

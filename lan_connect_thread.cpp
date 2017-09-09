@@ -55,9 +55,9 @@ struct tmcdev * lan_connect_thread::get_device(void)
 
 void lan_connect_thread::set_device_address(const char *addr)
 {
-  strncpy(dev_str, addr, 16);
+  strncpy(dev_str, addr, 63);
 
-  dev_str[15] = 0;
+  dev_str[63] = 0;
 }
 
 

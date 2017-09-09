@@ -41,6 +41,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <netdb.h>
 
 #include "tmc_dev.h"
 #include "utils.h"
@@ -103,9 +104,51 @@ static int tmclan_recv(char *buf, int sz)
 }
 
 
-struct tmcdev * tmclan_open(const char *ip_address)
+struct tmcdev * tmclan_open(const char *host_or_ip)
 {
+  char ip_address[256]={""};
+
   struct tmcdev *tmc_device;
+
+  struct addrinfo *addr_result, *res;
+
+  struct sockaddr_in *ipv4_addr;
+
+  if((host_or_ip[0] >= 'a') && (host_or_ip[0] <= 'z'))
+  {
+    printf("Resolving hostname: %s...\n", host_or_ip);
+    if(getaddrinfo(host_or_ip, NULL, NULL, &addr_result))
+    {
+      printf("Error: getaddrinfo()  file: %s  line: %i", __FILE__, __LINE__);
+      return NULL;
+    }
+
+    for(res=addr_result; res!=NULL; res=res->ai_next)
+    {
+      if(res->ai_family == AF_INET)
+      {
+        if(res->ai_socktype == SOCK_STREAM)
+        {
+          break;
+        }
+      }
+    }
+
+    if(res == NULL)
+    {
+      printf("Error: getaddrinfo()  file: %s  line: %i", __FILE__, __LINE__);
+      return NULL;
+    }
+
+    ipv4_addr = (struct sockaddr_in *)res->ai_addr;
+    inet_ntop(AF_INET, &(ipv4_addr->sin_addr), ip_address, INET_ADDRSTRLEN);
+    freeaddrinfo(addr_result);
+    printf("Resolved hostname %s into address: %s\n", host_or_ip, ip_address);
+  }
+  else
+  {
+    strcpy(ip_address, host_or_ip);
+  }
 
   sockfd = socket(PF_INET, SOCK_STREAM, 0);
   if(sockfd == -1)

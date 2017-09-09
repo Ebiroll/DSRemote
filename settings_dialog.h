@@ -43,6 +43,11 @@
 #include <QSettings>
 #include <QRadioButton>
 #include <QSpinBox>
+#include <QLineEdit>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "mainwindow.h"
 #include "global.h"
@@ -65,7 +70,7 @@ QPushButton  *cancelButton,
              *applyButton;
 
 QRadioButton *usbRadioButton,
-             *lanRadioButton;
+             *lanIPRadioButton;
 
 QComboBox    *comboBox1;
 
@@ -78,11 +83,14 @@ QSpinBox     *refreshSpinbox,
 QLabel       *refreshLabel,
              *invScrShtLabel,
              *showfpsLabel,
-             *extendvertdivLabel;
+             *extendvertdivLabel,
+             *hostnameLabel;
 
 QCheckBox    *invScrShtCheckbox,
              *showfpsCheckbox,
              *extendvertdivCheckbox;
+
+QLineEdit     *HostLineEdit;
 
 UI_Mainwindow *mainwindow;
 
@@ -93,6 +101,7 @@ void refreshSpinboxChanged(int);
 void invScrShtCheckboxChanged(int);
 void showfpsCheckboxChanged(int);
 void extendvertdivCheckboxChanged(int);
+void hostnamechanged(QString);
 
 };
 
