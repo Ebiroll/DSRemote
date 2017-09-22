@@ -1186,6 +1186,58 @@ void UI_Mainwindow::get_device_model(const char *str)
     if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
+  if(!strcmp(str, "MSO1074Z"))
+  {
+    devparms.channel_cnt = 4;
+
+    devparms.bandwidth = 70;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
+  }
+
+  if(!strcmp(str, "MSO1104Z"))
+  {
+    devparms.channel_cnt = 4;
+
+    devparms.bandwidth = 100;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
+  }
+
+  if(!strcmp(str, "MSO1074Z-S"))
+  {
+    devparms.channel_cnt = 4;
+
+    devparms.bandwidth = 70;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
+  }
+
+  if(!strcmp(str, "MSO1104Z-S"))
+  {
+    devparms.channel_cnt = 4;
+
+    devparms.bandwidth = 100;
+
+    devparms.modelserie = 1;
+
+    devparms.hordivisions = 12;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
+  }
+
   if(devparms.channel_cnt && devparms.bandwidth && devparms.modelserie)
   {
     strcpy(devparms.modelname, str);
