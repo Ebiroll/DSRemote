@@ -231,7 +231,8 @@ private:
           *select_chan4_act,
           *toggle_fft_act,
           *center_trigger_act,
-          *center_position_act;
+          *center_position_act,
+          *save_screenshot_act;
 
   struct tmcdev *device;
 
