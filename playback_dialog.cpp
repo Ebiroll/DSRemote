@@ -38,7 +38,7 @@ UI_playback_window::UI_playback_window(QWidget *w_parent)
 
   mainwindow->set_cue_cmd(":FUNC:WREC:FMAX?", rec_fmax_resp);
   mainwindow->set_cue_cmd(":FUNC:WREC:FEND?", rec_fend_resp);
-  if(devparms->modelserie != 6)
+  if(devparms->modelserie != 6 && devparms->modelserie != 4)
   {
     mainwindow->set_cue_cmd(":FUNC:WREC:FINT?", rec_fint_resp);
     mainwindow->set_cue_cmd(":FUNC:WREP:FINT?", rep_fint_resp);
@@ -262,7 +262,7 @@ void UI_playback_window::toggle_playback()
 
     toggle_playback_button->setText("Enable");
 
-    if(devparms->modelserie != 6)
+    if(devparms->modelserie != 6 && devparms->modelserie != 4)
     {
       mainwindow->set_cue_cmd(":FUNC:WREC:ENAB OFF");
     }
@@ -298,7 +298,7 @@ void UI_playback_window::rec_fint_spinbox_changed(double fint)
 
   strcat(str, "S");
 
-  if(devparms->modelserie != 6)
+  if(devparms->modelserie != 6 && devparms->modelserie != 4)
   {
     sprintf(str, ":FUNC:WREC:FINT %e", fint);
   }
@@ -351,7 +351,7 @@ void UI_playback_window::rep_fint_spinbox_changed(double fint)
 
   mainwindow->statusLabel->setText(str);
 
-  if(devparms->modelserie != 6)
+  if(devparms->modelserie != 6 && devparms->modelserie != 4)
   {
     sprintf(str, ":FUNC:WREP:FINT %e", fint);
   }
