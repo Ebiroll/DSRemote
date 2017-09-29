@@ -1795,7 +1795,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
         devparms->fft_voffset = nearbyint(devparms->fft_voffset * 10.0) / 10.0;
       }
 
-      if(devparms->modelserie != 6)
+      if(devparms->modelserie != 6 && devparms->modelserie != 4)
       {
         sprintf(str, ":MATH:OFFS %e", devparms->fft_voffset);
 

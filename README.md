@@ -31,5 +31,17 @@ Now you can run the program by typing: dsremote
  Read also the file readme_usbtcm_driver.txt
  and the file notes.txt.
 
+Supported devices
+---------------
 
+DS6000 and DS1000Z series oscilloscopes.
 
+### MSO4000/DS4000 series
+
+There is some basic support like capturing screenshots.
+
+Not tested yet:
+
+* Record & Playback function
+* Wave Inspector
+* serial decoding.
