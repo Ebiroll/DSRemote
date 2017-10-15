@@ -92,6 +92,12 @@ void UI_Mainwindow::adjdial_timer_handler()
     {
       usleep(20000);
 
+      set_cue_cmd(":DISP:CLE");
+    }
+    else
+    {
+      usleep(20000);
+
       set_cue_cmd(":CLE");
     }
   }

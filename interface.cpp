@@ -1073,7 +1073,7 @@ void UI_Mainwindow::acqButtonClicked()
 
   submenumemdepth.setTitle("Mem Depth");
   submenumemdepth.addAction("Auto",  this, SLOT(set_memdepth_auto()));
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie == 6 || devparms.modelserie == 4)
   {
     if(!dual)
     {
@@ -1092,7 +1092,7 @@ void UI_Mainwindow::acqButtonClicked()
       submenumemdepth.addAction("70M",  this, SLOT(set_memdepth_70m()));
     }
   }
-  else if((devparms.modelserie == 2) || (devparms.modelserie == 4))
+  else if(devparms.modelserie == 2)
     {
       if(chns_on < 2)
       {
@@ -1100,14 +1100,7 @@ void UI_Mainwindow::acqButtonClicked()
         submenumemdepth.addAction("140K", this, SLOT(set_memdepth_140k()));
         submenumemdepth.addAction("1.4M", this, SLOT(set_memdepth_1400k()));
         submenumemdepth.addAction("14M",  this, SLOT(set_memdepth_14m()));
-        if(devparms.modelserie == 2)
-        {
-          submenumemdepth.addAction("56M", this, SLOT(set_memdepth_56m()));
-        }
-        else
-        {
-          submenumemdepth.addAction("140M", this, SLOT(set_memdepth_140m()));
-        }
+        submenumemdepth.addAction("56M", this, SLOT(set_memdepth_56m()));
       }
       else
       {
@@ -1115,14 +1108,7 @@ void UI_Mainwindow::acqButtonClicked()
         submenumemdepth.addAction("70K",  this, SLOT(set_memdepth_70k()));
         submenumemdepth.addAction("700K", this, SLOT(set_memdepth_700k()));
         submenumemdepth.addAction("7M",   this, SLOT(set_memdepth_7m()));
-        if(devparms.modelserie == 2)
-        {
-          submenumemdepth.addAction("28M",  this, SLOT(set_memdepth_28m()));
-        }
-        else
-        {
-          submenumemdepth.addAction("70M",  this, SLOT(set_memdepth_70m()));
-        }
+        submenumemdepth.addAction("28M",  this, SLOT(set_memdepth_28m()));
       }
     }
     else if(devparms.modelserie == 1)
@@ -1874,11 +1860,11 @@ void UI_Mainwindow::playpauseButtonClicked()
   }
   else
   {
-    if((devparms.modelserie == 6) && (devparms.func_wrec_enable == 1))  // DS6000 series record mode
+    if(((devparms.modelserie == 6) || (devparms.modelserie == 4)) && (devparms.func_wrec_enable == 1))
     {
       set_cue_cmd(":FUNC:WRM PLAY");
 
-      devparms.func_wrec_enable = 2;  // DS6000 series play mode
+      devparms.func_wrec_enable = 2;
     }
 
     devparms.func_wplay_operate = 1;
@@ -1929,7 +1915,7 @@ void UI_Mainwindow::recordButtonClicked()
 
   statusLabel->setText("Record on");
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie == 6 || devparms.modelserie == 4)
   {
     set_cue_cmd(":FUNC:WREC:OPER REC");
   }
@@ -2270,6 +2256,18 @@ void UI_Mainwindow::chan_menu()
   submenubwl.setTitle("BWL");
   submenubwl.addAction("Off",    this, SLOT(chan_bwl_off()));
   submenubwl.addAction("20MHz",  this, SLOT(chan_bwl_20()));
+  if(devparms.modelserie == 4)
+  {
+    if(devparms.bandwidth >= 200)
+    {
+      submenubwl.addAction("100MHz", this, SLOT(chan_bwl_100()));
+    }
+
+    if(devparms.bandwidth >= 300)
+    {
+      submenubwl.addAction("200MHz", this, SLOT(chan_bwl_200()));
+    }
+  }
   if(devparms.modelserie == 6)
   {
     submenubwl.addAction("250MHz", this, SLOT(chan_bwl_250()));
@@ -2285,17 +2283,37 @@ void UI_Mainwindow::chan_menu()
       actionList[1]->setCheckable(true);
       actionList[1]->setChecked(true);
     }
-    else if(devparms.modelserie == 6)
+    else if(devparms.modelserie == 4)
       {
-        if(devparms.chanbwlimit[devparms.activechannel] == 250)
+        if(devparms.chanbwlimit[devparms.activechannel] == 100)
         {
           actionList[2]->setCheckable(true);
           actionList[2]->setChecked(true);
         }
+
+        if(devparms.chanbwlimit[devparms.activechannel] == 200)
+        {
+          actionList[3]->setCheckable(true);
+          actionList[3]->setChecked(true);
+        }
       }
+      else if(devparms.modelserie == 6)
+        {
+          if(devparms.chanbwlimit[devparms.activechannel] == 250)
+          {
+            actionList[2]->setCheckable(true);
+            actionList[2]->setChecked(true);
+          }
+        }
   menu.addMenu(&submenubwl);
 
   submenuprobe.setTitle("Probe");
+  if(devparms.modelserie != 6)
+  {
+    submenuprobe.addAction("0.01X", this, SLOT(chan_probe_001()));
+    submenuprobe.addAction("0.02X", this, SLOT(chan_probe_002()));
+    submenuprobe.addAction("0.05X", this, SLOT(chan_probe_005()));
+  }
   submenuprobe.addAction("0.1X", this, SLOT(chan_probe_01()));
   if(devparms.modelserie != 6)
   {
@@ -2315,59 +2333,95 @@ void UI_Mainwindow::chan_menu()
     submenuprobe.addAction("50X",  this, SLOT(chan_probe_50()));
   }
   submenuprobe.addAction("100X", this, SLOT(chan_probe_100()));
+  if(devparms.modelserie != 6)
+  {
+    submenuprobe.addAction("200X",  this, SLOT(chan_probe_200()));
+    submenuprobe.addAction("500X",  this, SLOT(chan_probe_500()));
+    submenuprobe.addAction("1000X",  this, SLOT(chan_probe_1000()));
+  }
   actionList = submenuprobe.actions();
   if(devparms.modelserie != 6)
   {
-    if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.1))
+    if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.01))
     {
       actionList[0]->setCheckable(true);
       actionList[0]->setChecked(true);
     }
-    else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.2))
+    else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.02))
       {
         actionList[1]->setCheckable(true);
         actionList[1]->setChecked(true);
       }
-      else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.5))
+      else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.05))
         {
           actionList[2]->setCheckable(true);
           actionList[2]->setChecked(true);
         }
-        else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 1))
+        else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.1))
           {
             actionList[3]->setCheckable(true);
             actionList[3]->setChecked(true);
           }
-          else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 2))
+          else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.2))
             {
               actionList[4]->setCheckable(true);
               actionList[4]->setChecked(true);
             }
-            else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 5))
+            else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 0.5))
               {
                 actionList[5]->setCheckable(true);
                 actionList[5]->setChecked(true);
               }
-              else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 10))
+              else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 1))
                 {
                   actionList[6]->setCheckable(true);
                   actionList[6]->setChecked(true);
                 }
-                else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 20))
+                else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 2))
                   {
                     actionList[7]->setCheckable(true);
                     actionList[7]->setChecked(true);
                   }
-                  else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 50))
+                  else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 5))
                     {
                       actionList[8]->setCheckable(true);
                       actionList[8]->setChecked(true);
                     }
-                    else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 100))
+                    else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 10))
                       {
                         actionList[9]->setCheckable(true);
                         actionList[9]->setChecked(true);
                       }
+                      else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 20))
+                        {
+                          actionList[10]->setCheckable(true);
+                          actionList[10]->setChecked(true);
+                        }
+                        else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 50))
+                          {
+                            actionList[11]->setCheckable(true);
+                            actionList[11]->setChecked(true);
+                          }
+                          else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 100))
+                            {
+                              actionList[12]->setCheckable(true);
+                              actionList[12]->setChecked(true);
+                            }
+                            else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 200))
+                              {
+                                actionList[13]->setCheckable(true);
+                                actionList[13]->setChecked(true);
+                              }
+                              else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 500))
+                                {
+                                  actionList[14]->setCheckable(true);
+                                  actionList[14]->setChecked(true);
+                                }
+                                else if(!dblcmp(devparms.chanprobe[devparms.activechannel], 1000))
+                                  {
+                                    actionList[15]->setCheckable(true);
+                                    actionList[15]->setChecked(true);
+                                  }
   }
   else
   {
@@ -2791,6 +2845,66 @@ void UI_Mainwindow::chan_unit_u()
 }
 
 
+void UI_Mainwindow::chan_probe_001()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 0.01;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 0.01X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_002()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 0.02;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 0.02X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_005()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 0.05;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 0.05X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
 void UI_Mainwindow::chan_probe_01()
 {
   char str[128];
@@ -2991,6 +3105,66 @@ void UI_Mainwindow::chan_probe_100()
 }
 
 
+void UI_Mainwindow::chan_probe_200()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 200;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 200X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_500()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 500;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 500X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
+void UI_Mainwindow::chan_probe_1000()
+{
+  char str[128];
+
+  devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
+
+  devparms.chanprobe[devparms.activechannel] = 1000;
+
+  devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
+
+  sprintf(str, "Channel %i probe: 1000X", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+
+  set_cue_cmd(str);
+}
+
+
 void UI_Mainwindow::chan_bwl_off()
 {
   char str[128];
@@ -3020,6 +3194,42 @@ void UI_Mainwindow::chan_bwl_20()
   statusLabel->setText(str);
 
   sprintf(str, ":CHAN%i:BWL 20M", devparms.activechannel + 1);
+
+  set_cue_cmd(str);
+
+  updateLabels();
+}
+
+
+void UI_Mainwindow::chan_bwl_100()
+{
+  char str[128];
+
+  devparms.chanbwlimit[devparms.activechannel] = 100;
+
+  sprintf(str, "Channel %i bandwidth limit: 100MHz", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:BWL 100M", devparms.activechannel + 1);
+
+  set_cue_cmd(str);
+
+  updateLabels();
+}
+
+
+void UI_Mainwindow::chan_bwl_200()
+{
+  char str[128];
+
+  devparms.chanbwlimit[devparms.activechannel] = 200;
+
+  sprintf(str, "Channel %i bandwidth limit: 200MHz", devparms.activechannel + 1);
+
+  statusLabel->setText(str);
+
+  sprintf(str, ":CHAN%i:BWL 200M", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 
@@ -3508,14 +3718,14 @@ void UI_Mainwindow::trigMenuButtonClicked()
   {
     submenusource.addAction("CH4", this, SLOT(trigger_source_ch4()));
   }
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie == 6 || devparms.modelserie == 4)
   {
     submenusource.addAction("EXT", this, SLOT(trigger_source_ext()));
     submenusource.addAction("EXT/ 5", this, SLOT(trigger_source_ext5()));
   }
   submenusource.addAction("AC Line", this, SLOT(trigger_source_acl()));
   actionList = submenusource.actions();
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie == 6 || devparms.modelserie == 4)
   {
     for(i=0; i<7; i++)
     {
@@ -3661,7 +3871,7 @@ void UI_Mainwindow::trigger_source_acl()
 
   statusLabel->setText("Trigger source AC powerline");
 
-  if(devparms.modelserie == 6)
+  if(devparms.modelserie == 6 || devparms.modelserie == 4)
   {
     set_cue_cmd(":TRIG:EDG:SOUR ACL");
   }
@@ -3934,7 +4144,7 @@ void UI_Mainwindow::toggle_fft_unit()
 
 void UI_Mainwindow::select_fft_ch1()
 {
-  if(devparms.modelserie != 6)
+  if(devparms.modelserie == 1)
   {
     set_cue_cmd(":MATH:FFT:SOUR CHAN1");
   }
@@ -3947,7 +4157,7 @@ void UI_Mainwindow::select_fft_ch1()
 
 void UI_Mainwindow::select_fft_ch2()
 {
-  if(devparms.modelserie != 6)
+  if(devparms.modelserie == 1)
   {
     set_cue_cmd(":MATH:FFT:SOUR CHAN2");
   }
@@ -3960,7 +4170,7 @@ void UI_Mainwindow::select_fft_ch2()
 
 void UI_Mainwindow::select_fft_ch3()
 {
-  if(devparms.modelserie != 6)
+  if(devparms.modelserie == 1)
   {
     set_cue_cmd(":MATH:FFT:SOUR CHAN3");
   }
@@ -3973,7 +4183,7 @@ void UI_Mainwindow::select_fft_ch3()
 
 void UI_Mainwindow::select_fft_ch4()
 {
-  if(devparms.modelserie != 6)
+  if(devparms.modelserie == 1)
   {
     set_cue_cmd(":MATH:FFT:SOUR CHAN4");
   }

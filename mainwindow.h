@@ -360,9 +360,14 @@ private slots:
   void chan_coupling_gnd();
   void chan_bwl_off();
   void chan_bwl_20();
+  void chan_bwl_100();
+  void chan_bwl_200();
   void chan_bwl_250();
   void chan_invert_on();
   void chan_invert_off();
+  void chan_probe_001();
+  void chan_probe_002();
+  void chan_probe_005();
   void chan_probe_01();
   void chan_probe_02();
   void chan_probe_05();
@@ -373,6 +378,9 @@ private slots:
   void chan_probe_20();
   void chan_probe_50();
   void chan_probe_100();
+  void chan_probe_200();
+  void chan_probe_500();
+  void chan_probe_1000();
 
   void chan_unit_v();
   void chan_unit_w();

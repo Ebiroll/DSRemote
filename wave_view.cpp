@@ -966,7 +966,7 @@ void WaveCurve::draw_decoder(QPainter *painter, int dw, int dh)
     sample_end = bufsize;
   }
 
-  if(devparms->modelserie == 6)
+  if(devparms->modelserie == 6 || devparms->modelserie == 4)
   {
     base_line = (dh / 2) - (((double)dh / 400.0) * devparms->math_decode_pos);
   }

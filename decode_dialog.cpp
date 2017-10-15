@@ -186,7 +186,7 @@ UI_decoder_window::UI_decoder_window(QWidget *w_parent)
   format_combobox->addItem("ASCII");
   format_combobox->addItem("Decimal");
   format_combobox->addItem("Binary");
-  if(devparms->modelserie != 6)
+  if(devparms->modelserie != 6 && devparms->modelserie != 4)
   {
     format_combobox->addItem("Line");
   }

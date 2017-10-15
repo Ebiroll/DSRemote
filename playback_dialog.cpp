@@ -233,7 +233,7 @@ void UI_playback_window::toggle_playback()
 
     mainwindow->statusLabel->setText("Recording enabled");
 
-    if(devparms->modelserie != 6)
+    if(devparms->modelserie != 6 && devparms->modelserie != 4)
     {
       mainwindow->set_cue_cmd(":FUNC:WREC:ENAB ON");
     }

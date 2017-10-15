@@ -344,10 +344,14 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
   {
     v_sense = -((double)curve_h / 256.0);
   }
-  else
-  {
-    v_sense = -((double)curve_h / (25.0 * devparms->vertdivisions));
-  }
+  else if(devparms->modelserie == 4)
+    {
+      v_sense = -((double)curve_h / (32.0 * devparms->vertdivisions));
+    }
+    else
+    {
+      v_sense = -((double)curve_h / (25.0 * devparms->vertdivisions));
+    }
 
   drawTrigCenterArrow(painter, curve_w / 2, 0);
 
@@ -796,7 +800,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
       h_step *= (100.0 / devparms->timebasescale) / devparms->math_fft_hscale;
     }
 
-    if(devparms->modelserie == 6)
+    if(devparms->modelserie == 6 || devparms->modelserie == 4)
     {
       h_step /= 28.0;
     }
@@ -2322,7 +2326,7 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
   char str[256];
 
 
-  if(devparms->modelserie == 6)
+  if(devparms->modelserie == 6 || devparms->modelserie == 4)
   {
     base_line = (dh / 2) - (((double)dh / 400.0) * devparms->math_decode_pos);
   }

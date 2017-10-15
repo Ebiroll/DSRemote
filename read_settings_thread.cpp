@@ -2063,6 +2063,7 @@ void read_settings_thread::run()
     goto GDS_OUT_ERROR;
   }
 
+//FIXME  DEC1:UART:BAUD? can return also "USER" instead of a number!
   devparms->math_decode_uart_baud = atoi(device->buf);
 
   usleep(TMC_GDS_DELAY);
