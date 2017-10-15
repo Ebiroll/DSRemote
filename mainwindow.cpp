@@ -987,6 +987,24 @@ void UI_Mainwindow::get_device_model(const char *str)
 
     devparms.modelserie = 4;
   }
+  
+  if(!strcmp(str, "MSO4012"))
+  {
+    devparms.channel_cnt = 2;
+
+    devparms.bandwidth = 100;
+
+    devparms.modelserie = 4;
+  }
+  
+  if(!strcmp(str, "MSO4024"))
+  {
+    devparms.channel_cnt = 4;
+
+    devparms.bandwidth = 200;
+
+    devparms.modelserie = 4;
+  }
 
   if(!strcmp(str, "DS2072A"))
   {
