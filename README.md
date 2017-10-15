@@ -66,15 +66,15 @@ openSUSE: sudo zypper install -t pattern devel_basis
           sudo zypper install xorg-x11-devel cups-devel freetype-devel fontconfig-devel
 
 #############################################################################################
-#                                                                                           #
-# Compile a static version of the Qt5 libraries excluding all modules that are not needed.  #
-#                                                                                           #
-# This will not mess with your system libraries. The new compiled libraries will be stored  #
-#                                                                                           #
-# in a new and separate directory: /usr/local/Qt-5.9.2                                      #
-#                                                                                           #
-# It will not interfere with other Qt programs.                                             #
-#                                                                                           #
+
+ Compile a static version of the Qt5 libraries excluding all modules that are not needed.
+
+ This will not mess with your system libraries. The new compiled libraries will be stored
+
+ in a new and separate directory: /usr/local/Qt-5.9.2
+
+ It will not interfere with other Qt programs.
+
 #############################################################################################
 
 mkdir Qt5-source
