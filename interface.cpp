@@ -1964,6 +1964,7 @@ void UI_Mainwindow::show_howto_operate()
     "Press 'c' to center the horizontal position.\n"
     "Press 't' to center the trigger position.\n"
     "Press 'f' to toggle FFT.\n"
+    "Press 'p' to save a screenshot.\n"
     );
 
   msgBox.exec();
