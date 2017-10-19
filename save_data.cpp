@@ -38,9 +38,6 @@ void UI_Mainwindow::save_screenshot()
        opath[MAX_PATHLEN];
 
   QPainter painter;
-#if QT_VERSION >= 0x050000
-  painter.setRenderHint(QPainter::Qt4CompatiblePainting, true);
-#endif
 
   QPainterPath path;
 
@@ -101,6 +98,9 @@ void UI_Mainwindow::save_screenshot()
   if(devparms.modelserie == 1)
   {
     painter.begin(&screenXpm);
+#if QT_VERSION >= 0x050000
+    painter.setRenderHint(QPainter::Qt4CompatiblePainting, true);
+#endif
 
     painter.fillRect(0, 0, 80, 29, Qt::black);
 
@@ -113,6 +113,9 @@ void UI_Mainwindow::save_screenshot()
   else if(devparms.modelserie == 6)
     {
       painter.begin(&screenXpm);
+#if QT_VERSION >= 0x050000
+      painter.setRenderHint(QPainter::Qt4CompatiblePainting, true);
+#endif
 
       painter.fillRect(0, 0, 95, 29, QColor(48, 48, 48));
 
