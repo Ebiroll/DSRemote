@@ -302,6 +302,8 @@ void WaveCurve::paintEvent(QPaintEvent *)
         continue;
       }
 
+      v_sense = ((double)curve_h / ((devparms->chanscale[chn] * devparms->vertdivisions) / devparms->yinc[chn])) / -32.0;
+
       h_trace_offset = curve_h / 2;
 
       h_trace_offset += (devparms->yor[chn] * v_sense * 32.0);
