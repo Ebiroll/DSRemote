@@ -395,7 +395,7 @@ void UI_settings_window::extendvertdivCheckboxChanged(int state)
 
   settings.setValue("gui/use_extra_vertdivisions", mainwindow->devparms.use_extra_vertdivisions);
 
-  if(mainwindow->devparms.modelserie == 1)
+  if((mainwindow->devparms.modelserie == 1) || (mainwindow->devparms.modelserie == 4))
   {
     if(mainwindow->devparms.use_extra_vertdivisions == 1)
     {

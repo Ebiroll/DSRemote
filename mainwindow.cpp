@@ -923,6 +923,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 100;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS4014"))
@@ -932,6 +934,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 100;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS4022"))
@@ -941,6 +945,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 200;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS4024"))
@@ -950,6 +956,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 200;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS4032"))
@@ -959,6 +967,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 350;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS4034"))
@@ -968,6 +978,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 350;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS4052"))
@@ -977,6 +989,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 500;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS4054"))
@@ -986,8 +1000,10 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 500;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
-  
+
   if(!strcmp(str, "MSO4012"))
   {
     devparms.channel_cnt = 2;
@@ -995,8 +1011,10 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 100;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
-  
+
   if(!strcmp(str, "MSO4024"))
   {
     devparms.channel_cnt = 4;
@@ -1004,6 +1022,8 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.bandwidth = 200;
 
     devparms.modelserie = 4;
+
+    if(devparms.use_extra_vertdivisions)  devparms.vertdivisions = 10;
   }
 
   if(!strcmp(str, "DS2072A"))
