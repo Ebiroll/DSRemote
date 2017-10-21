@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.35_1710201916"
+#define PROGRAM_VERSION       "0.35_1710210945"
 
 #define MAX_PATHLEN            4096
 
