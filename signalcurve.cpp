@@ -155,7 +155,8 @@ void SignalCurve::paintEvent(QPaintEvent *)
 
 void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 {
-  int i, chn, tmp, rot=1, small_rulers, curve_w_backup, curve_h_backup, w_trace_offset;
+  int i, chn, tmp, rot=1, small_rulers, curve_w_backup, curve_h_backup, w_trace_offset,
+      chns_done;
 
   char str[1024];
 
@@ -415,8 +416,19 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
       }
     }
 
-    for(chn=0; chn<devparms->channel_cnt; chn++)
+    for(chn=0, chns_done=0; chn<=devparms->channel_cnt; chn++)
     {
+      if(chns_done)  break;
+
+      if(chn == devparms->activechannel)  continue;
+
+      if(chn == devparms->channel_cnt)
+      {
+        chn = devparms->activechannel;
+
+        chns_done = 1;
+      }
+
       if(!devparms->chandisplay[chn])
       {
         continue;
