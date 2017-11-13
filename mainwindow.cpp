@@ -1024,6 +1024,15 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.modelserie = 2;
   }
 
+  if(!strcmp(str, "DS2102"))
+  {
+    devparms.channel_cnt = 2;
+
+    devparms.bandwidth = 100;
+
+    devparms.modelserie = 2;
+  }
+
   if(!strcmp(str, "DS2102A"))
   {
     devparms.channel_cnt = 2;
