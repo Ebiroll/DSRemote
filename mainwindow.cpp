@@ -321,7 +321,7 @@ void UI_Mainwindow::open_connection()
     devparms.current_screen_sf = 100.0 / devparms.timebasescale;
   }
 
-  if(devparms.modelserie == 1)
+  if((devparms.modelserie == 1) || (devparms.modelserie == 2))
   {
     trig50pctButton->setEnabled(false);
   }
@@ -1074,6 +1074,15 @@ void UI_Mainwindow::get_device_model(const char *str)
     devparms.channel_cnt = 2;
 
     devparms.bandwidth = 200;
+
+    devparms.modelserie = 2;
+  }
+
+  if(!strcmp(str, "DS2302"))
+  {
+    devparms.channel_cnt = 2;
+
+    devparms.bandwidth = 300;
 
     devparms.modelserie = 2;
   }

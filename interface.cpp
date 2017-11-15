@@ -1860,7 +1860,7 @@ void UI_Mainwindow::playpauseButtonClicked()
   }
   else
   {
-    if(((devparms.modelserie == 6) || (devparms.modelserie == 4)) && (devparms.func_wrec_enable == 1))
+    if((devparms.modelserie != 1) && (devparms.func_wrec_enable == 1))
     {
       set_cue_cmd(":FUNC:WRM PLAY");
 
@@ -1915,7 +1915,7 @@ void UI_Mainwindow::recordButtonClicked()
 
   statusLabel->setText("Record on");
 
-  if(devparms.modelserie == 6 || devparms.modelserie == 4)
+  if(devparms.modelserie != 1)
   {
     set_cue_cmd(":FUNC:WREC:OPER REC");
   }
@@ -3719,10 +3719,13 @@ void UI_Mainwindow::trigMenuButtonClicked()
   {
     submenusource.addAction("CH4", this, SLOT(trigger_source_ch4()));
   }
-  if(devparms.modelserie == 6 || devparms.modelserie == 4)
+  if(devparms.modelserie != 1)
   {
     submenusource.addAction("EXT", this, SLOT(trigger_source_ext()));
-    submenusource.addAction("EXT/ 5", this, SLOT(trigger_source_ext5()));
+    if(devparms.modelserie != 2)
+    {
+      submenusource.addAction("EXT/ 5", this, SLOT(trigger_source_ext5()));
+    }
   }
   submenusource.addAction("AC Line", this, SLOT(trigger_source_acl()));
   actionList = submenusource.actions();
@@ -3741,14 +3744,31 @@ void UI_Mainwindow::trigMenuButtonClicked()
   }
   else
   {
-    for(i=0; i<4; i++)
+    if(devparms.modelserie == 1)
     {
-      if(devparms.triggeredgesource == i)
+      for(i=0; i<4; i++)
       {
-        actionList[i]->setCheckable(true);
-        actionList[i]->setChecked(true);
+        if(devparms.triggeredgesource == i)
+        {
+          actionList[i]->setCheckable(true);
+          actionList[i]->setChecked(true);
 
-        break;
+          break;
+        }
+      }
+    }
+
+    if(devparms.modelserie == 2)
+    {
+      for(i=0; i<5; i++)
+      {
+        if(devparms.triggeredgesource == i)
+        {
+          actionList[i]->setCheckable(true);
+          actionList[i]->setChecked(true);
+
+          break;
+        }
       }
     }
 
@@ -3872,7 +3892,7 @@ void UI_Mainwindow::trigger_source_acl()
 
   statusLabel->setText("Trigger source AC powerline");
 
-  if(devparms.modelserie == 6 || devparms.modelserie == 4)
+  if(devparms.modelserie != 1)
   {
     set_cue_cmd(":TRIG:EDG:SOUR ACL");
   }
@@ -4093,19 +4113,19 @@ void UI_Mainwindow::toggle_fft_unit()
     else
     {
       set_cue_cmd(":MATH:FFT:UNIT VRMS");
+
+      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+      set_cue_cmd(str);
+
+      sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+
+      set_cue_cmd(str);
+
+      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+      set_cue_cmd(str);
     }
-
-    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
-
-    set_cue_cmd(str);
-
-    sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
-
-    set_cue_cmd(str);
-
-    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
-
-    set_cue_cmd(str);
 
     statusLabel->setText("FFT unit: Vrms");
   }
@@ -4123,20 +4143,20 @@ void UI_Mainwindow::toggle_fft_unit()
     }
     else
     {
-     set_cue_cmd(":MATH:FFT:UNIT DB");
+      set_cue_cmd(":MATH:FFT:UNIT DB");
+
+      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+      set_cue_cmd(str);
+
+      sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+
+      set_cue_cmd(str);
+
+      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+
+      set_cue_cmd(str);
     }
-
-    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
-
-    set_cue_cmd(str);
-
-    sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
-
-    set_cue_cmd(str);
-
-    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
-
-    set_cue_cmd(str);
 
     statusLabel->setText("FFT unit: dB");
   }
@@ -4148,6 +4168,10 @@ void UI_Mainwindow::select_fft_ch1()
   if(devparms.modelserie == 1)
   {
     set_cue_cmd(":MATH:FFT:SOUR CHAN1");
+  }
+  else
+  {
+    set_cue_cmd(":CALC:FFT:SOUR CHAN1");
   }
 
   devparms.math_fft_src = 0;
@@ -4162,6 +4186,10 @@ void UI_Mainwindow::select_fft_ch2()
   {
     set_cue_cmd(":MATH:FFT:SOUR CHAN2");
   }
+  else
+  {
+    set_cue_cmd(":CALC:FFT:SOUR CHAN2");
+  }
 
   devparms.math_fft_src = 1;
 
@@ -4175,6 +4203,10 @@ void UI_Mainwindow::select_fft_ch3()
   {
     set_cue_cmd(":MATH:FFT:SOUR CHAN3");
   }
+  else
+  {
+    set_cue_cmd(":CALC:FFT:SOUR CHAN3");
+  }
 
   devparms.math_fft_src = 2;
 
@@ -4187,6 +4219,10 @@ void UI_Mainwindow::select_fft_ch4()
   if(devparms.modelserie == 1)
   {
     set_cue_cmd(":MATH:FFT:SOUR CHAN4");
+  }
+  else
+  {
+    set_cue_cmd(":CALC:FFT:SOUR CHAN4");
   }
 
   devparms.math_fft_src = 3;

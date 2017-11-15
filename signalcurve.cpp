@@ -812,7 +812,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
       h_step *= (100.0 / devparms->timebasescale) / devparms->math_fft_hscale;
     }
 
-    if(devparms->modelserie == 6 || devparms->modelserie == 4)
+    if(devparms->modelserie != 1)
     {
       h_step /= 28.0;
     }
@@ -1811,7 +1811,7 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
         devparms->fft_voffset = nearbyint(devparms->fft_voffset * 10.0) / 10.0;
       }
 
-      if(devparms->modelserie != 6 && devparms->modelserie != 4)
+      if(devparms->modelserie == 1)
       {
         sprintf(str, ":MATH:OFFS %e", devparms->fft_voffset);
 
@@ -2338,7 +2338,7 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
   char str[256];
 
 
-  if(devparms->modelserie == 6 || devparms->modelserie == 4)
+  if(devparms->modelserie != 1)
   {
     base_line = (dh / 2) - (((double)dh / 400.0) * devparms->math_decode_pos);
   }

@@ -88,7 +88,7 @@ void UI_Mainwindow::adjdial_timer_handler()
 
     set_cue_cmd(str);
 
-    if(devparms.modelserie == 6)
+    if((devparms.modelserie == 2) || (devparms.modelserie == 6))
     {
       usleep(20000);
 
