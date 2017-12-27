@@ -571,7 +571,8 @@ void UI_Mainwindow::save_wave_inspector_buffer_to_edf(struct device_settings *d_
   char str[256],
        opath[MAX_PATHLEN];
 
-  long long rec_len=0LL;
+  long long rec_len=0LL,
+            datrecduration;
 
   QMessageBox wi_msg_box;
 
@@ -639,10 +640,25 @@ void UI_Mainwindow::save_wave_inspector_buffer_to_edf(struct device_settings *d_
 
   statusLabel->setText("Saving EDF file...");
 
-  if(edf_set_datarecord_us_duration(hdl, (rec_len / 10LL) / datrecs))
+  datrecduration = (rec_len / 10LL) / datrecs;
+
+//  printf("rec_len: %lli   datrecs: %i   datrecduration: %lli\n", rec_len, datrecs, datrecduration);
+
+  if(datrecduration < 100LL)
   {
-    strcpy(str, "Can not set datarecord duration of EDF file.");
-    goto OUT_ERROR;
+    if(edf_set_micro_datarecord_duration(hdl, datrecduration))
+    {
+      strcpy(str, "Can not set datarecord duration of EDF file.");
+      goto OUT_ERROR;
+    }
+  }
+  else
+  {
+    if(edf_set_datarecord_duration(hdl, datrecduration / 10LL))
+    {
+      strcpy(str, "Can not set datarecord duration of EDF file.");
+      goto OUT_ERROR;
+    }
   }
 
   j = 0;
@@ -676,6 +692,8 @@ void UI_Mainwindow::save_wave_inspector_buffer_to_edf(struct device_settings *d_
   }
 
   edf_set_equipment(hdl, d_parms->modelname);
+
+//  printf("datrecs: %i    smps_per_record: %i\n", datrecs, smps_per_record);
 
   sav_data_thrd.init_save_memory_edf_file(d_parms, hdl, datrecs, smps_per_record, d_parms->wavebuf);
 
@@ -731,6 +749,11 @@ OUT_ERROR:
   {
     edfclose_file(hdl);
   }
+
+  wi_msg_box.setIcon(QMessageBox::Critical);
+  wi_msg_box.setText(str);
+  wi_msg_box.setStandardButtons(QMessageBox::Ok);
+  wi_msg_box.exec();
 }
 
 
