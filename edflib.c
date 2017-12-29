@@ -416,6 +416,8 @@ int edfopen_file_readonly(const char *path, struct edf_hdr_struct *edfhdr, int r
         free(hdr);
         hdr = NULL;
         hdrlist[edfhdr->handle] = NULL;
+        free(annotationslist[edfhdr->handle]);
+        annotationslist[edfhdr->handle] = NULL;
 
         return -1;
       }
@@ -507,6 +509,10 @@ int edfclose_file(int handle)
         free(hdr);
 
         hdrlist[handle] = NULL;
+
+        free(write_annotationslist[handle]);
+
+        write_annotationslist[handle] = NULL;
 
         edf_files_open--;
 
