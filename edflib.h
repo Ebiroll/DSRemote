@@ -1,7 +1,7 @@
 /*
 *****************************************************************************
 *
-* Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Teunis van Beelen
+* Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Teunis van Beelen
 * All rights reserved.
 *
 * email: teuniz@gmail.com
@@ -63,7 +63,11 @@
 #define EDFLIB_FILETYPE_BDFPLUS              3
 #define EDFLIB_MALLOC_ERROR                 -1
 #define EDFLIB_NO_SUCH_FILE_OR_DIRECTORY    -2
+
+/* when this error occurs, try to open the file with EDFbrowser,
+   it will give you full details about the cause of the error. */
 #define EDFLIB_FILE_CONTAINS_FORMAT_ERRORS  -3
+
 #define EDFLIB_MAXFILES_REACHED             -4
 #define EDFLIB_FILE_READ_ERROR              -5
 #define EDFLIB_FILE_ALREADY_OPENED          -6
@@ -98,6 +102,25 @@ extern "C" {
 
 /* For more info about the EDF and EDF+ format, visit: http://edfplus.info/specs/ */
 /* For more info about the BDF and BDF+ format, visit: http://www.teuniz.net/edfbrowser/bdfplus%20format%20description.html */
+
+/*
+ * note: In EDF, the sensitivity (e.g. uV/bit) and offset are stored using four parameters:
+ * digital maximum and minimum, and physical maximum and minimum.
+ * Here, digital means the raw data coming from a sensor or ADC. Physical means the units like uV.
+ * The sensitivity in units/bit is calculated as follows:
+ *
+ * units per bit = (physical max - physical min) / (digital max - digital min)
+ *
+ * The digital offset is calculated as follows:
+ *
+ * offset = (physical max / units per bit) - digital max
+ *
+ * For a better explanation about the relation between digital data and physical data,
+ * read the document "Coding Schemes Used with Data Converters" (PDF):
+ *
+ * http://www.ti.com/general/docs/lit/getliterature.tsp?baseLiteratureNumber=sbaa042
+ *
+ */
 
 
 struct edf_param_struct{         /* this structure contains all the relevant EDF-signal parameters of one signal */
@@ -372,7 +395,7 @@ int edf_set_transducer(int handle, int edfsignal, const char *transducer);
 
 int edf_set_physical_dimension(int handle, int edfsignal, const char *phys_dim);
 
-/* Sets the physical dimension of signal edfsignal. ("uV", "BPM", "mA", "Degr.", etc.) */
+/* Sets the physical dimension (unit) of signal edfsignal. ("uV", "BPM", "mA", "Degr.", etc.) */
 /* phys_dim is a pointer to a NULL-terminated ASCII-string containing the physical dimension of the signal edfsignal */
 /* Returns 0 on success, otherwise -1 */
 /* This function is recommanded for every signal when you want to write a file */
