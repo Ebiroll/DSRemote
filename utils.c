@@ -72,14 +72,14 @@ int get_filename_from_path(char *dest, const char *src, int size)
 
   if(size<1)
   {
-    return(-1);
+    return -1;
   }
 
   if(size<2)
   {
     dest[0] = 0;
 
-    return(0);
+    return 0;
   }
 
   len = strlen(src);
@@ -88,7 +88,7 @@ int get_filename_from_path(char *dest, const char *src, int size)
   {
     dest[0] = 0;
 
-    return(0);
+    return 0;
   }
 
   for(i=len-1; i>=0; i--)
@@ -101,11 +101,18 @@ int get_filename_from_path(char *dest, const char *src, int size)
 
   i++;
 
+  if(i == len)
+  {
+    dest[0] = 0;
+
+    return 0;
+  }
+
   strncpy(dest, src + i, size);
 
   dest[size-1] = 0;
 
-  return(strlen(dest));
+  return strlen(dest);
 }
 
 
@@ -117,14 +124,14 @@ int get_directory_from_path(char *dest, const char *src, int size)
 
   if(size<1)
   {
-    return(-1);
+    return -1;
   }
 
   if(size<2)
   {
     dest[0] = 0;
 
-    return(0);
+    return 0;
   }
 
   len = strlen(src);
@@ -133,7 +140,7 @@ int get_directory_from_path(char *dest, const char *src, int size)
   {
     dest[0] = 0;
 
-    return(0);
+    return 0;
   }
 
   for(i=len-1; i>=0; i--)
@@ -155,7 +162,7 @@ int get_directory_from_path(char *dest, const char *src, int size)
     dest[size-1] = 0;
   }
 
-  return(strlen(dest));
+  return strlen(dest);
 }
 
 
@@ -198,7 +205,7 @@ void remove_trailing_spaces(char *str)
 
   len = strlen(str);
 
-  for(i=(len-1); i>-1; i--)
+  for(i=(len-1); i>=0; i--)
   {
     if(str[i]!=' ')  break;
   }
@@ -674,13 +681,15 @@ void latin1_to_ascii(char *str, int len)
 
 int antoi(const char *input_str, int len)
 {
-  char str[1024];
+  char str[4096];
+
+  if(len > 4095)  len = 4095;
 
   strncpy(str, input_str, len);
 
   str[len] = 0;
 
-  return(atoi_nonlocalized(str));
+  return atoi_nonlocalized(str);
 }
 
 
@@ -750,7 +759,7 @@ int fprint_int_number_nonlocalized(FILE *file, int q, int minimum, int sign)
     j++;
   }
 
-  return(j);
+  return j;
 }
 
 
@@ -822,7 +831,7 @@ int fprint_ll_number_nonlocalized(FILE *file, long long q, int minimum, int sign
     j++;
   }
 
-  return(j);
+  return j;
 }
 
 
@@ -886,7 +895,7 @@ int sprint_int_number_nonlocalized(char *str, int q, int minimum, int sign)
 
   str[j] = 0;
 
-  return(j);
+  return j;
 }
 
 
@@ -952,7 +961,7 @@ int sprint_ll_number_nonlocalized(char *str, long long q, int minimum, int sign)
 
   str[j] = 0;
 
-  return(j);
+  return j;
 }
 
 
@@ -1012,7 +1021,7 @@ int sprint_number_nonlocalized(char *str, double nr)
   {
     str[j] = 0;
 
-    return(j);
+    return j;
   }
 
   str[j++] = '.';
@@ -1046,7 +1055,7 @@ int sprint_number_nonlocalized(char *str, double nr)
     }
   }
 
-  return(j);
+  return j;
 }
 
 
@@ -1121,7 +1130,7 @@ double atof_nonlocalized(const char *str)
     value2 /= i;
   }
 
-  return(value + value2);
+  return value + value2;
 }
 
 
@@ -1161,7 +1170,7 @@ int atoi_nonlocalized(const char *str)
     value += (str[i] - '0');
   }
 
-  return(value * sign);
+  return value * sign;
 }
 
 
@@ -1204,11 +1213,11 @@ long long atoll_x(const char *str, int dimension)
     {
       if(negative)
       {
-        return(value * dimension * -1LL);
+        return value * dimension * -1LL;
       }
       else
       {
-        return(value * dimension);
+        return value * dimension;
       }
     }
 
@@ -1235,11 +1244,11 @@ long long atoll_x(const char *str, int dimension)
 
   if(negative)
   {
-    return(value * (dimension / radix) * -1LL);
+    return value * (dimension / radix) * -1LL;
   }
   else
   {
-    return(value * (dimension / radix));
+    return value * (dimension / radix);
   }
 }
 
@@ -1251,7 +1260,7 @@ int is_integer_number(char *str)
 
   l = strlen(str);
 
-  if(!l)  return(1);
+  if(!l)  return 1;
 
   if((str[0]=='+')||(str[0]=='-'))
   {
@@ -1265,7 +1274,7 @@ int is_integer_number(char *str)
     {
       if(!digit)
       {
-        return(1);
+        return 1;
       }
       hasspace++;
     }
@@ -1273,21 +1282,21 @@ int is_integer_number(char *str)
     {
       if((str[i]<48)||(str[i]>57))
       {
-        return(1);
+        return 1;
       }
       else
       {
         if(hasspace)
         {
-          return(1);
+          return 1;
         }
         digit++;
       }
     }
   }
 
-  if(digit)  return(0);
-  else  return(1);
+  if(digit)  return 0;
+  else  return 1;
 }
 
 
@@ -1296,11 +1305,11 @@ int is_integer_number(char *str)
 
 int is_number(char *str)
 {
-  int i=0, l, hasspace = 0, hassign=0, digit=0, hasdot=0, hasexp=0;
+  int i=0, len, hasspace=0, hassign=0, digit=0, hasdot=0, hasexp=0;
 
-  l = strlen(str);
+  len = strlen(str);
 
-  if(!l)  return(1);
+  if(!len)  return 1;
 
   if((str[0]=='+')||(str[0]=='-'))
   {
@@ -1308,13 +1317,13 @@ int is_number(char *str)
     i++;
   }
 
-  for(; i<l; i++)
+  for(; i<len; i++)
   {
     if((str[i]=='e')||(str[i]=='E'))
     {
       if((!digit)||hasexp)
       {
-        return(1);
+        return 1;
       }
       hasexp++;
       hassign = 0;
@@ -1327,7 +1336,7 @@ int is_number(char *str)
     {
       if(!digit)
       {
-        return(1);
+        return 1;
       }
       hasspace++;
     }
@@ -1335,17 +1344,17 @@ int is_number(char *str)
     {
       if(((str[i]<48)||(str[i]>57))&&str[i]!='.')
       {
-        return(1);
+        return 1;
       }
       else
       {
         if(hasspace)
         {
-          return(1);
+          return 1;
         }
         if(str[i]=='.')
         {
-          if(hasdot)  return(1);
+          if(hasdot)  return 1;
           hasdot++;
         }
         else
@@ -1358,9 +1367,9 @@ int is_number(char *str)
 
   if(hasexp)
   {
-    if(++i==l)
+    if(++i==len)
     {
-      return(1);
+      return 1;
     }
 
     if((str[i]=='+')||(str[i]=='-'))
@@ -1369,13 +1378,13 @@ int is_number(char *str)
       i++;
     }
 
-    for(; i<l; i++)
+    for(; i<len; i++)
     {
       if(str[i]==' ')
       {
         if(!digit)
         {
-          return(1);
+          return 1;
         }
         hasspace++;
       }
@@ -1383,13 +1392,13 @@ int is_number(char *str)
       {
         if((str[i]<48)||(str[i]>57))
         {
-          return(1);
+          return 1;
         }
         else
         {
           if(hasspace)
           {
-            return(1);
+            return 1;
           }
 
           digit++;
@@ -1398,8 +1407,8 @@ int is_number(char *str)
     }
   }
 
-  if(digit)  return(0);
-  else  return(1);
+  if(digit)  return 0;
+  else  return 1;
 }
 
 
@@ -1418,7 +1427,7 @@ int round_125_cat(double value)
 {
   if(value < 0)  value *= -1;
 
-  if(value < 0.000001)  return(10);
+  if(value < 0.000001)  return 10;
 
   while(value > 1000)  value /=10;
 
@@ -1426,22 +1435,22 @@ int round_125_cat(double value)
 
   if(value > 670)
   {
-    return(10);
+    return 10;
   }
   else if(value > 300)
     {
-      return(50);
+      return 50;
     }
     else if(value > 135)
       {
-        return(20);
+        return 20;
       }
       else
       {
-        return(10);
+        return 10;
       }
 
-  return(10);
+  return 10;
 }
 
 
@@ -1651,12 +1660,7 @@ double round_up_step125(double val, double *ratio)
 
   double ltmp;
 
-  if(!dblcmp(val, 0.0))
-  {
-    return 0;
-  }
-
-  while(val < 0.999)
+   while(val < 0.999)
   {
     val *= 10;
 
@@ -1724,11 +1728,6 @@ double round_down_step125(double val, double *ratio)
   int i, exp=0;
 
   double ltmp;
-
-  if(!dblcmp(val, 0.0))
-  {
-    return 0;
-  }
 
   while(val < 0.999)
   {
