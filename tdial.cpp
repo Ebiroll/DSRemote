@@ -355,13 +355,13 @@ void TDial::set_bg_color(QColor new_color)
 
 QColor TDial::get_fg_color(void)
 {
-  return(fg_color);
+  return fg_color;
 }
 
 
 QColor TDial::get_bg_color(void)
 {
-  return(bg_color);
+  return bg_color;
 }
 
 
