@@ -6,8 +6,8 @@ How to compile:
 ---------------
 
 
-- Install Git, the GCC compiler and the Qt4 development package:<br />
- Linux Mint 18: sudo apt-get install git-core libqt4-dev libqt4-core g++<br />
+- Install Git, make, the GCC compiler and the Qt4 development package:<br />
+ Linux Mint 18: sudo apt-get install git-core make libqt4-dev libqt4-core g++<br />
  openSuse Leap 42.3: sudo zypper in git-core libqt4-devel<br />
  Fedora 25: sudo dnf install git-core qt-devel gcc-c++<br />
 
