@@ -71,7 +71,7 @@ openSUSE: sudo zypper install -t pattern devel_basis
 
  This will not mess with your system libraries. The new compiled libraries will be stored
 
- in a new and separate directory: /usr/local/Qt-5.9.3
+ in a new and separate directory: /usr/local/Qt-5.9.4
 
  It will not interfere with other Qt programs.
 
@@ -81,14 +81,14 @@ mkdir Qt5-source
 
 cd Qt5-source
 
-wget http://ftp1.nluug.nl/languages/qt/official_releases/qt/5.9/5.9.3/single/qt-everywhere-opensource-src-5.9.3.tar.xz
+wget http://ftp1.nluug.nl/languages/qt/official_releases/qt/5.9/5.9.4/single/qt-everywhere-opensource-src-5.9.4.tar.xz
 
 here is a list of download mirrors: https://download.qt.io/static/mirrorlist/
-The Qt source package you are going to need is: qt-everywhere-opensource-src-5.9.3.tar.xz
+The Qt source package you are going to need is: qt-everywhere-opensource-src-5.9.4.tar.xz
 
-tar -xvf qt-everywhere-opensource-src-5.9.3.tar.xz
+tar -xvf qt-everywhere-opensource-src-5.9.4.tar.xz
 
-cd qt-everywhere-opensource-src-5.9.3
+cd qt-everywhere-opensource-src-5.9.4
 
 ./configure -v -release -opensource -confirm-license -c++std c++11 -static -accessibility -fontconfig -skip qtdeclarative -skip qtconnectivity -skip qtmultimedia -no-qml-debug -qt-zlib -no-mtdev -no-journald -qt-libpng -qt-libjpeg -system-freetype -qt-harfbuzz -no-openssl -no-libproxy -no-glib -nomake examples -nomake tests -no-compile-examples -cups -no-evdev -no-dbus -no-eglfs -qreal double -no-opengl -skip qtlocation -skip qtsensors -skip qtwayland -skip qtgamepad -skip qtserialbus
 
@@ -102,7 +102,7 @@ sudo make install
 
 Now go to the directory that contains the DSRemote sourcecode and enter the following commands:
 
-/usr/local/Qt-5.9.3/bin/qmake
+/usr/local/Qt-5.9.4/bin/qmake
 
 make -j8
 
