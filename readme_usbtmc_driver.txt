@@ -3,13 +3,19 @@
 The DS1054Z is plug and play with a recent kernelversion.
 You probably have to add yourself to the group "usbtmc" before you can access the device.
 Here's how you do that:
+
 First, check the groupname of the device, enter:
 
 ls -l /dev/usbtmc*
 
-Now, add yourself to the group (usbtmc in this example):
+In case it is root, enter the command:
+
+sudo groupadd usbtmc
+
+Now, add yourself to the group:
 
 sudo usermod -a -G usbtmc <username>
+
 You need to logout and login again to let the changes take into effect.
 
 In case you have a permission problem because /dev/usbtmc0 uid and gid are set to root,
