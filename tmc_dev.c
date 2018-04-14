@@ -272,6 +272,17 @@ int tmcdev_read(struct tmcdev *dev)
 
   size2 = atoi(blockhdr + 2);
 
+  while(size < size2 && size<MAX_RESP_LEN) // we did not get all the data
+  {
+    ssize_t read_size = read(dev->fd, &dev->hdrbuf[size], MAX_RESP_LEN-size);
+    if(read_size < 1) // timeout or error occurred
+    {
+      blockhdr[31] = 0;
+      return -1;
+    }
+    size += read_size;
+  }
+
   size--;  // remove the last character
 
   if(size < size2)
