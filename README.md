@@ -10,6 +10,7 @@ How to compile:
  Linux Mint 18: sudo apt-get install git-core make libqt4-dev libqt4-core g++<br />
  openSuse Leap 42.3: sudo zypper in git-core libqt4-devel<br />
  Fedora 25: sudo dnf install git-core qt-devel gcc-c++<br />
+ Ubuntu 18.04: sudo apt-get install g++ make git-core qtbase5-dev-tools qtbase5-dev qt5-default<br />
 
 - Download the source code:<br />
  mkdir DSRemote_git<br />
@@ -21,6 +22,7 @@ How to compile:
  Linux Mint 18: qmake<br />
  openSuse Leap 42.3: qmake<br />
  Fedora 25: qmake-qt4<br />
+ Ubuntu 18.04: qmake<br />
 
 - Compile the source code and install it:<br />
  make -j16<br />
