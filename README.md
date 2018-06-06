@@ -16,7 +16,7 @@ How to compile:
  mkdir DSRemote_git<br />
  cd DSRemote_git<br />
  git init<br />
- git pull https://github.com/Teuniz/DSRemote<br />
+ git pull https://gitlab.com/Teuniz/DSRemote<br />
 
 - Create the makefile:<br />
  Linux Mint 18: qmake<br />
