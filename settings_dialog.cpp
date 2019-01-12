@@ -3,7 +3,7 @@
 *
 * Author: Teunis van Beelen
 *
-* Copyright (C) 2015, 2016, 2017, 2018 Teunis van Beelen
+* Copyright (C) 2015, 2016, 2017, 2018, 2019 Teunis van Beelen
 *
 * Email: teuniz@gmail.com
 *
@@ -38,7 +38,7 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
 
   unsigned int ip_addr;
 
-  char dev_str[128];
+  char dev_str[256];
 
   QSettings settings;
 

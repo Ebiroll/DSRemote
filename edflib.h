@@ -1,7 +1,7 @@
 /*
 *****************************************************************************
 *
-* Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Teunis van Beelen
+* Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Teunis van Beelen
 * All rights reserved.
 *
 * email: teuniz@gmail.com
@@ -46,7 +46,7 @@
 
 
 #define EDFLIB_TIME_DIMENSION (10000000LL)
-#define EDFLIB_MAXSIGNALS 512
+#define EDFLIB_MAXSIGNALS 640
 #define EDFLIB_MAX_ANNOTATION_LEN 512
 
 #define EDFSEEK_SET 0
@@ -101,6 +101,7 @@ extern "C" {
 
 
 /* For more info about the EDF and EDF+ format, visit: http://edfplus.info/specs/ */
+
 /* For more info about the BDF and BDF+ format, visit: http://www.teuniz.net/edfbrowser/bdfplus%20format%20description.html */
 
 /*
@@ -120,6 +121,20 @@ extern "C" {
  *
  * http://www.ti.com/general/docs/lit/getliterature.tsp?baseLiteratureNumber=sbaa042
  *
+ * note: An EDF file usually contains multiple so-called datarecords. One datarecord usually has a duration of one second (this is the default but it is not mandatory!).
+ * In that case a file with a duration of five minutes contains 300 datarecords. The duration of a datarecord can be freely choosen but, if possible, use values from
+ * 0.1 to 1 second for easier handling. Just make sure that the total size of one datarecord, expressed in bytes, does not exceed 10MByte (15MBytes for BDF(+)).
+ *
+ * The RECOMMENDATION of a maximum datarecordsize of 61440 bytes in the EDF and EDF+ specification was usefull in the time people were still using DOS as their main operating system.
+ * Using DOS and fast (near) pointers (16-bit pointers), the maximum allocatable block of memory was 64KByte.
+ * This is not a concern anymore so the maximum datarecord size now is limited to 10MByte for EDF(+) and 15MByte for BDF(+). This helps to accommodate for higher samplingrates
+ * used by modern Analog to Digital Converters.
+ *
+ * EDF header character encoding: The EDF specification says that only ASCII characters are allowed.
+ * EDFlib will automatically convert characters with accents, umlauts, tilde, etc. to their "normal" equivalent without the accent/umlaut/tilde/etc.
+ *
+ * The description/name of an EDF+ annotation on the other hand, is encoded in UTF-8.
+ *
  */
 
 
@@ -130,7 +145,7 @@ struct edf_param_struct{         /* this structure contains all the relevant EDF
   double phys_min;               /* physical minimum, usually the minimum input of the ADC */
   int    dig_max;                /* digital maximum, usually the maximum output of the ADC, can not not be higher than 32767 for EDF or 8388607 for BDF */
   int    dig_min;                /* digital minimum, usually the minimum output of the ADC, can not not be lower than -32768 for EDF or -8388608 for BDF */
-  int    smp_in_datarecord;      /* number of samples of this signal in a datarecord */
+  int    smp_in_datarecord;      /* number of samples of this signal in a datarecord, if the datarecord has a duration of one second (default), then it equals the samplerate */
   char   physdimension[9];       /* physical dimension (uV, bpm, mA, etc.), null-terminated string */
   char   prefilter[81];          /* null-terminated string */
   char   transducer[81];         /* null-terminated string */
@@ -245,11 +260,13 @@ int edf_get_annotation(int handle, int n, struct edf_annotation_struct *annot);
 /* Fills the edf_annotation_struct with the annotation n, returns 0 on success, otherwise -1 */
 /* The string that describes the annotation/event is encoded in UTF-8 */
 /* To obtain the number of annotations in a file, check edf_hdr_struct -> annotations_in_file. */
+/* returns 0 on success or -1 in case of an error */
 
 /*
 Notes:
 
 Annotationsignals
+=================
 
 EDFplus and BDFplus store the annotations in one or more signals (in order to be backwards compatibel with EDF and BDF).
 The counting of the signals in the file starts at 0. Signals used for annotations are skipped by EDFlib.
@@ -259,9 +276,10 @@ Use the function edf_get_annotation() to get the annotations.
 So, when a file contains 5 signals and the third signal is used to store the annotations, the library will
 report that there are only 4 signals in the file.
 The library will "map" the signalnumbers as follows: 0->0, 1->1, 2->3, 3->4.
-This way you don't need to worry about which signals are annotationsignals. The library will do it for you.
+This way you don't need to worry about which signals are annotationsignals, the library will take care of it.
 
 How the library stores time-values
+==================================
 
 To avoid rounding errors, the library stores some timevalues in variables of type long long int.
 In order not to loose the subsecond precision, all timevalues have been multiplied by 10000000.
@@ -324,7 +342,7 @@ int edfopen_file_writeonly(const char *path, int filetype, int number_of_signals
 
 int edf_set_samplefrequency(int handle, int edfsignal, int samplefrequency);
 
-/* Sets the samplefrequency of signal edfsignal. */
+/* Sets the samplefrequency of signal edfsignal. (In reallity, it sets the number of samples in a datarecord.) */
 /* Returns 0 on success, otherwise -1 */
 /* This function is required for every signal and can be called only after opening a */
 /* file in writemode and before the first sample write action */
@@ -626,6 +644,7 @@ int edf_set_datarecord_duration(int handle, int duration);
 /* or set the samplefrequency to 1 Hz and the datarecord duration to 2 seconds. */
 /* Do not use this function if not necessary. */
 
+
 int edf_set_micro_datarecord_duration(int handle, int duration);
 
 /* Sets the datarecord duration to a very small value. */
@@ -639,6 +658,8 @@ int edf_set_micro_datarecord_duration(int handle, int duration);
 /* For example, if you want to use a samplerate of 5 GHz, */
 /* set the samplefrequency to 5000 Hz and the datarecord duration to 1 micro-second. */
 /* Do not use this function if not necessary. */
+/* This function was added to accommodate for high speed ADC's e.g. Digital Sampling Oscilloscopes */
+
 
 int edf_set_number_of_annotation_signals(int handle, int annot_signals);
 
@@ -646,9 +667,10 @@ int edf_set_number_of_annotation_signals(int handle, int annot_signals);
 /* This function is optional and can be called only after opening a file in writemode */
 /* and before the first sample write action */
 /* Normally you don't need to change the default value. Only when the number of annotations */
-/* you want to write is more than the number of seconds of the duration of the recording, you can use */
+/* you want to write is higher than the number of datarecords in the recording, you can use */
 /* this function to increase the storage space for annotations */
 /* Minimum is 1, maximum is 64 */
+/* Returns 0 on success, otherwise -1 */
 
 
 #ifdef __cplusplus

@@ -3,7 +3,7 @@
 *
 * Author: Teunis van Beelen
 *
-* Copyright (C) 2015, 2016, 2017, 2018 Teunis van Beelen
+* Copyright (C) 2015, 2016, 2017, 2018, 2019 Teunis van Beelen
 *
 * Email: teuniz@gmail.com
 *
@@ -47,7 +47,7 @@ void UI_Mainwindow::open_connection()
 
   char str[4096] = {""},
        dev_str[256] = {""},
-       resp_str[1024] = {""},
+       resp_str[2048] = {""},
        *ptr;
 
   QSettings settings;
