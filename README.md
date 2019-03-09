@@ -55,11 +55,11 @@ DSRemote assumes that, on your DS1054Z, all options are installed.
 If that is not the case it's possible that the software does not work correctly.
 On your scope, go to the menu Utility -> Options -> Installed and make sure you have the following options installed:
 
-"DECODER RS232,I2C,SPI Official"
-"MEM_DEPTH 24M/12M/6M Official"
-"TRIGGER Timeout,Runt,Window,Delay,Setup,NthEdge,RS232,I2C,SPI Official"
-"RECORDER Record/Re-play Official"
-"BANDWIDTH 100M Official"
+* DECODER RS232,I2C,SPI Official
+* MEM_DEPTH 24M/12M/6M Official
+* TRIGGER Timeout,Runt,Window,Delay,Setup,NthEdge,RS232,I2C,SPI Official
+* RECORDER Record/Re-play Official
+* BANDWIDTH 100M Official
 
 
 
