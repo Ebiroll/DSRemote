@@ -49,8 +49,22 @@ Not tested yet:
 * serial decoding.
 
 
+DS1000Z series:
+---------------
+DSRemote assumes that, on your DS1054Z, all options are installed.
+If that is not the case it's possible that the software does not work correctly.
+On your scope, go to the menu Utility -> Options -> Installed and make sure you have the following options installed:
+
+"DECODER RS232,I2C,SPI Official"
+"MEM_DEPTH 24M/12M/6M Official"
+"TRIGGER Timeout,Runt,Window,Delay,Setup,NthEdge,RS232,I2C,SPI Official"
+"RECORDER Record/Re-play Official"
+"BANDWIDTH 100M Official"
 
 
+
+Qt framework:
+-------------
 In case you insist on using Qt5, the recommended way is not to use the Qt5 libraries that comes with your distro.
 Instead, download and compile the Qt5 source and use that to compile DSRemote.
 Here's a step by step list of instuctions:
