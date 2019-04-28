@@ -13,10 +13,8 @@ How to compile:
  Ubuntu 18.04: sudo apt-get install g++ make git-core qtbase5-dev-tools qtbase5-dev qt5-default<br />
 
 - Download the source code:<br />
- mkdir DSRemote_git<br />
- cd DSRemote_git<br />
- git init<br />
- git pull https://gitlab.com/Teuniz/DSRemote<br />
+ git clone https://gitlab.com/Teuniz/DSRemote.git<br />
+ cd DSRemote<br />
 
 - Create the makefile:<br />
  Linux Mint 18: qmake<br />

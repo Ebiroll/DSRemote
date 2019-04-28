@@ -1,4 +1,25 @@
 
+>>>>>>>>>>>>>> Warning <<<<<<<<<<<<<<<<<<<<
+
+The firmware of the DS1054Z has a bug in the USB driver.
+
+The scope uses HS bulk endpoints with a packetsize of 64 bytes which is illegal because the standard says it must be
+512 bytes. So, some controllers don't forward the packet to the driver (or the driver doesn't forward it to an upper layer)
+because it expects more data to arrive.
+
+In my experience and from what users of DSRemote reported to me, there's usually no problem
+with older hardware (motherboard USB chipsets that supports USB 1 & 2 only).
+In case your pc has a more recent/modern chipset, it's very likely that the scope will not work via USB!
+
+I reported this bug long time ago (March 2017) to Rigol and their response was:
+
+"the bug is confirmed, but it seems to hard to fix it.
+A fix will be implemted in new Models, for older ones, no confirmation to
+have a fix available soon."
+
+If this bug occurs, use LAN connection instead (and contact Rigol to report it and ask for a firmware update).
+
+>>>>>>>>>>>>>> End of warning <<<<<<<<<<<<<<<<<<<<<<
 
 The DS1054Z is plug and play with a recent kernelversion.
 You probably have to add yourself to the group "usbtmc" before you can access the device.
