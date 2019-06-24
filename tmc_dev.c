@@ -147,7 +147,8 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
        !strncmp(buf, ":FUNC:WREP:OPER?", 16) ||
        !strncmp(buf, ":FUNC:WREP:FMAX?", 16) ||
        !strncmp(buf, ":FUNC:WREC:FMAX?", 16) ||
-       !strncmp(buf, ":FUNC:WREP:FCUR?", 16)))
+       !strncmp(buf, ":FUNC:WREP:FCUR?", 16) ||
+       !strncmp(buf, ":WAV:XOR?", 9)))
   {
     printf("tmc_dev write: %s", buf);
   }

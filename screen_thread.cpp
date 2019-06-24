@@ -123,6 +123,7 @@ void screen_thread::get_params(struct device_settings *dev_parms)
     if(params.chandisplay[i])
     {
       memcpy(dev_parms->wavebuf[i], params.wavebuf[i], params.wavebufsz * sizeof(short));
+      dev_parms->xorigin[i] = params.xorigin[i];
     }
   }
   dev_parms->thread_error_stat = params.error_stat;
@@ -753,6 +754,22 @@ void screen_thread::run()
         line = __LINE__;
         goto OUT_ERROR;
       }
+
+      if(tmc_write(":WAV:XOR?") != 9)
+      {
+        printf("Can not write to device.\n");
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+
+      if(tmc_read() < 1)
+      {
+        printf("Can not read from device.\n");
+        line = __LINE__;
+        goto OUT_ERROR;
+      }
+
+      params.xorigin[i] = atof(device->buf);
 
       if(tmc_write(":WAV:DATA?") != 10)
       {

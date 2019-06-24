@@ -110,6 +110,8 @@ private:
     int func_wplay_operate;
     int func_wplay_fcur;
 
+    double xorigin[MAX_CHNS];
+
     char debug_str[1024];
   } params;
 

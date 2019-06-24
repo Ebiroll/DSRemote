@@ -280,7 +280,8 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
       !strncmp(buf, ":FUNC:WREP:OPER?", 16) ||
       !strncmp(buf, ":FUNC:WREP:FMAX?", 16) ||
       !strncmp(buf, ":FUNC:WREC:FMAX?", 16) ||
-      !strncmp(buf, ":FUNC:WREP:FCUR?", 16)))
+      !strncmp(buf, ":FUNC:WREP:FCUR?", 16) ||
+      !strncmp(buf, ":WAV:XOR?", 9)))
   {
     printf("tmc_lan write: %s", buf);
   }

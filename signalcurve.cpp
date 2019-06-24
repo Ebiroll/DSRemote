@@ -406,16 +406,6 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
     h_step = (double)curve_w / (devparms->hordivisions * 100);
 
-    w_trace_offset = 0;
-
-    if(bufsize != (devparms->hordivisions * 100))
-    {
-      if(devparms->timebaseoffset < 0)
-      {
-        w_trace_offset = curve_w - ((double)curve_w * ((double)bufsize / (double)(devparms->hordivisions * 100)));
-      }
-    }
-
     for(chn=0, chns_done=0; chn<=devparms->channel_cnt; chn++)
     {
       if(chns_done)  break;
@@ -433,6 +423,8 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
       {
         continue;
       }
+
+      w_trace_offset = (curve_w / 2.0) - (((devparms->timebaseoffset - devparms->xorigin[chn]) / devparms->timebasescale) * ((double)curve_w / (double)(devparms->hordivisions)));
 
       painter->setPen(QPen(QBrush(SignalColor[chn], Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 

@@ -35,7 +35,7 @@
 
 
 #define PROGRAM_NAME          "DSRemote"
-#define PROGRAM_VERSION       "0.35_1904280934"
+#define PROGRAM_VERSION       "0.35_1906241731"
 
 #define MAX_PATHLEN            4096
 
@@ -242,6 +242,8 @@ struct device_settings
   int wavebufsz;
   double yinc[MAX_CHNS];
   int yor[MAX_CHNS];
+
+  double xorigin[MAX_CHNS];
 
   int screenshot_inv;           // 0=normal, 1=inverted colors
 
