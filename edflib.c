@@ -3922,7 +3922,7 @@ int edf_set_micro_datarecord_duration(int handle, int duration)
     return -1;
   }
 
-  if((duration < 1) || (duration > 99))
+  if((duration < 1) || (duration > 9999))
   {
     return -1;
   }

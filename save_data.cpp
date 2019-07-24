@@ -644,7 +644,7 @@ void UI_Mainwindow::save_wave_inspector_buffer_to_edf(struct device_settings *d_
 
 //  printf("rec_len: %lli   datrecs: %i   datrecduration: %lli\n", rec_len, datrecs, datrecduration);
 
-  if(datrecduration < 100LL)
+  if(datrecduration < 10000LL)
   {
     if(edf_set_micro_datarecord_duration(hdl, datrecduration))
     {
