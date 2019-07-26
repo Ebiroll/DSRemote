@@ -300,7 +300,7 @@ void UI_Mainwindow::get_deep_memory_waveform(void)
 
     if(devparms.yinc[chn] < 1e-6)
     {
-      sprintf(str, "Error, parameter \"YINC\" out of range.  line %i file %s", __LINE__, __FILE__);
+      sprintf(str, "Error, parameter \"YINC\" out of range: %e  line %i file %s", devparms.yinc[chn], __LINE__, __FILE__);
       goto OUT_ERROR;
     }
 
@@ -316,7 +316,7 @@ void UI_Mainwindow::get_deep_memory_waveform(void)
 
     if((yref[chn] < 1) || (yref[chn] > 255))
     {
-      sprintf(str, "Error, parameter \"YREF\" out of range.  line %i file %s", __LINE__, __FILE__);
+      sprintf(str, "Error, parameter \"YREF\" out of range: %i  line %i file %s", yref[chn], __LINE__, __FILE__);
       goto OUT_ERROR;
     }
 
@@ -332,7 +332,7 @@ void UI_Mainwindow::get_deep_memory_waveform(void)
 
     if((devparms.yor[chn] < -255) || (devparms.yor[chn] > 255))
     {
-      sprintf(str, "Error, parameter \"YOR\" out of range.  line %i file %s", __LINE__, __FILE__);
+      sprintf(str, "Error, parameter \"YOR\" out of range: %i  line %i file %s", devparms.yor[chn], __LINE__, __FILE__);
       goto OUT_ERROR;
     }
 
@@ -392,7 +392,7 @@ void UI_Mainwindow::get_deep_memory_waveform(void)
 
       if(n > SAV_MEM_BSZ)
       {
-        sprintf(str, "Datablock too big for buffer.  line %i file %s", __LINE__, __FILE__);
+        sprintf(str, "Datablock too big for buffer: %i  line %i file %s", n, __LINE__, __FILE__);
         goto OUT_ERROR;
       }
 
@@ -648,7 +648,8 @@ void UI_Mainwindow::save_wave_inspector_buffer_to_edf(struct device_settings *d_
   {
     if(edf_set_micro_datarecord_duration(hdl, datrecduration))
     {
-      strcpy(str, "Can not set datarecord duration of EDF file.");
+      sprintf(str, "Can not set datarecord duration of EDF file: %lli", datrecduration);
+      printf("\ndebug line %i: rec_len: %lli   datrecs: %i   datrecduration: %lli\n", __LINE__, rec_len, datrecs, datrecduration);
       goto OUT_ERROR;
     }
   }
@@ -656,7 +657,8 @@ void UI_Mainwindow::save_wave_inspector_buffer_to_edf(struct device_settings *d_
   {
     if(edf_set_datarecord_duration(hdl, datrecduration / 10LL))
     {
-      strcpy(str, "Can not set datarecord duration of EDF file.");
+      sprintf(str, "Can not set datarecord duration of EDF file: %lli", datrecduration);
+      printf("\ndebug line %i: rec_len: %lli   datrecs: %i   datrecduration: %lli\n", __LINE__, rec_len, datrecs, datrecduration);
       goto OUT_ERROR;
     }
   }
@@ -904,7 +906,7 @@ void UI_Mainwindow::save_screen_waveform()
 
     if(devparms.yinc[chn] < 1e-6)
     {
-      sprintf(str, "Error, parameter \"YINC\" out of range.  line %i file %s", __LINE__, __FILE__);
+      sprintf(str, "Error, parameter \"YINC\" out of range: %e  line %i file %s", devparms.yinc[chn], __LINE__, __FILE__);
       goto OUT_ERROR;
     }
 
@@ -920,7 +922,7 @@ void UI_Mainwindow::save_screen_waveform()
 
     if((yref[chn] < 1) || (yref[chn] > 255))
     {
-      sprintf(str, "Error, parameter \"YREF\" out of range.  line %i file %s", __LINE__, __FILE__);
+      sprintf(str, "Error, parameter \"YREF\" out of range: %i  line %i file %s", yref[chn], __LINE__, __FILE__);
       goto OUT_ERROR;
     }
 
@@ -936,7 +938,7 @@ void UI_Mainwindow::save_screen_waveform()
 
     if((devparms.yor[chn] < -255) || (devparms.yor[chn] > 255))
     {
-      sprintf(str, "Error, parameter \"YOR\" out of range.  line %i file %s", __LINE__, __FILE__);
+      sprintf(str, "Error, parameter \"YOR\" out of range: %i  line %i file %s", devparms.yor[chn], __LINE__, __FILE__);
       goto OUT_ERROR;
     }
 
@@ -966,7 +968,7 @@ void UI_Mainwindow::save_screen_waveform()
 
     if(n > WAVFRM_MAX_BUFSZ)
     {
-      strcpy(str, "Datablock too big for buffer.");
+      sprintf(str, "Datablock too big for buffer: %i", n);
       goto OUT_ERROR;
     }
 
@@ -1008,7 +1010,7 @@ void UI_Mainwindow::save_screen_waveform()
 
   if(edf_set_datarecord_duration(hdl, rec_len / 100LL))
   {
-    strcpy(str, "Can not set datarecord duration of EDF file.");
+    sprintf(str, "Can not set datarecord duration of EDF file: %lli", rec_len / 100LL);
     goto OUT_ERROR;
   }
 

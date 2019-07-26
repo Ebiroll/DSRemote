@@ -305,13 +305,27 @@ void UI_Mainwindow::adjDialChanged(int new_pos)
     {
       if(!dir)
       {
-        if(devparms.acquireaverages >= 8192)
+        if(devparms.modelserie == 6)
         {
-          devparms.acquireaverages = 8192;
+          if(devparms.acquireaverages >= 8192)
+          {
+            devparms.acquireaverages = 8192;
 
-          old_pos = new_pos;
+            old_pos = new_pos;
 
-          return;
+            return;
+          }
+        }
+        else
+        {
+          if(devparms.acquireaverages >= 1024)
+          {
+            devparms.acquireaverages = 1024;
+
+            old_pos = new_pos;
+
+            return;
+          }
         }
 
         devparms.acquireaverages *= 2;
