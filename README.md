@@ -2,6 +2,9 @@
 Operate your Rigol oscilloscope from your Linux desktop.
 ========================================================
 
+webpage: <https://www.teuniz.net/DSRemote/>
+
+
 How to compile:
 ---------------
 
