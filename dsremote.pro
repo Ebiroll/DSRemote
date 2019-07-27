@@ -121,6 +121,8 @@ desktop_link.path += /usr/share/applications
 desktop_link.files += install/dsremote.desktop
 INSTALLS += desktop_link
 
-
+udev_rule.path += /etc/udev/rules.d
+udev_rule.files += install/30-usbtmc.rules
+INSTALLS += udev_rule
 
 
