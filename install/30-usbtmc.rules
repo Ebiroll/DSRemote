@@ -4,6 +4,9 @@
 # Rigol Technologies  DS1000Z series
 SUBSYSTEMS=="usb", ACTION=="add", ATTRS{idVendor}=="1ab1", ATTRS{idProduct}=="04ce", GROUP="usbtmc", MODE="0660"
 
+# Rigol Technologies  DS4000 series
+SUBSYSTEMS=="usb", ACTION=="add", ATTRS{idVendor}=="1ab1", ATTRS{idProduct}=="04be", GROUP="usbtmc", MODE="0660"
+
 # Rigol Technologies  DS6000 series
 SUBSYSTEMS=="usb", ACTION=="add", ATTRS{idVendor}=="1ab1", ATTRS{idProduct}=="04b0", GROUP="usbtmc", MODE="0660"
 
