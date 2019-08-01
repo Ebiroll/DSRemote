@@ -66,6 +66,9 @@ UI_Mainwindow::UI_Mainwindow()
 
   QApplication::setFont(*appfont);
 
+  sprintf(str, "font: %ipx;", pxw);
+  setStyleSheet(str);
+
   setlocale(LC_NUMERIC, "C");
 
   QCoreApplication::setOrganizationName("TvB");
