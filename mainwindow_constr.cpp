@@ -32,9 +32,13 @@
 
 UI_Mainwindow::UI_Mainwindow()
 {
-  int i;
+  int i, pxw;
 
   char str[1024];
+
+  QPixmap pxm(500, 100);
+
+  QPainter p_aint(&pxm);
 
   setMinimumSize(1170, 630);
   setWindowTitle(PROGRAM_NAME " " PROGRAM_VERSION);
@@ -42,13 +46,23 @@ UI_Mainwindow::UI_Mainwindow()
 
   appfont = new QFont;
 
-  monofont = new QFont;
+  appfont->setFamily("Noto Sans");
 
-  appfont->setFamily("Arial");
-  appfont->setPixelSize(12);
+  for(i=20; i>7; i--)
+  {
+    appfont->setPixelSize(i);
 
-  monofont->setFamily("andale mono");
-  monofont->setPixelSize(12);
+    p_aint.setFont(*appfont);
+
+    pxw = p_aint.boundingRect(0, 0, 500, 100, Qt::AlignLeft | Qt::TextSingleLine, "ABCDEFGHIJKLMNOPQRSTUVWXYZ").width();
+
+//    printf("i is: %i    width is: %i\n", i, pxw);
+
+    if(pxw < 203)  break;
+  }
+  pxw = i;
+
+  appfont->setPixelSize(pxw);
 
   QApplication::setFont(*appfont);
 
@@ -61,6 +75,8 @@ UI_Mainwindow::UI_Mainwindow()
   QSettings settings;
 
   memset(&devparms, 0, sizeof(struct device_settings));
+
+  devparms.font_size = pxw;
 
   devparms.screenshot_buf = (char *)malloc(WAVFRM_MAX_BUFSZ);
 
@@ -252,25 +268,25 @@ UI_Mainwindow::UI_Mainwindow()
   recordButton->setStyleSheet("background-image: url(:/images/record.png);");
 
   menuGrpBox = new QGroupBox("Menu", DPRwidget);
-  menuGrpBox->setGeometry(180, 60, 125, 120);
+  menuGrpBox->setGeometry(180, 50, 125, 130);
 
   acqButton = new QPushButton(menuGrpBox);
-  acqButton->setGeometry(15, 20, 40, 18);
+  acqButton->setGeometry(15, 30, 40, 18);
   acqButton->setText("acq");
   cursButton = new QPushButton(menuGrpBox);
-  cursButton->setGeometry(70, 20, 40, 18);
+  cursButton->setGeometry(70, 30, 40, 18);
   cursButton->setText("curs");
   saveButton = new QPushButton(menuGrpBox);
-  saveButton->setGeometry(15, 55, 40, 18);
+  saveButton->setGeometry(15, 65, 40, 18);
   saveButton->setText("save");
   dispButton = new QPushButton(menuGrpBox);
-  dispButton->setGeometry(70, 55, 40, 18);
+  dispButton->setGeometry(70, 65, 40, 18);
   dispButton->setText("disp");
   utilButton = new QPushButton(menuGrpBox);
-  utilButton->setGeometry(15, 90, 40, 18);
+  utilButton->setGeometry(15, 100, 40, 18);
   utilButton->setText("util");
   helpButton = new QPushButton(menuGrpBox);
-  helpButton->setGeometry(70, 90, 40, 18);
+  helpButton->setGeometry(70, 100, 40, 18);
   helpButton->setText("help");
 
   horizontalGrpBox = new QGroupBox("Horizontal", DPRwidget);
@@ -636,7 +652,6 @@ UI_Mainwindow::~UI_Mainwindow()
 
   delete scrn_thread;
   delete appfont;
-  delete monofont;
   pthread_mutex_destroy(&devparms.mutexx);
 
   free(devparms.screenshot_buf);

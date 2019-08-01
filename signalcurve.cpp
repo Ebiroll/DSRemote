@@ -146,6 +146,10 @@ void SignalCurve::paintEvent(QPaintEvent *)
     paint.setRenderHint(QPainter::Qt4CompatiblePainting, true);
 #endif
 
+    smallfont.setPixelSize(devparms->font_size);
+
+    paint.setFont(smallfont);
+
     drawWidget(&paint, width(), height());
 
     old_w = width();

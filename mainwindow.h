@@ -65,6 +65,8 @@
 #include <QProgressDialog>
 #include <QKeySequence>
 #include <QEventLoop>
+#include <QRect>
+#include <QPixmap>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -122,8 +124,7 @@ public:
 
   QLabel       *statusLabel;
 
-  QFont        *appfont,
-               *monofont;
+  QFont        *appfont;
 
   int adjDialFunc,
       navDialFunc;

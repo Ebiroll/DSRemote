@@ -97,6 +97,10 @@ void WaveCurve::paintEvent(QPaintEvent *)
 
   QPainter *painter = &paint;
 
+  smallfont.setPixelSize(devparms->font_size);
+
+  painter->setFont(smallfont);
+
   curve_w = width();
 
   curve_h = height();

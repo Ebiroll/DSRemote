@@ -282,6 +282,8 @@ struct device_settings
 
   int show_fps;
 
+  int font_size;
+
   // below here is use for the wave inspector
   int wave_mem_view_sample_start;
   int wave_mem_view_enabled;
