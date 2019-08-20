@@ -135,15 +135,10 @@ strip -s dsremote
 upx dsremote
 
 
-Notes:
-------
-
-This is not a community project, so, no pull-requests please, they will be ignored.
-I only put the source here on Gitlab for backup and to make it easy for other people to clone the project and tinker with it.
-If you have found a bug or want to add some features, send me your sourcecode/patch and I'll have a look at it.
-Then I'll decide what to do with it.
-
-This is a Linux project. Patches or feature requests that will make it easier to port the program to
-other platforms will be ignored.
+Note: This is a private project made available to the public. No pullrequests!
+      If you believe you found a bug or want to add some feature, open an issue on Gitlab or send me an email.
+      In case you want to add some code, send me a diff, no pull requests, they will be ignored.
+      Also, all requests regarding to support other platforms and/or other tools will be ignored.
+      Again, this a Linux & GCC & Make project. That means no Mac/windows/Clang/CMake etc.
 
 
