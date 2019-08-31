@@ -653,7 +653,7 @@ int edf_set_micro_datarecord_duration(int handle, int duration);
 /* Sets the datarecord duration to a very small value. */
 /* ATTENTION: the argument "duration" is expressed in units of 1 microSecond! */
 /* This function is optional, normally you don't need to change the default value. */
-/* The datarecord duration must be in the range 1 to 99 micro-seconds. */
+/* The datarecord duration must be in the range 1 to 9999 micro-seconds. */
 /* Returns 0 on success, otherwise -1 */
 /* This function is NOT REQUIRED but can be called after opening a */
 /* file in writemode and before the first sample write action. */
