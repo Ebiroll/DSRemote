@@ -36,12 +36,11 @@ UI_Aboutwindow::UI_Aboutwindow()
 {
   char str[512];
 
-  strcpy(str, " QT version at runtime is ");
-  strncat(str, qVersion(), 32);
-  strcat(str, "\n QT version at compiletime is ");
-  strncat(str, QT_VERSION_STR, 32);
-  strncat(str, "\n Compiled on " __DATE__ " " __TIME__, 40);
-  str[511] = 0;
+  strlcpy(str, " QT version at runtime is ", 512);
+  strlcat(str, qVersion(), 512);
+  strlcat(str, "\n QT version at compiletime is ", 512);
+  strlcat(str, QT_VERSION_STR, 512);
+  strlcat(str, "\n Compiled on " __DATE__ " " __TIME__, 512);
 
   AboutDialog = new QDialog;
 

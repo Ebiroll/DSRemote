@@ -66,7 +66,7 @@ void UI_Mainwindow::open_connection()
     return;
   }
 
-  strcpy(str, settings.value("connection/type", "USB").toString().toLatin1().data());
+  strlcpy(str, settings.value("connection/type", "USB").toString().toLatin1().data(), 4096);
 
   if(!strcmp(str, "LAN"))
   {
@@ -79,11 +79,11 @@ void UI_Mainwindow::open_connection()
 
   if(devparms.connectiontype == 0)  // USB
   {
-    strcpy(dev_str, settings.value("connection/device", "/dev/usbtmc0").toString().toLatin1().data());
+    strlcpy(dev_str, settings.value("connection/device", "/dev/usbtmc0").toString().toLatin1().data(), 256);
 
     if(!strcmp(dev_str, ""))
     {
-      strcpy(dev_str, "/dev/usbtmc0");
+      strlcpy(dev_str, "/dev/usbtmc0", 256);
 
       settings.setValue("connection/device", dev_str);
     }
@@ -91,26 +91,26 @@ void UI_Mainwindow::open_connection()
     device = tmc_open_usb(dev_str);
     if(device == NULL)
     {
-      sprintf(str, "Can not open device %s", dev_str);
+      snprintf(str, 4096, "Can not open device %s", dev_str);
       goto OC_OUT_ERROR;
     }
   }
 
   if(devparms.connectiontype == 1)  // LAN
   {
-    strcpy(devparms.hostname, settings.value("connection/hostname", "").toString().toLatin1().data());
+    strlcpy(devparms.hostname, settings.value("connection/hostname", "").toString().toLatin1().data(), 128);
 
     if(strlen(devparms.hostname))
     {
-      strcpy(dev_str, devparms.hostname);
+      strlcpy(dev_str, devparms.hostname, 256);
     }
     else
     {
-      strcpy(dev_str, settings.value("connection/ip", "192.168.1.100").toString().toLatin1().data());
+      strlcpy(dev_str, settings.value("connection/ip", "192.168.1.100").toString().toLatin1().data(), 256);
 
       if(!strcmp(dev_str, ""))
       {
-        sprintf(str, "No IP address or hostname set");
+        snprintf(str, 4096, "No IP address or hostname set");
         goto OC_OUT_ERROR;
       }
 
@@ -118,7 +118,7 @@ void UI_Mainwindow::open_connection()
 
       if(len < 7)
       {
-        sprintf(str, "No IP address set");
+        snprintf(str, 4096, "No IP address set");
         goto OC_OUT_ERROR;
       }
 
@@ -160,7 +160,7 @@ void UI_Mainwindow::open_connection()
 
     statusLabel->setText("Trying to connect...");
 
-    sprintf(str, "Trying to connect to %s", dev_str);
+    snprintf(str, 4096, "Trying to connect to %s", dev_str);
 
     msgBox.setIcon(QMessageBox::NoIcon);
     msgBox.setText(str);
@@ -175,7 +175,7 @@ void UI_Mainwindow::open_connection()
       statusLabel->setText("Connection aborted");
       lan_cn_thrd.terminate();
       lan_cn_thrd.wait(20000);
-      sprintf(str, "Connection aborted");
+      snprintf(str, 4096, "Connection aborted");
       disconnect(&lan_cn_thrd, 0, 0, 0);
       goto OC_OUT_ERROR;
     }
@@ -186,7 +186,7 @@ void UI_Mainwindow::open_connection()
     if(device == NULL)
     {
       statusLabel->setText("Connection failed");
-      sprintf(str, "Can not open connection to %s", dev_str);
+      snprintf(str, 4096, "Can not open connection to %s", dev_str);
       goto OC_OUT_ERROR;
     }
   }
@@ -194,7 +194,7 @@ void UI_Mainwindow::open_connection()
   if(tmc_write("*IDN?") != 5)
 //  if(tmc_write("*IDN?;:SYST:ERR?") != 16)  // This is a fix for the broken *IDN? command in older fw version
   {
-    sprintf(str, "Can not write to device %s", dev_str);
+    snprintf(str, 4096, "Can not write to device %s", dev_str);
     goto OC_OUT_ERROR;
   }
 
@@ -202,7 +202,7 @@ void UI_Mainwindow::open_connection()
 
   if(n < 0)
   {
-    sprintf(str, "Can not read from device %s", dev_str);
+    snprintf(str, 4096, "Can not read from device %s", dev_str);
     goto OC_OUT_ERROR;
   }
 
@@ -212,22 +212,18 @@ void UI_Mainwindow::open_connection()
 
   devparms.modelname[0] = 0;
 
-  strncpy(resp_str, device->buf, 1024);
-
-  device->buf[1023] = 0;
+  strlcpy(resp_str, device->buf, 1024);
 
   ptr = strtok(resp_str, ",");
   if(ptr == NULL)
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
-    str[1023] = 0;
     goto OC_OUT_ERROR;
   }
 
   if(strcmp(ptr, "RIGOL TECHNOLOGIES"))
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
-    str[1023] = 0;
     goto OC_OUT_ERROR;
   }
 
@@ -235,7 +231,6 @@ void UI_Mainwindow::open_connection()
   if(ptr == NULL)
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
-    str[1023] = 0;
     goto OC_OUT_ERROR;
   }
 
@@ -244,7 +239,6 @@ void UI_Mainwindow::open_connection()
   if((!devparms.channel_cnt) || (!devparms.bandwidth))
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
-    str[1023] = 0;
     goto OC_OUT_ERROR;
   }
 
@@ -252,21 +246,19 @@ void UI_Mainwindow::open_connection()
   if(ptr == NULL)
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
-    str[1023] = 0;
     goto OC_OUT_ERROR;
   }
 
-  strcpy(devparms.serialnr, ptr);
+  strlcpy(devparms.serialnr, ptr, 128);
 
   ptr = strtok(NULL, ",");
   if(ptr == NULL)
   {
     snprintf(str, 1024, "Received an unknown identification string from device:\n\n%s\n ", device->buf);
-    str[1023] = 0;
     goto OC_OUT_ERROR;
   }
 
-  strcpy(devparms.softwvers, ptr);
+  strlcpy(devparms.softwvers, ptr, 128);
 
   for(i=0; ; i++)
   {
@@ -307,7 +299,7 @@ void UI_Mainwindow::open_connection()
 
   if(get_device_settings())
   {
-    strcpy(str, "Can not read device settings");
+    strlcpy(str, "Can not read device settings", 4096);
 
     goto OC_OUT_ERROR;
   }
@@ -412,7 +404,7 @@ void UI_Mainwindow::open_connection()
   connect(stopButton,      SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
   connect(recordButton,    SIGNAL(clicked()), this, SLOT(recordButtonClicked()));
 
-  sprintf(str, PROGRAM_NAME " " PROGRAM_VERSION "   %s   %s   %s",
+  snprintf(str, 4096, PROGRAM_NAME " " PROGRAM_VERSION "   %s   %s   %s",
           devparms.serialnr, devparms.softwvers, dev_str);
 //   sprintf(str, PROGRAM_NAME " " PROGRAM_VERSION "   %s   %s",
 //           devparms.softwvers, dev_str);
@@ -480,7 +472,7 @@ void UI_Mainwindow::close_connection()
 
   setWindowTitle(PROGRAM_NAME " " PROGRAM_VERSION);
 
-  strcpy(devparms.modelname, "-----");
+  strlcpy(devparms.modelname, "-----", 128);
 
   adjDialFunc = ADJ_DIAL_FUNC_NONE;
   navDialFunc = NAV_DIAL_FUNC_NONE;
@@ -616,7 +608,7 @@ int UI_Mainwindow::get_device_settings(int delay)
     statusLabel->setText("Reading settings aborted");
     rd_set_thrd.terminate();
     rd_set_thrd.wait(20000);
-    sprintf(str, "Reading settings aborted");
+    snprintf(str, 4096, "Reading settings aborted");
     disconnect(&rd_set_thrd, 0, 0, 0);
     return -1;
   }
@@ -626,11 +618,11 @@ int UI_Mainwindow::get_device_settings(int delay)
   if(rd_set_thrd.get_error_num() != 0)
   {
     statusLabel->setText("Error while reading settings");
-    rd_set_thrd.get_error_str(str);
+    rd_set_thrd.get_error_str(str, 4096);
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.setText(str);
     msgBox.exec();
-    strcpy(str, "Can not read settings from device");
+    strlcpy(str, "Can not read settings from device", 4096);
     return -1;
   }
 
@@ -1231,14 +1223,14 @@ void UI_Mainwindow::get_device_model(const char *str)
 
   if(devparms.channel_cnt && devparms.bandwidth && devparms.modelserie)
   {
-    strcpy(devparms.modelname, str);
+    strlcpy(devparms.modelname, str, 128);
   }
 }
 
 
 void UI_Mainwindow::former_page()
 {
-  char str[256];
+  char str[512];
 
   if(device == NULL)
   {
@@ -1269,11 +1261,11 @@ void UI_Mainwindow::former_page()
       devparms.timebasedelayoffset = -(((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale));
     }
 
-    strcpy(str, "Delayed timebase position: ");
+    strlcpy(str, "Delayed timebase position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1298,11 +1290,11 @@ void UI_Mainwindow::former_page()
       }
     }
 
-    strcpy(str, "Horizontal position: ");
+    strlcpy(str, "Horizontal position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1315,7 +1307,7 @@ void UI_Mainwindow::former_page()
 
 void UI_Mainwindow::next_page()
 {
-  char str[256];
+  char str[512];
 
   if(device == NULL)
   {
@@ -1346,11 +1338,11 @@ void UI_Mainwindow::next_page()
       devparms.timebasedelayoffset = (((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale));
     }
 
-    strcpy(str, "Delayed timebase position: ");
+    strlcpy(str, "Delayed timebase position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1375,11 +1367,11 @@ void UI_Mainwindow::next_page()
       }
     }
 
-    strcpy(str, "Horizontal position: ");
+    strlcpy(str, "Horizontal position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1392,7 +1384,7 @@ void UI_Mainwindow::next_page()
 
 void UI_Mainwindow::shift_page_left()
 {
-  char str[256];
+  char str[512];
 
   if(device == NULL)
   {
@@ -1415,20 +1407,20 @@ void UI_Mainwindow::shift_page_left()
 
     if(devparms.modelserie != 1)
     {
-      sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
+      snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
     }
     else
     {
-      sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hcenter);
+      snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hcenter);
     }
 
     set_cue_cmd(str);
 
-    strcpy(str, "FFT center: ");
+    strlcpy(str, "FFT center: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hcenter, 0);
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hcenter, 0, 512 - strlen(str));
 
-    strcat(str, "Hz");
+    strlcat(str, "Hz", 512);
 
     statusLabel->setText(str);
 
@@ -1456,11 +1448,11 @@ void UI_Mainwindow::shift_page_left()
       devparms.timebasedelayoffset = -(((devparms.hordivisions / 2) * devparms.timebasescale) - devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale));
     }
 
-    strcpy(str, "Delayed timebase position: ");
+    strlcpy(str, "Delayed timebase position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1485,11 +1477,11 @@ void UI_Mainwindow::shift_page_left()
       }
     }
 
-    strcpy(str, "Horizontal position: ");
+    strlcpy(str, "Horizontal position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1502,7 +1494,7 @@ void UI_Mainwindow::shift_page_left()
 
 void UI_Mainwindow::shift_page_right()
 {
-  char str[256];
+  char str[512];
 
   if(device == NULL)
   {
@@ -1525,20 +1517,20 @@ void UI_Mainwindow::shift_page_right()
 
     if(devparms.modelserie != 1)
     {
-      sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
+      snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
     }
     else
     {
-      sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hcenter);
+      snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hcenter);
     }
 
     set_cue_cmd(str);
 
-    strcpy(str, "FFT center: ");
+    strlcpy(str, "FFT center: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hcenter, 0);
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hcenter, 0, 512 - strlen(str));
 
-    strcat(str, "Hz");
+    strlcat(str, "Hz", 512);
 
     statusLabel->setText(str);
 
@@ -1566,11 +1558,11 @@ void UI_Mainwindow::shift_page_right()
       devparms.timebasedelayoffset = (((devparms.hordivisions / 2) * devparms.timebasescale) + devparms.timebaseoffset - ((devparms.hordivisions / 2) * devparms.timebasedelayscale));
     }
 
-    strcpy(str, "Delayed timebase position: ");
+    strlcpy(str, "Delayed timebase position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1595,11 +1587,11 @@ void UI_Mainwindow::shift_page_right()
       }
     }
 
-    strcpy(str, "Horizontal position: ");
+    strlcpy(str, "Horizontal position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1612,7 +1604,7 @@ void UI_Mainwindow::shift_page_right()
 
 void UI_Mainwindow::center_trigger()
 {
-  char str[256];
+  char str[512];
 
   if(device == NULL)
   {
@@ -1630,20 +1622,20 @@ void UI_Mainwindow::center_trigger()
 
     if(devparms.modelserie != 1)
     {
-      sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
+      snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hcenter);
     }
     else
     {
-      sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hcenter);
+      snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hcenter);
     }
 
     set_cue_cmd(str);
 
-    strcpy(str, "FFT center: ");
+    strlcpy(str, "FFT center: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hcenter, 0);
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hcenter, 0, 512 - strlen(str));
 
-    strcat(str, "Hz");
+    strlcat(str, "Hz", 512);
 
     statusLabel->setText(str);
 
@@ -1661,11 +1653,11 @@ void UI_Mainwindow::center_trigger()
   {
     devparms.timebasedelayoffset = 0;
 
-    strcpy(str, "Delayed timebase position: ");
+    strlcpy(str, "Delayed timebase position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1675,11 +1667,11 @@ void UI_Mainwindow::center_trigger()
   {
     devparms.timebaseoffset = 0;
 
-    strcpy(str, "Horizontal position: ");
+    strlcpy(str, "Horizontal position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -1692,7 +1684,7 @@ void UI_Mainwindow::center_trigger()
 
 void UI_Mainwindow::zoom_in()
 {
-  char str[256];
+  char str[512];
 
   if(device == NULL)
   {
@@ -1731,20 +1723,20 @@ void UI_Mainwindow::zoom_in()
 
     if(devparms.modelserie != 1)
     {
-      sprintf(str, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
+      snprintf(str, 512, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
     }
     else
     {
-      sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
+      snprintf(str, 512, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
     }
 
     set_cue_cmd(str);
 
-    strcpy(str, "FFT scale: ");
+    strlcpy(str, "FFT scale: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale, 0);
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale, 0, 512 - strlen(str));
 
-    strcat(str, "Hz/Div");
+    strlcat(str, "Hz/Div", 512);
 
     statusLabel->setText(str);
 
@@ -1795,15 +1787,15 @@ void UI_Mainwindow::zoom_in()
 
     devparms.current_screen_sf = 100.0 / devparms.timebasedelayscale;
 
-    strcpy(str, "Delayed timebase: ");
+    strlcpy(str, "Delayed timebase: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
+    snprintf(str, 512, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
 
     set_cue_cmd(str);
   }
@@ -1844,15 +1836,15 @@ void UI_Mainwindow::zoom_in()
 
     devparms.current_screen_sf = 100.0 / devparms.timebasescale;
 
-    strcpy(str, "Timebase: ");
+    strlcpy(str, "Timebase: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
+    snprintf(str, 512, ":TIM:SCAL %e", devparms.timebasescale);
 
     set_cue_cmd(str);
   }
@@ -1863,7 +1855,7 @@ void UI_Mainwindow::zoom_in()
 
 void UI_Mainwindow::zoom_out()
 {
-  char str[256];
+  char str[512];
 
   if(device == NULL)
   {
@@ -1902,20 +1894,20 @@ void UI_Mainwindow::zoom_out()
 
     if(devparms.modelserie != 1)
     {
-      sprintf(str, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
+      snprintf(str, 512, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
     }
     else
     {
-      sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
+      snprintf(str, 512, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
     }
 
     set_cue_cmd(str);
 
-    strcpy(str, "FFT scale: ");
+    strlcpy(str, "FFT scale: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale, 0);
+    convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale, 0, 512 - strlen(str));
 
-    strcat(str, "Hz/Div");
+    strlcat(str, "Hz/Div", 512);
 
     statusLabel->setText(str);
 
@@ -1944,15 +1936,15 @@ void UI_Mainwindow::zoom_out()
 
     devparms.current_screen_sf = 100.0 / devparms.timebasedelayscale;
 
-    strcpy(str, "Delayed timebase: ");
+    strlcpy(str, "Delayed timebase: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
+    snprintf(str, 512, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
 
     set_cue_cmd(str);
 
@@ -1974,15 +1966,15 @@ void UI_Mainwindow::zoom_out()
 
     devparms.current_screen_sf = 100.0 / devparms.timebasescale;
 
-    strcpy(str, "Timebase: ");
+    strlcpy(str, "Timebase: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
+    snprintf(str, 512, ":TIM:SCAL %e", devparms.timebasescale);
 
     set_cue_cmd(str);
 
@@ -2052,35 +2044,35 @@ void UI_Mainwindow::chan_scale_plus()
     {
       if(devparms.math_fft_unit == 1)
       {
-        sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale);
+        snprintf(str, 512, ":CALC:FFT:VSC %e", devparms.fft_vscale);
 
         set_cue_cmd(str);
       }
       else
       {
-        sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale / devparms.chanscale[devparms.math_fft_src]);
+        snprintf(str, 512, ":CALC:FFT:VSC %e", devparms.fft_vscale / devparms.chanscale[devparms.math_fft_src]);
 
         set_cue_cmd(str);
       }
     }
     else
     {
-      sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+      snprintf(str, 512, ":MATH:SCAL %e", devparms.fft_vscale);
 
       set_cue_cmd(str);
     }
 
     if(devparms.math_fft_unit == 0)
     {
-      strcpy(str, "FFT scale: ");
+      strlcpy(str, "FFT scale: ", 512);
 
-      convert_to_metric_suffix(str + strlen(str), devparms.fft_vscale, 1);
+      convert_to_metric_suffix(str + strlen(str), devparms.fft_vscale, 1, 512 - strlen(str));
 
-      strcat(str, "V/Div");
+      strlcat(str, "V/Div", 512);
     }
     else
     {
-      sprintf(str, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
+      snprintf(str, 512, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
     }
 
     statusLabel->setText(str);
@@ -2118,15 +2110,15 @@ void UI_Mainwindow::chan_scale_plus()
 
   devparms.chanoffset[chn] /= ltmp;
 
-  sprintf(str, "Channel %i scale: ", chn + 1);
+  snprintf(str, 512, "Channel %i scale: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2, 512 - strlen(str));
 
-  strcat(str, "V");
+  strlcat(str, "V", 512);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+  snprintf(str, 512, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
   set_cue_cmd(str);
 
@@ -2192,15 +2184,15 @@ void UI_Mainwindow::chan_scale_plus_all()
 
     devparms.chanoffset[chn] /= ltmp;
 
-    sprintf(str, "Channel %i scale: ", chn + 1);
+    snprintf(str, 512, "Channel %i scale: ", chn + 1);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2, 512 - strlen(str));
 
-    strcat(str, "V");
+    strlcat(str, "V", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+    snprintf(str, 512, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
     set_cue_cmd(str);
   }
@@ -2265,35 +2257,35 @@ void UI_Mainwindow::chan_scale_minus()
     {
       if(devparms.math_fft_unit == 1)
       {
-        sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale);
+        snprintf(str, 512, ":CALC:FFT:VSC %e", devparms.fft_vscale);
 
         set_cue_cmd(str);
       }
       else
       {
-        sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale / devparms.chanscale[devparms.math_fft_src]);
+        snprintf(str, 512, ":CALC:FFT:VSC %e", devparms.fft_vscale / devparms.chanscale[devparms.math_fft_src]);
 
         set_cue_cmd(str);
       }
     }
     else
     {
-      sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+      snprintf(str, 512, ":MATH:SCAL %e", devparms.fft_vscale);
 
       set_cue_cmd(str);
     }
 
     if(devparms.math_fft_unit == 0)
     {
-      strcpy(str, "FFT scale: ");
+      strlcpy(str, "FFT scale: ", 512);
 
-      convert_to_metric_suffix(str + strlen(str), devparms.fft_vscale, 1);
+      convert_to_metric_suffix(str + strlen(str), devparms.fft_vscale, 1, 512 - strlen(str));
 
-      strcat(str, "V/Div");
+      strlcat(str, "V/Div", 512);
     }
     else
     {
-      sprintf(str, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
+      snprintf(str, 512, "FFT scale: %.1fdB/Div", devparms.fft_vscale);
     }
 
     statusLabel->setText(str);
@@ -2338,15 +2330,15 @@ void UI_Mainwindow::chan_scale_minus()
 
   devparms.chanoffset[chn] /= ltmp;
 
-  sprintf(str, "Channel %i scale: ", chn + 1);
+  snprintf(str, 512, "Channel %i scale: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2, 512 - strlen(str));
 
-  strcat(str, "V");
+  strlcat(str, "V", 512);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+  snprintf(str, 512, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
   set_cue_cmd(str);
 
@@ -2419,15 +2411,15 @@ void UI_Mainwindow::chan_scale_minus_all()
 
     devparms.chanoffset[chn] /= ltmp;
 
-    sprintf(str, "Channel %i scale: ", chn + 1);
+    snprintf(str, 512, "Channel %i scale: ", chn + 1);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2, 512 - strlen(str));
 
-    strcat(str, "V");
+    strlcat(str, "V", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+    snprintf(str, 512, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
     set_cue_cmd(str);
   }
@@ -2473,28 +2465,28 @@ void UI_Mainwindow::shift_trace_up()
 
     if(devparms.modelserie != 1)
     {
-      sprintf(str, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
+      snprintf(str, 512, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
 
       set_cue_cmd(str);
     }
     else
     {
-      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+      snprintf(str, 512, ":MATH:OFFS %e", devparms.fft_voffset);
 
       set_cue_cmd(str);
     }
 
     if(devparms.math_fft_unit == 0)
     {
-      strcpy(str, "FFT position: ");
+      strlcpy(str, "FFT position: ", 512);
 
-      convert_to_metric_suffix(str + strlen(str), devparms.fft_voffset, 1);
+      convert_to_metric_suffix(str + strlen(str), devparms.fft_voffset, 1, 512 - strlen(str));
 
-      strcat(str, "V");
+      strlcat(str, "V", 512);
     }
     else
     {
-      sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
+      snprintf(str, 512, "FFT position: %+.0fdB", devparms.fft_voffset);
     }
 
     statusLabel->setText(str);
@@ -2519,11 +2511,11 @@ void UI_Mainwindow::shift_trace_up()
 
   devparms.chanoffset[chn] += devparms.chanscale[chn];
 
-  sprintf(str, "Channel %i offset: ", chn + 1);
+  snprintf(str, 512, "Channel %i offset: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2, 512 - strlen(str));
 
-  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
+  strlcat(str, devparms.chanunitstr[devparms.chanunit[chn]], 512);
 
   statusLabel->setText(str);
 
@@ -2581,28 +2573,28 @@ void UI_Mainwindow::shift_trace_down()
 
     if(devparms.modelserie != 1)
     {
-      sprintf(str, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
+      snprintf(str, 512, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
 
       set_cue_cmd(str);
     }
     else
     {
-      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+      snprintf(str, 512, ":MATH:OFFS %e", devparms.fft_voffset);
 
       set_cue_cmd(str);
     }
 
     if(devparms.math_fft_unit == 0)
     {
-      strcpy(str, "FFT position: ");
+      strlcpy(str, "FFT position: ", 512);
 
-      convert_to_metric_suffix(str + strlen(str), devparms.fft_voffset, 1);
+      convert_to_metric_suffix(str + strlen(str), devparms.fft_voffset, 1, 512 - strlen(str));
 
-      strcat(str, "V");
+      strlcat(str, "V", 512);
     }
     else
     {
-      sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
+      snprintf(str, 512, "FFT position: %+.0fdB", devparms.fft_voffset);
     }
 
     statusLabel->setText(str);
@@ -2627,11 +2619,11 @@ void UI_Mainwindow::shift_trace_down()
 
   devparms.chanoffset[chn] -= devparms.chanscale[chn];
 
-  sprintf(str, "Channel %i offset: ", chn + 1);
+  snprintf(str, 512, "Channel %i offset: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2, 512 - strlen(str));
 
-  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
+  strlcat(str, devparms.chanunitstr[devparms.chanunit[chn]], 512);
 
   statusLabel->setText(str);
 
@@ -2649,7 +2641,7 @@ void UI_Mainwindow::set_to_factory()
 {
   int i;
 
-  char str[256];
+  char str[512];
 
   if((device == NULL) || (!devparms.connected))
   {
@@ -2748,7 +2740,7 @@ void UI_Mainwindow::set_to_factory()
   {
     for(i=0; i<MAX_CHNS; i++)
     {
-      sprintf(str, ":CHAN%i:SCAL 1", i + 1);
+      snprintf(str, 512, ":CHAN%i:SCAL 1", i + 1);
 
       tmc_write(str);
 
@@ -2794,7 +2786,7 @@ void UI_Mainwindow::screenUpdate()
   {
     scrn_timer->stop();
 
-    sprintf(str, "An error occurred while reading screen data from device.\n"
+    snprintf(str, 512, "An error occurred while reading screen data from device.\n"
                 "File screen_thread.cpp line %i", devparms.thread_error_line);
 
     QMessageBox msgBox;
@@ -2928,9 +2920,7 @@ void UI_Mainwindow::screenUpdate()
 
 void UI_Mainwindow::set_cue_cmd(const char *str)
 {
-  strncpy(devparms.cmd_cue[devparms.cmd_cue_idx_in], str, 128);
-
-  devparms.cmd_cue[devparms.cmd_cue_idx_in][127] = 0;
+  strlcpy(devparms.cmd_cue[devparms.cmd_cue_idx_in], str, 128);
 
   devparms.cmd_cue_resp[devparms.cmd_cue_idx_in] = NULL;
 
@@ -2944,9 +2934,7 @@ void UI_Mainwindow::set_cue_cmd(const char *str)
 
 void UI_Mainwindow::set_cue_cmd(const char *str, char *ptr)
 {
-  strncpy(devparms.cmd_cue[devparms.cmd_cue_idx_in], str, 128);
-
-  devparms.cmd_cue[devparms.cmd_cue_idx_in][127] = 0;
+  strlcpy(devparms.cmd_cue[devparms.cmd_cue_idx_in], str, 128);
 
   ptr[0] = 0;
 

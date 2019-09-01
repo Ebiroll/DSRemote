@@ -56,7 +56,7 @@ public:
   save_data_thread(int);
 
   int get_error_num(void);
-  void get_error_str(char *);
+  void get_error_str(char *, int);
   int get_num_bytes_rcvd(void);
   void init_save_memory_edf_file(struct device_settings *devp, int,
                                  int, int, short **wav);

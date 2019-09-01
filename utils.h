@@ -3,7 +3,7 @@
 *
 * Author: Teunis van Beelen
 *
-* Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Teunis van Beelen
+* Copyright (C) 2009 - 2019 Teunis van Beelen
 *
 * Email: teuniz@protonmail.com
 *
@@ -46,6 +46,37 @@ extern "C" {
 #include <ctype.h>
 #include <math.h>
 
+/************************* BANNED ************************/
+
+#if defined(__APPLE__) || defined(__MACH__) || defined(__APPLE_CC__) || defined(__FreeBSD__)
+/* nothing */
+#else
+#define BANNED(func) sorry_##func##_is_a_banned_function
+
+#undef strcpy
+#define strcpy(x,y) BANNED(strcpy)
+#undef strcat
+#define strcat(x,y) BANNED(strcat)
+/*
+#undef strncpy
+#define strncpy(x,y,n) BANNED(strncpy)
+#undef strncat
+#define strncat(x,y,n) BANNED(strncat)
+*/
+#undef sprintf
+#undef vsprintf
+#ifdef HAVE_VARIADIC_MACROS
+#define sprintf(...) BANNED(sprintf)
+#define vsprintf(...) BANNED(vsprintf)
+#else
+#define sprintf(buf,fmt,arg) BANNED(sprintf)
+#define vsprintf(buf,fmt,arg) BANNED(vsprintf)
+#endif
+
+#endif
+
+/*********************************************************/
+
 
 void remove_trailing_spaces(char *);
 void remove_leading_spaces(char *);
@@ -63,6 +94,9 @@ double atof_nonlocalized(const char *);
 int sprint_number_nonlocalized(char *, double);
 long long atoll_x(const char *, int);
 void strntolower(char *, int);
+
+/* returns also empty tokens */
+char * strtok_r_e(char *, const char *, char **);
 
 /* 3th argument is the minimum digits that will be printed (minus sign not included), leading zero's will be added if necessary */
 /* if 4th argument is zero, only negative numbers will have the sign '-' character */
@@ -87,8 +121,8 @@ void asciitobin(char *, const char *);  /* destination must have eight times the
 void hextobin(char *, const char *);    /* destination must have four times the size of source! */
 
 /* Converts a double to Giga/Mega/Kilo/milli/micro/etc. */
-/* int is number of decimals. Result is written into the string argument */
-int convert_to_metric_suffix(char *, double, int);
+/* int is number of decimals and size of destination. Result is written into the string argument */
+int convert_to_metric_suffix(char *, double, int, int);
 
 double round_up_step125(double, double *);      /* Rounds the value up to 1-2-5 steps */
 double round_down_step125(double, double *);    /* Rounds the value down to 1-2-5 steps */
@@ -97,6 +131,24 @@ double round_to_3digits(double);   /* Rounds the value to max 3 digits */
 int strtoipaddr(unsigned int *, const char *);  /* convert a string "192.168.1.12" to an integer */
 
 int dblcmp(double, double);  /* returns 0 when equal */
+
+int base64_dec(const void *, void *, int);
+
+/* sz is size of destination, returns length of string in dest.
+ * This is different than the official BSD implementation!
+ * From the BSD man-page:
+ * "The strlcpy() and strlcat() functions return the total length of
+ * the string they tried to create. For strlcpy() that means the
+ * length of src. For strlcat() that means the initial length of dst
+ * plus the length of src. While this may seem somewhat confusing,
+ * it was done to make truncation detection simple."
+ */
+#if defined(__APPLE__) || defined(__MACH__) || defined(__APPLE_CC__) || defined(__FreeBSD__)
+/* nothing here */
+#else
+int strlcpy(char *, const char *, int);
+int strlcat(char *, const char *, int);
+#endif
 
 #ifdef __cplusplus
 } /* extern "C" */

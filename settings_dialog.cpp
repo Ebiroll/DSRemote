@@ -138,6 +138,7 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   {
     strncpy(mainwindow->devparms.hostname, settings.value("connection/hostname").toString().toLatin1().data(), 63);
   }
+  mainwindow->devparms.hostname[63] = 0;
 
   HostLineEdit = new QLineEdit(this);
   HostLineEdit->setGeometry(180, 120, 240, 25);
@@ -212,13 +213,11 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
   cancelButton->setGeometry(250, 450, 100, 25);
   cancelButton->setText("Cancel");
 
-  strncpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data(), 128);
-
-  dev_str[127] = 0;
+  strlcpy(dev_str, settings.value("connection/device").toString().toLocal8Bit().data(), 256);
 
   if(!strcmp(dev_str, ""))
   {
-    strcpy(dev_str, "/dev/usbtmc0");
+    strlcpy(dev_str, "/dev/usbtmc0", 256);
   }
 
   comboBox1->setCurrentIndex(dev_str[11] - '0');
@@ -252,7 +251,7 @@ UI_settings_window::UI_settings_window(QWidget *parnt)
 
 void UI_settings_window::applyButtonClicked()
 {
-  char dev_str[128];
+  char dev_str[256];
 
   QSettings settings;
 
@@ -261,7 +260,7 @@ void UI_settings_window::applyButtonClicked()
     close();
   }
 
-  strcpy(dev_str, "/dev/usbtmc0");
+  strlcpy(dev_str, "/dev/usbtmc0", 256);
 
   dev_str[11] = '0' + comboBox1->currentIndex();
 
@@ -280,12 +279,13 @@ void UI_settings_window::applyButtonClicked()
 
   settings.setValue("connection/device", dev_str);
 
-  sprintf(dev_str, "%i.%i.%i.%i",
+  snprintf(dev_str, 256, "%i.%i.%i.%i",
           ipSpinbox1->value(), ipSpinbox2->value(), ipSpinbox3->value(), ipSpinbox4->value());
 
   settings.setValue("connection/ip", dev_str);
 
-  strncpy(mainwindow->devparms.hostname, HostLineEdit->text().toLatin1().data(), 64);
+  strncpy(mainwindow->devparms.hostname, HostLineEdit->text().toLatin1().data(), 63);
+  mainwindow->devparms.hostname[63] = 0;
 
   settings.setValue("connection/hostname", mainwindow->devparms.hostname);
 

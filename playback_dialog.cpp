@@ -276,13 +276,13 @@ void UI_playback_window::toggle_playback()
 
 void UI_playback_window::rec_fend_spinbox_changed(int fend)
 {
-  char str[128];
+  char str[512];
 
-  sprintf(str, "Recording frame end: %i", fend);
+  snprintf(str, 512, "Recording frame end: %i", fend);
 
   mainwindow->statusLabel->setText(str);
 
-  sprintf(str, ":FUNC:WREC:FEND %i", fend);
+  snprintf(str, 512, ":FUNC:WREC:FEND %i", fend);
 
   mainwindow->set_cue_cmd(str);
 }
@@ -290,21 +290,23 @@ void UI_playback_window::rec_fend_spinbox_changed(int fend)
 
 void UI_playback_window::rec_fint_spinbox_changed(double fint)
 {
-  char str[128];
+  char str[512];
 
-  strcpy(str, "Recording frame interval: ");
+  strlcpy(str, "Recording frame interval: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), 3, fint);
+  convert_to_metric_suffix(str + strlen(str), 3, fint, 512);
 
-  strcat(str, "S");
+  strlcat(str, "S", 512);
+
+  mainwindow->statusLabel->setText(str);
 
   if(devparms->modelserie == 1)
   {
-    sprintf(str, ":FUNC:WREC:FINT %e", fint);
+    snprintf(str, 512, ":FUNC:WREC:FINT %e", fint);
   }
   else
   {
-    sprintf(str, ":FUNC:WREC:INT %e", fint);
+    snprintf(str, 512, ":FUNC:WREC:INT %e", fint);
   }
 
   mainwindow->set_cue_cmd(str);
@@ -313,13 +315,13 @@ void UI_playback_window::rec_fint_spinbox_changed(double fint)
 
 void UI_playback_window::rep_fstart_spinbox_changed(int fstart)
 {
-  char str[128];
+  char str[512];
 
-  sprintf(str, "Playback frame start: %i", fstart);
+  snprintf(str, 512, "Playback frame start: %i", fstart);
 
   mainwindow->statusLabel->setText(str);
 
-  sprintf(str, ":FUNC:WREP:FST %i", fstart);
+  snprintf(str, 512, ":FUNC:WREP:FST %i", fstart);
 
   mainwindow->set_cue_cmd(str);
 }
@@ -327,13 +329,13 @@ void UI_playback_window::rep_fstart_spinbox_changed(int fstart)
 
 void UI_playback_window::rep_fend_spinbox_changed(int fend)
 {
-  char str[128];
+  char str[512];
 
-  sprintf(str, "Playback frame end: %i", fend);
+  snprintf(str, 512, "Playback frame end: %i", fend);
 
   mainwindow->statusLabel->setText(str);
 
-  sprintf(str, ":FUNC:WREP:FEND %i", fend);
+  snprintf(str, 512, ":FUNC:WREP:FEND %i", fend);
 
   mainwindow->set_cue_cmd(str);
 }
@@ -341,23 +343,23 @@ void UI_playback_window::rep_fend_spinbox_changed(int fend)
 
 void UI_playback_window::rep_fint_spinbox_changed(double fint)
 {
-  char str[128];
+  char str[512];
 
-  strcpy(str, "Playback frame interval: ");
+  strlcpy(str, "Playback frame interval: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), 3, fint);
+  convert_to_metric_suffix(str + strlen(str), 3, fint, 512);
 
-  strcat(str, "S");
+  strlcat(str, "S", 512);
 
   mainwindow->statusLabel->setText(str);
 
   if(devparms->modelserie == 1)
   {
-    sprintf(str, ":FUNC:WREP:FINT %e", fint);
+    snprintf(str, 512, ":FUNC:WREP:FINT %e", fint);
   }
   else
   {
-    sprintf(str, ":FUNC:WREP:INT %e", fint);
+    snprintf(str, 512, ":FUNC:WREP:INT %e", fint);
   }
 
   mainwindow->set_cue_cmd(str);

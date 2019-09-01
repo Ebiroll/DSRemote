@@ -56,7 +56,7 @@ public:
   void set_device(struct tmcdev *);
   void set_devparm_ptr(struct device_settings *);
   int get_error_num(void);
-  void get_error_str(char *);
+  void get_error_str(char *, int);
   void set_delay(int);
 
 private:

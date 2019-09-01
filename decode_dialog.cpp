@@ -505,17 +505,17 @@ void UI_decoder_window::uart_endian_combobox_clicked(int idx)
 
 void UI_decoder_window::uart_baud_spinbox_changed()
 {
-  char str[256];
+  char str[512];
 
   devparms->math_decode_uart_baud = uart_baud_spinbox->value();
 
   if(devparms->modelserie != 1)
   {
-    sprintf(str, ":BUS1:RS232:BAUD %i", devparms->math_decode_uart_baud);
+    snprintf(str, 512, ":BUS1:RS232:BAUD %i", devparms->math_decode_uart_baud);
   }
   else
   {
-    sprintf(str, ":DEC1:UART:BAUD %i", devparms->math_decode_uart_baud);
+    snprintf(str, 512, ":DEC1:UART:BAUD %i", devparms->math_decode_uart_baud);
   }
 
   mainwindow->set_cue_cmd(str);
@@ -524,7 +524,7 @@ void UI_decoder_window::uart_baud_spinbox_changed()
 
 void UI_decoder_window::uart_width_combobox_clicked(int idx)
 {
-  char str[256];
+  char str[512];
 
   idx += 5;
 
@@ -532,11 +532,11 @@ void UI_decoder_window::uart_width_combobox_clicked(int idx)
 
   if(devparms->modelserie != 1)
   {
-    sprintf(str, ":BUS1:RS232:DBIT %i", idx);
+    snprintf(str, 512, ":BUS1:RS232:DBIT %i", idx);
   }
   else
   {
-    sprintf(str, ":DEC1:UART:WIDT %i", idx);
+    snprintf(str, 512, ":DEC1:UART:WIDT %i", idx);
   }
 
   mainwindow->set_cue_cmd(str);
@@ -619,17 +619,17 @@ void UI_decoder_window::uart_parity_combobox_clicked(int idx)
 
 void UI_decoder_window::spi_width_spinbox_changed()
 {
-  char str[256];
+  char str[512];
 
   devparms->math_decode_spi_width = spi_width_spinbox->value();
 
   if(devparms->modelserie != 1)
   {
-    sprintf(str, ":BUS1:SPI:DBIT %i", devparms->math_decode_spi_width);
+    snprintf(str, 512, ":BUS1:SPI:DBIT %i", devparms->math_decode_spi_width);
   }
   else
   {
-    sprintf(str, ":DEC1:SPI:WIDT %i", devparms->math_decode_spi_width);
+    snprintf(str, 512, ":DEC1:SPI:WIDT %i", devparms->math_decode_spi_width);
   }
 
   mainwindow->set_cue_cmd(str);
@@ -638,13 +638,13 @@ void UI_decoder_window::spi_width_spinbox_changed()
 
 void UI_decoder_window::spi_timeout_dspinbox_changed()
 {
-  char str[256];
+  char str[512];
 
   devparms->math_decode_spi_timeout = spi_timeout_dspinbox->value();
 
   if(devparms->modelserie == 1)
   {
-    sprintf(str, ":DEC1:SPI:TIM %e", devparms->math_decode_spi_timeout);
+    snprintf(str, 512, ":DEC1:SPI:TIM %e", devparms->math_decode_spi_timeout);
 
     mainwindow->set_cue_cmd(str);
   }
@@ -653,7 +653,7 @@ void UI_decoder_window::spi_timeout_dspinbox_changed()
 
 void UI_decoder_window::trace_pos_spinbox_changed()
 {
-  char str[256];
+  char str[512];
 
   devparms->math_decode_pos = trace_pos_spinbox->value();
 
@@ -661,24 +661,24 @@ void UI_decoder_window::trace_pos_spinbox_changed()
   {
     if(devparms->math_decode_mode == DECODE_MODE_SPI)
     {
-      sprintf(str, ":BUS1:SPI:OFFS %i", devparms->math_decode_pos);
+      snprintf(str, 512, ":BUS1:SPI:OFFS %i", devparms->math_decode_pos);
     }
     else if(devparms->math_decode_mode == DECODE_MODE_UART)
       {
-        sprintf(str, ":BUS1:RS232:OFFS %i", devparms->math_decode_pos);
+        snprintf(str, 512, ":BUS1:RS232:OFFS %i", devparms->math_decode_pos);
       }
       else if(devparms->math_decode_mode == DECODE_MODE_I2C)
         {
-          sprintf(str, ":BUS1:IIC:OFFS %i", devparms->math_decode_pos);
+          snprintf(str, 512, ":BUS1:IIC:OFFS %i", devparms->math_decode_pos);
         }
         else if(devparms->math_decode_mode == DECODE_MODE_PAR)
           {
-            sprintf(str, ":BUS1:PARA:OFFS %i", devparms->math_decode_pos);
+            snprintf(str, 512, ":BUS1:PARA:OFFS %i", devparms->math_decode_pos);
           }
   }
   else
   {
-    sprintf(str, ":DEC1:POS %i", devparms->math_decode_pos);
+    snprintf(str, 512, ":DEC1:POS %i", devparms->math_decode_pos);
   }
 
   mainwindow->set_cue_cmd(str);
@@ -716,7 +716,7 @@ void UI_decoder_window::spi_select_combobox_clicked(int idx)
 
 void UI_decoder_window::spi_mode_combobox_clicked(int idx)
 {
-  char str[256];
+  char str[512];
 
   devparms->math_decode_spi_mode = idx;
 
@@ -736,7 +736,7 @@ void UI_decoder_window::spi_mode_combobox_clicked(int idx)
 
       if(spi_cs_src_combobox->currentIndex() > 0)
       {
-        sprintf(str, ":DEC1:SPI:CS CHAN%i", spi_cs_src_combobox->currentIndex());
+        snprintf(str, 512, ":DEC1:SPI:CS CHAN%i", spi_cs_src_combobox->currentIndex());
 
         mainwindow->set_cue_cmd(str);
       }
@@ -932,7 +932,7 @@ void UI_decoder_window::tabholder_index_changed(int idx)
 
 void UI_decoder_window::threshold_1_dspinbox_changed()
 {
-  char str[256];
+  char str[512];
 
   if(tabholder->currentIndex() == DECODE_MODE_TAB_UART)
   {
@@ -940,7 +940,7 @@ void UI_decoder_window::threshold_1_dspinbox_changed()
     {
       devparms->math_decode_threshold_uart_tx = threshold_1_dspinbox->value();
 
-      sprintf(str, ":BUS1:RS232:TTHR %e", devparms->math_decode_threshold_uart_tx);
+      snprintf(str, 512, ":BUS1:RS232:TTHR %e", devparms->math_decode_threshold_uart_tx);
 
       mainwindow->set_cue_cmd(str);
     }
@@ -948,7 +948,7 @@ void UI_decoder_window::threshold_1_dspinbox_changed()
       {
         devparms->math_decode_threshold[uart_tx_src_combobox->currentIndex() - 1] = threshold_1_dspinbox->value();
 
-        sprintf(str, ":DEC1:THRE:CHAN%i %e", uart_tx_src_combobox->currentIndex(),
+        snprintf(str, 512, ":DEC1:THRE:CHAN%i %e", uart_tx_src_combobox->currentIndex(),
                 devparms->math_decode_threshold[uart_tx_src_combobox->currentIndex() - 1]);
 
         mainwindow->set_cue_cmd(str);
@@ -960,7 +960,7 @@ void UI_decoder_window::threshold_1_dspinbox_changed()
       {
         devparms->math_decode_threshold[2] = threshold_1_dspinbox->value();
 
-        sprintf(str, ":BUS1:SPI:SCLK:THR %e", devparms->math_decode_threshold[2]);
+        snprintf(str, 512, ":BUS1:SPI:SCLK:THR %e", devparms->math_decode_threshold[2]);
 
         mainwindow->set_cue_cmd(str);
       }
@@ -968,7 +968,7 @@ void UI_decoder_window::threshold_1_dspinbox_changed()
       {
         devparms->math_decode_threshold[spi_clk_src_combobox->currentIndex()] = threshold_1_dspinbox->value();
 
-        sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_clk_src_combobox->currentIndex() + 1,
+        snprintf(str, 512, ":DEC1:THRE:CHAN%i %e", spi_clk_src_combobox->currentIndex() + 1,
                 devparms->math_decode_threshold[spi_clk_src_combobox->currentIndex()]);
 
         mainwindow->set_cue_cmd(str);
@@ -981,7 +981,7 @@ void UI_decoder_window::threshold_1_dspinbox_changed()
 
 void UI_decoder_window::threshold_2_dspinbox_changed()
 {
-  char str[256];
+  char str[512];
 
   if(tabholder->currentIndex() == DECODE_MODE_TAB_UART)
   {
@@ -989,7 +989,7 @@ void UI_decoder_window::threshold_2_dspinbox_changed()
     {
       devparms->math_decode_threshold_uart_rx = threshold_2_dspinbox->value();
 
-      sprintf(str, ":BUS1:RS232:RTHR %e", devparms->math_decode_threshold_uart_rx);
+      snprintf(str, 512, ":BUS1:RS232:RTHR %e", devparms->math_decode_threshold_uart_rx);
 
       mainwindow->set_cue_cmd(str);
     }
@@ -997,7 +997,7 @@ void UI_decoder_window::threshold_2_dspinbox_changed()
       {
         devparms->math_decode_threshold[uart_rx_src_combobox->currentIndex() - 1] = threshold_2_dspinbox->value();
 
-        sprintf(str, ":DEC1:THRE:CHAN%i %e", uart_rx_src_combobox->currentIndex(),
+        snprintf(str, 512, ":DEC1:THRE:CHAN%i %e", uart_rx_src_combobox->currentIndex(),
                 devparms->math_decode_threshold[uart_rx_src_combobox->currentIndex() - 1]);
 
         mainwindow->set_cue_cmd(str);
@@ -1009,7 +1009,7 @@ void UI_decoder_window::threshold_2_dspinbox_changed()
       {
         devparms->math_decode_threshold[1] = threshold_2_dspinbox->value();
 
-        sprintf(str, ":BUS1:SPI:MOSI:THR %e", devparms->math_decode_threshold[1]);
+        snprintf(str, 512, ":BUS1:SPI:MOSI:THR %e", devparms->math_decode_threshold[1]);
 
         mainwindow->set_cue_cmd(str);
       }
@@ -1017,7 +1017,7 @@ void UI_decoder_window::threshold_2_dspinbox_changed()
         {
           devparms->math_decode_threshold[spi_mosi_src_combobox->currentIndex() - 1] = threshold_2_dspinbox->value();
 
-          sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_mosi_src_combobox->currentIndex(),
+          snprintf(str, 512, ":DEC1:THRE:CHAN%i %e", spi_mosi_src_combobox->currentIndex(),
                   devparms->math_decode_threshold[spi_mosi_src_combobox->currentIndex() - 1]);
 
           mainwindow->set_cue_cmd(str);
@@ -1030,7 +1030,7 @@ void UI_decoder_window::threshold_2_dspinbox_changed()
 
 void UI_decoder_window::threshold_3_dspinbox_changed()
 {
-  char str[256];
+  char str[512];
 
   if(tabholder->currentIndex() == DECODE_MODE_TAB_UART)
   {
@@ -1041,7 +1041,7 @@ void UI_decoder_window::threshold_3_dspinbox_changed()
       {
         devparms->math_decode_threshold[0] = threshold_3_dspinbox->value();
 
-        sprintf(str, ":BUS1:SPI:MISO:THR %e", devparms->math_decode_threshold[0]);
+        snprintf(str, 512, ":BUS1:SPI:MISO:THR %e", devparms->math_decode_threshold[0]);
 
         mainwindow->set_cue_cmd(str);
       }
@@ -1049,7 +1049,7 @@ void UI_decoder_window::threshold_3_dspinbox_changed()
         {
           devparms->math_decode_threshold[spi_miso_src_combobox->currentIndex() - 1] = threshold_3_dspinbox->value();
 
-          sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_miso_src_combobox->currentIndex(),
+          snprintf(str, 512, ":DEC1:THRE:CHAN%i %e", spi_miso_src_combobox->currentIndex(),
                   devparms->math_decode_threshold[spi_miso_src_combobox->currentIndex() - 1]);
 
           mainwindow->set_cue_cmd(str);
@@ -1062,7 +1062,7 @@ void UI_decoder_window::threshold_3_dspinbox_changed()
 
 void UI_decoder_window::threshold_4_dspinbox_changed()
 {
-  char str[256];
+  char str[512];
 
   if(tabholder->currentIndex() == DECODE_MODE_TAB_UART)
   {
@@ -1073,7 +1073,7 @@ void UI_decoder_window::threshold_4_dspinbox_changed()
       {
         devparms->math_decode_threshold[3] = threshold_4_dspinbox->value();
 
-        sprintf(str, ":BUS1:SPI:SS:THR %e", devparms->math_decode_threshold[3]);
+        snprintf(str, 512, ":BUS1:SPI:SS:THR %e", devparms->math_decode_threshold[3]);
 
         mainwindow->set_cue_cmd(str);
       }
@@ -1081,7 +1081,7 @@ void UI_decoder_window::threshold_4_dspinbox_changed()
         {
           devparms->math_decode_threshold[spi_cs_src_combobox->currentIndex() - 1] = threshold_4_dspinbox->value();
 
-          sprintf(str, ":DEC1:THRE:CHAN%i %e", spi_cs_src_combobox->currentIndex(),
+          snprintf(str, 512, ":DEC1:THRE:CHAN%i %e", spi_cs_src_combobox->currentIndex(),
                   devparms->math_decode_threshold[spi_cs_src_combobox->currentIndex() - 1]);
 
           mainwindow->set_cue_cmd(str);
@@ -1109,7 +1109,7 @@ void UI_decoder_window::src_combobox_clicked(int)
 
 void UI_decoder_window::threshold_auto_clicked(int thr_auto)
 {
-  char str[256];
+  char str[512];
 
   devparms->math_decode_threshold_auto = thr_auto;
 
@@ -1131,13 +1131,13 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
     {
       if(devparms->modelserie != 1)
       {
-        sprintf(str, ":BUS1:RS232:TX CHAN%i", uart_tx_src_combobox->currentIndex());
+        snprintf(str, 512, ":BUS1:RS232:TX CHAN%i", uart_tx_src_combobox->currentIndex());
 
         mainwindow->set_cue_cmd(str);
       }
       else
       {
-        sprintf(str, ":DEC1:UART:TX CHAN%i", uart_tx_src_combobox->currentIndex());
+        snprintf(str, 512, ":DEC1:UART:TX CHAN%i", uart_tx_src_combobox->currentIndex());
 
         mainwindow->set_cue_cmd(str);
       }
@@ -1158,13 +1158,13 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
     {
       if(devparms->modelserie != 1)
       {
-        sprintf(str, ":BUS1:RS232:RX CHAN%i", uart_rx_src_combobox->currentIndex());
+        snprintf(str, 512, ":BUS1:RS232:RX CHAN%i", uart_rx_src_combobox->currentIndex());
 
         mainwindow->set_cue_cmd(str);
       }
       else
       {
-        sprintf(str, ":DEC1:UART:RX CHAN%i", uart_rx_src_combobox->currentIndex());
+        snprintf(str, 512, ":DEC1:UART:RX CHAN%i", uart_rx_src_combobox->currentIndex());
 
         mainwindow->set_cue_cmd(str);
       }
@@ -1220,13 +1220,13 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
     {
       if(devparms->modelserie != 1)
       {
-        sprintf(str, ":BUS1:SPI:SCLK:SOUR CHAN%i", spi_clk_src_combobox->currentIndex() + 1);
+        snprintf(str, 512, ":BUS1:SPI:SCLK:SOUR CHAN%i", spi_clk_src_combobox->currentIndex() + 1);
 
         mainwindow->set_cue_cmd(str);
       }
       else
       {
-        sprintf(str, ":DEC1:SPI:CLK CHAN%i", spi_clk_src_combobox->currentIndex() + 1);
+        snprintf(str, 512, ":DEC1:SPI:CLK CHAN%i", spi_clk_src_combobox->currentIndex() + 1);
 
         mainwindow->set_cue_cmd(str);
       }
@@ -1235,13 +1235,13 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
       {
         if(devparms->modelserie != 1)
         {
-          sprintf(str, ":BUS1:SPI:MOSI:SOUR CHAN%i", spi_mosi_src_combobox->currentIndex());
+          snprintf(str, 512, ":BUS1:SPI:MOSI:SOUR CHAN%i", spi_mosi_src_combobox->currentIndex());
 
           mainwindow->set_cue_cmd(str);
         }
         else
         {
-          sprintf(str, ":DEC1:SPI:MOSI CHAN%i", spi_mosi_src_combobox->currentIndex());
+          snprintf(str, 512, ":DEC1:SPI:MOSI CHAN%i", spi_mosi_src_combobox->currentIndex());
 
           mainwindow->set_cue_cmd(str);
         }
@@ -1262,13 +1262,13 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
       {
         if(devparms->modelserie != 1)
         {
-          sprintf(str, ":BUS1:SPI:MISO:SOUR CHAN%i", spi_miso_src_combobox->currentIndex());
+          snprintf(str, 512, ":BUS1:SPI:MISO:SOUR CHAN%i", spi_miso_src_combobox->currentIndex());
 
           mainwindow->set_cue_cmd(str);
         }
         else
         {
-          sprintf(str, ":DEC1:SPI:MISO CHAN%i", spi_miso_src_combobox->currentIndex());
+          snprintf(str, 512, ":DEC1:SPI:MISO CHAN%i", spi_miso_src_combobox->currentIndex());
 
           mainwindow->set_cue_cmd(str);
         }
@@ -1301,7 +1301,7 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
       {
         if(devparms->modelserie != 1)
         {
-          sprintf(str, ":BUS1:SPI:SS:SOUR CHAN%i", spi_cs_src_combobox->currentIndex());
+          snprintf(str, 512, ":BUS1:SPI:SS:SOUR CHAN%i", spi_cs_src_combobox->currentIndex());
 
           mainwindow->set_cue_cmd(str);
         }
@@ -1309,7 +1309,7 @@ void UI_decoder_window::threshold_auto_clicked(int thr_auto)
         {
           if(devparms->math_decode_spi_mode)
           {
-            sprintf(str, ":DEC1:SPI:CS CHAN%i", spi_cs_src_combobox->currentIndex());
+            snprintf(str, 512, ":DEC1:SPI:CS CHAN%i", spi_cs_src_combobox->currentIndex());
 
             mainwindow->set_cue_cmd(str);
           }

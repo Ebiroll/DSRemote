@@ -3,7 +3,7 @@
 *
 * Author: Teunis van Beelen
 *
-* Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Teunis van Beelen
+* Copyright (C) 2009 - 2019 Teunis van Beelen
 *
 * Email: teuniz@protonmail.com
 *
@@ -65,17 +65,17 @@ void remove_extension_from_filename(char *str)
 }
 
 
-  /* size is size of destination, returns length of filename */
-int get_filename_from_path(char *dest, const char *src, int size)
+  /* sz is size of destination, returns length of filename */
+int get_filename_from_path(char *dest, const char *src, int sz)
 {
   int i, len;
 
-  if(size<1)
+  if(sz<1)
   {
     return -1;
   }
 
-  if(size<2)
+  if(sz<2)
   {
     dest[0] = 0;
 
@@ -108,26 +108,26 @@ int get_filename_from_path(char *dest, const char *src, int size)
     return 0;
   }
 
-  strncpy(dest, src + i, size);
+  strncpy(dest, src + i, sz);
 
-  dest[size-1] = 0;
+  dest[sz-1] = 0;
 
   return strlen(dest);
 }
 
 
-  /* size is size of destination, returns length of directory */
+  /* sz is size of destination, returns length of directory */
   /* last character of destination is not a slash! */
-int get_directory_from_path(char *dest, const char *src, int size)
+int get_directory_from_path(char *dest, const char *src, int sz)
 {
   int i, len;
 
-  if(size<1)
+  if(sz<1)
   {
     return -1;
   }
 
-  if(size<2)
+  if(sz<2)
   {
     dest[0] = 0;
 
@@ -151,15 +151,15 @@ int get_directory_from_path(char *dest, const char *src, int size)
     }
   }
 
-  strncpy(dest, src, size);
+  strncpy(dest, src, sz);
 
-  if(i < size)
+  if(i < sz)
   {
     dest[i] = 0;
   }
   else
   {
-    dest[size-1] = 0;
+    dest[sz-1] = 0;
   }
 
   return strlen(dest);
@@ -1497,18 +1497,20 @@ void bintoascii(char *str)
 
 void bintohex(char *str)
 {
-  int i, len;
+  int i, len, newlen;
 
   char scratchpad[16];
 
-  len = strlen(str) / 8;
+  len = strlen(str);
 
-  for(i=0; i<len; i++)
+  newlen = len / 8;
+
+  for(i=0; i<newlen; i++)
   {
     strncpy(scratchpad, str + (i * 8), 8);
     scratchpad[8] = 0;
 
-    sprintf(str + (i * 2), "%02x", (unsigned int)strtol(scratchpad, NULL, 2));
+    snprintf(str + (i * 2), len, "%02x", (unsigned int)strtol(scratchpad, NULL, 2));
   }
 
   str[i * 2] = 0;
@@ -1801,11 +1803,13 @@ double round_down_step125(double val, double *ratio)
 }
 
 
-int convert_to_metric_suffix(char *buf, double value, int decimals)
+int convert_to_metric_suffix(char *dest, double value, int decimals, int sz)
 {
   double ltmp;
 
   char suffix=' ';
+
+  if(sz < 1)  return 0;
 
   if(value < 0)
   {
@@ -1869,21 +1873,21 @@ int convert_to_metric_suffix(char *buf, double value, int decimals)
   {
     switch(decimals)
     {
-      case 0: return sprintf(buf, "%.0f%c", ltmp, suffix);
+      case 0: return snprintf(dest, sz, "%.0f%c", ltmp, suffix);
               break;
-      case 1: return sprintf(buf, "%.1f%c", ltmp, suffix);
+      case 1: return snprintf(dest, sz, "%.1f%c", ltmp, suffix);
               break;
-      case 2: return sprintf(buf, "%.2f%c", ltmp, suffix);
+      case 2: return snprintf(dest, sz, "%.2f%c", ltmp, suffix);
               break;
-      case 3: return sprintf(buf, "%.3f%c", ltmp, suffix);
+      case 3: return snprintf(dest, sz, "%.3f%c", ltmp, suffix);
               break;
-      case 4: return sprintf(buf, "%.4f%c", ltmp, suffix);
+      case 4: return snprintf(dest, sz, "%.4f%c", ltmp, suffix);
               break;
-      case 5: return sprintf(buf, "%.5f%c", ltmp, suffix);
+      case 5: return snprintf(dest, sz, "%.5f%c", ltmp, suffix);
               break;
-      case 6: return sprintf(buf, "%.6f%c", ltmp, suffix);
+      case 6: return snprintf(dest, sz, "%.6f%c", ltmp, suffix);
               break;
-      default: return sprintf(buf, "%.3f%c", ltmp, suffix);
+      default: return snprintf(dest, sz, "%.3f%c", ltmp, suffix);
               break;
     }
   }
@@ -1892,18 +1896,18 @@ int convert_to_metric_suffix(char *buf, double value, int decimals)
   {
     switch(decimals)
     {
-      case 0: return sprintf(buf, "%.0f%c", ltmp * -1, suffix);
+      case 0: return snprintf(dest, sz, "%.0f%c", ltmp * -1, suffix);
               break;
-      case 1: return sprintf(buf, "%.1f%c", ltmp * -1, suffix);
+      case 1: return snprintf(dest, sz, "%.1f%c", ltmp * -1, suffix);
               break;
-      case 2: return sprintf(buf, "%.2f%c", ltmp * -1, suffix);
+      case 2: return snprintf(dest, sz, "%.2f%c", ltmp * -1, suffix);
               break;
-      default: return sprintf(buf, "%.3f%c", ltmp * -1, suffix);
+      default: return snprintf(dest, sz, "%.3f%c", ltmp * -1, suffix);
               break;
     }
   }
 
-  strcpy(buf, "0");
+  strlcpy(dest, "0", sz);
 
   return 1;
 }
@@ -1976,6 +1980,215 @@ int dblcmp(double val1, double val2)
       return 0;
     }
 }
+
+
+int base64_dec(const void *src, void *dest, int len)
+{
+  int i, j, idx;
+
+  const unsigned char *arr_in=(const unsigned char *)src;
+
+  unsigned char *arr_out=(unsigned char *)dest;
+
+  union{
+    unsigned char four[4];
+    unsigned short two[2];
+    unsigned int one;
+  } var;
+
+  unsigned char base64[256]={
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,62,0,0,0,63,52,53,54,55,56,57,58,59,60,61,0,0,0,0,0,0,
+    0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,0,0,0,0,0,
+    0,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+  var.one = 0;
+
+  for(i=0, j=0, idx=0; i<len; i++)
+  {
+    if(arr_in[i] <= ' ')
+    {
+      continue;
+    }
+
+    if(arr_in[i] == '=')
+    {
+      break;
+    }
+
+    if(arr_in[i] != 'A')
+    {
+      if(base64[arr_in[i]] == 0)
+      {
+        return -1;
+      }
+    }
+
+    var.one += base64[arr_in[i]];
+
+    idx++;
+
+    if(idx < 4)
+    {
+      var.one <<= 6;
+    }
+    else
+    {
+      idx = 0;
+
+      arr_out[j++] = var.four[2];
+
+      arr_out[j++] = var.four[1];
+
+      arr_out[j++] = var.four[0];
+
+      var.one = 0;
+    }
+  }
+
+  if(idx == 2)
+  {
+    var.one >>= 6;
+
+    arr_out[j++] = var.four[0];
+  }
+  else if(idx == 3)
+    {
+      var.one >>= 6;
+
+      arr_out[j++] = var.four[1];
+
+      arr_out[j++] = var.four[0];
+    }
+
+  return j;
+}
+
+
+/* returns also empty tokens */
+char * strtok_r_e(char *str, const char *delim, char **saveptr)
+{
+  int i, j, delim_len;
+
+  char *ptr;
+
+  char *buf;
+
+  if(delim == NULL)  return NULL;
+
+  delim_len = strlen(delim);
+  if(delim_len < 1)  return NULL;
+
+  if(str != NULL)
+  {
+    buf = str;
+  }
+  else
+  {
+    buf = *saveptr;
+  }
+
+  for(i=0; ; i++)
+  {
+    if(buf[i] == 0)
+    {
+      if(i)
+      {
+        ptr = buf;
+
+        buf += i;
+
+        *saveptr = buf;
+
+        return ptr;
+      }
+      else
+      {
+        return NULL;
+      }
+    }
+
+    for(j=0; j<delim_len; j++)
+    {
+      if(buf[i] == delim[j])
+      {
+        buf[i] = 0;
+
+        ptr = buf;
+
+        buf += (i + 1);
+
+        *saveptr = buf;
+
+        return ptr;
+      }
+    }
+  }
+
+  return NULL;
+}
+
+
+/* sz is size of destination, returns length of string in dest.
+ * This is different than the official BSD implementation!
+ * From the BSD man-page:
+ * "The strlcpy() and strlcat() functions return the total length of
+ * the string they tried to create. For strlcpy() that means the
+ * length of src. For strlcat() that means the initial length of dst
+ * plus the length of src. While this may seem somewhat confusing,
+ * it was done to make truncation detection simple."
+ */
+#if defined(__APPLE__) || defined(__MACH__) || defined(__APPLE_CC__) || defined(__FreeBSD__)
+/* nothing here */
+#else
+int strlcpy(char *dst, const char *src, int sz)
+{
+  int srclen;
+
+  sz--;
+
+  srclen = strlen(src);
+
+  if(srclen > sz)  srclen = sz;
+
+  memcpy(dst, src, srclen);
+
+  dst[srclen] = 0;
+
+  return srclen;
+}
+
+
+int strlcat(char *dst, const char *src, int sz)
+{
+  int srclen,
+      dstlen;
+
+  dstlen = strlen(dst);
+
+  sz -= dstlen + 1;
+
+  if(!sz)  return dstlen;
+
+  srclen = strlen(src);
+
+  if(srclen > sz)  srclen = sz;
+
+  memcpy(dst + dstlen, src, srclen);
+
+  dst[dstlen + srclen] = 0;
+
+  return (dstlen + srclen);
+}
+#endif
+
+
+
+
 
 
 

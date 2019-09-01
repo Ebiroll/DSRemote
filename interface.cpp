@@ -179,29 +179,29 @@ void UI_Mainwindow::navDialReleased()
 
   if(navDialFunc == NAV_DIAL_FUNC_HOLDOFF)
   {
-    strcpy(str, "Trigger holdoff: ");
+    strlcpy(str, "Trigger holdoff: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2, 512);
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
+    snprintf(str, 512, ":TRIG:HOLD %e", devparms.triggerholdoff);
 
     set_cue_cmd(str);
   }
   else if(devparms.timebasedelayenable)
     {
-      strcpy(str, "Delayed timebase position: ");
+      strlcpy(str, "Delayed timebase position: ", 512);
 
-      convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+      convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2, 512);
 
-      strcat(str, "s");
+      strlcat(str, "s", 512);
 
       statusLabel->setText(str);
 
-      sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+      snprintf(str, 512, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
       set_cue_cmd(str);
     }
@@ -433,11 +433,11 @@ void UI_Mainwindow::trigAdjustDialChanged(int new_pos)
     devparms.triggeredgelevel[chn] += devparms.chanscale[chn] / 50;
   }
 
-  strcpy(str, "Trigger level: ");
+  strlcpy(str, "Trigger level: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[chn], 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[chn], 2, 512);
 
-  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
+  strlcat(str, devparms.chanunitstr[devparms.chanunit[chn]], 512);
 
   statusLabel->setText(str);
 
@@ -571,11 +571,11 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
 
     devparms.current_screen_sf = 100.0 / devparms.timebasedelayscale;
 
-    strcpy(str, "Delayed timebase: ");
+    strlcpy(str, "Delayed timebase: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayscale, 2, 512);
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -652,11 +652,11 @@ void UI_Mainwindow::horScaleDialChanged(int new_pos)
 
     devparms.current_screen_sf = 100.0 / devparms.timebasescale;
 
-    strcpy(str, "Timebase: ");
+    strlcpy(str, "Timebase: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasescale, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -747,11 +747,11 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
       devparms.timebasedelayoffset -= (devparms.timebasedelayscale / 50);
     }
 
-    strcpy(str, "Delayed timebase position: ");
+    strlcpy(str, "Delayed timebase position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2, 512);
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -788,11 +788,11 @@ void UI_Mainwindow::horPosDialChanged(int new_pos)
       devparms.timebaseoffset -= devparms.timebasescale / 50;
     }
 
-    strcpy(str, "Horizontal position: ");
+    strlcpy(str, "Horizontal position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
@@ -886,11 +886,11 @@ void UI_Mainwindow::vertOffsetDialChanged(int new_pos)
     devparms.chanoffset[chn] += val;
   }
 
-  sprintf(str, "Channel %i offset: ", chn + 1);
+  snprintf(str, 512, "Channel %i offset: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2, 512 - strlen(str));
 
-  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
+  strlcat(str, devparms.chanunitstr[devparms.chanunit[chn]], 512);
 
   statusLabel->setText(str);
 
@@ -1014,15 +1014,15 @@ void UI_Mainwindow::vertScaleDialChanged(int new_pos)
 
   devparms.chanoffset[chn] /= ltmp;
 
-  sprintf(str, "Channel %i scale: ", chn + 1);
+  snprintf(str, 512, "Channel %i scale: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanscale[chn], 2, 512 - strlen(str));
 
-  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
+  strlcat(str, devparms.chanunitstr[devparms.chanunit[chn]], 512);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+  snprintf(str, 512, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
   set_cue_cmd(str);
 
@@ -1228,7 +1228,7 @@ void UI_Mainwindow::acqButtonClicked()
 
 void UI_Mainwindow::set_memdepth(int mdepth)
 {
-  char str[256];
+  char str[512];
 
   QMessageBox msgBox;
 
@@ -1255,13 +1255,13 @@ void UI_Mainwindow::set_memdepth(int mdepth)
     return;
   }
 
-  strcpy(str, "Memory depth: ");
+  strlcpy(str, "Memory depth: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), mdepth, 0);
+  convert_to_metric_suffix(str + strlen(str), mdepth, 0, 512 - strlen(str));
 
   statusLabel->setText(str);
 
-  sprintf(str, ":ACQ:MDEP %i", mdepth);
+  snprintf(str, 512, ":ACQ:MDEP %i", mdepth);
 
   set_cue_cmd(str);
 
@@ -2008,11 +2008,11 @@ void UI_Mainwindow::vertScaleDialClicked(QPoint)
   {
     devparms.chanvernier[chn] = 0;
 
-    sprintf(str, "Channel %i vernier: off", chn + 1);
+    snprintf(str, 512, "Channel %i vernier: off", chn + 1);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":CHAN%i:VERN 0", chn + 1);
+    snprintf(str, 512, ":CHAN%i:VERN 0", chn + 1);
 
     set_cue_cmd(str);
   }
@@ -2020,11 +2020,11 @@ void UI_Mainwindow::vertScaleDialClicked(QPoint)
   {
     devparms.chanvernier[chn] = 1;
 
-    sprintf(str, "Channel %i vernier: on", chn + 1);
+    snprintf(str, 512, "Channel %i vernier: on", chn + 1);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":CHAN%i:VERN 1", chn + 1);
+    snprintf(str, 512, ":CHAN%i:VERN 1", chn + 1);
 
     set_cue_cmd(str);
   }
@@ -2495,7 +2495,7 @@ void UI_Mainwindow::chan_menu()
 
 void UI_Mainwindow::math_menu()
 {
-  char str[1024];
+  char str[512];
 
   double val;
 
@@ -2524,37 +2524,37 @@ void UI_Mainwindow::math_menu()
   }
 
   submenufftctr.setTitle("Center");
-  convert_to_metric_suffix(str, devparms.math_fft_hscale * 5.0 , 1);
-  strcat(str, "Hz");
+  convert_to_metric_suffix(str, devparms.math_fft_hscale * 5.0 , 1, 512);
+  strlcat(str, "Hz", 512);
   submenufftctr.addAction(str, this, SLOT(select_fft_ctr_5()));
-  convert_to_metric_suffix(str, devparms.math_fft_hscale * 6.0 , 1);
-  strcat(str, "Hz");
+  convert_to_metric_suffix(str, devparms.math_fft_hscale * 6.0 , 1, 512);
+  strlcat(str, "Hz", 512);
   submenufftctr.addAction(str, this, SLOT(select_fft_ctr_6()));
-  convert_to_metric_suffix(str, devparms.math_fft_hscale * 7.0 , 1);
-  strcat(str, "Hz");
+  convert_to_metric_suffix(str, devparms.math_fft_hscale * 7.0 , 1, 512);
+  strlcat(str, "Hz", 512);
   submenufftctr.addAction(str, this, SLOT(select_fft_ctr_7()));
-  convert_to_metric_suffix(str, devparms.math_fft_hscale * 8.0 , 1);
-  strcat(str, "Hz");
+  convert_to_metric_suffix(str, devparms.math_fft_hscale * 8.0 , 1, 512);
+  strlcat(str, "Hz", 512);
   submenufftctr.addAction(str, this, SLOT(select_fft_ctr_8()));
   if((devparms.math_fft_hscale * 9.0) < (val * 0.40001))
   {
-    convert_to_metric_suffix(str, devparms.math_fft_hscale * 9.0 , 1);
-    strcat(str, "Hz");
+    convert_to_metric_suffix(str, devparms.math_fft_hscale * 9.0 , 1, 512);
+    strlcat(str, "Hz", 512);
     submenufftctr.addAction(str, this, SLOT(select_fft_ctr_9()));
     if((devparms.math_fft_hscale * 10.0) < (val * 0.40001))
     {
-      convert_to_metric_suffix(str, devparms.math_fft_hscale * 10.0 , 1);
-      strcat(str, "Hz");
+      convert_to_metric_suffix(str, devparms.math_fft_hscale * 10.0 , 1, 512);
+      strlcat(str, "Hz", 512);
       submenufftctr.addAction(str, this, SLOT(select_fft_ctr_10()));
       if((devparms.math_fft_hscale * 11.0) < (val * 0.40001))
       {
-        convert_to_metric_suffix(str, devparms.math_fft_hscale * 11.0 , 1);
-        strcat(str, "Hz");
+        convert_to_metric_suffix(str, devparms.math_fft_hscale * 11.0 , 1, 512);
+        strlcat(str, "Hz", 512);
         submenufftctr.addAction(str, this, SLOT(select_fft_ctr_11()));
         if((devparms.math_fft_hscale * 12.0) < (val * 0.40001))
         {
-          convert_to_metric_suffix(str, devparms.math_fft_hscale * 12.0 , 1);
-          strcat(str, "Hz");
+          convert_to_metric_suffix(str, devparms.math_fft_hscale * 12.0 , 1, 512);
+          strlcat(str, "Hz", 512);
           submenufftctr.addAction(str, this, SLOT(select_fft_ctr_12()));
         }
       }
@@ -2565,80 +2565,80 @@ void UI_Mainwindow::math_menu()
 //   if(devparms.modelserie == 6)
 //   {
 //     convert_to_metric_suffix(str, val / 40.0 , 2);
-//     strcat(str, "Hz/Div");
+//     strlcat(str, "Hz/Div", 512);
 //     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_40()));
 //     convert_to_metric_suffix(str, val / 80.0 , 2);
-//     strcat(str, "Hz/Div");
+//     strlcat(str, "Hz/Div", 512);
 //     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_80()));
 //     convert_to_metric_suffix(str, val / 200.0 , 2);
-//     strcat(str, "Hz/Div");
+//     strlcat(str, "Hz/Div", 512);
 //     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
 //   }
 //   else
 //   {
-    convert_to_metric_suffix(str, val / 20.0 , 2);
-    strcat(str, "Hz/Div");
+    convert_to_metric_suffix(str, val / 20.0 , 2, 512);
+    strlcat(str, "Hz/Div", 512);
     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_20()));
-    convert_to_metric_suffix(str, val / 40.0 , 2);
-    strcat(str, "Hz/Div");
+    convert_to_metric_suffix(str, val / 40.0 , 2, 512);
+    strlcat(str, "Hz/Div", 512);
     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_40()));
-    convert_to_metric_suffix(str, val / 100.0 , 2);
-    strcat(str, "Hz/Div");
+    convert_to_metric_suffix(str, val / 100.0 , 2, 512);
+    strlcat(str, "Hz/Div", 512);
     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_100()));
-    convert_to_metric_suffix(str, val / 200.0 , 2);
-    strcat(str, "Hz/Div");
+    convert_to_metric_suffix(str, val / 200.0 , 2, 512);
+    strlcat(str, "Hz/Div", 512);
     submenuffthzdiv.addAction(str, this, SLOT(select_fft_hzdiv_200()));
 //  }
 
   submenufftoffset.setTitle("Offset");
   if(devparms.math_fft_unit == 0)
   {
-    convert_to_metric_suffix(str, devparms.fft_vscale * 4.0, 1);
-    strcat(str, "V");
+    convert_to_metric_suffix(str, devparms.fft_vscale * 4.0, 1, 512);
+    strlcat(str, "V", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp4()));
-    convert_to_metric_suffix(str, devparms.fft_vscale * 3.0, 1);
-    strcat(str, "V");
+    convert_to_metric_suffix(str, devparms.fft_vscale * 3.0, 1, 512);
+    strlcat(str, "V", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp3()));
-    convert_to_metric_suffix(str, devparms.fft_vscale * 2.0, 1);
-    strcat(str, "V");
+    convert_to_metric_suffix(str, devparms.fft_vscale * 2.0, 1, 512);
+    strlcat(str, "V", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp2()));
-    convert_to_metric_suffix(str, devparms.fft_vscale, 1);
-    strcat(str, "V");
+    convert_to_metric_suffix(str, devparms.fft_vscale, 1, 512);
+    strlcat(str, "V", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp1()));
-    strcpy(str, "0V");
+    strlcpy(str, "0V", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffset0()));
-    convert_to_metric_suffix(str, devparms.fft_vscale * -1.0, 1);
-    strcat(str, "V");
+    convert_to_metric_suffix(str, devparms.fft_vscale * -1.0, 1, 512);
+    strlcat(str, "V", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm1()));
-    convert_to_metric_suffix(str, devparms.fft_vscale * -2.0, 1);
-    strcat(str, "V");
+    convert_to_metric_suffix(str, devparms.fft_vscale * -2.0, 1, 512);
+    strlcat(str, "V", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm2()));
-    convert_to_metric_suffix(str, devparms.fft_vscale * -3.0, 1);
-    strcat(str, "V");
+    convert_to_metric_suffix(str, devparms.fft_vscale * -3.0, 1, 512);
+    strlcat(str, "V", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm3()));
-    convert_to_metric_suffix(str, devparms.fft_vscale * -4.0, 1);
-    strcat(str, "V");
+    convert_to_metric_suffix(str, devparms.fft_vscale * -4.0, 1, 512);
+    strlcat(str, "V", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm4()));
   }
   else
   {
-    sprintf(str, "%+.0fdB", devparms.fft_vscale * 4.0);
+    snprintf(str, 512, "%+.0fdB", devparms.fft_vscale * 4.0);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp4()));
-    sprintf(str, "%+.0fdB", devparms.fft_vscale * 3.0);
+    snprintf(str, 512, "%+.0fdB", devparms.fft_vscale * 3.0);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp3()));
-    sprintf(str, "%+.0fdB", devparms.fft_vscale * 2.0);
+    snprintf(str, 512, "%+.0fdB", devparms.fft_vscale * 2.0);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp2()));
-    sprintf(str, "%+.0fdB", devparms.fft_vscale);
+    snprintf(str, 512, "%+.0fdB", devparms.fft_vscale);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetp1()));
-    strcpy(str, "0dB");
+    strlcpy(str, "0dB", 512);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffset0()));
-    sprintf(str, "%.0fdB", devparms.fft_vscale * -1.0);
+    snprintf(str, 512, "%.0fdB", devparms.fft_vscale * -1.0);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm1()));
-    sprintf(str, "%.0fdB", devparms.fft_vscale * -2.0);
+    snprintf(str, 512, "%.0fdB", devparms.fft_vscale * -2.0);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm2()));
-    sprintf(str, "%.0fdB", devparms.fft_vscale * -3.0);
+    snprintf(str, 512, "%.0fdB", devparms.fft_vscale * -3.0);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm3()));
-    sprintf(str, "%.0fdB", devparms.fft_vscale * -4.0);
+    snprintf(str, 512, "%.0fdB", devparms.fft_vscale * -4.0);
     submenufftoffset.addAction(str, this, SLOT(select_fft_voffsetm4()));
   }
 
@@ -2744,15 +2744,15 @@ void UI_Mainwindow::math_menu()
 
 void UI_Mainwindow::chan_coupling_ac()
 {
-  char str[128];
+  char str[512];
 
   devparms.chancoupling[devparms.activechannel] = 2;
 
-  sprintf(str, "Channel %i coupling: AC", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i coupling: AC", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:COUP AC", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:COUP AC", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 
@@ -2762,15 +2762,15 @@ void UI_Mainwindow::chan_coupling_ac()
 
 void UI_Mainwindow::chan_coupling_dc()
 {
-  char str[128];
+  char str[512];
 
   devparms.chancoupling[devparms.activechannel] = 1;
 
-  sprintf(str, "Channel %i coupling: DC", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i coupling: DC", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:COUP DC", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:COUP DC", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 
@@ -2780,15 +2780,15 @@ void UI_Mainwindow::chan_coupling_dc()
 
 void UI_Mainwindow::chan_coupling_gnd()
 {
-  char str[128];
+  char str[512];
 
   devparms.chancoupling[devparms.activechannel] = 0;
 
-  sprintf(str, "Channel %i coupling: GND", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i coupling: GND", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:COUP GND", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:COUP GND", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 
@@ -2798,15 +2798,15 @@ void UI_Mainwindow::chan_coupling_gnd()
 
 void UI_Mainwindow::chan_unit_v()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanunit[devparms.activechannel] = 0;
 
-  sprintf(str, "Channel %i units: Volt", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i units: Volt", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:UNIT VOLT", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:UNIT VOLT", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 }
@@ -2814,15 +2814,15 @@ void UI_Mainwindow::chan_unit_v()
 
 void UI_Mainwindow::chan_unit_w()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanunit[devparms.activechannel] = 1;
 
-  sprintf(str, "Channel %i units: Watt", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i units: Watt", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:UNIT WATT", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:UNIT WATT", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 }
@@ -2830,15 +2830,15 @@ void UI_Mainwindow::chan_unit_w()
 
 void UI_Mainwindow::chan_unit_a()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanunit[devparms.activechannel] = 2;
 
-  sprintf(str, "Channel %i units: Ampere", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i units: Ampere", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:UNIT AMP", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:UNIT AMP", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 }
@@ -2846,15 +2846,15 @@ void UI_Mainwindow::chan_unit_a()
 
 void UI_Mainwindow::chan_unit_u()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanunit[devparms.activechannel] = 3;
 
-  sprintf(str, "Channel %i units: Unknown", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i units: Unknown", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:UNIT UNKN", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:UNIT UNKN", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 }
@@ -2862,7 +2862,7 @@ void UI_Mainwindow::chan_unit_u()
 
 void UI_Mainwindow::chan_probe_001()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -2870,11 +2870,11 @@ void UI_Mainwindow::chan_probe_001()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 0.01X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 0.01X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -2882,7 +2882,7 @@ void UI_Mainwindow::chan_probe_001()
 
 void UI_Mainwindow::chan_probe_002()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -2890,11 +2890,11 @@ void UI_Mainwindow::chan_probe_002()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 0.02X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 0.02X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -2902,7 +2902,7 @@ void UI_Mainwindow::chan_probe_002()
 
 void UI_Mainwindow::chan_probe_005()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -2910,11 +2910,11 @@ void UI_Mainwindow::chan_probe_005()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 0.05X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 0.05X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -2922,7 +2922,7 @@ void UI_Mainwindow::chan_probe_005()
 
 void UI_Mainwindow::chan_probe_01()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -2930,11 +2930,11 @@ void UI_Mainwindow::chan_probe_01()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 0.1X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 0.1X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -2942,7 +2942,7 @@ void UI_Mainwindow::chan_probe_01()
 
 void UI_Mainwindow::chan_probe_02()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -2950,11 +2950,11 @@ void UI_Mainwindow::chan_probe_02()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 0.2X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 0.2X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -2962,7 +2962,7 @@ void UI_Mainwindow::chan_probe_02()
 
 void UI_Mainwindow::chan_probe_05()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -2970,11 +2970,11 @@ void UI_Mainwindow::chan_probe_05()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 0.5X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 0.5X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -2982,7 +2982,7 @@ void UI_Mainwindow::chan_probe_05()
 
 void UI_Mainwindow::chan_probe_1()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -2990,11 +2990,11 @@ void UI_Mainwindow::chan_probe_1()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 1X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 1X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3002,7 +3002,7 @@ void UI_Mainwindow::chan_probe_1()
 
 void UI_Mainwindow::chan_probe_2()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -3010,11 +3010,11 @@ void UI_Mainwindow::chan_probe_2()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 2X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 2X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3022,7 +3022,7 @@ void UI_Mainwindow::chan_probe_2()
 
 void UI_Mainwindow::chan_probe_5()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -3030,11 +3030,11 @@ void UI_Mainwindow::chan_probe_5()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 5X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 5X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3042,7 +3042,7 @@ void UI_Mainwindow::chan_probe_5()
 
 void UI_Mainwindow::chan_probe_10()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -3050,11 +3050,11 @@ void UI_Mainwindow::chan_probe_10()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 10X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 10X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3062,7 +3062,7 @@ void UI_Mainwindow::chan_probe_10()
 
 void UI_Mainwindow::chan_probe_20()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -3070,11 +3070,11 @@ void UI_Mainwindow::chan_probe_20()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 20X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 20X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3082,7 +3082,7 @@ void UI_Mainwindow::chan_probe_20()
 
 void UI_Mainwindow::chan_probe_50()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -3090,11 +3090,11 @@ void UI_Mainwindow::chan_probe_50()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 50X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 50X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3102,7 +3102,7 @@ void UI_Mainwindow::chan_probe_50()
 
 void UI_Mainwindow::chan_probe_100()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -3110,11 +3110,11 @@ void UI_Mainwindow::chan_probe_100()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 100X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 100X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3122,7 +3122,7 @@ void UI_Mainwindow::chan_probe_100()
 
 void UI_Mainwindow::chan_probe_200()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -3130,11 +3130,11 @@ void UI_Mainwindow::chan_probe_200()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 200X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 200X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3142,7 +3142,7 @@ void UI_Mainwindow::chan_probe_200()
 
 void UI_Mainwindow::chan_probe_500()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -3150,11 +3150,11 @@ void UI_Mainwindow::chan_probe_500()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 500X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 500X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3162,7 +3162,7 @@ void UI_Mainwindow::chan_probe_500()
 
 void UI_Mainwindow::chan_probe_1000()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanscale[devparms.activechannel] /= devparms.chanprobe[devparms.activechannel];
 
@@ -3170,11 +3170,11 @@ void UI_Mainwindow::chan_probe_1000()
 
   devparms.chanscale[devparms.activechannel] *= devparms.chanprobe[devparms.activechannel];
 
-  sprintf(str, "Channel %i probe: 1000X", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i probe: 1000X", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
+  snprintf(str, 512, ":CHAN%i:PROB %e", devparms.activechannel + 1, devparms.chanprobe[devparms.activechannel]);
 
   set_cue_cmd(str);
 }
@@ -3182,15 +3182,15 @@ void UI_Mainwindow::chan_probe_1000()
 
 void UI_Mainwindow::chan_bwl_off()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanbwlimit[devparms.activechannel] = 0;
 
-  sprintf(str, "Channel %i bandwidth limit: Off", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i bandwidth limit: Off", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:BWL OFF", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:BWL OFF", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 
@@ -3200,15 +3200,15 @@ void UI_Mainwindow::chan_bwl_off()
 
 void UI_Mainwindow::chan_bwl_20()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanbwlimit[devparms.activechannel] = 20;
 
-  sprintf(str, "Channel %i bandwidth limit: 20MHz", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i bandwidth limit: 20MHz", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:BWL 20M", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:BWL 20M", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 
@@ -3218,15 +3218,15 @@ void UI_Mainwindow::chan_bwl_20()
 
 void UI_Mainwindow::chan_bwl_100()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanbwlimit[devparms.activechannel] = 100;
 
-  sprintf(str, "Channel %i bandwidth limit: 100MHz", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i bandwidth limit: 100MHz", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:BWL 100M", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:BWL 100M", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 
@@ -3236,15 +3236,15 @@ void UI_Mainwindow::chan_bwl_100()
 
 void UI_Mainwindow::chan_bwl_200()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanbwlimit[devparms.activechannel] = 200;
 
-  sprintf(str, "Channel %i bandwidth limit: 200MHz", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i bandwidth limit: 200MHz", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:BWL 200M", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:BWL 200M", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 
@@ -3254,15 +3254,15 @@ void UI_Mainwindow::chan_bwl_200()
 
 void UI_Mainwindow::chan_bwl_250()
 {
-  char str[128];
+  char str[512];
 
   devparms.chanbwlimit[devparms.activechannel] = 250;
 
-  sprintf(str, "Channel %i bandwidth limit: 250MHz", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i bandwidth limit: 250MHz", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:BWL 250M", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:BWL 250M", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 
@@ -3274,7 +3274,7 @@ void UI_Mainwindow::updateLabels()
 {
   int chn;
 
-  char str[128];
+  char str[512];
 
   for(chn=0; chn<devparms.channel_cnt; chn++)
   {
@@ -3282,17 +3282,17 @@ void UI_Mainwindow::updateLabels()
 
     if(devparms.chancoupling[chn] == 2)
     {
-      strcat(str, "AC");
+      strlcat(str, "AC", 512);
     }
 
     if(devparms.chanimpedance[chn])
     {
-      strcat(str, " 50");
+      strlcat(str, " 50", 512);
     }
 
     if(devparms.chanbwlimit[chn])
     {
-      strcat(str, " BW");
+      strlcat(str, " BW", 512);
     }
 
     switch(chn)
@@ -3312,7 +3312,7 @@ void UI_Mainwindow::updateLabels()
 
 void UI_Mainwindow::chan_invert_on()
 {
-  char str[128];
+  char str[512];
 
   if(!devparms.chaninvert[devparms.activechannel])
   {
@@ -3321,11 +3321,11 @@ void UI_Mainwindow::chan_invert_on()
 
   devparms.chaninvert[devparms.activechannel] = 1;
 
-  sprintf(str, "Channel %i inverted: On", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i inverted: On", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:INV 1", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:INV 1", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 }
@@ -3333,7 +3333,7 @@ void UI_Mainwindow::chan_invert_on()
 
 void UI_Mainwindow::chan_invert_off()
 {
-  char str[128];
+  char str[512];
 
   if(devparms.chaninvert[devparms.activechannel])
   {
@@ -3342,11 +3342,11 @@ void UI_Mainwindow::chan_invert_off()
 
   devparms.chaninvert[devparms.activechannel] = 0;
 
-  sprintf(str, "Channel %i inverted: Off", devparms.activechannel + 1);
+  snprintf(str, 512, "Channel %i inverted: Off", devparms.activechannel + 1);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:INV 0", devparms.activechannel + 1);
+  snprintf(str, 512, ":CHAN%i:INV 0", devparms.activechannel + 1);
 
   set_cue_cmd(str);
 }
@@ -3372,15 +3372,15 @@ void UI_Mainwindow::vertOffsetDialClicked(QPoint)
 
   devparms.chanoffset[chn] = 0;
 
-  sprintf(str, "Channel %i offset: ", chn + 1);
+  snprintf(str, 512, "Channel %i offset: ", chn + 1);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.chanoffset[chn], 2, 512 - strlen(str));
 
-  strcat(str, devparms.chanunitstr[devparms.chanunit[chn]]);
+  strlcat(str, devparms.chanunitstr[devparms.chanunit[chn]], 512);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":CHAN%i:OFFS %e", chn + 1, devparms.chanoffset[chn]);
+  snprintf(str, 512, ":CHAN%i:OFFS %e", chn + 1, devparms.chanoffset[chn]);
 
   set_cue_cmd(str);
 }
@@ -3550,15 +3550,15 @@ void UI_Mainwindow::horPosDialClicked(QPoint)
   {
     devparms.timebasedelayoffset = devparms.timebaseoffset;
 
-    strcpy(str, "Delayed timebase position: ");
+    strlcpy(str, "Delayed timebase position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebasedelayoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+    snprintf(str, 512, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
 
     set_cue_cmd(str);
   }
@@ -3566,15 +3566,15 @@ void UI_Mainwindow::horPosDialClicked(QPoint)
   {
     devparms.timebaseoffset = 0;
 
-    strcpy(str, "Horizontal position: ");
+    strlcpy(str, "Horizontal position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.timebaseoffset, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
+    snprintf(str, 512, ":TIM:OFFS %e", devparms.timebaseoffset);
 
     set_cue_cmd(str);
   }
@@ -3830,9 +3830,9 @@ void UI_Mainwindow::trigMenuButtonClicked()
   menu.addMenu(&submenuslope);
 
   submenusetting.setTitle("Setting");
-  sprintf(str, "Holdoff ");
-  convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 3);
-  strcat(str, "S");
+  snprintf(str, 512, "Holdoff ");
+  convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 3, 512 - strlen(str));
+  strlcat(str, "S", 512);
   submenusetting.addAction(str, this, SLOT(trigger_setting_holdoff()));
   menu.addMenu(&submenusetting);
 
@@ -4025,15 +4025,15 @@ void UI_Mainwindow::trigAdjustDialClicked(QPoint)
 
   devparms.triggeredgelevel[devparms.triggeredgesource] = 0;
 
-  strcpy(str, "Trigger level: ");
+  strlcpy(str, "Trigger level: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[devparms.triggeredgesource], 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.triggeredgelevel[devparms.triggeredgesource], 2, 512 - strlen(str));
 
-  strcat(str, devparms.chanunitstr[devparms.chanunit[devparms.triggeredgesource]]);
+  strlcat(str, devparms.chanunitstr[devparms.chanunit[devparms.triggeredgesource]], 512);
 
   statusLabel->setText(str);
 
-  sprintf(str, ":TRIG:EDG:LEV %e", devparms.triggeredgelevel[devparms.triggeredgesource]);
+  snprintf(str, 512, ":TRIG:EDG:LEV %e", devparms.triggeredgelevel[devparms.triggeredgesource]);
 
   set_cue_cmd(str);
 }
@@ -4128,15 +4128,15 @@ void UI_Mainwindow::toggle_fft_unit()
     {
       set_cue_cmd(":MATH:FFT:UNIT VRMS");
 
-      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+      snprintf(str, 512, ":MATH:OFFS %e", devparms.fft_voffset);
 
       set_cue_cmd(str);
 
-      sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+      snprintf(str, 512, ":MATH:SCAL %e", devparms.fft_vscale);
 
       set_cue_cmd(str);
 
-      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+      snprintf(str, 512, ":MATH:OFFS %e", devparms.fft_voffset);
 
       set_cue_cmd(str);
     }
@@ -4159,15 +4159,15 @@ void UI_Mainwindow::toggle_fft_unit()
     {
       set_cue_cmd(":MATH:FFT:UNIT DB");
 
-      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+      snprintf(str, 512, ":MATH:OFFS %e", devparms.fft_voffset);
 
       set_cue_cmd(str);
 
-      sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+      snprintf(str, 512, ":MATH:SCAL %e", devparms.fft_vscale);
 
       set_cue_cmd(str);
 
-      sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+      snprintf(str, 512, ":MATH:OFFS %e", devparms.fft_voffset);
 
       set_cue_cmd(str);
     }
@@ -4290,20 +4290,20 @@ void UI_Mainwindow::set_fft_hzdiv(double val)
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
+    snprintf(str, 512, ":CALC:FFT:HSP %e", devparms.math_fft_hscale);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
+    snprintf(str, 512, ":MATH:FFT:HSC %e", devparms.math_fft_hscale);
   }
 
   set_cue_cmd(str);
 
-  strcpy(str, "FFT scale: ");
+  strlcpy(str, "FFT scale: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale, 2);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale, 2, 512 - strlen(str));
 
-  strcat(str, "Hz/Div");
+  strlcat(str, "Hz/Div", 512);
 
   statusLabel->setText(str);
 }
@@ -4315,22 +4315,22 @@ void UI_Mainwindow::select_fft_ctr_5()
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 5.0);
+    snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 5.0);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 5.0);
+    snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 5.0);
   }
 
   set_cue_cmd(str);
 
   devparms.math_fft_hcenter = devparms.math_fft_hscale * 5.0;
 
-  strcpy(str, "FFT center: ");
+  strlcpy(str, "FFT center: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 5.0, 1);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 5.0, 1, 512 - strlen(str));
 
-  strcat(str, "Hz");
+  strlcat(str, "Hz", 512);
 
   statusLabel->setText(str);
 }
@@ -4342,22 +4342,22 @@ void UI_Mainwindow::select_fft_ctr_6()
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 6.0);
+    snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 6.0);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 6.0);
+    snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 6.0);
   }
 
   set_cue_cmd(str);
 
   devparms.math_fft_hcenter = devparms.math_fft_hscale * 6.0;
 
-  strcpy(str, "FFT center: ");
+  strlcpy(str, "FFT center: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 6.0, 1);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 6.0, 1, 512 - strlen(str));
 
-  strcat(str, "Hz");
+  strlcat(str, "Hz", 512);
 
   statusLabel->setText(str);
 }
@@ -4369,22 +4369,22 @@ void UI_Mainwindow::select_fft_ctr_7()
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 7.0);
+    snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 7.0);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 7.0);
+    snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 7.0);
   }
 
   set_cue_cmd(str);
 
   devparms.math_fft_hcenter = devparms.math_fft_hscale * 7.0;
 
-  strcpy(str, "FFT center: ");
+  strlcpy(str, "FFT center: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 7.0, 1);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 7.0, 1, 512 - strlen(str));
 
-  strcat(str, "Hz");
+  strlcat(str, "Hz", 512);
 
   statusLabel->setText(str);
 }
@@ -4396,22 +4396,22 @@ void UI_Mainwindow::select_fft_ctr_8()
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 8.0);
+    snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 8.0);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 8.0);
+    snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 8.0);
   }
 
   set_cue_cmd(str);
 
   devparms.math_fft_hcenter = devparms.math_fft_hscale * 8.0;
 
-  strcpy(str, "FFT center: ");
+  strlcpy(str, "FFT center: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 8.0, 1);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 8.0, 1, 512 - strlen(str));
 
-  strcat(str, "Hz");
+  strlcat(str, "Hz", 512);
 
   statusLabel->setText(str);
 }
@@ -4423,22 +4423,22 @@ void UI_Mainwindow::select_fft_ctr_9()
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 9.0);
+    snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 9.0);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 9.0);
+    snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 9.0);
   }
 
   set_cue_cmd(str);
 
   devparms.math_fft_hcenter = devparms.math_fft_hscale * 9.0;
 
-  strcpy(str, "FFT center: ");
+  strlcpy(str, "FFT center: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 9.0, 1);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 9.0, 1, 512 - strlen(str));
 
-  strcat(str, "Hz");
+  strlcat(str, "Hz", 512);
 
   statusLabel->setText(str);
 }
@@ -4450,22 +4450,22 @@ void UI_Mainwindow::select_fft_ctr_10()
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 10.0);
+    snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 10.0);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 10.0);
+    snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 10.0);
   }
 
   set_cue_cmd(str);
 
   devparms.math_fft_hcenter = devparms.math_fft_hscale * 10.0;
 
-  strcpy(str, "FFT center: ");
+  strlcpy(str, "FFT center: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 10.0, 1);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 10.0, 1, 512 - strlen(str));
 
-  strcat(str, "Hz");
+  strlcat(str, "Hz", 512);
 
   statusLabel->setText(str);
 }
@@ -4477,22 +4477,22 @@ void UI_Mainwindow::select_fft_ctr_11()
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 11.0);
+    snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 11.0);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 11.0);
+    snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 11.0);
   }
 
   set_cue_cmd(str);
 
   devparms.math_fft_hcenter = devparms.math_fft_hscale * 11.0;
 
-  strcpy(str, "FFT center: ");
+  strlcpy(str, "FFT center: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale *11.0, 1);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale *11.0, 1, 512 - strlen(str));
 
-  strcat(str, "Hz");
+  strlcat(str, "Hz", 512);
 
   statusLabel->setText(str);
 }
@@ -4504,22 +4504,22 @@ void UI_Mainwindow::select_fft_ctr_12()
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 12.0);
+    snprintf(str, 512, ":CALC:FFT:HCEN %e", devparms.math_fft_hscale * 12.0);
   }
   else
   {
-    sprintf(str, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 12.0);
+    snprintf(str, 512, ":MATH:FFT:HCEN %e", devparms.math_fft_hscale * 12.0);
   }
 
   set_cue_cmd(str);
 
   devparms.math_fft_hcenter = devparms.math_fft_hscale * 12.0;
 
-  strcpy(str, "FFT center: ");
+  strlcpy(str, "FFT center: ", 512);
 
-  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 12.0, 1);
+  convert_to_metric_suffix(str + strlen(str), devparms.math_fft_hscale * 12.0, 1, 512 - strlen(str));
 
-  strcat(str, "Hz");
+  strlcat(str, "Hz", 512);
 
   statusLabel->setText(str);
 }
@@ -4598,35 +4598,35 @@ void UI_Mainwindow::set_fft_vscale()
   {
     if(devparms.math_fft_unit == 1)
     {
-      sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale);
+      snprintf(str, 512, ":CALC:FFT:VSC %e", devparms.fft_vscale);
 
       set_cue_cmd(str);
     }
     else
     {
-      sprintf(str, ":CALC:FFT:VSC %e", devparms.fft_vscale / devparms.chanscale[devparms.math_fft_src]);
+      snprintf(str, 512, ":CALC:FFT:VSC %e", devparms.fft_vscale / devparms.chanscale[devparms.math_fft_src]);
 
       set_cue_cmd(str);
     }
   }
   else
   {
-    sprintf(str, ":MATH:SCAL %e", devparms.fft_vscale);
+    snprintf(str, 512, ":MATH:SCAL %e", devparms.fft_vscale);
 
     set_cue_cmd(str);
   }
 
   if(devparms.math_fft_unit == 0)
   {
-    strcpy(str, "FFT scale: ");
+    strlcpy(str, "FFT scale: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.fft_vscale, 1);
+    convert_to_metric_suffix(str + strlen(str), devparms.fft_vscale, 1, 512 - strlen(str));
 
-    strcat(str, "V");
+    strlcat(str, "V", 512);
   }
   else
   {
-    sprintf(str, "FFT scale: %+.1fdB/Div", devparms.fft_vscale);
+    snprintf(str, 512, "FFT scale: %+.1fdB/Div", devparms.fft_vscale);
   }
 
   statusLabel->setText(str);
@@ -4713,28 +4713,28 @@ void UI_Mainwindow::set_fft_voffset()
 
   if(devparms.modelserie != 1)
   {
-    sprintf(str, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
+    snprintf(str, 512, ":CALC:FFT:VOFF %e", devparms.fft_voffset);
 
     set_cue_cmd(str);
   }
   else
   {
-    sprintf(str, ":MATH:OFFS %e", devparms.fft_voffset);
+    snprintf(str, 512, ":MATH:OFFS %e", devparms.fft_voffset);
 
     set_cue_cmd(str);
   }
 
   if(devparms.math_fft_unit == 0)
   {
-    strcpy(str, "FFT position: ");
+    strlcpy(str, "FFT position: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.fft_voffset, 1);
+    convert_to_metric_suffix(str + strlen(str), devparms.fft_voffset, 1, 512 - strlen(str));
 
-    strcat(str, "V");
+    strlcat(str, "V", 512);
   }
   else
   {
-    sprintf(str, "FFT position: %+.0fdB", devparms.fft_voffset);
+    snprintf(str, 512, "FFT position: %+.0fdB", devparms.fft_voffset);
   }
 
   statusLabel->setText(str);

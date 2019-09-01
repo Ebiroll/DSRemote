@@ -76,15 +76,15 @@ void UI_Mainwindow::adjdial_timer_handler()
 
   if(adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF)
   {
-    strcpy(str, "Trigger holdoff: ");
+    strlcpy(str, "Trigger holdoff: ", 512);
 
-    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms.triggerholdoff, 2, 512 - strlen(str));
 
-    strcat(str, "s");
+    strlcat(str, "s", 512);
 
     statusLabel->setText(str);
 
-    sprintf(str, ":TRIG:HOLD %e", devparms.triggerholdoff);
+    snprintf(str, 512, ":TRIG:HOLD %e", devparms.triggerholdoff);
 
     set_cue_cmd(str);
 
@@ -103,11 +103,11 @@ void UI_Mainwindow::adjdial_timer_handler()
   }
   else if(adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
     {
-      sprintf(str, "Acquire averages: %i", devparms.acquireaverages);
+      snprintf(str, 512, "Acquire averages: %i", devparms.acquireaverages);
 
       statusLabel->setText(str);
 
-      sprintf(str, ":ACQ:AVER %i", devparms.acquireaverages);
+      snprintf(str, 512, ":ACQ:AVER %i", devparms.acquireaverages);
 
       set_cue_cmd(str);
     }
@@ -136,15 +136,15 @@ void UI_Mainwindow::scrn_timer_handler()
 
 void UI_Mainwindow::horPosDial_timer_handler()
 {
-  char str[256];
+  char str[512];
 
   if(devparms.timebasedelayenable)
   {
-    sprintf(str, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
+    snprintf(str, 512, ":TIM:DEL:OFFS %e", devparms.timebasedelayoffset);
   }
   else
   {
-    sprintf(str, ":TIM:OFFS %e", devparms.timebaseoffset);
+    snprintf(str, 512, ":TIM:OFFS %e", devparms.timebaseoffset);
   }
 
   set_cue_cmd(str);
@@ -155,7 +155,7 @@ void UI_Mainwindow::trigAdjDial_timer_handler()
 {
   int chn;
 
-  char str[256];
+  char str[512];
 
   chn = devparms.triggeredgesource;
 
@@ -164,7 +164,7 @@ void UI_Mainwindow::trigAdjDial_timer_handler()
     return;
   }
 
-  sprintf(str, ":TRIG:EDG:LEV %e", devparms.triggeredgelevel[chn]);
+  snprintf(str, 512, ":TRIG:EDG:LEV %e", devparms.triggeredgelevel[chn]);
 
   set_cue_cmd(str);
 }
@@ -174,7 +174,7 @@ void UI_Mainwindow::vertOffsDial_timer_handler()
 {
   int chn;
 
-  char str[256];
+  char str[512];
 
   if(devparms.activechannel < 0)
   {
@@ -183,7 +183,7 @@ void UI_Mainwindow::vertOffsDial_timer_handler()
 
   chn = devparms.activechannel;
 
-  sprintf(str, ":CHAN%i:OFFS %e", chn + 1, devparms.chanoffset[chn]);
+  snprintf(str, 512, ":CHAN%i:OFFS %e", chn + 1, devparms.chanoffset[chn]);
 
   set_cue_cmd(str);
 }
@@ -191,15 +191,15 @@ void UI_Mainwindow::vertOffsDial_timer_handler()
 
 void UI_Mainwindow::horScaleDial_timer_handler()
 {
-  char str[256];
+  char str[512];
 
   if(devparms.timebasedelayenable)
   {
-    sprintf(str, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
+    snprintf(str, 512, ":TIM:DEL:SCAL %e", devparms.timebasedelayscale);
   }
   else
   {
-    sprintf(str, ":TIM:SCAL %e", devparms.timebasescale);
+    snprintf(str, 512, ":TIM:SCAL %e", devparms.timebasescale);
   }
 
   set_cue_cmd(str);
@@ -210,7 +210,7 @@ void UI_Mainwindow::vertScaleDial_timer_handler()
 {
   int chn;
 
-  char str[256];
+  char str[512];
 
   if(devparms.activechannel < 0)
   {
@@ -219,7 +219,7 @@ void UI_Mainwindow::vertScaleDial_timer_handler()
 
   chn = devparms.activechannel;
 
-  sprintf(str, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
+  snprintf(str, 512, ":CHAN%i:SCAL %e", chn + 1, devparms.chanscale[chn]);
 
   set_cue_cmd(str);
 }

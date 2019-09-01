@@ -147,7 +147,7 @@ struct tmcdev * tmclan_open(const char *host_or_ip)
   }
   else
   {
-    strcpy(ip_address, host_or_ip);
+    strlcpy(ip_address, host_or_ip, 256);
   }
 
   sockfd = socket(PF_INET, SOCK_STREAM, 0);
@@ -260,11 +260,9 @@ int tmclan_write(struct tmcdev *tmc_device __attribute__ ((unused)), const char 
     qry = 1;
   }
 
-  strncpy(buf, cmd, MAX_CMD_LEN);
+  strlcpy(buf, cmd, MAX_CMD_LEN + 16);
 
-  buf[MAX_CMD_LEN] = 0;
-
-  strcat(buf, "\n");
+  strlcat(buf, "\n", MAX_CMD_LEN + 16);
 
   if(!(!strncmp(buf, ":TRIG:STAT?", 11) ||  /* don't print these commands to the console */
       !strncmp(buf, ":TRIG:SWE?", 10) ||    /* because they are used repeatedly */

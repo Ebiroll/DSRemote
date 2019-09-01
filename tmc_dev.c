@@ -35,6 +35,7 @@
 #include <errno.h>
 
 #include "tmc_dev.h"
+#include "utils.h"
 
 
 
@@ -127,11 +128,9 @@ int tmcdev_write(struct tmcdev *dev, const char *cmd)
     qry = 1;
   }
 
-  strncpy(buf, cmd, MAX_CMD_LEN);
+  strlcpy(buf, cmd, MAX_CMD_LEN + 16);
 
-  buf[MAX_CMD_LEN] = 0;
-
-  strcat(buf, "\n");
+  strlcat(buf, "\n", MAX_CMD_LEN + 16);
 
   if(!(!strncmp(buf, ":TRIG:STAT?", 11) ||  /* don't print these commands to the console */
        !strncmp(buf, ":TRIG:SWE?", 10) ||   /* because they are used repeatedly */

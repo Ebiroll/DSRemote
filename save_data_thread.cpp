@@ -58,9 +58,9 @@ int save_data_thread::get_error_num(void)
 }
 
 
-void save_data_thread::get_error_str(char *dest)
+void save_data_thread::get_error_str(char *dest, int sz)
 {
-  strcpy(dest, err_str);
+  strlcpy(dest, err_str, sz);
 }
 
 
@@ -118,7 +118,7 @@ void save_data_thread::save_memory_edf_file(void)
 
   if(devparms == NULL)
   {
-    strcpy(err_str, "save_memory_edf_file(): Invalid devparms pointer.");
+    strlcpy(err_str, "save_memory_edf_file(): Invalid devparms pointer.", 4096);
 
     err_num = 1;
 
@@ -129,7 +129,7 @@ void save_data_thread::save_memory_edf_file(void)
 
   if(hdl < 0)
   {
-    strcpy(err_str, "save_memory_edf_file(): Invalid handel.");
+    strlcpy(err_str, "save_memory_edf_file(): Invalid handel.", 4096);
 
     err_num = 2;
 
@@ -151,7 +151,7 @@ void save_data_thread::save_memory_edf_file(void)
 
       if(edfwrite_digital_short_samples(hdl, wavbuf[chn] + (i * smps_per_record)))
       {
-        strcpy(err_str, "A file write error occurred.");
+        strlcpy(err_str, "A file write error occurred.", 4096);
 
         err_num = 3;
 

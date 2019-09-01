@@ -429,8 +429,7 @@ int screen_thread::get_devicestatus()
 
 OUT_ERROR:
 
-  strncpy(params.debug_str, device->hdrbuf, 1024);
-  params.debug_str[1023] = 0;
+  strlcpy(params.debug_str, device->hdrbuf, 1024);
 
   params.error_line = line;
 
@@ -442,7 +441,7 @@ void screen_thread::run()
 {
   int i, j, k, n=0, chns=0, line, cmd_sent=0;
 
-  char str[128];
+  char str[512];
 
   double y_incr, binsz;
 
@@ -490,9 +489,7 @@ void screen_thread::run()
         goto OUT_ERROR;
       }
 
-      strncpy(deviceparms->cmd_cue_resp[params.cmd_cue_idx_out], device->buf, 128);
-
-      deviceparms->cmd_cue_resp[params.cmd_cue_idx_out][127] = 0;
+      strlcpy(deviceparms->cmd_cue_resp[params.cmd_cue_idx_out], device->buf, 128);
     }
 
     if((!strncmp(deviceparms->cmd_cue[params.cmd_cue_idx_out], ":TLHA", 5)) ||
@@ -699,7 +696,7 @@ void screen_thread::run()
 //
 //     if(n < 0)
 //     {
-//       strcpy(str, "Can not read from device.");
+//       strlcpy(str, "Can not read from device.", 512);
 //       goto OUT_ERROR;
 //     }
 //
@@ -707,7 +704,7 @@ void screen_thread::run()
 //
 //     if(parse_preamble(device->buf, device->sz, &wfp, i))
 //     {
-//       strcpy(str, "Preamble parsing error.");
+//       strlcpy(str, "Preamble parsing error.", 512);
 //       goto OUT_ERROR;
 //     }
 //
@@ -732,7 +729,7 @@ void screen_thread::run()
 
 ///////////////////////////////////////////////////////////
 
-      sprintf(str, ":WAV:SOUR CHAN%i", i + 1);
+      snprintf(str, 512, ":WAV:SOUR CHAN%i", i + 1);
 
       if(tmc_write(str) != 15)
       {
@@ -875,7 +872,7 @@ OUT_ERROR:
 
   params.result = TMC_THRD_RESULT_NONE;
 
-  sprintf(str, "An error occurred while reading screen data from device.\n"
+  snprintf(str, 512, "An error occurred while reading screen data from device.\n"
                "File %s line %i", __FILE__, line);
 
   h_busy = 0;

@@ -563,56 +563,56 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
 
   if((mainwindow->adjDialFunc == ADJ_DIAL_FUNC_HOLDOFF) || (mainwindow->navDialFunc == NAV_DIAL_FUNC_HOLDOFF))
   {
-    convert_to_metric_suffix(str, devparms->triggerholdoff, 2);
+    convert_to_metric_suffix(str, devparms->triggerholdoff, 2, 1024);
 
-    strcat(str, "S");
+    strlcat(str, "S", 1024);
 
     paintLabel(painter, curve_w - 110, 5, 100, 20, str, Qt::white);
   }
   else if(mainwindow->adjDialFunc == ADJ_DIAL_FUNC_ACQ_AVG)
     {
-      sprintf(str, "%i", devparms->acquireaverages);
+      snprintf(str, 1024, "%i", devparms->acquireaverages);
 
       paintLabel(painter, curve_w - 110, 5, 100, 20, str, Qt::white);
     }
 
   if(label_active == LABEL_ACTIVE_TRIG)
   {
-    convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource], 2);
+    convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource], 2, 1024);
 
-    strcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]]);
+    strlcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]], 1024);
 
     paintLabel(painter, curve_w - 120, curve_h - 50, 100, 20, str, QColor(255, 128, 0));
   }
   else if(label_active == LABEL_ACTIVE_CHAN1)
     {
-      convert_to_metric_suffix(str, devparms->chanoffset[0], 2);
+      convert_to_metric_suffix(str, devparms->chanoffset[0], 2, 1024);
 
-      strcat(str, devparms->chanunitstr[devparms->chanunit[0]]);
+      strlcat(str, devparms->chanunitstr[devparms->chanunit[0]], 1024);
 
       paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[0]);
     }
     else if(label_active == LABEL_ACTIVE_CHAN2)
       {
-        convert_to_metric_suffix(str, devparms->chanoffset[1], 2);
+        convert_to_metric_suffix(str, devparms->chanoffset[1], 2, 1024);
 
-        strcat(str, devparms->chanunitstr[devparms->chanunit[1]]);
+        strlcat(str, devparms->chanunitstr[devparms->chanunit[1]], 1024);
 
         paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[1]);
       }
       else if(label_active == LABEL_ACTIVE_CHAN3)
         {
-          convert_to_metric_suffix(str, devparms->chanoffset[2], 2);
+          convert_to_metric_suffix(str, devparms->chanoffset[2], 2, 1024);
 
-          strcat(str, devparms->chanunitstr[devparms->chanunit[2]]);
+          strlcat(str, devparms->chanunitstr[devparms->chanunit[2]], 1024);
 
           paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[2]);
         }
         else if(label_active == LABEL_ACTIVE_CHAN4)
           {
-            convert_to_metric_suffix(str, devparms->chanoffset[3], 2);
+            convert_to_metric_suffix(str, devparms->chanoffset[3], 2, 1024);
 
-            strcat(str, devparms->chanunitstr[devparms->chanunit[3]]);
+            strlcat(str, devparms->chanunitstr[devparms->chanunit[3]], 1024);
 
             paintLabel(painter, 20, curve_h - 50, 100, 20, str, SignalColor[3]);
           }
@@ -625,15 +625,15 @@ void SignalCurve::drawWidget(QPainter *painter, int curve_w, int curve_h)
     {
       if(devparms->math_fft_unit == 0)
       {
-        strcpy(str, "POS: ");
+        strlcpy(str, "POS: ", 1024);
 
-        convert_to_metric_suffix(str + strlen(str), devparms->fft_voffset, 1);
+        convert_to_metric_suffix(str + strlen(str), devparms->fft_voffset, 1, 1024);
 
-        strcat(str, "V");
+        strlcat(str, "V", 1024);
       }
       else
       {
-        sprintf(str, "POS: %.1fdB", devparms->fft_voffset);
+        snprintf(str, 1024, "POS: %.1fdB", devparms->fft_voffset);
       }
 
       paintLabel(painter, 20, curve_h * 1.85 - 50.0, 100, 20, str, QColor(128, 64, 255));
@@ -846,37 +846,37 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
 //       }
     }
 
-    sprintf(str, "FFT:  CH%i  ", devparms->math_fft_src + 1);
+    snprintf(str, 1024, "FFT:  CH%i  ", devparms->math_fft_src + 1);
 
-    convert_to_metric_suffix(str + strlen(str), devparms->fft_vscale, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms->fft_vscale, 2, 1024 - strlen(str));
 
     if(devparms->math_fft_unit == 0)
     {
-      strcat(str, "V/Div   Center ");
+      strlcat(str, "V/Div   Center ", 1024);
     }
     else
     {
-      strcat(str, "dBV/Div   Center ");
+      strlcat(str, "dBV/Div   Center ", 1024);
     }
 
-    convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hcenter, 1);
+    convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hcenter, 1, 1024 - strlen(str));
 
-    strcat(str, "Hz   ");
+    strlcat(str, "Hz   ", 1024);
 
-    convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hscale, 2);
+    convert_to_metric_suffix(str + strlen(str), devparms->math_fft_hscale, 2, 1024 - strlen(str));
 
-    strcat(str, "Hz/Div   ");
+    strlcat(str, "Hz/Div   ", 1024);
 
     if(devparms->timebasedelayenable)
     {
-      convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasedelayscale, 0);
+      convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasedelayscale, 0, 1024 - strlen(str));
     }
     else
     {
-      convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasescale, 0);
+      convert_to_metric_suffix(str + strlen(str), 100.0 / devparms->timebasescale, 0, 1024 - strlen(str));
     }
 
-    strcat(str, "Sa/s");
+    strlcat(str, "Sa/s", 1024);
 
     painter->drawText(15, 30, str);
 
@@ -886,7 +886,7 @@ void SignalCurve::drawFFT(QPainter *painter, int curve_h_b, int curve_w_b)
   {
     painter->setPen(QPen(QBrush(QColor(128, 64, 255), Qt::SolidPattern), tracewidth, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 
-    sprintf(str, "FFT: CH%i Data Invalid!", devparms->math_fft_src + 1);
+    snprintf(str, 1024, "FFT: CH%i Data Invalid!", devparms->math_fft_src + 1);
 
     painter->drawText(15, 30, str);
   }
@@ -915,7 +915,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 {
   int i, x1, tmp;
 
-  char str[128];
+  char str[512];
 
   double dtmp1, dtmp2;
 
@@ -1003,16 +1003,16 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   if(devparms->timebasedelayenable)
   {
-    convert_to_metric_suffix(str, devparms->timebasedelayscale, 1);
+    convert_to_metric_suffix(str, devparms->timebasedelayscale, 1, 512);
   }
   else
   {
-    convert_to_metric_suffix(str, devparms->timebasescale, 1);
+    convert_to_metric_suffix(str, devparms->timebasescale, 1, 512);
   }
 
   remove_trailing_zeros(str);
 
-  strcat(str, "s");
+  strlcat(str, "s", 512);
 
   painter->drawText(140, 5, 70, 20, Qt::AlignCenter, str);
 
@@ -1020,19 +1020,19 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->setPen(Qt::gray);
 
-  convert_to_metric_suffix(str, devparms->samplerate, 0);
+  convert_to_metric_suffix(str, devparms->samplerate, 0, 512);
 
-  strcat(str, "Sa/s");
+  strlcat(str, "Sa/s", 512);
 
   painter->drawText(200, -1, 85, 20, Qt::AlignCenter, str);
 
   if(devparms->acquirememdepth)
   {
-    convert_to_metric_suffix(str, devparms->acquirememdepth, 1);
+    convert_to_metric_suffix(str, devparms->acquirememdepth, 1, 512);
 
     remove_trailing_zeros(str);
 
-    strcat(str, "pts");
+    strlcat(str, "pts", 512);
 
     painter->drawText(200, 14, 85, 20, Qt::AlignCenter, str);
   }
@@ -1125,14 +1125,14 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   if(devparms->timebasedelayenable)
   {
-    convert_to_metric_suffix(str, devparms->timebasedelayoffset, 4);
+    convert_to_metric_suffix(str, devparms->timebasedelayoffset, 4, 512);
   }
   else
   {
-    convert_to_metric_suffix(str, devparms->timebaseoffset, 4);
+    convert_to_metric_suffix(str, devparms->timebaseoffset, 4, 512);
   }
 
-  strcat(str, "s");
+  strlcat(str, "s", 512);
 
   painter->drawText(570, 5, 85, 20, Qt::AlignCenter, str);
 
@@ -1148,9 +1148,9 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
   painter->drawText(670, 20, "T");
 
-  convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource], 2);
+  convert_to_metric_suffix(str, devparms->triggeredgelevel[devparms->triggeredgesource], 2, 512);
 
-  strcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]]);
+  strlcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]], 512);
 
   if(devparms->triggeredgesource < 4)
   {
@@ -1181,7 +1181,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
   {
     painter->fillPath(path, SignalColor[devparms->triggeredgesource]);
 
-    sprintf(str, "%i", devparms->triggeredgesource + 1);
+    snprintf(str, 512, "%i", devparms->triggeredgesource + 1);
   }
   else
   {
@@ -1189,10 +1189,10 @@ void SignalCurve::drawTopLabels(QPainter *painter)
     {
       case 4:
       case 5: painter->fillPath(path, Qt::green);
-              strcpy(str, "E");
+              strlcpy(str, "E", 512);
               break;
       case 6: painter->fillPath(path, QColor(255, 64, 0));
-              strcpy(str, "AC");
+              strlcpy(str, "AC", 512);
               break;
     }
   }
@@ -1233,7 +1233,7 @@ void SignalCurve::drawTopLabels(QPainter *painter)
 
 void SignalCurve::drawfpsLabel(QPainter *painter, int xpos, int ypos)
 {
-  char str[256];
+  char str[512];
 
   static struct timespec tp1, tp2;
 
@@ -1243,11 +1243,11 @@ void SignalCurve::drawfpsLabel(QPainter *painter, int xpos, int ypos)
 
   if(tp1.tv_nsec >= tp2.tv_nsec)
   {
-    sprintf(str, "%04.1f fps", 1.0 / ((tp1.tv_sec - tp2.tv_sec) + ((tp1.tv_nsec - tp2.tv_nsec) / 1e9)));
+    snprintf(str, 512, "%04.1f fps", 1.0 / ((tp1.tv_sec - tp2.tv_sec) + ((tp1.tv_nsec - tp2.tv_nsec) / 1e9)));
   }
   else
   {
-    sprintf(str, "%04.1f fps", 1.0 / ((tp1.tv_sec - tp2.tv_sec - 1) + ((tp1.tv_nsec - tp2.tv_nsec + 1000000000) / 1e9)));
+    snprintf(str, 512, "%04.1f fps", 1.0 / ((tp1.tv_sec - tp2.tv_sec - 1) + ((tp1.tv_nsec - tp2.tv_nsec + 1000000000) / 1e9)));
   }
 
   painter->drawText(xpos, ypos, str);
@@ -1261,7 +1261,7 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
   QPainterPath path;
 
   char str1[4],
-       str2[128];
+       str2[512];
 
   if(devparms == NULL)
   {
@@ -1271,13 +1271,13 @@ void SignalCurve::drawChanLabel(QPainter *painter, int xpos, int ypos, int chn)
   str1[0] = '1' + chn;
   str1[1] = 0;
 
-  convert_to_metric_suffix(str2, devparms->chanscale[chn], 2);
+  convert_to_metric_suffix(str2, devparms->chanscale[chn], 2, 512);
 
-  strcat(str2, devparms->chanunitstr[devparms->chanunit[chn]]);
+  strlcat(str2, devparms->chanunitstr[devparms->chanunit[chn]], 512);
 
   if(devparms->chanbwlimit[chn])
   {
-    strcat(str2, " B");
+    strlcat(str2, " B", 512);
   }
 
   if(devparms->chandisplay[chn])
@@ -1809,22 +1809,22 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       if(devparms->modelserie == 1)
       {
-        sprintf(str, ":MATH:OFFS %e", devparms->fft_voffset);
+        snprintf(str, 512, ":MATH:OFFS %e", devparms->fft_voffset);
 
         mainwindow->set_cue_cmd(str);
       }
 
       if(devparms->math_fft_unit == 0)
       {
-        strcpy(str, "FFT position: ");
+        strlcpy(str, "FFT position: ", 512);
 
-        convert_to_metric_suffix(str + strlen(str), devparms->fft_voffset, 1);
+        convert_to_metric_suffix(str + strlen(str), devparms->fft_voffset, 1, 512 - strlen(str));
 
-        strcat(str, "V/Div");
+        strlcat(str, "V/Div", 512);
       }
       else
       {
-        sprintf(str, "FFT position: %+.0fdB", devparms->fft_voffset);
+        snprintf(str, 512, "FFT position: %+.0fdB", devparms->fft_voffset);
       }
 
       mainwindow->statusLabel->setText(str);
@@ -1875,15 +1875,15 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
         devparms->timebasedelayoffset = (righttime - delayrange);
       }
 
-      strcpy(str, "Delayed timebase position: ");
+      strlcpy(str, "Delayed timebase position: ", 512);
 
-      convert_to_metric_suffix(str + strlen(str), devparms->timebasedelayoffset, 2);
+      convert_to_metric_suffix(str + strlen(str), devparms->timebasedelayoffset, 2, 512 - strlen(str));
 
-      strcat(str, "s");
+      strlcat(str, "s", 512);
 
       mainwindow->statusLabel->setText(str);
 
-      sprintf(str, ":TIM:DEL:OFFS %e", devparms->timebasedelayoffset);
+      snprintf(str, 512, ":TIM:DEL:OFFS %e", devparms->timebasedelayoffset);
 
       mainwindow->set_cue_cmd(str);
     }
@@ -1895,15 +1895,15 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       devparms->timebaseoffset = (devparms->timebasescale / 50) * tmp;
 
-      strcpy(str, "Horizontal position: ");
+      strlcpy(str, "Horizontal position: ", 512);
 
-      convert_to_metric_suffix(str + strlen(str), devparms->timebaseoffset, 2);
+      convert_to_metric_suffix(str + strlen(str), devparms->timebaseoffset, 2, 512 - strlen(str));
 
-      strcat(str, "s");
+      strlcat(str, "s", 512);
 
       mainwindow->statusLabel->setText(str);
 
-      sprintf(str, ":TIM:OFFS %e", devparms->timebaseoffset);
+      snprintf(str, 512, ":TIM:OFFS %e", devparms->timebaseoffset);
 
       mainwindow->set_cue_cmd(str);
     }
@@ -1937,15 +1937,15 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
       devparms->triggeredgelevel[devparms->triggeredgesource] = (devparms->chanscale[devparms->triggeredgesource] / 50) * tmp;
 
-      sprintf(str, "Trigger level: ");
+      snprintf(str, 512, "Trigger level: ");
 
-      convert_to_metric_suffix(str + strlen(str), devparms->triggeredgelevel[devparms->triggeredgesource], 2);
+      convert_to_metric_suffix(str + strlen(str), devparms->triggeredgelevel[devparms->triggeredgesource], 2, 512 - strlen(str));
 
-      strcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]]);
+      strlcat(str, devparms->chanunitstr[devparms->chanunit[devparms->triggeredgesource]], 512);
 
       mainwindow->statusLabel->setText(str);
 
-      sprintf(str, ":TRIG:EDG:LEV %e", devparms->triggeredgelevel[devparms->triggeredgesource]);
+      snprintf(str, 512, ":TRIG:EDG:LEV %e", devparms->triggeredgelevel[devparms->triggeredgesource]);
 
       mainwindow->set_cue_cmd(str);
 
@@ -1983,15 +1983,15 @@ void SignalCurve::mouseReleaseEvent(QMouseEvent *release_event)
 
           devparms->chanoffset[chn] = (devparms->chanscale[chn] / 50) * tmp;
 
-          sprintf(str, "Channel %i offset: ", chn + 1);
+          snprintf(str, 512, "Channel %i offset: ", chn + 1);
 
-          convert_to_metric_suffix(str + strlen(str), devparms->chanoffset[chn], 3);
+          convert_to_metric_suffix(str + strlen(str), devparms->chanoffset[chn], 3, 512 - strlen(str));
 
-          strcat(str, devparms->chanunitstr[devparms->chanunit[chn]]);
+          strlcat(str, devparms->chanunitstr[devparms->chanunit[chn]], 512);
 
           mainwindow->statusLabel->setText(str);
 
-          sprintf(str, ":CHAN%i:OFFS %e", chn + 1, devparms->chanoffset[chn]);
+          snprintf(str, 512, ":CHAN%i:OFFS %e", chn + 1, devparms->chanoffset[chn]);
 
           mainwindow->set_cue_cmd(str);
 
@@ -2219,7 +2219,7 @@ void SignalCurve::paintCounterLabel(QPainter *painter, int xpos, int ypos)
 {
   int i;
 
-  char str[128];
+  char str[512];
 
   QPainterPath path;
 
@@ -2247,13 +2247,13 @@ void SignalCurve::paintCounterLabel(QPainter *painter, int xpos, int ypos)
 
   if((devparms->counterfreq < 15) || (devparms->counterfreq > 1.1e9))
   {
-    strcpy(str, "< 15 Hz");
+    strlcpy(str, "< 15 Hz", 512);
   }
   else
   {
-    convert_to_metric_suffix(str, devparms->counterfreq, 5);
+    convert_to_metric_suffix(str, devparms->counterfreq, 5, 512);
 
-    strcat(str, "Hz");
+    strlcat(str, "Hz", 512);
   }
 
   for(i=0; i<3; i++)
@@ -2271,7 +2271,7 @@ void SignalCurve::paintCounterLabel(QPainter *painter, int xpos, int ypos)
 
 void SignalCurve::paintPlaybackLabel(QPainter *painter, int xpos, int ypos)
 {
-  char str[128];
+  char str[512];
 
   QPainterPath path;
 
@@ -2289,7 +2289,7 @@ void SignalCurve::paintPlaybackLabel(QPainter *painter, int xpos, int ypos)
 
     painter->setPen(Qt::red);
 
-    sprintf(str, "%i/%i", 0, devparms->func_wrec_fend);
+    snprintf(str, 512, "%i/%i", 0, devparms->func_wrec_fend);
 
     painter->drawText(xpos + 30, ypos, 120, 20, Qt::AlignCenter, str);
   }
@@ -2299,7 +2299,7 @@ void SignalCurve::paintPlaybackLabel(QPainter *painter, int xpos, int ypos)
 
     painter->setPen(Qt::green);
 
-    sprintf(str, "%i/%i", devparms->func_wplay_fcur, devparms->func_wrec_fend);
+    snprintf(str, 512, "%i/%i", devparms->func_wplay_fcur, devparms->func_wrec_fend);
 
     painter->drawText(xpos + 30, ypos, 120, 20, Qt::AlignCenter, str);
   }
@@ -2331,7 +2331,7 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
 
   double pix_per_smpl;
 
-  char str[256];
+  char str[512];
 
 
   if(devparms->modelserie != 1)
@@ -2441,19 +2441,19 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
       {
         if(devparms->math_decode_format == 0)  // hex
         {
-          sprintf(str, "%02X", devparms->math_decode_uart_tx_val[i]);
+          snprintf(str, 512, "%02X", devparms->math_decode_uart_tx_val[i]);
 
           painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
         }
         else if(devparms->math_decode_format == 1)  // ASCII
           {
-            ascii_decode_control_char(devparms->math_decode_uart_tx_val[i], str);
+            ascii_decode_control_char(devparms->math_decode_uart_tx_val[i], str, 512);
 
             painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
           }
           else if(devparms->math_decode_format == 2)  // decimal
             {
-              sprintf(str, "%u", (unsigned int)devparms->math_decode_uart_tx_val[i]);
+              snprintf(str, 512, "%u", (unsigned int)devparms->math_decode_uart_tx_val[i]);
 
               painter->drawText(devparms->math_decode_uart_tx_val_pos[i] * pix_per_smpl, line_h_uart_tx - 13, cell_width, 30, Qt::AlignCenter, str);
             }
@@ -2513,19 +2513,19 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
       {
         if(devparms->math_decode_format == 0)  // hex
         {
-          sprintf(str, "%02X", devparms->math_decode_uart_rx_val[i]);
+          snprintf(str, 512, "%02X", devparms->math_decode_uart_rx_val[i]);
 
           painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
         }
         else if(devparms->math_decode_format == 1)  // ASCII
           {
-            ascii_decode_control_char(devparms->math_decode_uart_rx_val[i], str);
+            ascii_decode_control_char(devparms->math_decode_uart_rx_val[i], str, 512);
 
             painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
           }
           else if(devparms->math_decode_format == 2)  // decimal
             {
-              sprintf(str, "%u", (unsigned int)devparms->math_decode_uart_rx_val[i]);
+              snprintf(str, 512, "%u", (unsigned int)devparms->math_decode_uart_rx_val[i]);
 
               painter->drawText(devparms->math_decode_uart_rx_val_pos[i] * pix_per_smpl, line_h_uart_rx - 13, cell_width, 30, Qt::AlignCenter, str);
             }
@@ -2662,13 +2662,13 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
         {
           switch(spi_chars)
           {
-            case 1: sprintf(str, "%02X", devparms->math_decode_spi_mosi_val[i]);
+            case 1: snprintf(str, 512, "%02X", devparms->math_decode_spi_mosi_val[i]);
                     break;
-            case 2: sprintf(str, "%04X", devparms->math_decode_spi_mosi_val[i]);
+            case 2: snprintf(str, 512, "%04X", devparms->math_decode_spi_mosi_val[i]);
                     break;
-            case 3: sprintf(str, "%06X", devparms->math_decode_spi_mosi_val[i]);
+            case 3: snprintf(str, 512, "%06X", devparms->math_decode_spi_mosi_val[i]);
                     break;
-            case 4: sprintf(str, "%08X", devparms->math_decode_spi_mosi_val[i]);
+            case 4: snprintf(str, 512, "%08X", devparms->math_decode_spi_mosi_val[i]);
                     break;
           }
 
@@ -2678,14 +2678,14 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
           {
             for(k=0, j=0; k<spi_chars; k++)
             {
-              j += ascii_decode_control_char(devparms->math_decode_spi_mosi_val[i] >> (k * 8), str + j);
+              j += ascii_decode_control_char(devparms->math_decode_spi_mosi_val[i] >> (k * 8), str + j, 512 - j);
             }
 
             painter->drawText(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 30, Qt::AlignCenter, str);
           }
           else if(devparms->math_decode_format == 2)  // decimal
             {
-              sprintf(str, "%u", devparms->math_decode_spi_mosi_val[i]);
+              snprintf(str, 512, "%u", devparms->math_decode_spi_mosi_val[i]);
 
               painter->drawText(devparms->math_decode_spi_mosi_val_pos[i] * pix_per_smpl, line_h_spi_mosi - 13, cell_width, 30, Qt::AlignCenter, str);
             }
@@ -2738,13 +2738,13 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
         {
           switch(spi_chars)
           {
-            case 1: sprintf(str, "%02X", devparms->math_decode_spi_miso_val[i]);
+            case 1: snprintf(str, 512, "%02X", devparms->math_decode_spi_miso_val[i]);
                     break;
-            case 2: sprintf(str, "%04X", devparms->math_decode_spi_miso_val[i]);
+            case 2: snprintf(str, 512, "%04X", devparms->math_decode_spi_miso_val[i]);
                     break;
-            case 3: sprintf(str, "%06X", devparms->math_decode_spi_miso_val[i]);
+            case 3: snprintf(str, 512, "%06X", devparms->math_decode_spi_miso_val[i]);
                     break;
-            case 4: sprintf(str, "%08X", devparms->math_decode_spi_miso_val[i]);
+            case 4: snprintf(str, 512, "%08X", devparms->math_decode_spi_miso_val[i]);
                     break;
           }
 
@@ -2754,14 +2754,14 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
           {
             for(k=0, j=0; k<spi_chars; k++)
             {
-              j += ascii_decode_control_char(devparms->math_decode_spi_miso_val[i] >> (k * 8), str + j);
+              j += ascii_decode_control_char(devparms->math_decode_spi_miso_val[i] >> (k * 8), str + j, 512 - j);
             }
 
             painter->drawText(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 30, Qt::AlignCenter, str);
           }
           else if(devparms->math_decode_format == 2)  // decimal
             {
-              sprintf(str, "%u", devparms->math_decode_spi_miso_val[i]);
+              snprintf(str, 512, "%u", devparms->math_decode_spi_miso_val[i]);
 
               painter->drawText(devparms->math_decode_spi_miso_val_pos[i] * pix_per_smpl, line_h_spi_miso - 13, cell_width, 30, Qt::AlignCenter, str);
             }
@@ -2793,7 +2793,7 @@ void SignalCurve::draw_decoder(QPainter *painter, int dw, int dh)
 }
 
 
-int SignalCurve::ascii_decode_control_char(char ch, char *str)
+int SignalCurve::ascii_decode_control_char(char ch, char *str, int sz)
 {
   if((ch > 32) && (ch < 127))
   {
@@ -2806,75 +2806,75 @@ int SignalCurve::ascii_decode_control_char(char ch, char *str)
 
   switch(ch)
   {
-    case  0: strcpy(str, "NULL");
+    case  0: strlcpy(str, "NULL", sz);
              break;
-    case  1: strcpy(str, "SOH");
+    case  1: strlcpy(str, "SOH", sz);
              break;
-    case  2: strcpy(str, "STX");
+    case  2: strlcpy(str, "STX", sz);
              break;
-    case  3: strcpy(str, "ETX");
+    case  3: strlcpy(str, "ETX", sz);
              break;
-    case  4: strcpy(str, "EOT");
+    case  4: strlcpy(str, "EOT", sz);
              break;
-    case  5: strcpy(str, "ENQ");
+    case  5: strlcpy(str, "ENQ", sz);
              break;
-    case  6: strcpy(str, "ACK");
+    case  6: strlcpy(str, "ACK", sz);
              break;
-    case  7: strcpy(str, "BEL");
+    case  7: strlcpy(str, "BEL", sz);
              break;
-    case  8: strcpy(str, "BS");
+    case  8: strlcpy(str, "BS", sz);
              break;
-    case  9: strcpy(str, "HT");
+    case  9: strlcpy(str, "HT", sz);
              break;
-    case 10: strcpy(str, "LF");
+    case 10: strlcpy(str, "LF", sz);
              break;
-    case 11: strcpy(str, "VT");
+    case 11: strlcpy(str, "VT", sz);
              break;
-    case 12: strcpy(str, "FF");
+    case 12: strlcpy(str, "FF", sz);
              break;
-    case 13: strcpy(str, "CR");
+    case 13: strlcpy(str, "CR", sz);
              break;
-    case 14: strcpy(str, "SO");
+    case 14: strlcpy(str, "SO", sz);
              break;
-    case 15: strcpy(str, "SI");
+    case 15: strlcpy(str, "SI", sz);
              break;
-    case 16: strcpy(str, "DLE");
+    case 16: strlcpy(str, "DLE", sz);
              break;
-    case 17: strcpy(str, "DC1");
+    case 17: strlcpy(str, "DC1", sz);
              break;
-    case 18: strcpy(str, "DC2");
+    case 18: strlcpy(str, "DC2", sz);
              break;
-    case 19: strcpy(str, "DC3");
+    case 19: strlcpy(str, "DC3", sz);
              break;
-    case 20: strcpy(str, "DC4");
+    case 20: strlcpy(str, "DC4", sz);
              break;
-    case 21: strcpy(str, "NAK");
+    case 21: strlcpy(str, "NAK", sz);
              break;
-    case 22: strcpy(str, "SYN");
+    case 22: strlcpy(str, "SYN", sz);
              break;
-    case 23: strcpy(str, "ETB");
+    case 23: strlcpy(str, "ETB", sz);
              break;
-    case 24: strcpy(str, "CAN");
+    case 24: strlcpy(str, "CAN", sz);
              break;
-    case 25: strcpy(str, "EM");
+    case 25: strlcpy(str, "EM", sz);
              break;
-    case 26: strcpy(str, "SUB");
+    case 26: strlcpy(str, "SUB", sz);
              break;
-    case 27: strcpy(str, "ESC");
+    case 27: strlcpy(str, "ESC", sz);
              break;
-    case 28: strcpy(str, "FS");
+    case 28: strlcpy(str, "FS", sz);
              break;
-    case 29: strcpy(str, "GS");
+    case 29: strlcpy(str, "GS", sz);
              break;
-    case 30: strcpy(str, "RS");
+    case 30: strlcpy(str, "RS", sz);
              break;
-    case 31: strcpy(str, "US");
+    case 31: strlcpy(str, "US", sz);
              break;
-    case 32: strcpy(str, "SP");
+    case 32: strlcpy(str, "SP", sz);
              break;
-    case 127: strcpy(str, "DEL");
+    case 127: strlcpy(str, "DEL", sz);
              break;
-    default: strcpy(str, ".");
+    default: strlcpy(str, ".", sz);
              break;
   }
 

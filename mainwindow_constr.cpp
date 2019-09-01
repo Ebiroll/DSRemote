@@ -66,7 +66,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   QApplication::setFont(*appfont);
 
-  sprintf(str, "font: %ipx;", pxw);
+  snprintf(str, 1024, "font: %ipx;", pxw);
   setStyleSheet(str);
 
   setlocale(LC_NUMERIC, "C");
@@ -90,10 +90,10 @@ UI_Mainwindow::UI_Mainwindow()
     devparms.chanscale[i] = 1;
   }
 
-  strcpy(devparms.chanunitstr[0], "V");
-  strcpy(devparms.chanunitstr[1], "W");
-  strcpy(devparms.chanunitstr[2], "A");
-  strcpy(devparms.chanunitstr[3], "U");
+  strlcpy(devparms.chanunitstr[0], "V", 1024);
+  strlcpy(devparms.chanunitstr[1], "W", 1024);
+  strlcpy(devparms.chanunitstr[2], "A", 1024);
+  strlcpy(devparms.chanunitstr[3], "U", 1024);
 
   devparms.fftbuf_in = (double *)malloc(FFT_MAX_BUFSZ * sizeof(double));
 
@@ -175,7 +175,7 @@ UI_Mainwindow::UI_Mainwindow()
 
   devparms.fft_voffset = 20.0;
 
-  strcpy(devparms.modelname, "-----");
+  strlcpy(devparms.modelname, "-----", 128);
 
   pthread_mutex_init(&devparms.mutexx, NULL);
 
@@ -542,9 +542,9 @@ UI_Mainwindow::UI_Mainwindow()
 
   device = NULL;
 
-  strcpy(recent_savedir, settings.value("path/savedir").toString().toLocal8Bit().data());
+  strlcpy(recent_savedir, settings.value("path/savedir").toString().toLocal8Bit().data(), MAX_PATHLEN);
 
-  strcpy(str, settings.value("connection/type").toString().toLatin1().data());
+  strlcpy(str, settings.value("connection/type").toString().toLatin1().data(), 1024);
 
   if(!strcmp(str, "LAN"))
   {

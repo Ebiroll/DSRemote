@@ -55,9 +55,9 @@ int read_settings_thread::get_error_num(void)
 }
 
 
-void read_settings_thread::get_error_str(char *dest)
+void read_settings_thread::get_error_str(char *dest, int sz)
 {
-  strcpy(dest, err_str);
+  strlcpy(dest, err_str, sz);
 }
 
 
@@ -94,7 +94,7 @@ void read_settings_thread::run()
 
   for(chn=0; chn<devparms->channel_cnt; chn++)
   {
-    sprintf(str, ":CHAN%i:BWL?", chn + 1);
+    snprintf(str, 512, ":CHAN%i:BWL?", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -128,7 +128,7 @@ void read_settings_thread::run()
           goto GDS_OUT_ERROR;
         }
 
-    sprintf(str, ":CHAN%i:COUP?", chn + 1);
+    snprintf(str, 512, ":CHAN%i:COUP?", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -162,7 +162,7 @@ void read_settings_thread::run()
           goto GDS_OUT_ERROR;
         }
 
-    sprintf(str, ":CHAN%i:DISP?", chn + 1);
+    snprintf(str, 512, ":CHAN%i:DISP?", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -199,7 +199,7 @@ void read_settings_thread::run()
 
     if(devparms->modelserie != 1)
     {
-      sprintf(str, ":CHAN%i:IMP?", chn + 1);
+      snprintf(str, 512, ":CHAN%i:IMP?", chn + 1);
 
       usleep(TMC_GDS_DELAY);
 
@@ -230,7 +230,7 @@ void read_settings_thread::run()
         }
     }
 
-    sprintf(str, ":CHAN%i:INV?", chn + 1);
+    snprintf(str, 512, ":CHAN%i:INV?", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -260,7 +260,7 @@ void read_settings_thread::run()
         goto GDS_OUT_ERROR;
       }
 
-    sprintf(str, ":CHAN%i:OFFS?", chn + 1);
+    snprintf(str, 512, ":CHAN%i:OFFS?", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -278,7 +278,7 @@ void read_settings_thread::run()
 
     devparms->chanoffset[chn] = atof(device->buf);
 
-    sprintf(str, ":CHAN%i:PROB?", chn + 1);
+    snprintf(str, 512, ":CHAN%i:PROB?", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -296,7 +296,7 @@ void read_settings_thread::run()
 
     devparms->chanprobe[chn] = atof(device->buf);
 
-    sprintf(str, ":CHAN%i:UNIT?", chn + 1);
+    snprintf(str, 512, ":CHAN%i:UNIT?", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -333,7 +333,7 @@ void read_settings_thread::run()
             devparms->chanunit[chn] = 0;
           }
 
-    sprintf(str, ":CHAN%i:SCAL?", chn + 1);
+    snprintf(str, 512, ":CHAN%i:SCAL?", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -351,7 +351,7 @@ void read_settings_thread::run()
 
     devparms->chanscale[chn] = atof(device->buf);
 
-    sprintf(str, ":CHAN%i:VERN?", chn + 1);
+    snprintf(str, 512, ":CHAN%i:VERN?", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -901,7 +901,7 @@ void read_settings_thread::run()
 
   for(chn=0; chn<devparms->channel_cnt; chn++)
   {
-    sprintf(str, ":TRIG:EDG:SOUR CHAN%i", chn + 1);
+    snprintf(str, 512, ":TRIG:EDG:SOUR CHAN%i", chn + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -930,7 +930,7 @@ void read_settings_thread::run()
 
   if(devparms->triggeredgesource < 4)
   {
-    sprintf(str, ":TRIG:EDG:SOUR CHAN%i", devparms->triggeredgesource + 1);
+    snprintf(str, 512, ":TRIG:EDG:SOUR CHAN%i", devparms->triggeredgesource + 1);
 
     usleep(TMC_GDS_DELAY);
 
@@ -2789,7 +2789,7 @@ void read_settings_thread::run()
 
 GDS_OUT_ERROR:
 
-  snprintf(err_str, 4095,
+  snprintf(err_str, 4096,
            "An error occurred while reading settings from device.\n"
            "File %s line %i", __FILE__, line);
 
