@@ -1,7 +1,7 @@
 /*
 *****************************************************************************
 *
-* Copyright (c) 2009 - 2019 Teunis van Beelen
+* Copyright (c) 2009 - 2020 Teunis van Beelen
 * All rights reserved.
 *
 * Email: teuniz@protonmail.com
