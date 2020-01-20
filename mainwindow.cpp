@@ -2648,6 +2648,12 @@ void UI_Mainwindow::set_to_factory()
     return;
   }
 
+  QMessageBox msgBox2;
+  msgBox2.setText("Do you want to reset the instrument to the factory settings?");
+  msgBox2.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+  msgBox2.setDefaultButton(QMessageBox::No);
+  if(msgBox2.exec() != QMessageBox::Yes)  return;
+
   scrn_timer->stop();
 
   scrn_thread->wait();
@@ -2723,7 +2729,7 @@ void UI_Mainwindow::set_to_factory()
   waveForm->update();
 
   QMessageBox msgBox;
-  msgBox.setText("Restoring the instrument to the default state.\n"
+  msgBox.setText("Resetting the instrument to the factory settings.\n"
                  "Please wait...");
 
   QTimer t_rst_1;
