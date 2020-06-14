@@ -77,7 +77,7 @@ void read_settings_thread::run()
 {
   int chn, line=0;
 
-  char str[512];
+  char str[512]="";
 
   err_num = -1;
 
@@ -2791,7 +2791,10 @@ GDS_OUT_ERROR:
 
   snprintf(err_str, 4096,
            "An error occurred while reading settings from device.\n"
-           "File %s line %i", __FILE__, line);
+           "Command sent: %s\n"
+           "Received: %s\n"
+           "File %s line %i",
+           str, device->buf, __FILE__, line);
 
   err_num = -1;
 
