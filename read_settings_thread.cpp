@@ -1238,7 +1238,7 @@ void read_settings_thread::run()
   devparms->math_fft_split = atoi(device->buf);
 
   usleep(TMC_GDS_DELAY);
-
+#if 0
   if(devparms->modelserie != 1)
   {
     if(tmc_write(":CALC:MODE?") != 11)
@@ -2782,6 +2782,7 @@ void read_settings_thread::run()
 
     devparms->func_wplay_fcur = atoi(device->buf);
   }
+#endif
 
   err_num = 0;
 

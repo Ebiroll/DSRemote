@@ -1,4 +1,4 @@
-
+  
 contains(QT_MAJOR_VERSION, 4) {
 
 LIST = 0 1 2 3 4 5 6
@@ -27,9 +27,9 @@ TEMPLATE = app
 TARGET = dsremote
 DEPENDPATH += .
 INCLUDEPATH += .
-CONFIG += qt
+CONFIG += qt debug
 CONFIG += warn_on
-CONFIG += release
+#CONFIG += release
 CONFIG += static
 CONFIG += largefile
 

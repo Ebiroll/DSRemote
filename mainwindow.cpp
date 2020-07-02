@@ -1072,7 +1072,7 @@ void UI_Mainwindow::get_device_model(const char *str)
 
   if(!strcmp(str, "DS2302"))
   {
-    devparms.channel_cnt = 2;
+    devparms.channel_cnt = 1;
 
     devparms.bandwidth = 300;
 
@@ -1123,6 +1123,19 @@ void UI_Mainwindow::get_device_model(const char *str)
 
     devparms.modelserie = 1;
   }
+
+  if(!strcmp(str, "MSO2302A"))
+  {
+    devparms.channel_cnt = 2;
+
+    devparms.bandwidth = 70;
+
+    devparms.modelserie = 1;
+
+    devparms.math_fft = 0;
+  }
+
+  
 
   if(!strcmp(str, "DS1074Z Plus"))
   {
